@@ -73,12 +73,9 @@ export default function AdminPage() {
   const isDev = import.meta.env.DEV
 
   useEffect(() => {
-    // En producción cargamos desde el archivo estático; en dev desde la API local
-    const load = import.meta.env.DEV
-      ? fetch('/api/products').then(r => r.json())
-      : fetch('/products.json').then(r => r.json())
-
-    load
+    // Siempre cargamos desde el archivo estático (funciona en dev y producción)
+    fetch('/products.json')
+      .then(r => r.json())
       .then(setProducts)
       .catch(() => showToast('No se pudo cargar el catálogo.', 'error'))
   }, [])
@@ -111,12 +108,14 @@ export default function AdminPage() {
   }
 
   const handleAdd = async (product) => {
-    await persistProducts([...products, product])
+    const withDate = { ...product, fechaPublicacion: new Date().toISOString() }
+    await persistProducts([...products, withDate])
     setTab('editar')
   }
 
   const handleUpdate = async (updated) => {
-    await persistProducts(products.map(p => p.id === updated.id ? updated : p))
+    const withDate = { ...updated, fechaActualizacion: new Date().toISOString() }
+    await persistProducts(products.map(p => p.id === updated.id ? withDate : p))
     setEditing(null)
     setTab('editar')
   }

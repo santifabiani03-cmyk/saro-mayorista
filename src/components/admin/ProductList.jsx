@@ -56,6 +56,7 @@ export default function ProductList({ products, onEdit, onDelete, saving }) {
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Filtros</th>
                 <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Variantes</th>
                 <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Precio</th>
+                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">Fechas</th>
                 <th className="px-4 py-3"></th>
               </tr>
             </thead>
@@ -139,6 +140,30 @@ export default function ProductList({ products, onEdit, onDelete, saving }) {
                       <span className="font-bold text-saro-blue">
                         ${Number(p.precio).toLocaleString('es-AR')}
                       </span>
+                    </td>
+
+                    {/* Fechas */}
+                    <td className="px-4 py-3 hidden lg:table-cell">
+                      <div className="space-y-1">
+                        {p.fechaPublicacion ? (
+                          <div>
+                            <p className="text-xs text-gray-400">Publicado</p>
+                            <p className="text-xs font-medium text-gray-600">
+                              {new Date(p.fechaPublicacion).toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'numeric' })}
+                            </p>
+                          </div>
+                        ) : (
+                          <p className="text-xs text-gray-300 italic">Sin fecha</p>
+                        )}
+                        {p.fechaActualizacion && (
+                          <div>
+                            <p className="text-xs text-gray-400">Editado</p>
+                            <p className="text-xs font-medium text-gray-500">
+                              {new Date(p.fechaActualizacion).toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'numeric' })}
+                            </p>
+                          </div>
+                        )}
+                      </div>
                     </td>
 
                     {/* Acciones */}
