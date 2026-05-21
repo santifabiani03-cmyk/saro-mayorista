@@ -1,28 +1,5 @@
 [
   {
-    "id": "p2",
-    "nombre": "Short Running Elite",
-    "categoria": "ropa",
-    "genero": "masculino",
-    "parteCuerpo": "piernas",
-    "emoji": "🩳",
-    "precio": 7200,
-    "colores": [
-      "Negro",
-      "Azul",
-      "Verde"
-    ],
-    "talles": [
-      "S",
-      "M",
-      "L",
-      "XL"
-    ],
-    "noStock": [],
-    "descripcion": "Short deportivo con bolsillo con cierre y cordón ajustable. Tela ultra-liviana con tratamiento anti-humedad. Ideal para running, tenis y pádel.",
-    "tag": "destacado"
-  },
-  {
     "id": "p3",
     "nombre": "Buzo Hoodie Premium",
     "categoria": "ropa",
