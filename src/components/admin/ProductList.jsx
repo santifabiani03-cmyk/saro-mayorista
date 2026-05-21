@@ -70,22 +70,28 @@ export default function ProductList({ products, onEdit, onDelete, saving }) {
                     <td className="px-4 py-3">
                       <div className="flex items-center gap-3">
                         {/* Thumb */}
-                        <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0">
-                          {p.imagen ? (
-                            <img
-                              src={p.imagen}
-                              alt={p.nombre}
-                              className="w-full h-full object-cover"
-                              onError={e => { e.target.style.display = 'none'; e.target.nextSibling.style.display = 'flex' }}
-                            />
-                          ) : null}
-                          <span
-                            className="text-xl flex items-center justify-center w-full h-full"
-                            style={{ display: p.imagen ? 'none' : 'flex' }}
-                          >
-                            {p.emoji}
-                          </span>
-                        </div>
+                        {(() => {
+                          const thumb = p.imagenes?.[0] ?? p.imagen
+                          return (
+                            <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 relative">
+                              {thumb ? (
+                                <img
+                                  src={thumb}
+                                  alt={p.nombre}
+                                  className="w-full h-full object-cover"
+                                  onError={e => { e.target.style.display = 'none' }}
+                                />
+                              ) : (
+                                <span className="text-xl">{p.emoji}</span>
+                              )}
+                              {(p.imagenes?.length ?? 0) > 1 && (
+                                <span className="absolute bottom-0 right-0 bg-black/60 text-white text-[9px] leading-none px-1 py-0.5 rounded-tl-lg">
+                                  {p.imagenes.length}
+                                </span>
+                              )}
+                            </div>
+                          )
+                        })()}
                         <div>
                           <p className="font-semibold text-gray-900 leading-tight">{p.nombre}</p>
                           {tag && (

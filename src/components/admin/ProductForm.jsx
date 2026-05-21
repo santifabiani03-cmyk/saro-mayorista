@@ -7,7 +7,31 @@ import {
 const BLANK = {
   nombre: '', precio: '', descripcion: '', tag: '',
   categoria: 'ropa', genero: 'masculino', parteCuerpo: 'torso',
-  colores: [], talles: [], noStock: [], emoji: '👕', imagen: '',
+  colores: [], talles: [], noStock: [], emoji: '👕',
+}
+
+/** Sube un archivo al serverless /api/upload-image y retorna la URL o null */
+async function uploadFile(file, productName) {
+  return new Promise(resolve => {
+    const reader = new FileReader()
+    reader.onload = async ev => {
+      const base64 = ev.target.result.split(',')[1]
+      const ext    = file.name.split('.').pop().toLowerCase()
+      const slug   = (productName || 'imagen').trim().toLowerCase()
+        .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'img'
+      const name   = `${slug}-${Date.now()}.${ext}`
+      try {
+        const res  = await fetch('/api/upload-image', {
+          method:  'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body:    JSON.stringify({ name, data: base64 }),
+        })
+        const json = await res.json()
+        resolve(json.path ?? null)
+      } catch { resolve(null) }
+    }
+    reader.readAsDataURL(file)
+  })
 }
 
 // ── Sub-componentes inline ────────────────────────────────────────────────────
@@ -45,47 +69,85 @@ function RadioGroup({ options, value, onChange }) {
   )
 }
 
-// ── Imagen uploader ───────────────────────────────────────────────────────────
+// ── Multi-image uploader ──────────────────────────────────────────────────────
 
-function ImageUploader({ preview, onFile }) {
-  const inputRef = useRef()
+function MultiImageUploader({ images, onChange, productName }) {
+  const inputRef    = useRef()
+  const [pending, setPending] = useState(0)   // cuántas imágenes se están subiendo
   const [dragging, setDragging] = useState(false)
 
-  const handle = (file) => {
-    if (!file || !file.type.startsWith('image/')) return
-    onFile(file)
+  const handleFiles = async (files) => {
+    const list = Array.from(files).filter(f => f.type.startsWith('image/'))
+    if (!list.length) return
+    setPending(p => p + list.length)
+    const urls = await Promise.all(list.map(f => uploadFile(f, productName)))
+    onChange([...images, ...urls.filter(Boolean)])
+    setPending(p => p - list.length)
+    inputRef.current.value = ''
   }
+
+  const remove = (i) => onChange(images.filter((_, j) => j !== i))
 
   return (
     <div
-      onClick={() => inputRef.current.click()}
       onDragOver={e => { e.preventDefault(); setDragging(true) }}
       onDragLeave={() => setDragging(false)}
-      onDrop={e => { e.preventDefault(); setDragging(false); handle(e.dataTransfer.files[0]) }}
-      className={`relative aspect-square rounded-2xl border-2 border-dashed flex flex-col items-center justify-center cursor-pointer transition-all overflow-hidden ${
-        dragging ? 'border-saro-blue bg-saro-light' : 'border-gray-200 hover:border-saro-blue hover:bg-gray-50'
-      }`}
+      onDrop={e => { e.preventDefault(); setDragging(false); handleFiles(e.dataTransfer.files) }}
     >
-      {preview ? (
-        <>
-          <img src={preview} alt="preview" className="w-full h-full object-cover" />
-          <div className="absolute inset-0 bg-black/40 opacity-0 hover:opacity-100 flex items-center justify-center transition-opacity">
-            <span className="text-white text-sm font-semibold">Cambiar imagen</span>
+      {/* Grid de imágenes */}
+      <div className={`grid grid-cols-3 gap-2 p-2 rounded-2xl transition-colors ${dragging ? 'bg-saro-light border-2 border-saro-blue border-dashed' : ''}`}>
+
+        {/* Imágenes existentes */}
+        {images.map((url, i) => (
+          <div key={url + i} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 group">
+            <img src={url} alt="" className="w-full h-full object-cover" />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors" />
+            {/* Badge "Principal" en la primera */}
+            {i === 0 && (
+              <span className="absolute bottom-1 left-1 text-[10px] bg-saro-blue text-white px-1.5 py-0.5 rounded-full font-semibold">
+                Principal
+              </span>
+            )}
+            {/* Botón eliminar */}
+            <button
+              type="button"
+              onClick={() => remove(i)}
+              className="absolute top-1 right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
+            >✕</button>
           </div>
-        </>
-      ) : (
-        <div className="text-center p-4 select-none">
-          <span className="text-4xl block mb-2">📷</span>
-          <p className="text-sm font-medium text-gray-500">Clic o arrastrá la imagen</p>
-          <p className="text-xs text-gray-400 mt-1">JPG, PNG, WEBP</p>
-        </div>
+        ))}
+
+        {/* Placeholders de carga */}
+        {Array.from({ length: pending }).map((_, i) => (
+          <div key={`loading-${i}`} className="aspect-square rounded-xl bg-gray-100 flex items-center justify-center">
+            <span className="text-2xl animate-pulse">⏳</span>
+          </div>
+        ))}
+
+        {/* Botón agregar */}
+        <button
+          type="button"
+          onClick={() => inputRef.current.click()}
+          className="aspect-square rounded-xl border-2 border-dashed border-gray-200 hover:border-saro-blue hover:bg-saro-light text-gray-400 hover:text-saro-blue transition-all flex flex-col items-center justify-center gap-1 select-none"
+        >
+          <span className="text-2xl leading-none">+</span>
+          <span className="text-xs font-medium">Agregar</span>
+        </button>
+      </div>
+
+      {images.length === 0 && pending === 0 && (
+        <p className="text-xs text-gray-400 text-center mt-2">
+          Clic en + o arrastrá imágenes aquí · JPG, PNG, WEBP
+        </p>
       )}
+
       <input
         ref={inputRef}
         type="file"
         accept="image/*"
-        className="hidden"
-        onChange={e => handle(e.target.files[0])}
+        multiple
+        hidden
+        onChange={e => handleFiles(e.target.files)}
       />
     </div>
   )
@@ -284,11 +346,17 @@ function NoStockMatrix({ colores, talles, noStock, onChange }) {
 // ── Formulario principal ──────────────────────────────────────────────────────
 
 export default function ProductForm({ initial, onSave, onCancel, saving }) {
-  const [form, setForm]         = useState(() => initial ? { ...BLANK, ...initial, precio: String(initial.precio) } : { ...BLANK })
-  const [imageFile, setImageFile] = useState(null)
-  const [preview, setPreview]   = useState(initial?.imagen ?? '')
-  const [uploading, setUploading] = useState(false)
-  const [errors, setErrors]     = useState({})
+  // Excluir campos de imagen del form; se manejan en estado separado
+  const [form, setForm] = useState(() => {
+    if (!initial) return { ...BLANK }
+    const { imagen: _img, imagenes: _imgs, ...rest } = initial
+    return { ...BLANK, ...rest, precio: String(initial.precio) }
+  })
+  // imagenes: array de URLs ya subidas
+  const [imagenes, setImagenes] = useState(
+    () => initial?.imagenes?.length ? initial.imagenes : initial?.imagen ? [initial.imagen] : []
+  )
+  const [errors, setErrors] = useState({})
 
   // Auto emoji cuando cambia categoría o parteCuerpo
   useEffect(() => {
@@ -313,54 +381,23 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     return Object.keys(e).length === 0
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     if (!validate()) return
 
-    let imagenFinal = form.imagen
-
-    // Subir imagen si hay un archivo nuevo
-    if (imageFile) {
-      setUploading(true)
-      const reader = new FileReader()
-      imagenFinal = await new Promise((resolve, reject) => {
-        reader.onload = async (ev) => {
-          const base64 = ev.target.result.split(',')[1]
-          const ext    = imageFile.name.split('.').pop().toLowerCase()
-          const slug   = form.nombre.trim().toLowerCase()
-            .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
-          const name   = `${slug}.${ext}`
-          try {
-            // Siempre usa el endpoint /api/upload-image
-            // En dev: interceptado por vite.config.js (guarda local)
-            // En prod: Vercel serverless function (sube a GitHub server-side)
-            const res  = await fetch('/api/upload-image', {
-              method: 'POST',
-              headers: { 'Content-Type': 'application/json' },
-              body: JSON.stringify({ name, data: base64 }),
-            })
-            const json = await res.json()
-            resolve(json.path ?? '')
-          } catch { resolve('') }
-        }
-        reader.onerror = reject
-        reader.readAsDataURL(imageFile)
-      })
-      setUploading(false)
-    }
-
     const product = {
       ...form,
-      id:     form.id ?? `p${Date.now()}`,
-      precio: Number(form.precio),
-      imagen: imagenFinal || undefined,
+      id:       form.id ?? `p${Date.now()}`,
+      precio:   Number(form.precio),
+      imagenes,
     }
-    if (!product.imagen) delete product.imagen
+    // Eliminar campo legacy si existía
+    delete product.imagen
 
     onSave(product)
   }
 
-  const busy = saving || uploading
+  const busy = saving
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -380,17 +417,12 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
         {/* ── Columna izquierda: imagen + info básica ── */}
         <div className="space-y-5">
           <Field>
-            <Label>Imagen del producto</Label>
-            <ImageUploader preview={preview} onFile={handleImageFile} />
-            {preview && (
-              <button
-                type="button"
-                onClick={() => { setPreview(''); setImageFile(null); set('imagen', '') }}
-                className="text-xs text-red-400 hover:text-red-600"
-              >
-                Quitar imagen
-              </button>
-            )}
+            <Label>Imágenes del producto</Label>
+            <MultiImageUploader
+              images={imagenes}
+              onChange={setImagenes}
+              productName={form.nombre}
+            />
           </Field>
 
           <Field>
@@ -551,11 +583,11 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
           {/* Preview rápido */}
           <div className="bg-saro-light rounded-2xl p-4 flex items-center gap-4">
             <div
-              className="w-16 h-16 rounded-xl flex items-center justify-center text-3xl flex-shrink-0"
+              className="w-16 h-16 rounded-xl flex items-center justify-center text-3xl flex-shrink-0 overflow-hidden"
               style={{ backgroundColor: '#dbeafe' }}
             >
-              {preview
-                ? <img src={preview} alt="" className="w-full h-full object-cover rounded-xl" />
+              {imagenes[0]
+                ? <img src={imagenes[0]} alt="" className="w-full h-full object-cover" />
                 : form.emoji
               }
             </div>
@@ -590,10 +622,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                   : 'bg-saro-blue hover:bg-saro-dark text-white shadow-sm'
               }`}
             >
-              {uploading ? '⬆️ Subiendo imagen…'
-                : saving  ? '💾 Guardando…'
-                : initial  ? '💾 Guardar cambios'
-                : '✅ Publicar producto'}
+              {saving ? '💾 Guardando…' : initial ? '💾 Guardar cambios' : '✅ Publicar producto'}
             </button>
           </div>
         </div>

@@ -1,7 +1,12 @@
 import { COLOR_MAP, TAG_CONFIG } from '../utils/colors'
+import ImageCarousel from './ImageCarousel'
+
+// Compatibilidad: soporta campo legacy `imagen` (string) y nuevo `imagenes` (array)
+const getImages = p => p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : []
 
 export default function ProductCard({ product, onClick }) {
-  const tag = TAG_CONFIG[product.tag]
+  const tag  = TAG_CONFIG[product.tag]
+  const imgs = getImages(product)
 
   const totalCombos = product.colores.length * product.talles.length
   const sinStock    = product.noStock?.length === totalCombos
@@ -11,25 +16,9 @@ export default function ProductCard({ product, onClick }) {
       onClick={onClick}
       className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer group hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
     >
-      {/* Imagen o emoji placeholder */}
-      <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center overflow-hidden">
-        {product.imagen ? (
-          <img
-            src={product.imagen}
-            alt={product.nombre}
-            className="w-full h-full object-cover transition-transform duration-200 group-hover:scale-105"
-            onError={e => {
-              e.target.style.display = 'none'
-              e.target.nextSibling.style.display = 'flex'
-            }}
-          />
-        ) : null}
-        <span
-          className="text-6xl transition-transform duration-200 group-hover:scale-110 select-none"
-          style={{ display: product.imagen ? 'none' : 'flex' }}
-        >
-          {product.emoji}
-        </span>
+      {/* Imagen / carrusel */}
+      <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+        <ImageCarousel images={imgs} emoji={product.emoji} compact />
 
         {tag && (
           <span className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-xs font-semibold ${tag.cls}`}>
@@ -38,7 +27,7 @@ export default function ProductCard({ product, onClick }) {
         )}
 
         {sinStock && (
-          <div className="absolute inset-0 bg-white/70 flex items-center justify-center rounded-2xl">
+          <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
             <span className="bg-gray-700 text-white text-xs font-medium px-3 py-1 rounded-full">
               Sin stock
             </span>

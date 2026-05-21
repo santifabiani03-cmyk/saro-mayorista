@@ -1,6 +1,10 @@
 import { useState, useEffect } from 'react'
 import { useCart } from '../context/CartContext'
-import { COLOR_MAP, COLOR_BG_MAP, TAG_CONFIG } from '../utils/colors'
+import { COLOR_MAP, TAG_CONFIG } from '../utils/colors'
+import ImageCarousel from './ImageCarousel'
+
+// Compatibilidad: soporta campo legacy `imagen` (string) y nuevo `imagenes` (array)
+const getImages = p => p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : []
 
 function buildMatrix(colores, talles) {
   const m = {}
@@ -10,8 +14,8 @@ function buildMatrix(colores, talles) {
 
 export default function ProductModal({ product, onClose }) {
   const { addItems } = useCart()
-  const [matrix, setMatrix]         = useState(() => buildMatrix(product.colores, product.talles))
-  const [activeColor, setActiveColor] = useState(product.colores[0])
+  const [matrix, setMatrix] = useState(() => buildMatrix(product.colores, product.talles))
+  const imgs = getImages(product)
 
   // Bloquear scroll del body mientras el modal esté abierto
   useEffect(() => {
@@ -47,7 +51,6 @@ export default function ProductModal({ product, onClose }) {
   }
 
   const tag = TAG_CONFIG[product.tag]
-  const bgColor = COLOR_BG_MAP[activeColor] ?? '#f3f4f6'
 
   return (
     <div
@@ -58,7 +61,7 @@ export default function ProductModal({ product, onClose }) {
         className="bg-white rounded-2xl w-full max-w-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden"
         onClick={e => e.stopPropagation()}
       >
-        {/* ── Header del modal ── */}
+        {/* ── Header ── */}
         <div className="flex items-start justify-between p-4 sm:p-5 border-b border-gray-100 flex-shrink-0">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
@@ -82,60 +85,13 @@ export default function ProductModal({ product, onClose }) {
           </button>
         </div>
 
-        {/* ── Cuerpo scrolleable ── */}
+        {/* ── Cuerpo ── */}
         <div className="overflow-y-auto flex-1">
           <div className="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            {/* ── Galería ── */}
+            {/* ── Galería con carrusel ── */}
             <div className="space-y-3">
-              {/* Imagen principal */}
-              <div
-                className="aspect-square rounded-2xl flex items-center justify-center text-8xl sm:text-9xl transition-colors duration-300 overflow-hidden"
-                style={{ backgroundColor: product.imagen ? '#f3f4f6' : bgColor }}
-              >
-                {product.imagen ? (
-                  <img
-                    src={product.imagen}
-                    alt={product.nombre}
-                    className="w-full h-full object-cover rounded-2xl"
-                    onError={e => {
-                      e.target.style.display = 'none'
-                      e.target.nextSibling.style.display = 'flex'
-                    }}
-                  />
-                ) : null}
-                <span
-                  className="text-8xl sm:text-9xl"
-                  style={{ display: product.imagen ? 'none' : 'flex' }}
-                >
-                  {product.emoji}
-                </span>
-              </div>
-
-              {/* Thumbnails de colores */}
-              <div className="flex gap-2 flex-wrap">
-                {product.colores.map(color => (
-                  <button
-                    key={color}
-                    title={color}
-                    onClick={() => setActiveColor(color)}
-                    className={`w-9 h-9 rounded-lg border-2 transition-all overflow-hidden ${
-                      activeColor === color
-                        ? 'border-saro-blue scale-110 shadow-md'
-                        : 'border-gray-200 hover:border-gray-400'
-                    }`}
-                    style={{ backgroundColor: COLOR_BG_MAP[color] ?? '#f3f4f6' }}
-                  >
-                    {product.imagen ? (
-                      <img src={product.imagen} alt={color} className="w-full h-full object-cover" />
-                    ) : (
-                      <span className="text-lg leading-none">{product.emoji}</span>
-                    )}
-                  </button>
-                ))}
-              </div>
-
-              {/* Descripción */}
+              <ImageCarousel images={imgs} emoji={product.emoji} thumbs />
               <p className="text-sm text-gray-600 leading-relaxed">{product.descripcion}</p>
             </div>
 
@@ -158,7 +114,6 @@ export default function ProductModal({ product, onClose }) {
                   <tbody>
                     {product.colores.map((color, ci) => (
                       <tr key={color} className={ci % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
-                        {/* Celda de color */}
                         <td className="py-2 px-3">
                           <div className="flex items-center gap-1.5">
                             <span
@@ -168,7 +123,6 @@ export default function ProductModal({ product, onClose }) {
                             <span className="text-xs text-gray-700 whitespace-nowrap">{color}</span>
                           </div>
                         </td>
-                        {/* Celdas de talle */}
                         {product.talles.map(talle => {
                           const noStock = isNoStock(color, talle)
                           const qty     = matrix[color]?.[talle] ?? 0
@@ -181,22 +135,14 @@ export default function ProductModal({ product, onClose }) {
                                   <button
                                     onClick={() => updateQty(color, talle, -1)}
                                     className="w-6 h-6 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-600 text-gray-600 text-xs font-bold transition-colors flex items-center justify-center"
-                                  >
-                                    −
-                                  </button>
-                                  <span
-                                    className={`w-6 text-center text-xs font-bold tabular-nums ${
-                                      qty > 0 ? 'text-saro-blue' : 'text-gray-300'
-                                    }`}
-                                  >
+                                  >−</button>
+                                  <span className={`w-6 text-center text-xs font-bold tabular-nums ${qty > 0 ? 'text-saro-blue' : 'text-gray-300'}`}>
                                     {qty}
                                   </span>
                                   <button
                                     onClick={() => updateQty(color, talle, 1)}
                                     className="w-6 h-6 rounded-md bg-gray-100 hover:bg-green-100 hover:text-green-700 text-gray-600 text-xs font-bold transition-colors flex items-center justify-center"
-                                  >
-                                    +
-                                  </button>
+                                  >+</button>
                                 </div>
                               )}
                             </td>
@@ -208,7 +154,6 @@ export default function ProductModal({ product, onClose }) {
                 </table>
               </div>
 
-              {/* Resumen de selección */}
               {totalUnidades > 0 && (
                 <div className="flex items-center justify-between bg-saro-light rounded-xl px-4 py-3">
                   <span className="text-sm font-medium text-saro-dark">
