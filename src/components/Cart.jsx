@@ -1,21 +1,47 @@
+import { useState } from 'react'
 import { useCart } from '../context/CartContext'
 
 export default function Cart({ config }) {
   const { items, removeItem, updateQty, clearCart, total, totalItems, isOpen, setIsOpen } = useCart()
+  const [copied, setCopied] = useState(false)
 
   const minPurchase = config.minPurchase
   const progress    = Math.min(100, (total / minPurchase) * 100)
   const remaining   = minPurchase - total
   const canSend     = total >= minPurchase
 
-  const sendWhatsApp = () => {
-    if (items.length === 0) return
+  const buildMessage = () => {
     let msg = `¡Hola SARO! 👋 Quiero hacer un pedido mayorista:\n\n`
     items.forEach(i => {
       msg += `• *${i.nombre}* — ${i.color} / ${i.talle} × ${i.cantidad} = $${(i.precio * i.cantidad).toLocaleString('es-AR')}\n`
     })
     msg += `\n*TOTAL: $${total.toLocaleString('es-AR')}*\n\nGracias!`
-    window.open(`https://wa.me/${config.whatsappNumber}?text=${encodeURIComponent(msg)}`, '_blank')
+    return msg
+  }
+
+  const sendWhatsApp = () => {
+    if (items.length === 0) return
+    window.open(`https://wa.me/${config.whatsappNumber}?text=${encodeURIComponent(buildMessage())}`, '_blank')
+  }
+
+  const copyMessage = async () => {
+    try {
+      await navigator.clipboard.writeText(buildMessage())
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    } catch {
+      // Fallback para navegadores que no soportan clipboard API
+      const ta = document.createElement('textarea')
+      ta.value = buildMessage()
+      ta.style.position = 'fixed'
+      ta.style.opacity  = '0'
+      document.body.appendChild(ta)
+      ta.select()
+      document.execCommand('copy')
+      document.body.removeChild(ta)
+      setCopied(true)
+      setTimeout(() => setCopied(false), 2000)
+    }
   }
 
   return (
@@ -149,13 +175,23 @@ export default function Cart({ config }) {
               </div>
             </div>
 
-            {/* Botón WhatsApp — siempre activo */}
+            {/* Botón WhatsApp */}
             <button
               onClick={sendWhatsApp}
               className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all bg-green-500 hover:bg-green-600 text-white shadow-lg shadow-green-200 active:scale-95"
             >
               <span className="text-lg">📱</span>
               Enviar pedido por WhatsApp
+            </button>
+
+            {/* Botón copiar mensaje */}
+            <button
+              onClick={copyMessage}
+              className="w-full py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all bg-gray-100 hover:bg-gray-200 text-gray-600 active:scale-95"
+            >
+              {copied
+                ? <><span>✅</span> ¡Copiado!</>
+                : <><span>📋</span> Copiar texto del pedido</>}
             </button>
 
             <button
