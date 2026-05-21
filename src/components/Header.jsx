@@ -9,9 +9,9 @@ export default function Header({ config }) {
 
         {/* Logo */}
         <img
-          src="/assets/logo.png"
+          src="/assets/logo-horizontal.png"
           alt={config.storeName}
-          className="h-10 w-auto object-contain"
+          className="h-14 w-auto object-contain"
           onError={e => {
             e.target.style.display = 'none'
             e.target.nextSibling.style.display = 'block'

@@ -43,7 +43,7 @@ function PinGate({ onAuth }) {
         <img
           src="/assets/logo.png"
           alt="SARO"
-          className="h-12 w-auto mx-auto mb-6"
+          className="h-20 w-auto mx-auto mb-6"
           onError={e => { e.target.style.display = 'none' }}
         />
         <h1 className="font-extrabold text-xl text-saro-dark mb-1">Panel Admin</h1>
@@ -197,9 +197,9 @@ export default function AdminPage() {
         <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
           <div className="flex items-center gap-3">
             <img
-              src="/assets/logo.png"
+              src="/assets/logo-horizontal.png"
               alt="SARO"
-              className="h-9 w-auto brightness-0 invert"
+              className="h-10 w-auto brightness-0 invert"
               onError={e => { e.target.style.display = 'none' }}
             />
             <div>
