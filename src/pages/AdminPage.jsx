@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import ProductForm from '../components/admin/ProductForm'
 import ProductList from '../components/admin/ProductList'
+import { saveProductsToGitHub } from '../utils/githubApi'
 
 const CORRECT_PIN = import.meta.env.VITE_ADMIN_PIN ?? 'saro2025'
 const SESSION_KEY = 'saro_admin_auth'
@@ -79,23 +80,28 @@ export default function AdminPage() {
       .catch(() => setToast({ type: 'error', msg: 'No se pudo cargar el catálogo.' }))
   }, [])
 
-  const showToast = (msg, type = 'ok') => {
+  const showToast = (msg, type = 'ok', duration = 3500) => {
     setToast({ msg, type })
-    setTimeout(() => setToast(null), 3500)
+    setTimeout(() => setToast(null), duration)
   }
 
   const persistProducts = async (newList) => {
     setSaving(true)
     try {
-      await fetch('/api/products', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(newList),
-      })
+      if (isDev) {
+        await fetch('/api/products', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify(newList),
+        })
+        showToast('✅ Guardado localmente')
+      } else {
+        await saveProductsToGitHub(newList)
+        showToast('✅ Publicado · El sitio se actualiza en ~30s', 'ok', 6000)
+      }
       setProducts(newList)
-      showToast('✅ Cambios guardados en products.json')
-    } catch {
-      showToast('❌ Error al guardar', 'error')
+    } catch (e) {
+      showToast('❌ Error al guardar: ' + (e?.message ?? 'desconocido'), 'error', 6000)
     } finally {
       setSaving(false)
     }
@@ -135,9 +141,9 @@ export default function AdminPage() {
       const res = await fetch('/api/deploy', { method: 'POST' })
       const json = await res.json()
       if (json.ok) {
-        showToast('🚀 Publicado! El sitio se actualizará en ~1 minuto.')
+        showToast('🚀 ¡Publicado! El sitio ya está actualizado.', 'ok', 6000)
       } else {
-        showToast('❌ Error al publicar: ' + (json.error ?? 'desconocido'), 'error')
+        showToast('❌ Error al publicar: ' + (json.error ?? 'desconocido'), 'error', 6000)
       }
     } catch {
       showToast('❌ No se pudo conectar. ¿Está corriendo npm run dev?', 'error')
@@ -167,7 +173,7 @@ export default function AdminPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {isDev && (
+            {isDev ? (
               <button
                 onClick={handleDeploy}
                 disabled={deploying}
@@ -175,6 +181,8 @@ export default function AdminPage() {
               >
                 {deploying ? '⏳ Publicando…' : '🚀 Publicar en sitio'}
               </button>
+            ) : (
+              <span className="text-xs text-green-300 font-medium">● En vivo · auto-deploy</span>
             )}
             <a
               href="/"

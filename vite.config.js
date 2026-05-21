@@ -52,17 +52,21 @@ function adminApiPlugin() {
           return res.end(JSON.stringify({ ok: true, path: `/assets/${safe}` }))
         }
 
-        // POST /api/deploy  →  git commit + push → Vercel auto-redeploya
+        // POST /api/deploy  →  vercel --prod (deploy directo desde la PC)
         if (req.url === '/api/deploy' && req.method === 'POST') {
           try {
             const projectDir = path.resolve('.')
-            execSync('git add public/products.json public/assets', { cwd: projectDir })
-            execSync('git commit -m "actualizar catálogo" --allow-empty', { cwd: projectDir })
-            execSync('git push', { cwd: projectDir })
+            // Buscar vercel en PATH de Windows (npm global)
+            const vercelCmd = process.platform === 'win32' ? 'vercel.cmd' : 'vercel'
+            execSync(`${vercelCmd} --prod --yes`, {
+              cwd: projectDir,
+              env: { ...process.env },
+              timeout: 120000,
+            })
             return res.end(JSON.stringify({ ok: true }))
           } catch (err) {
             res.statusCode = 500
-            return res.end(JSON.stringify({ error: err.message }))
+            return res.end(JSON.stringify({ error: err.message?.slice(0, 300) ?? 'Error desconocido' }))
           }
         }
 
