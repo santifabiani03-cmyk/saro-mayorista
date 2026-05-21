@@ -197,12 +197,6 @@ export default function AdminPage() {
         </div>
       </header>
 
-      {/* Aviso si no es dev */}
-      {!isDev && (
-        <div className="bg-amber-50 border-b border-amber-200 px-5 py-3 text-center text-sm text-amber-700">
-          ⚠️ El panel admin solo guarda cambios cuando corrés el servidor local (<code>npm run dev</code>).
-        </div>
-      )}
 
       {/* Tabs */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
