@@ -30,9 +30,10 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
-  const token = process.env.GITHUB_TOKEN
-  const owner = process.env.GITHUB_OWNER
-  const repo  = process.env.GITHUB_REPO
+  // Limpiar posibles caracteres BOM u espacios que se pegan al setear env vars
+  const token = (process.env.GITHUB_TOKEN ?? '').replace(/^﻿/, '').trim()
+  const owner = (process.env.GITHUB_OWNER ?? '').replace(/^﻿/, '').trim()
+  const repo  = (process.env.GITHUB_REPO  ?? '').replace(/^﻿/, '').trim()
 
   if (!token || !owner || !repo) {
     return res.status(500).json({ error: 'Faltan variables de entorno del servidor' })
