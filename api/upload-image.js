@@ -1,0 +1,65 @@
+/**
+ * Vercel serverless function — POST /api/upload-image
+ * Recibe { name: "slug.jpg", data: "<base64 puro>" }
+ * y sube el archivo a public/assets/ en GitHub.
+ * El token nunca sale al browser.
+ */
+
+const GITHUB_API = 'https://api.github.com'
+
+function ghHeaders(token) {
+  return {
+    Authorization: `Bearer ${token}`,
+    'Content-Type': 'application/json',
+    'User-Agent': 'saro-admin',
+  }
+}
+
+async function getFileSha(owner, repo, filePath, token) {
+  const res = await fetch(
+    `${GITHUB_API}/repos/${owner}/${repo}/contents/${filePath}`,
+    { headers: ghHeaders(token) }
+  )
+  if (!res.ok) return null
+  const data = await res.json()
+  return data.sha ?? null
+}
+
+export default async function handler(req, res) {
+  if (req.method !== 'POST') {
+    return res.status(405).json({ error: 'Method not allowed' })
+  }
+
+  const token = process.env.GITHUB_TOKEN
+  const owner = process.env.GITHUB_OWNER
+  const repo  = process.env.GITHUB_REPO
+
+  if (!token || !owner || !repo) {
+    return res.status(500).json({ error: 'Faltan variables de entorno del servidor' })
+  }
+
+  const { name, data } = req.body ?? {}
+  if (!name || !data) {
+    return res.status(400).json({ error: 'Faltan name/data' })
+  }
+
+  const safe = name.toLowerCase().replace(/[^a-z0-9._-]/g, '-')
+  const filePath = `public/assets/${safe}`
+
+  try {
+    const sha  = await getFileSha(owner, repo, filePath, token)
+    const body = { message: `agregar imagen: ${safe}`, content: data, ...(sha && { sha }) }
+    const putRes = await fetch(`${GITHUB_API}/repos/${owner}/${repo}/contents/${filePath}`, {
+      method:  'PUT',
+      headers: ghHeaders(token),
+      body:    JSON.stringify(body),
+    })
+    if (!putRes.ok) {
+      const err = await putRes.json().catch(() => ({}))
+      throw new Error(err.message ?? `GitHub API error ${putRes.status}`)
+    }
+    return res.status(200).json({ ok: true, path: `/assets/${safe}` })
+  } catch (e) {
+    return res.status(500).json({ error: e.message ?? 'Error desconocido' })
+  }
+}

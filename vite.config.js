@@ -39,8 +39,9 @@ function adminApiPlugin() {
           return res.end(JSON.stringify({ ok: true }))
         }
 
-        // POST /api/upload  →  { name: "slug.jpg", data: "<base64>" }
-        if (req.url === '/api/upload' && req.method === 'POST') {
+        // POST /api/upload  →  { name: "slug.jpg", data: "<base64>" }  (legacy, dev only)
+        // POST /api/upload-image  →  mismo comportamiento (usado en prod también)
+        if ((req.url === '/api/upload' || req.url === '/api/upload-image') && req.method === 'POST') {
           const { name, data } = body
           if (!name || !data) {
             res.statusCode = 400

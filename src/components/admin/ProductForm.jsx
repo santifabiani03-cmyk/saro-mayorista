@@ -3,7 +3,6 @@ import {
   COLOR_MAP, PREDEFINED_COLORS, PREDEFINED_TALLES,
   getAutoEmoji, TAG_CONFIG,
 } from '../../utils/colors'
-import { uploadImageToGitHub } from '../../utils/githubApi'
 
 const BLANK = {
   nombre: '', precio: '', descripcion: '', tag: '',
@@ -332,19 +331,16 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
             .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '')
           const name   = `${slug}.${ext}`
           try {
-            let path = ''
-            if (import.meta.env.DEV) {
-              const res  = await fetch('/api/upload', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ name, data: base64 }),
-              })
-              const json = await res.json()
-              path = json.path ?? ''
-            } else {
-              path = await uploadImageToGitHub(name, base64)
-            }
-            resolve(path)
+            // Siempre usa el endpoint /api/upload-image
+            // En dev: interceptado por vite.config.js (guarda local)
+            // En prod: Vercel serverless function (sube a GitHub server-side)
+            const res  = await fetch('/api/upload-image', {
+              method: 'POST',
+              headers: { 'Content-Type': 'application/json' },
+              body: JSON.stringify({ name, data: base64 }),
+            })
+            const json = await res.json()
+            resolve(json.path ?? '')
           } catch { resolve('') }
         }
         reader.onerror = reject
