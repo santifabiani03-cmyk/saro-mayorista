@@ -209,5 +209,30 @@
       "/assets/imagen-1779402093096.webp"
     ],
     "fechaPublicacion": "2026-05-21T22:22:01.250Z"
+  },
+  {
+    "nombre": "qqq",
+    "precio": 1231223,
+    "descripcion": "22",
+    "tag": "nuevo",
+    "categoria": "padel",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Blanco"
+    ],
+    "talles": [
+      "M",
+      "XL",
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎽",
+    "id": "p1779402221533",
+    "imagenes": [
+      "/assets/imagen-1779402191024.webp",
+      "/assets/imagen-1779402199893.webp"
+    ],
+    "fechaPublicacion": "2026-05-21T22:23:41.533Z"
   }
 ]
