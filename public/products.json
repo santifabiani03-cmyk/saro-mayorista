@@ -183,5 +183,31 @@
     "imagen": "/assets/1111.jpg",
     "id": "p1779399693858",
     "fechaPublicacion": "2026-05-21T21:41:33.859Z"
+  },
+  {
+    "nombre": "2",
+    "precio": 155555,
+    "descripcion": "2",
+    "tag": "",
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Blanco",
+      "Rojo"
+    ],
+    "talles": [
+      "XXL",
+      "L",
+      "S"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "id": "p1779402121250",
+    "imagenes": [
+      "/assets/imagen-1779402076429.webp",
+      "/assets/imagen-1779402093096.webp"
+    ],
+    "fechaPublicacion": "2026-05-21T22:22:01.250Z"
   }
 ]
