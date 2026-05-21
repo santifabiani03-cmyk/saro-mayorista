@@ -1,91 +1,5 @@
 [
   {
-    "id": "p3",
-    "nombre": "Buzo Hoodie Premium",
-    "categoria": "ropa",
-    "genero": "masculino",
-    "parteCuerpo": "torso",
-    "emoji": "🧥",
-    "precio": 18500,
-    "colores": [
-      "Negro",
-      "Gris",
-      "Marino"
-    ],
-    "talles": [
-      "S",
-      "M",
-      "L",
-      "XL",
-      "XXL"
-    ],
-    "noStock": [
-      {
-        "color": "Gris",
-        "talle": "S"
-      }
-    ],
-    "descripcion": "Buzo con capucha y bolsillo canguro. Frisa polar de alta densidad. Cierre con cordón reforzado. Perfecto para calentamiento y uso casual post-entrenamiento.",
-    "tag": ""
-  },
-  {
-    "id": "p5",
-    "nombre": "Calza Deportiva Pro",
-    "categoria": "ropa",
-    "genero": "femenino",
-    "parteCuerpo": "piernas",
-    "emoji": "🩱",
-    "precio": 9800,
-    "colores": [
-      "Negro",
-      "Rosa",
-      "Violeta"
-    ],
-    "talles": [
-      "XS",
-      "S",
-      "M",
-      "L",
-      "XL"
-    ],
-    "noStock": [
-      {
-        "color": "Violeta",
-        "talle": "XS"
-      }
-    ],
-    "descripcion": "Calza de alta compresión con tiro alto. Tela cuatro vías con tecnología anti-pilling. Bolsillo lateral oculto. Ideal para yoga, pilates y entrenamiento funcional.",
-    "tag": "nuevo"
-  },
-  {
-    "id": "p6",
-    "nombre": "Top Deportivo Fit",
-    "categoria": "ropa",
-    "genero": "femenino",
-    "parteCuerpo": "torso",
-    "emoji": "🎽",
-    "precio": 6500,
-    "colores": [
-      "Negro",
-      "Blanco",
-      "Fucsia"
-    ],
-    "talles": [
-      "XS",
-      "S",
-      "M",
-      "L"
-    ],
-    "noStock": [
-      {
-        "color": "Fucsia",
-        "talle": "L"
-      }
-    ],
-    "descripcion": "Top deportivo con soporte medio y espalda cruzada. Copa removible. Tela suave con UPF 50+. Perfecto para yoga, danza y entrenamiento en general.",
-    "tag": "destacado"
-  },
-  {
     "id": "p7",
     "nombre": "Remera Dry-Fit Mujer",
     "categoria": "ropa",
@@ -243,5 +157,31 @@
     "emoji": "👕",
     "imagen": "/assets/buzo-medio-cierre-micropolar-unisex.jpeg",
     "id": "p1779317305009"
+  },
+  {
+    "nombre": "1111",
+    "precio": 111,
+    "descripcion": "11112",
+    "tag": "",
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Blanco",
+      "Rojo",
+      "Azul"
+    ],
+    "talles": [
+      "XXL",
+      "M",
+      "S",
+      "XS",
+      "L"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "imagen": "/assets/1111.jpg",
+    "id": "p1779399693858",
+    "fechaPublicacion": "2026-05-21T21:41:33.859Z"
   }
 ]
