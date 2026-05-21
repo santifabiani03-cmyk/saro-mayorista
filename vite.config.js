@@ -7,6 +7,22 @@ import { execSync } from 'node:child_process'
 const PRODUCTS_FILE = path.resolve('public/products.json')
 const ASSETS_DIR    = path.resolve('public/assets')
 
+// Leer ADMIN_PIN del .env.local para el servidor de desarrollo
+const _envLocal = (() => {
+  try {
+    return Object.fromEntries(
+      fs.readFileSync('.env.local', 'utf-8')
+        .split('\n')
+        .filter(l => l.includes('=') && !l.startsWith('#'))
+        .map(l => { const [k, ...v] = l.split('='); return [k.trim(), v.join('=').trim()] })
+    )
+  } catch { return {} }
+})()
+const DEV_ADMIN_PIN = process.env.ADMIN_PIN
+  ?? _envLocal.ADMIN_PIN
+  ?? _envLocal.VITE_ADMIN_PIN
+  ?? 'saro2025'
+
 function adminApiPlugin() {
   return {
     name: 'admin-api',
@@ -51,6 +67,12 @@ function adminApiPlugin() {
           const buffer = Buffer.from(data, 'base64')
           fs.writeFileSync(path.join(ASSETS_DIR, safe), buffer)
           return res.end(JSON.stringify({ ok: true, path: `/assets/${safe}` }))
+        }
+
+        // POST /api/verify-pin  →  valida el PIN del admin (en dev, lee del .env.local)
+        if (req.url === '/api/verify-pin' && req.method === 'POST') {
+          const { pin } = body
+          return res.end(JSON.stringify({ ok: typeof pin === 'string' && pin === DEV_ADMIN_PIN }))
         }
 
         // POST /api/publish  →  guarda products.json localmente (en dev, equivale al serverless)

@@ -69,7 +69,21 @@ export default function Cart({ config }) {
                 key={`${item.productId}-${item.color}-${item.talle}-${idx}`}
                 className="flex items-center gap-3 bg-gray-50 rounded-xl p-3"
               >
-                <span className="text-2xl flex-shrink-0">{item.emoji}</span>
+                {/* Thumbnail: foto real del producto o emoji de respaldo */}
+                <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 flex items-center justify-center">
+                  {item.imagen
+                    ? <img
+                        src={item.imagen}
+                        alt={item.nombre}
+                        className="w-full h-full object-cover"
+                        onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex' }}
+                      />
+                    : null}
+                  <span
+                    className="text-2xl flex items-center justify-center w-full h-full"
+                    style={{ display: item.imagen ? 'none' : 'flex' }}
+                  >{item.emoji}</span>
+                </div>
                 <div className="flex-1 min-w-0">
                   <p className="font-semibold text-sm text-gray-900 truncate">{item.nombre}</p>
                   <p className="text-xs text-gray-500 mt-0.5">{item.color} · {item.talle}</p>

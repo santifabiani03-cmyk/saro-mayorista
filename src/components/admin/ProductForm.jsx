@@ -10,28 +10,72 @@ const BLANK = {
   colores: [], talles: [], noStock: [], emoji: '👕',
 }
 
-/** Sube un archivo al serverless /api/upload-image y retorna la URL o null */
-async function uploadFile(file, productName) {
+/**
+ * Comprime una imagen usando Canvas:
+ * - Redimensiona al ancho máximo (por defecto 1200px)
+ * - Convierte a WebP (con fallback a JPEG si el browser no lo soporta)
+ * - Devuelve { base64, ext } o null si falla
+ */
+async function compressImage(file, maxWidth = 1200, quality = 0.85) {
   return new Promise(resolve => {
-    const reader = new FileReader()
-    reader.onload = async ev => {
-      const base64 = ev.target.result.split(',')[1]
-      const ext    = file.name.split('.').pop().toLowerCase()
-      const slug   = (productName || 'imagen').trim().toLowerCase()
-        .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'img'
-      const name   = `${slug}-${Date.now()}.${ext}`
-      try {
-        const res  = await fetch('/api/upload-image', {
-          method:  'POST',
-          headers: { 'Content-Type': 'application/json' },
-          body:    JSON.stringify({ name, data: base64 }),
-        })
-        const json = await res.json()
-        resolve(json.path ?? null)
-      } catch { resolve(null) }
+    const objectUrl = URL.createObjectURL(file)
+    const img = new Image()
+
+    img.onerror = () => { URL.revokeObjectURL(objectUrl); resolve(null) }
+    img.onload  = () => {
+      URL.revokeObjectURL(objectUrl)
+
+      const ratio = Math.min(1, maxWidth / img.width)
+      const w = Math.round(img.width  * ratio)
+      const h = Math.round(img.height * ratio)
+
+      const canvas = document.createElement('canvas')
+      canvas.width  = w
+      canvas.height = h
+      canvas.getContext('2d').drawImage(img, 0, 0, w, h)
+
+      // Intentar WebP primero
+      canvas.toBlob(webpBlob => {
+        const isRealWebP = webpBlob?.type === 'image/webp' && webpBlob.size > 100
+        if (isRealWebP) {
+          const reader = new FileReader()
+          reader.onload = e => resolve({ base64: e.target.result.split(',')[1], ext: 'webp' })
+          reader.readAsDataURL(webpBlob)
+        } else {
+          // Fallback a JPEG
+          canvas.toBlob(jpgBlob => {
+            if (!jpgBlob) { resolve(null); return }
+            const reader = new FileReader()
+            reader.onload = e => resolve({ base64: e.target.result.split(',')[1], ext: 'jpg' })
+            reader.readAsDataURL(jpgBlob)
+          }, 'image/jpeg', quality)
+        }
+      }, 'image/webp', quality)
     }
-    reader.readAsDataURL(file)
+
+    img.src = objectUrl
   })
+}
+
+/** Comprime y sube un archivo al serverless /api/upload-image. Retorna la URL o null. */
+async function uploadFile(file, productName) {
+  const compressed = await compressImage(file)
+  if (!compressed) return null
+
+  const { base64, ext } = compressed
+  const slug = (productName || 'imagen').trim().toLowerCase()
+    .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'img'
+  const name = `${slug}-${Date.now()}.${ext}`
+
+  try {
+    const res  = await fetch('/api/upload-image', {
+      method:  'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body:    JSON.stringify({ name, data: base64 }),
+    })
+    const json = await res.json()
+    return json.path ?? null
+  } catch { return null }
 }
 
 // ── Sub-componentes inline ────────────────────────────────────────────────────

@@ -1,12 +1,27 @@
-import { createContext, useContext, useState } from 'react'
+import { createContext, useContext, useState, useEffect } from 'react'
 
 const CartContext = createContext(null)
+const CART_KEY = 'saro_cart_v1'
 
 export function CartProvider({ children }) {
-  const [items, setItems]   = useState([])
+  // Inicializar desde localStorage para que el carrito sobreviva recargas
+  const [items, setItems] = useState(() => {
+    try {
+      const saved = localStorage.getItem(CART_KEY)
+      return saved ? JSON.parse(saved) : []
+    } catch { return [] }
+  })
   const [isOpen, setIsOpen] = useState(false)
 
+  // Persistir en localStorage cada vez que cambia el carrito
+  useEffect(() => {
+    try { localStorage.setItem(CART_KEY, JSON.stringify(items)) } catch {}
+  }, [items])
+
   const addItems = (product, selections) => {
+    // Guardar la primera imagen para mostrarla en el carrito
+    const imagen = product.imagenes?.[0] ?? product.imagen ?? null
+
     setItems(prev => {
       const next = [...prev]
       selections.forEach(({ color, talle, cantidad }) => {
@@ -20,6 +35,7 @@ export function CartProvider({ children }) {
             productId: product.id,
             nombre:    product.nombre,
             emoji:     product.emoji,
+            imagen,
             precio:    product.precio,
             color,
             talle,

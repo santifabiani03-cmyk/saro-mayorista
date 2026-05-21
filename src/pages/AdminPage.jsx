@@ -3,24 +3,37 @@ import ProductForm from '../components/admin/ProductForm'
 import ProductList from '../components/admin/ProductList'
 
 
-const CORRECT_PIN = import.meta.env.VITE_ADMIN_PIN ?? 'saro2025'
 const SESSION_KEY = 'saro_admin_auth'
 
 function PinGate({ onAuth }) {
-  const [pin, setPin]     = useState('')
-  const [error, setError] = useState(false)
-  const [shake, setShake] = useState(false)
+  const [pin, setPin]         = useState('')
+  const [error, setError]     = useState(false)
+  const [shake, setShake]     = useState(false)
+  const [loading, setLoading] = useState(false)
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
-    if (pin === CORRECT_PIN) {
-      sessionStorage.setItem(SESSION_KEY, 'ok')
-      onAuth()
-    } else {
+    setLoading(true)
+    try {
+      const res  = await fetch('/api/verify-pin', {
+        method:  'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body:    JSON.stringify({ pin }),
+      })
+      const json = await res.json()
+      if (json.ok) {
+        sessionStorage.setItem(SESSION_KEY, 'ok')
+        onAuth()
+      } else {
+        setError(true)
+        setShake(true)
+        setPin('')
+        setTimeout(() => setShake(false), 500)
+      }
+    } catch {
       setError(true)
-      setShake(true)
-      setPin('')
-      setTimeout(() => setShake(false), 500)
+    } finally {
+      setLoading(false)
     }
   }
 
@@ -52,9 +65,10 @@ function PinGate({ onAuth }) {
           )}
           <button
             type="submit"
-            className="w-full py-3 bg-saro-blue hover:bg-saro-dark text-white font-bold rounded-xl transition-colors"
+            disabled={loading}
+            className="w-full py-3 bg-saro-blue hover:bg-saro-dark text-white font-bold rounded-xl transition-colors disabled:opacity-60"
           >
-            Ingresar
+            {loading ? 'Verificando…' : 'Ingresar'}
           </button>
         </form>
       </div>
