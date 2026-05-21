@@ -73,11 +73,14 @@ export default function AdminPage() {
   const isDev = import.meta.env.DEV
 
   useEffect(() => {
-    const url = isDev ? '/api/products' : '/products.json'
-    fetch(url)
-      .then(r => r.json())
+    // En producción cargamos desde el archivo estático; en dev desde la API local
+    const load = import.meta.env.DEV
+      ? fetch('/api/products').then(r => r.json())
+      : fetch('/products.json').then(r => r.json())
+
+    load
       .then(setProducts)
-      .catch(() => setToast({ type: 'error', msg: 'No se pudo cargar el catálogo.' }))
+      .catch(() => showToast('No se pudo cargar el catálogo.', 'error'))
   }, [])
 
   const showToast = (msg, type = 'ok', duration = 3500) => {
