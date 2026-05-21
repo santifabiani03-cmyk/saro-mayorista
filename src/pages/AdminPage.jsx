@@ -70,7 +70,8 @@ export default function AdminPage() {
   const [toast, setToast]               = useState(null)
   const [saving, setSaving]             = useState(false)
   const [deploying, setDeploying]       = useState(false)
-  const isDev = import.meta.env.DEV
+  // isDev = true solo cuando corre en localhost (desarrollo local)
+  const isDev = window.location.hostname === 'localhost'
 
   useEffect(() => {
     // Siempre cargamos desde el archivo estático (funciona en dev y producción)
