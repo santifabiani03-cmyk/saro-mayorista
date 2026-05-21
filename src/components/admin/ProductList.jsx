@@ -149,7 +149,7 @@ export default function ProductList({ products, onEdit, onDelete, saving }) {
                           <div>
                             <p className="text-xs text-gray-400">Publicado</p>
                             <p className="text-xs font-medium text-gray-600">
-                              {new Date(p.fechaPublicacion).toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'numeric' })}
+                              {new Date(p.fechaPublicacion).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' })}
                             </p>
                           </div>
                         ) : (
@@ -159,7 +159,7 @@ export default function ProductList({ products, onEdit, onDelete, saving }) {
                           <div>
                             <p className="text-xs text-gray-400">Editado</p>
                             <p className="text-xs font-medium text-gray-500">
-                              {new Date(p.fechaActualizacion).toLocaleDateString('es-AR', { day:'2-digit', month:'short', year:'numeric' })}
+                              {new Date(p.fechaActualizacion).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' })}
                             </p>
                           </div>
                         )}
