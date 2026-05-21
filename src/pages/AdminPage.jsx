@@ -1,0 +1,248 @@
+import { useState, useEffect } from 'react'
+import ProductForm from '../components/admin/ProductForm'
+import ProductList from '../components/admin/ProductList'
+
+const CORRECT_PIN = import.meta.env.VITE_ADMIN_PIN ?? 'saro2025'
+const SESSION_KEY = 'saro_admin_auth'
+
+function PinGate({ onAuth }) {
+  const [pin, setPin]     = useState('')
+  const [error, setError] = useState(false)
+  const [shake, setShake] = useState(false)
+
+  const handleSubmit = (e) => {
+    e.preventDefault()
+    if (pin === CORRECT_PIN) {
+      sessionStorage.setItem(SESSION_KEY, 'ok')
+      onAuth()
+    } else {
+      setError(true)
+      setShake(true)
+      setPin('')
+      setTimeout(() => setShake(false), 500)
+    }
+  }
+
+  return (
+    <div className="min-h-screen bg-saro-dark flex items-center justify-center px-4">
+      <div className={`bg-white rounded-2xl shadow-2xl p-8 w-full max-w-sm text-center ${shake ? 'animate-bounce' : ''}`}>
+        <img
+          src="/assets/logo.png"
+          alt="SARO"
+          className="h-12 w-auto mx-auto mb-6"
+          onError={e => { e.target.style.display = 'none' }}
+        />
+        <h1 className="font-extrabold text-xl text-saro-dark mb-1">Panel Admin</h1>
+        <p className="text-sm text-gray-400 mb-6">Ingresá el código de acceso</p>
+
+        <form onSubmit={handleSubmit} className="space-y-4">
+          <input
+            type="password"
+            value={pin}
+            onChange={e => { setPin(e.target.value); setError(false) }}
+            placeholder="••••••••"
+            autoFocus
+            className={`w-full border-2 rounded-xl px-4 py-3 text-center text-lg tracking-widest font-mono focus:outline-none transition-colors ${
+              error ? 'border-red-400 bg-red-50' : 'border-gray-200 focus:border-saro-blue'
+            }`}
+          />
+          {error && (
+            <p className="text-sm text-red-500 font-medium">Código incorrecto. Intentá de nuevo.</p>
+          )}
+          <button
+            type="submit"
+            className="w-full py-3 bg-saro-blue hover:bg-saro-dark text-white font-bold rounded-xl transition-colors"
+          >
+            Ingresar
+          </button>
+        </form>
+      </div>
+    </div>
+  )
+}
+
+export default function AdminPage() {
+  const [authed, setAuthed]             = useState(() => sessionStorage.getItem(SESSION_KEY) === 'ok')
+  const [tab, setTab]                   = useState('nuevo')
+  const [products, setProducts]         = useState([])
+  const [editingProduct, setEditing]    = useState(null)
+  const [toast, setToast]               = useState(null)
+  const [saving, setSaving]             = useState(false)
+  const [deploying, setDeploying]       = useState(false)
+  const isDev = import.meta.env.DEV
+
+  useEffect(() => {
+    const url = isDev ? '/api/products' : '/products.json'
+    fetch(url)
+      .then(r => r.json())
+      .then(setProducts)
+      .catch(() => setToast({ type: 'error', msg: 'No se pudo cargar el catálogo.' }))
+  }, [])
+
+  const showToast = (msg, type = 'ok') => {
+    setToast({ msg, type })
+    setTimeout(() => setToast(null), 3500)
+  }
+
+  const persistProducts = async (newList) => {
+    setSaving(true)
+    try {
+      await fetch('/api/products', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify(newList),
+      })
+      setProducts(newList)
+      showToast('✅ Cambios guardados en products.json')
+    } catch {
+      showToast('❌ Error al guardar', 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  const handleAdd = async (product) => {
+    await persistProducts([...products, product])
+    setTab('editar')
+  }
+
+  const handleUpdate = async (updated) => {
+    await persistProducts(products.map(p => p.id === updated.id ? updated : p))
+    setEditing(null)
+    setTab('editar')
+  }
+
+  const handleDelete = async (id) => {
+    if (!confirm('¿Eliminar este producto del catálogo?')) return
+    await persistProducts(products.filter(p => p.id !== id))
+    showToast('🗑️ Producto eliminado')
+  }
+
+  const handleEdit = (product) => {
+    setEditing(product)
+    setTab('nuevo')
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+
+  const handleCancelEdit = () => {
+    setEditing(null)
+    setTab('editar')
+  }
+
+  const handleDeploy = async () => {
+    setDeploying(true)
+    try {
+      const res = await fetch('/api/deploy', { method: 'POST' })
+      const json = await res.json()
+      if (json.ok) {
+        showToast('🚀 Publicado! El sitio se actualizará en ~1 minuto.')
+      } else {
+        showToast('❌ Error al publicar: ' + (json.error ?? 'desconocido'), 'error')
+      }
+    } catch {
+      showToast('❌ No se pudo conectar. ¿Está corriendo npm run dev?', 'error')
+    } finally {
+      setDeploying(false)
+    }
+  }
+
+  if (!authed) return <PinGate onAuth={() => setAuthed(true)} />
+
+  return (
+    <div className="min-h-screen bg-gray-50 font-sans">
+
+      {/* Header */}
+      <header className="bg-saro-dark text-white shadow-lg">
+        <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
+          <div className="flex items-center gap-3">
+            <img
+              src="/assets/logo.png"
+              alt="SARO"
+              className="h-9 w-auto brightness-0 invert"
+              onError={e => { e.target.style.display = 'none' }}
+            />
+            <div>
+              <p className="font-extrabold text-lg leading-none">Panel Admin</p>
+              <p className="text-xs text-saro-light opacity-80 mt-0.5">SARO Mayorista</p>
+            </div>
+          </div>
+          <div className="flex items-center gap-3">
+            {isDev && (
+              <button
+                onClick={handleDeploy}
+                disabled={deploying}
+                className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-400 disabled:opacity-60 text-white text-sm font-bold rounded-xl transition-colors"
+              >
+                {deploying ? '⏳ Publicando…' : '🚀 Publicar en sitio'}
+              </button>
+            )}
+            <a
+              href="/"
+              className="text-sm text-saro-light hover:text-white flex items-center gap-1 transition-colors"
+            >
+              ← Ver tienda
+            </a>
+          </div>
+        </div>
+      </header>
+
+      {/* Aviso si no es dev */}
+      {!isDev && (
+        <div className="bg-amber-50 border-b border-amber-200 px-5 py-3 text-center text-sm text-amber-700">
+          ⚠️ El panel admin solo guarda cambios cuando corrés el servidor local (<code>npm run dev</code>).
+        </div>
+      )}
+
+      {/* Tabs */}
+      <div className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+        <div className="max-w-6xl mx-auto px-5 flex gap-1">
+          {[
+            { key: 'nuevo', label: editingProduct ? '✏️ Editando producto' : '＋ Nuevo producto' },
+            { key: 'editar', label: `📋 Publicados (${products.length})` },
+          ].map(t => (
+            <button
+              key={t.key}
+              onClick={() => { setTab(t.key); if (t.key === 'editar') setEditing(null) }}
+              className={`px-5 py-3.5 text-sm font-semibold border-b-2 transition-colors ${
+                tab === t.key
+                  ? 'border-saro-blue text-saro-blue'
+                  : 'border-transparent text-gray-500 hover:text-gray-800'
+              }`}
+            >
+              {t.label}
+            </button>
+          ))}
+        </div>
+      </div>
+
+      {/* Toast */}
+      {toast && (
+        <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-xl text-sm font-medium transition-all ${
+          toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-900 text-white'
+        }`}>
+          {toast.msg}
+        </div>
+      )}
+
+      {/* Contenido */}
+      <div className="max-w-6xl mx-auto px-5 py-8">
+        {tab === 'nuevo' ? (
+          <ProductForm
+            key={editingProduct?.id ?? '__new__'}
+            initial={editingProduct}
+            onSave={editingProduct ? handleUpdate : handleAdd}
+            onCancel={editingProduct ? handleCancelEdit : null}
+            saving={saving}
+          />
+        ) : (
+          <ProductList
+            products={products}
+            onEdit={handleEdit}
+            onDelete={handleDelete}
+            saving={saving}
+          />
+        )}
+      </div>
+    </div>
+  )
+}

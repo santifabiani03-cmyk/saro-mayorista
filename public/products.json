@@ -1,0 +1,270 @@
+[
+  {
+    "id": "p2",
+    "nombre": "Short Running Elite",
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "piernas",
+    "emoji": "🩳",
+    "precio": 7200,
+    "colores": [
+      "Negro",
+      "Azul",
+      "Verde"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "noStock": [],
+    "descripcion": "Short deportivo con bolsillo con cierre y cordón ajustable. Tela ultra-liviana con tratamiento anti-humedad. Ideal para running, tenis y pádel.",
+    "tag": "destacado"
+  },
+  {
+    "id": "p3",
+    "nombre": "Buzo Hoodie Premium",
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "torso",
+    "emoji": "🧥",
+    "precio": 18500,
+    "colores": [
+      "Negro",
+      "Gris",
+      "Marino"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [
+      {
+        "color": "Gris",
+        "talle": "S"
+      }
+    ],
+    "descripcion": "Buzo con capucha y bolsillo canguro. Frisa polar de alta densidad. Cierre con cordón reforzado. Perfecto para calentamiento y uso casual post-entrenamiento.",
+    "tag": ""
+  },
+  {
+    "id": "p5",
+    "nombre": "Calza Deportiva Pro",
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "emoji": "🩱",
+    "precio": 9800,
+    "colores": [
+      "Negro",
+      "Rosa",
+      "Violeta"
+    ],
+    "talles": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "noStock": [
+      {
+        "color": "Violeta",
+        "talle": "XS"
+      }
+    ],
+    "descripcion": "Calza de alta compresión con tiro alto. Tela cuatro vías con tecnología anti-pilling. Bolsillo lateral oculto. Ideal para yoga, pilates y entrenamiento funcional.",
+    "tag": "nuevo"
+  },
+  {
+    "id": "p6",
+    "nombre": "Top Deportivo Fit",
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "emoji": "🎽",
+    "precio": 6500,
+    "colores": [
+      "Negro",
+      "Blanco",
+      "Fucsia"
+    ],
+    "talles": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "noStock": [
+      {
+        "color": "Fucsia",
+        "talle": "L"
+      }
+    ],
+    "descripcion": "Top deportivo con soporte medio y espalda cruzada. Copa removible. Tela suave con UPF 50+. Perfecto para yoga, danza y entrenamiento en general.",
+    "tag": "destacado"
+  },
+  {
+    "id": "p7",
+    "nombre": "Remera Dry-Fit Mujer",
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "emoji": "👚",
+    "precio": 7800,
+    "colores": [
+      "Blanco",
+      "Celeste",
+      "Rosa"
+    ],
+    "talles": [
+      "XS",
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "noStock": [],
+    "descripcion": "Remera deportiva de corte entallado con tecnología de absorción y evaporación rápida. Costuras planas laterales para mayor libertad de movimiento.",
+    "tag": ""
+  },
+  {
+    "id": "p8",
+    "nombre": "Short Deportivo Mujer",
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "emoji": "🩳",
+    "precio": 6200,
+    "colores": [
+      "Negro",
+      "Rosa",
+      "Naranja"
+    ],
+    "talles": [
+      "XS",
+      "S",
+      "M",
+      "L"
+    ],
+    "noStock": [
+      {
+        "color": "Naranja",
+        "talle": "XS"
+      }
+    ],
+    "descripcion": "Short deportivo con elástico ajustable en cintura y tiro medio. Bolsillos laterales. Tela liviana ideal para running, tenis y actividades outdoor.",
+    "tag": ""
+  },
+  {
+    "id": "p9",
+    "nombre": "Paleta Pádel Carbon Pro",
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "emoji": "🏓",
+    "precio": 45000,
+    "colores": [
+      "Negro/Azul",
+      "Negro/Rojo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "descripcion": "Paleta de pádel con núcleo de EVA Soft y cara de fibra de carbono 3K. Balance medio-alto para un juego versátil. Peso aproximado 360-375g. Incluye funda protectora.",
+    "tag": "destacado"
+  },
+  {
+    "id": "p10",
+    "nombre": "Pelotitas Pádel Pack x3",
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "emoji": "🎾",
+    "precio": 3200,
+    "colores": [
+      "Amarillo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "descripcion": "Pack de 3 pelotas de pádel homologadas. Alta durabilidad con presión constante para mayor consistencia de juego. Aptas para todo tipo de superficie.",
+    "tag": ""
+  },
+  {
+    "id": "p11",
+    "nombre": "Grips para Paleta Pack x10",
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "emoji": "🤚",
+    "precio": 5500,
+    "colores": [
+      "Negro",
+      "Blanco",
+      "Fucsia"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "descripcion": "Pack de 10 overgrips para paleta de pádel. Tacto suave y antideslizante con alta absorción de sudor. Ultra-finos para mantener el feel original de la paleta.",
+    "tag": "oferta"
+  },
+  {
+    "id": "p12",
+    "nombre": "Muñequera Pádel Pro",
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "emoji": "🤜",
+    "precio": 2800,
+    "colores": [
+      "Negro",
+      "Blanco",
+      "Rosa"
+    ],
+    "talles": [
+      "S/M",
+      "L/XL"
+    ],
+    "noStock": [
+      {
+        "color": "Rosa",
+        "talle": "L/XL"
+      }
+    ],
+    "descripcion": "Muñequera deportiva de terry con alta absorción. Elástico cómodo sin perder sujeción. Ideal para pádel, tenis y todos los deportes de raqueta.",
+    "tag": ""
+  },
+  {
+    "nombre": "Buzo medio cierre micropolar unisex",
+    "precio": 20999,
+    "descripcion": "Buzo medio cierre micropolar unisex calidad super premium usado por maradona",
+    "tag": "destacado",
+    "categoria": "ropa",
+    "genero": "unisex",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro",
+      "Gris"
+    ],
+    "talles": [
+      "M",
+      "XL",
+      "L",
+      "S",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "imagen": "/assets/buzo-medio-cierre-micropolar-unisex.jpeg",
+    "id": "p1779317305009"
+  }
+]

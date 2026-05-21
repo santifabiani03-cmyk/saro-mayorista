@@ -1,0 +1,251 @@
+import { useState, useEffect } from 'react'
+import { useCart } from '../context/CartContext'
+import { COLOR_MAP, COLOR_BG_MAP, TAG_CONFIG } from '../utils/colors'
+
+function buildMatrix(colores, talles) {
+  const m = {}
+  colores.forEach(c => { m[c] = {}; talles.forEach(t => { m[c][t] = 0 }) })
+  return m
+}
+
+export default function ProductModal({ product, onClose }) {
+  const { addItems } = useCart()
+  const [matrix, setMatrix]         = useState(() => buildMatrix(product.colores, product.talles))
+  const [activeColor, setActiveColor] = useState(product.colores[0])
+
+  // Bloquear scroll del body mientras el modal esté abierto
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    return () => { document.body.style.overflow = '' }
+  }, [])
+
+  const isNoStock = (color, talle) =>
+    product.noStock?.some(ns => ns.color === color && ns.talle === talle)
+
+  const updateQty = (color, talle, delta) => {
+    if (isNoStock(color, talle)) return
+    setMatrix(prev => ({
+      ...prev,
+      [color]: { ...prev[color], [talle]: Math.max(0, (prev[color][talle] ?? 0) + delta) },
+    }))
+  }
+
+  const totalUnidades = product.colores.reduce(
+    (s, c) => s + product.talles.reduce((ss, t) => ss + (matrix[c]?.[t] ?? 0), 0), 0
+  )
+
+  const handleAgregar = () => {
+    const selections = []
+    product.colores.forEach(color =>
+      product.talles.forEach(talle => {
+        const qty = matrix[color]?.[talle] ?? 0
+        if (qty > 0) selections.push({ color, talle, cantidad: qty })
+      })
+    )
+    if (selections.length > 0) addItems(product, selections)
+    onClose()
+  }
+
+  const tag = TAG_CONFIG[product.tag]
+  const bgColor = COLOR_BG_MAP[activeColor] ?? '#f3f4f6'
+
+  return (
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/50 backdrop-blur-sm"
+      onClick={onClose}
+    >
+      <div
+        className="bg-white rounded-2xl w-full max-w-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden"
+        onClick={e => e.stopPropagation()}
+      >
+        {/* ── Header del modal ── */}
+        <div className="flex items-start justify-between p-4 sm:p-5 border-b border-gray-100 flex-shrink-0">
+          <div>
+            <div className="flex items-center gap-2 flex-wrap">
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900">{product.nombre}</h2>
+              {tag && (
+                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${tag.cls}`}>
+                  {tag.label}
+                </span>
+              )}
+            </div>
+            <p className="text-2xl font-extrabold text-saro-blue mt-0.5">
+              ${product.precio.toLocaleString('es-AR')}
+              <span className="text-sm font-normal text-gray-400 ml-1">c/u</span>
+            </p>
+          </div>
+          <button
+            onClick={onClose}
+            className="text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl p-1.5 text-xl leading-none transition-colors flex-shrink-0"
+          >
+            ✕
+          </button>
+        </div>
+
+        {/* ── Cuerpo scrolleable ── */}
+        <div className="overflow-y-auto flex-1">
+          <div className="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
+
+            {/* ── Galería ── */}
+            <div className="space-y-3">
+              {/* Imagen principal */}
+              <div
+                className="aspect-square rounded-2xl flex items-center justify-center text-8xl sm:text-9xl transition-colors duration-300 overflow-hidden"
+                style={{ backgroundColor: product.imagen ? '#f3f4f6' : bgColor }}
+              >
+                {product.imagen ? (
+                  <img
+                    src={product.imagen}
+                    alt={product.nombre}
+                    className="w-full h-full object-cover rounded-2xl"
+                    onError={e => {
+                      e.target.style.display = 'none'
+                      e.target.nextSibling.style.display = 'flex'
+                    }}
+                  />
+                ) : null}
+                <span
+                  className="text-8xl sm:text-9xl"
+                  style={{ display: product.imagen ? 'none' : 'flex' }}
+                >
+                  {product.emoji}
+                </span>
+              </div>
+
+              {/* Thumbnails de colores */}
+              <div className="flex gap-2 flex-wrap">
+                {product.colores.map(color => (
+                  <button
+                    key={color}
+                    title={color}
+                    onClick={() => setActiveColor(color)}
+                    className={`w-9 h-9 rounded-lg border-2 transition-all overflow-hidden ${
+                      activeColor === color
+                        ? 'border-saro-blue scale-110 shadow-md'
+                        : 'border-gray-200 hover:border-gray-400'
+                    }`}
+                    style={{ backgroundColor: COLOR_BG_MAP[color] ?? '#f3f4f6' }}
+                  >
+                    {product.imagen ? (
+                      <img src={product.imagen} alt={color} className="w-full h-full object-cover" />
+                    ) : (
+                      <span className="text-lg leading-none">{product.emoji}</span>
+                    )}
+                  </button>
+                ))}
+              </div>
+
+              {/* Descripción */}
+              <p className="text-sm text-gray-600 leading-relaxed">{product.descripcion}</p>
+            </div>
+
+            {/* ── Matriz color × talle ── */}
+            <div className="space-y-3">
+              <h3 className="font-semibold text-gray-800">Seleccioná cantidades</h3>
+
+              <div className="overflow-x-auto rounded-xl border border-gray-100">
+                <table className="w-full text-sm min-w-max">
+                  <thead className="bg-gray-50">
+                    <tr>
+                      <th className="text-left py-2 px-3 text-gray-500 font-medium text-xs">Color</th>
+                      {product.talles.map(t => (
+                        <th key={t} className="py-2 px-2 text-center text-gray-500 font-medium text-xs min-w-[68px]">
+                          {t}
+                        </th>
+                      ))}
+                    </tr>
+                  </thead>
+                  <tbody>
+                    {product.colores.map((color, ci) => (
+                      <tr key={color} className={ci % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
+                        {/* Celda de color */}
+                        <td className="py-2 px-3">
+                          <div className="flex items-center gap-1.5">
+                            <span
+                              className="w-3 h-3 rounded-full border border-gray-200 flex-shrink-0"
+                              style={{ backgroundColor: COLOR_MAP[color] ?? '#e5e7eb' }}
+                            />
+                            <span className="text-xs text-gray-700 whitespace-nowrap">{color}</span>
+                          </div>
+                        </td>
+                        {/* Celdas de talle */}
+                        {product.talles.map(talle => {
+                          const noStock = isNoStock(color, talle)
+                          const qty     = matrix[color]?.[talle] ?? 0
+                          return (
+                            <td key={talle} className="py-1.5 px-1 text-center">
+                              {noStock ? (
+                                <span className="text-gray-300 text-base">✕</span>
+                              ) : (
+                                <div className="flex items-center justify-center gap-0.5">
+                                  <button
+                                    onClick={() => updateQty(color, talle, -1)}
+                                    className="w-6 h-6 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-600 text-gray-600 text-xs font-bold transition-colors flex items-center justify-center"
+                                  >
+                                    −
+                                  </button>
+                                  <span
+                                    className={`w-6 text-center text-xs font-bold tabular-nums ${
+                                      qty > 0 ? 'text-saro-blue' : 'text-gray-300'
+                                    }`}
+                                  >
+                                    {qty}
+                                  </span>
+                                  <button
+                                    onClick={() => updateQty(color, talle, 1)}
+                                    className="w-6 h-6 rounded-md bg-gray-100 hover:bg-green-100 hover:text-green-700 text-gray-600 text-xs font-bold transition-colors flex items-center justify-center"
+                                  >
+                                    +
+                                  </button>
+                                </div>
+                              )}
+                            </td>
+                          )
+                        })}
+                      </tr>
+                    ))}
+                  </tbody>
+                </table>
+              </div>
+
+              {/* Resumen de selección */}
+              {totalUnidades > 0 && (
+                <div className="flex items-center justify-between bg-saro-light rounded-xl px-4 py-3">
+                  <span className="text-sm font-medium text-saro-dark">
+                    {totalUnidades} unidad{totalUnidades !== 1 ? 'es' : ''} seleccionada{totalUnidades !== 1 ? 's' : ''}
+                  </span>
+                  <span className="font-extrabold text-saro-blue">
+                    ${(totalUnidades * product.precio).toLocaleString('es-AR')}
+                  </span>
+                </div>
+              )}
+            </div>
+          </div>
+        </div>
+
+        {/* ── Footer ── */}
+        <div className="flex gap-3 p-4 sm:p-5 border-t border-gray-100 flex-shrink-0">
+          <button
+            onClick={onClose}
+            className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium text-sm transition-colors"
+          >
+            Cancelar
+          </button>
+          <button
+            onClick={handleAgregar}
+            disabled={totalUnidades === 0}
+            className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-colors ${
+              totalUnidades > 0
+                ? 'bg-saro-blue hover:bg-saro-dark text-white shadow-sm'
+                : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+            }`}
+          >
+            {totalUnidades > 0
+              ? `Agregar ${totalUnidades} al carrito`
+              : 'Seleccioná cantidades'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
