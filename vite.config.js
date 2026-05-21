@@ -52,6 +52,17 @@ function adminApiPlugin() {
           return res.end(JSON.stringify({ ok: true, path: `/assets/${safe}` }))
         }
 
+        // POST /api/publish  →  guarda products.json localmente (en dev, equivale al serverless)
+        if (req.url === '/api/publish' && req.method === 'POST') {
+          const { products } = body
+          if (!Array.isArray(products)) {
+            res.statusCode = 400
+            return res.end(JSON.stringify({ error: 'Body debe tener { products: [...] }' }))
+          }
+          fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2))
+          return res.end(JSON.stringify({ ok: true }))
+        }
+
         // POST /api/deploy  →  vercel --prod (deploy directo desde la PC)
         if (req.url === '/api/deploy' && req.method === 'POST') {
           try {

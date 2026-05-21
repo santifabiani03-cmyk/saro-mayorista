@@ -1,7 +1,7 @@
 import { useState, useEffect } from 'react'
 import ProductForm from '../components/admin/ProductForm'
 import ProductList from '../components/admin/ProductList'
-import { saveProductsToGitHub } from '../utils/githubApi'
+
 
 const CORRECT_PIN = import.meta.env.VITE_ADMIN_PIN ?? 'saro2025'
 const SESSION_KEY = 'saro_admin_auth'
@@ -146,15 +146,24 @@ export default function AdminPage() {
   const handleDeploy = async () => {
     setDeploying(true)
     try {
+      // Llama al serverless /api/publish (tanto en dev como en prod)
+      // En dev: vite.config.js intercepta y guarda localmente
+      // En prod: Vercel serverless function usa GITHUB_TOKEN server-side → no hay error ISO-8859-1
+      const res  = await fetch('/api/publish', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ products }),
+      })
+      const json = await res.json()
+      if (!json.ok) throw new Error(json.error ?? 'Error desconocido')
+
       if (isDev) {
-        // En local: deploy vía Vite API (corre vercel --prod)
-        const res  = await fetch('/api/deploy', { method: 'POST' })
-        const json = await res.json()
-        if (!json.ok) throw new Error(json.error ?? 'Error desconocido')
-      } else {
-        // En producción: guarda en GitHub → GitHub Actions redeploya
-        await saveProductsToGitHub(products)
+        // En local también disparamos el deploy a Vercel
+        const deployRes  = await fetch('/api/deploy', { method: 'POST' })
+        const deployJson = await deployRes.json()
+        if (!deployJson.ok) throw new Error(deployJson.error ?? 'Error al deployar')
       }
+
       setPublishedSnap([...products]) // marca como sincronizado
       showToast('🚀 ¡Publicado! El sitio se actualiza en ~40s', 'ok', 6000)
     } catch (e) {
