@@ -66,6 +66,7 @@ export default function AdminPage() {
   const [authed, setAuthed]             = useState(() => sessionStorage.getItem(SESSION_KEY) === 'ok')
   const [tab, setTab]                   = useState('nuevo')
   const [products, setProducts]         = useState([])
+  const [publishedSnap, setPublishedSnap] = useState(null) // snapshot de lo que está publicado
   const [editingProduct, setEditing]    = useState(null)
   const [toast, setToast]               = useState(null)
   const [saving, setSaving]             = useState(false)
@@ -73,11 +74,17 @@ export default function AdminPage() {
   // isDev = true solo cuando corre en localhost (desarrollo local)
   const isDev = window.location.hostname === 'localhost'
 
+  // Sincronizado = el estado actual coincide con lo que está publicado
+  const isSynced = publishedSnap !== null &&
+    JSON.stringify(products) === JSON.stringify(publishedSnap)
+
   useEffect(() => {
-    // Siempre cargamos desde el archivo estático (funciona en dev y producción)
     fetch('/products.json')
       .then(r => r.json())
-      .then(setProducts)
+      .then(data => {
+        setProducts(data)
+        setPublishedSnap(data) // guardamos snapshot de lo publicado
+      })
       .catch(() => showToast('No se pudo cargar el catálogo.', 'error'))
   }, [])
 
@@ -95,11 +102,9 @@ export default function AdminPage() {
           headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify(newList),
         })
-        showToast('✅ Guardado localmente')
-      } else {
-        await saveProductsToGitHub(newList)
-        showToast('✅ Publicado · El sitio se actualiza en ~30s', 'ok', 6000)
+        showToast('✅ Guardado localmente — usá "Publicar en sitio" para subir los cambios')
       }
+      // Solo actualiza el estado local; el deploy es manual con el botón
       setProducts(newList)
     } catch (e) {
       showToast('❌ Error al guardar: ' + (e?.message ?? 'desconocido'), 'error', 6000)
@@ -141,15 +146,19 @@ export default function AdminPage() {
   const handleDeploy = async () => {
     setDeploying(true)
     try {
-      const res = await fetch('/api/deploy', { method: 'POST' })
-      const json = await res.json()
-      if (json.ok) {
-        showToast('🚀 ¡Publicado! El sitio ya está actualizado.', 'ok', 6000)
+      if (isDev) {
+        // En local: deploy vía Vite API (corre vercel --prod)
+        const res  = await fetch('/api/deploy', { method: 'POST' })
+        const json = await res.json()
+        if (!json.ok) throw new Error(json.error ?? 'Error desconocido')
       } else {
-        showToast('❌ Error al publicar: ' + (json.error ?? 'desconocido'), 'error', 6000)
+        // En producción: guarda en GitHub → GitHub Actions redeploya
+        await saveProductsToGitHub(products)
       }
-    } catch {
-      showToast('❌ No se pudo conectar. ¿Está corriendo npm run dev?', 'error')
+      setPublishedSnap([...products]) // marca como sincronizado
+      showToast('🚀 ¡Publicado! El sitio se actualiza en ~40s', 'ok', 6000)
+    } catch (e) {
+      showToast('❌ Error al publicar: ' + (e?.message ?? 'desconocido'), 'error', 6000)
     } finally {
       setDeploying(false)
     }
@@ -176,17 +185,29 @@ export default function AdminPage() {
             </div>
           </div>
           <div className="flex items-center gap-3">
-            {isDev ? (
-              <button
-                onClick={handleDeploy}
-                disabled={deploying}
-                className="flex items-center gap-2 px-4 py-2 bg-green-500 hover:bg-green-400 disabled:opacity-60 text-white text-sm font-bold rounded-xl transition-colors"
-              >
-                {deploying ? '⏳ Publicando…' : '🚀 Publicar en sitio'}
-              </button>
-            ) : (
-              <span className="text-xs text-green-300 font-medium">● En vivo · auto-deploy</span>
+            {/* Indicador de sincronización */}
+            {publishedSnap !== null && (
+              <span className={`text-xs font-semibold flex items-center gap-1.5 ${isSynced ? 'text-green-400' : 'text-red-400'}`}>
+                <span className={`w-2 h-2 rounded-full ${isSynced ? 'bg-green-400' : 'bg-red-400 animate-pulse'}`} />
+                {isSynced ? 'En vivo' : 'Cambios sin publicar'}
+              </span>
             )}
+
+            {/* Botón publicar */}
+            <button
+              onClick={handleDeploy}
+              disabled={deploying || isSynced}
+              className={`flex items-center gap-2 px-4 py-2 text-white text-sm font-bold rounded-xl transition-all ${
+                deploying
+                  ? 'bg-gray-500 opacity-60 cursor-not-allowed'
+                  : isSynced
+                  ? 'bg-gray-600 opacity-50 cursor-not-allowed'
+                  : 'bg-green-500 hover:bg-green-400 shadow-lg shadow-green-900/30'
+              }`}
+            >
+              {deploying ? '⏳ Publicando…' : '🚀 Publicar en sitio'}
+            </button>
+
             <a
               href="/"
               className="text-sm text-saro-light hover:text-white flex items-center gap-1 transition-colors"
