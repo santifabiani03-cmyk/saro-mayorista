@@ -173,6 +173,13 @@ export default function AdminPage() {
     setTab('editar')
   }
 
+  const handleToggleVisible = async (id) => {
+    const newList = products.map(p =>
+      p.id === id ? { ...p, visible: p.visible === false ? true : false } : p
+    )
+    await persistProducts(newList)
+  }
+
   const handleDeploy = async () => {
     setDeploying(true)
     try {
@@ -316,6 +323,7 @@ export default function AdminPage() {
             products={products}
             onEdit={handleEdit}
             onDelete={handleDelete}
+            onToggleVisible={handleToggleVisible}
             saving={saving}
           />
         )}

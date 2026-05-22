@@ -30,6 +30,7 @@ export default function App() {
   }, [])
 
   const filtered = products.filter(p => {
+    if (p.visible === false) return false  // productos ocultos por el admin
     if (filters.categoria   && p.categoria   !== filters.categoria)   return false
     if (filters.genero      && p.genero      !== filters.genero)      return false
     if (filters.parteCuerpo && p.parteCuerpo !== filters.parteCuerpo) return false
