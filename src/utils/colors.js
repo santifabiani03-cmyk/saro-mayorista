@@ -66,6 +66,12 @@ export const PREDEFINED_TALLES = [
   'Única','37-40','41-44','45-48','S/M','L/XL',
 ]
 
+// Orden canónico de talles para mostrar en la matriz del modal
+export const SIZE_ORDER = [
+  'XS','S','S/M','M','L','L/XL','XL','XXL','XXXL',
+  'Única','37-40','41-44','45-48',
+]
+
 export const AUTO_EMOJI = {
   ropa:  { torso:'👕', piernas:'🩳', pies:'🧦', manos:'🧤', accesorio:'🎒' },
   padel: { manos:'🏓', accesorio:'🎾', torso:'🎽', piernas:'🩳', pies:'👟' },

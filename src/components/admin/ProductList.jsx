@@ -19,7 +19,7 @@ function EyeOffIcon() {
   )
 }
 
-export default function ProductList({ products, onEdit, onDelete, onToggleVisible, saving }) {
+export default function ProductList({ products, onEdit, onDelete, onToggleVisible, onToggleSinStock, saving }) {
   const [search, setSearch] = useState('')
   const [filterCat, setFilterCat] = useState('')
 
@@ -80,8 +80,9 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
             </thead>
             <tbody className="divide-y divide-gray-50">
               {filtered.map(p => {
-                const tag     = TAG_CONFIG[p.tag]
-                const visible = p.visible !== false  // undefined = visible por defecto
+                const tag      = TAG_CONFIG[p.tag]
+                const visible  = p.visible !== false
+                const sinStock = p.sinStock === true
                 return (
                   <tr key={p.id} className={`hover:bg-gray-50/60 transition-colors group ${!visible ? 'opacity-40' : ''}`}>
 
@@ -122,6 +123,11 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                             {!visible && (
                               <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">
                                 Oculto
+                              </span>
+                            )}
+                            {sinStock && (
+                              <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-gray-500 text-white">
+                                Sin stock
                               </span>
                             )}
                           </div>
@@ -201,6 +207,20 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                     {/* Acciones */}
                     <td className="px-4 py-3">
                       <div className="flex gap-2 justify-end items-center">
+                        {/* Toggle sin stock */}
+                        <button
+                          onClick={() => onToggleSinStock(p.id)}
+                          disabled={saving}
+                          title={sinStock ? 'Marcar con stock' : 'Marcar sin stock'}
+                          className={`p-1.5 rounded-lg transition-colors text-xs font-bold ${
+                            sinStock
+                              ? 'bg-gray-500 text-white hover:bg-gray-400'
+                              : 'text-gray-300 hover:text-gray-600 hover:bg-gray-100'
+                          }`}
+                        >
+                          S
+                        </button>
+
                         {/* Ojo: siempre visible */}
                         <button
                           onClick={() => onToggleVisible(p.id)}

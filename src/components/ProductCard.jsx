@@ -8,8 +8,10 @@ export default function ProductCard({ product, onClick }) {
   const tag  = TAG_CONFIG[product.tag]
   const imgs = getImages(product)
 
+  // sinStock: campo explícito del admin, o calculado si todos los combos están sin stock
   const totalCombos = product.colores.length * product.talles.length
-  const sinStock    = product.noStock?.length === totalCombos
+  const sinStock    = product.sinStock === true ||
+                      (totalCombos > 0 && product.noStock?.length === totalCombos)
 
   return (
     <div
@@ -27,11 +29,9 @@ export default function ProductCard({ product, onClick }) {
         )}
 
         {sinStock && (
-          <div className="absolute inset-0 bg-white/70 flex items-center justify-center">
-            <span className="bg-gray-700 text-white text-xs font-medium px-3 py-1 rounded-full">
-              Sin stock
-            </span>
-          </div>
+          <span className="absolute top-2 right-2 bg-gray-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm">
+            Sin stock
+          </span>
         )}
       </div>
 

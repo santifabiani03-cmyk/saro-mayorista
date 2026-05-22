@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useCart } from '../context/CartContext'
-import { COLOR_MAP, TAG_CONFIG } from '../utils/colors'
+import { COLOR_MAP, TAG_CONFIG, SIZE_ORDER } from '../utils/colors'
 import ImageCarousel from './ImageCarousel'
 
 // Compatibilidad: soporta campo legacy `imagen` (string) y nuevo `imagenes` (array)
@@ -14,7 +14,18 @@ function buildMatrix(colores, talles) {
 
 export default function ProductModal({ product, onClose }) {
   const { addItems } = useCart()
-  const [matrix, setMatrix] = useState(() => buildMatrix(product.colores, product.talles))
+
+  // Talles ordenados canónicamente (XS → S → M → L → XL → XXL …)
+  const sortedTalles = [...product.talles].sort((a, b) => {
+    const ia = SIZE_ORDER.indexOf(a)
+    const ib = SIZE_ORDER.indexOf(b)
+    if (ia === -1 && ib === -1) return 0
+    if (ia === -1) return 1
+    if (ib === -1) return -1
+    return ia - ib
+  })
+
+  const [matrix, setMatrix] = useState(() => buildMatrix(product.colores, sortedTalles))
   const imgs = getImages(product)
 
   // Bloquear scroll del body mientras el modal esté abierto
@@ -35,13 +46,13 @@ export default function ProductModal({ product, onClose }) {
   }
 
   const totalUnidades = product.colores.reduce(
-    (s, c) => s + product.talles.reduce((ss, t) => ss + (matrix[c]?.[t] ?? 0), 0), 0
+    (s, c) => s + sortedTalles.reduce((ss, t) => ss + (matrix[c]?.[t] ?? 0), 0), 0
   )
 
   const handleAgregar = () => {
     const selections = []
     product.colores.forEach(color =>
-      product.talles.forEach(talle => {
+      sortedTalles.forEach(talle => {
         const qty = matrix[color]?.[talle] ?? 0
         if (qty > 0) selections.push({ color, talle, cantidad: qty })
       })
@@ -104,7 +115,7 @@ export default function ProductModal({ product, onClose }) {
                   <thead className="bg-gray-50">
                     <tr>
                       <th className="text-left py-2 px-3 text-gray-500 font-medium text-xs">Color</th>
-                      {product.talles.map(t => (
+                      {sortedTalles.map(t => (
                         <th key={t} className="py-2 px-2 text-center text-gray-500 font-medium text-xs min-w-[68px]">
                           {t}
                         </th>
@@ -123,7 +134,7 @@ export default function ProductModal({ product, onClose }) {
                             <span className="text-xs text-gray-700 whitespace-nowrap">{color}</span>
                           </div>
                         </td>
-                        {product.talles.map(talle => {
+                        {sortedTalles.map(talle => {
                           const noStock = isNoStock(color, talle)
                           const qty     = matrix[color]?.[talle] ?? 0
                           return (

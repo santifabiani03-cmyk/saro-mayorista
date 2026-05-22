@@ -182,6 +182,13 @@ export default function AdminPage() {
     await persistProducts(newList)
   }
 
+  const handleToggleSinStock = async (id) => {
+    const newList = products.map(p =>
+      p.id === id ? { ...p, sinStock: !p.sinStock } : p
+    )
+    await persistProducts(newList)
+  }
+
   const handleDeploy = async () => {
     setDeploying(true)
     try {
@@ -326,6 +333,7 @@ export default function AdminPage() {
             onEdit={handleEdit}
             onDelete={handleDelete}
             onToggleVisible={handleToggleVisible}
+            onToggleSinStock={handleToggleSinStock}
             saving={saving}
           />
         )}
