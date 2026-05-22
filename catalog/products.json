@@ -1,12 +1,12 @@
 [
   {
-    "id": "p10",
-    "nombre": "Pelotitas Pádel Pack x3",
+    "nombre": "Tubo pelotas NOAC x2u. ",
+    "precio": 6500,
+    "descripcion": "Tubo de pelotas x2 unidades marca NOAC. Excelente paño y presurizacion \nIMPORTADAS",
+    "tags": [],
     "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "accesorio",
-    "emoji": "🎾",
-    "precio": 3200,
     "colores": [
       "Amarillo"
     ],
@@ -14,10 +14,14 @@
       "Única"
     ],
     "noStock": [],
-    "descripcion": "Pack de 3 pelotas de pádel homologadas. Alta durabilidad con presión constante para mayor consistencia de juego. Aptas para todo tipo de superficie.",
-    "tag": "",
-    "visible": false,
-    "sinStock": false
+    "emoji": "🎾",
+    "id": "p10",
+    "visible": true,
+    "sinStock": false,
+    "imagenes": [
+      "/assets/tubo-pelotas-noac-x2u-1779451593153.webp"
+    ],
+    "fechaActualizacion": "2026-05-22T12:06:41.973Z"
   },
   {
     "id": "p11",
