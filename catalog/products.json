@@ -72,7 +72,7 @@
     "nombre": "Buzo medio cierre micropolar unisex",
     "precio": 20999,
     "descripcion": "Buzo medio cierre micropolar unisex calidad super premium usado por maradona",
-    "tag": "",
+    "tag": "destacado",
     "categoria": "ropa",
     "genero": "unisex",
     "parteCuerpo": "torso",
@@ -91,10 +91,10 @@
     "emoji": "👕",
     "id": "p1779317305009",
     "sinStock": true,
+    "fechaActualizacion": "2026-05-22T05:03:28.360Z",
     "imagenes": [
       "/assets/buzo-medio-cierre-micropolar-unisex.jpeg"
-    ],
-    "fechaActualizacion": "2026-05-22T05:01:27.374Z"
+    ]
   },
   {
     "nombre": "1111",
