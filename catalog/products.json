@@ -55,7 +55,7 @@
     "nombre": "1111",
     "precio": 111,
     "descripcion": "11112",
-    "tag": "",
+    "tags": [],
     "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "piernas",
@@ -73,10 +73,13 @@
     ],
     "noStock": [],
     "emoji": "🩳",
-    "imagen": "/assets/1111.jpg",
     "id": "p1779399693858",
     "fechaPublicacion": "2026-05-21T21:41:33.859Z",
-    "visible": false
+    "visible": true,
+    "imagenes": [
+      "/assets/1111.jpg"
+    ],
+    "fechaActualizacion": "2026-05-22T15:20:52.918Z"
   },
   {
     "nombre": "2",
