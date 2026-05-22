@@ -16,7 +16,7 @@
     "noStock": [],
     "descripcion": "Pack de 3 pelotas de pádel homologadas. Alta durabilidad con presión constante para mayor consistencia de juego. Aptas para todo tipo de superficie.",
     "tag": "",
-    "visible": true,
+    "visible": false,
     "sinStock": false
   },
   {
@@ -38,7 +38,7 @@
     "noStock": [],
     "descripcion": "Pack de 10 overgrips para paleta de pádel. Tacto suave y antideslizante con alta absorción de sudor. Ultra-finos para mantener el feel original de la paleta.",
     "tag": "oferta",
-    "visible": true
+    "visible": false
   },
   {
     "id": "p12",
