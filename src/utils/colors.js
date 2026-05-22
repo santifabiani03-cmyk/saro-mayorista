@@ -45,7 +45,7 @@ export const TAG_CONFIG = {
 }
 
 export const CATEGORIA_LABELS  = { ropa: '👕 Ropa', padel: '🏓 Pádel' }
-export const GENERO_LABELS     = { masculino: '♂ Masculino', femenino: '♀ Femenino', unisex: '⚡ Unisex' }
+export const GENERO_LABELS     = { masculino: 'Masculino', femenino: 'Femenino', unisex: 'Unisex' }
 export const PARTE_LABELS      = {
   torso:     '👕 Torso',
   piernas:   '🩳 Piernas',
