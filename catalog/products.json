@@ -73,8 +73,6 @@
     "precio": 20999,
     "descripcion": "Buzo medio cierre micropolar unisex calidad super premium usado por maradona",
     "tags": [
-      "destacado",
-      "oferta",
       "nuevo",
       "oferta_relampago"
     ],
@@ -96,7 +94,7 @@
     "emoji": "👕",
     "id": "p1779317305009",
     "sinStock": false,
-    "fechaActualizacion": "2026-05-22T05:18:14.548Z",
+    "fechaActualizacion": "2026-05-22T05:31:59.394Z",
     "imagenes": [
       "/assets/buzo-medio-cierre-micropolar-unisex.jpeg"
     ]
