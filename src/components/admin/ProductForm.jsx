@@ -1,7 +1,7 @@
 import { useState, useEffect, useRef } from 'react'
 import {
   COLOR_MAP, PREDEFINED_COLORS, PREDEFINED_TALLES,
-  getAutoEmoji, TAG_CONFIG, getProductTags,
+  getAutoEmoji, TAG_CONFIG, getProductTags, getSwatchStyle,
 } from '../../utils/colors'
 
 const BLANK = {
@@ -231,7 +231,7 @@ function ColorPicker({ selected, onChange }) {
             >
               <span
                 className="w-3 h-3 rounded-full border border-white shadow-sm flex-shrink-0"
-                style={{ backgroundColor: COLOR_MAP[c] ?? '#e5e7eb' }}
+                style={getSwatchStyle(c)}
               />
               {c}
               {active && <span className="text-saro-blue font-bold">✓</span>}
@@ -354,7 +354,7 @@ function NoStockMatrix({ colores, talles, noStock, onChange }) {
                 <div className="flex items-center gap-1.5">
                   <span
                     className="w-3 h-3 rounded-full border border-gray-200"
-                    style={{ backgroundColor: COLOR_MAP[color] ?? '#e5e7eb' }}
+                    style={getSwatchStyle(color)}
                   />
                   <span className="text-xs text-gray-700">{color}</span>
                 </div>

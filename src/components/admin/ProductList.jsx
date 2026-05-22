@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { COLOR_MAP, TAG_CONFIG, getProductTags } from '../../utils/colors'
+import { COLOR_MAP, TAG_CONFIG, getProductTags, getSwatchStyle } from '../../utils/colors'
 
 function EyeIcon() {
   return (
@@ -155,7 +155,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                               key={c}
                               title={c}
                               className="w-3.5 h-3.5 rounded-full border border-white shadow-sm"
-                              style={{ backgroundColor: COLOR_MAP[c] ?? '#e5e7eb' }}
+                              style={getSwatchStyle(c)}
                             />
                           ))}
                           {p.colores.length > 8 && (

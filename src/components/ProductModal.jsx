@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useCart } from '../context/CartContext'
-import { COLOR_MAP, TAG_CONFIG, SIZE_ORDER, getProductTags } from '../utils/colors'
+import { COLOR_MAP, TAG_CONFIG, SIZE_ORDER, getProductTags, getSwatchStyle } from '../utils/colors'
 import ImageCarousel from './ImageCarousel'
 
 // Compatibilidad: soporta campo legacy `imagen` (string) y nuevo `imagenes` (array)
@@ -129,7 +129,7 @@ export default function ProductModal({ product, onClose }) {
                           <div className="flex items-center gap-1.5">
                             <span
                               className="w-3 h-3 rounded-full border border-gray-200 flex-shrink-0"
-                              style={{ backgroundColor: COLOR_MAP[color] ?? '#e5e7eb' }}
+                              style={getSwatchStyle(color)}
                             />
                             <span className="text-xs text-gray-700 whitespace-nowrap">{color}</span>
                           </div>

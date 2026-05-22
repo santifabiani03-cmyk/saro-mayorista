@@ -1,4 +1,4 @@
-import { COLOR_MAP, TAG_CONFIG, getProductTags } from '../utils/colors'
+import { COLOR_MAP, TAG_CONFIG, getProductTags, getSwatchStyle } from '../utils/colors'
 import ImageCarousel from './ImageCarousel'
 
 // Compatibilidad: soporta campo legacy `imagen` (string) y nuevo `imagenes` (array)
@@ -57,7 +57,7 @@ export default function ProductCard({ product, onClick }) {
               key={c}
               title={c}
               className="w-3.5 h-3.5 rounded-full border border-white shadow-sm flex-shrink-0"
-              style={{ backgroundColor: COLOR_MAP[c] ?? '#e5e7eb' }}
+              style={getSwatchStyle(c)}
             />
           ))}
           {product.colores.length > 6 && (
