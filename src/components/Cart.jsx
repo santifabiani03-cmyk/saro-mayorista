@@ -15,7 +15,7 @@ export default function Cart({ config }) {
     const grouped = {}
     items.forEach(i => {
       if (!grouped[i.productId]) {
-        grouped[i.productId] = { nombre: i.nombre, precio: i.precio, items: [] }
+        grouped[i.productId] = { nombre: i.nombre, precio: i.precio, promos: i.promos ?? [], items: [] }
       }
       grouped[i.productId].items.push(i)
     })
@@ -24,11 +24,24 @@ export default function Cart({ config }) {
 
     Object.values(grouped).forEach(prod => {
       const totalQty = prod.items.reduce((s, i) => s + i.cantidad, 0)
+      // Determinar si aplica promo
+      const applicable = prod.promos
+        .filter(p => totalQty >= p.cantidad)
+        .sort((a, b) => b.cantidad - a.cantidad)[0]
+      const precioUnit = applicable
+        ? Math.round(applicable.precioTotal / applicable.cantidad)
+        : prod.precio
+      const subtotal = Math.round(totalQty * precioUnit)
+
       msg += `\n*${prod.nombre}* $${prod.precio.toLocaleString('es-AR')} C/u\n\n`
       prod.items.forEach(i => {
         msg += `• ${i.color} - ${i.talle} x${i.cantidad}\n`
       })
-      msg += `= ${totalQty} x $${prod.precio.toLocaleString('es-AR')} = $${(totalQty * prod.precio).toLocaleString('es-AR')}\n`
+      if (applicable) {
+        msg += `= ${totalQty}u → promo ${applicable.cantidad}u: $${precioUnit.toLocaleString('es-AR')}/u = $${subtotal.toLocaleString('es-AR')}\n`
+      } else {
+        msg += `= ${totalQty} x $${prod.precio.toLocaleString('es-AR')} = $${subtotal.toLocaleString('es-AR')}\n`
+      }
     })
 
     msg += `\n*TOTAL: $${total.toLocaleString('es-AR')}*\n\nGracias!`
@@ -156,6 +169,22 @@ export default function Cart({ config }) {
                   <span className="font-bold text-sm text-saro-blue">
                     ${(item.precio * item.cantidad).toLocaleString('es-AR')}
                   </span>
+                  {item.promos?.length > 0 && (() => {
+                    // Calcular qty total de este producto en el carrito
+                    const prodQty = items.filter(x => x.productId === item.productId)
+                      .reduce((s, x) => s + x.cantidad, 0)
+                    const best = item.promos
+                      .filter(p => prodQty >= p.cantidad)
+                      .sort((a, b) => b.cantidad - a.cantidad)[0]
+                    if (best) {
+                      return (
+                        <span className="text-[10px] text-green-600 font-medium">
+                          promo {best.cantidad}u
+                        </span>
+                      )
+                    }
+                    return null
+                  })()}
                   <button
                     onClick={() => removeItem(item.productId, item.color, item.talle)}
                     className="text-xs text-gray-400 hover:text-red-500 transition-colors"

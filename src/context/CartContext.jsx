@@ -37,6 +37,7 @@ export function CartProvider({ children }) {
             emoji:     product.emoji,
             imagen,
             precio:    product.precio,
+            promos:    product.promos ?? [],
             color,
             talle,
             cantidad,
@@ -66,7 +67,28 @@ export function CartProvider({ children }) {
 
   const clearCart = () => setItems([])
 
-  const total      = items.reduce((s, i) => s + i.precio * i.cantidad, 0)
+  // Agrupar por producto para aplicar promos
+  const getPromoTotals = () => {
+    const grouped = {}
+    items.forEach(i => {
+      if (!grouped[i.productId]) grouped[i.productId] = { precio: i.precio, promos: i.promos ?? [], qty: 0 }
+      grouped[i.productId].qty += i.cantidad
+    })
+    let sum = 0
+    Object.values(grouped).forEach(g => {
+      const applicable = g.promos
+        .filter(p => g.qty >= p.cantidad)
+        .sort((a, b) => b.cantidad - a.cantidad)[0]
+      if (applicable) {
+        sum += g.qty * (applicable.precioTotal / applicable.cantidad)
+      } else {
+        sum += g.qty * g.precio
+      }
+    })
+    return Math.round(sum)
+  }
+
+  const total      = getPromoTotals()
   const totalItems = items.reduce((s, i) => s + i.cantidad, 0)
 
   return (

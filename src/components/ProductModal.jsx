@@ -175,16 +175,70 @@ export default function ProductModal({ product, onClose }) {
                 </div>
               )}
 
-              {totalUnidades > 0 && (
-                <div className="flex items-center justify-between bg-saro-light rounded-xl px-4 py-3">
-                  <span className="text-sm font-medium text-saro-dark">
-                    {totalUnidades} unidad{totalUnidades !== 1 ? 'es' : ''} seleccionada{totalUnidades !== 1 ? 's' : ''}
-                  </span>
-                  <span className="font-extrabold text-saro-blue">
-                    ${(totalUnidades * product.precio).toLocaleString('es-AR')}
-                  </span>
+              {/* Promos por cantidad */}
+              {product.promos?.length > 0 && (
+                <div className="space-y-1.5">
+                  <p className="text-xs font-semibold text-gray-500">🔥 Promos por cantidad:</p>
+                  <div className="flex flex-wrap gap-1.5">
+                    {product.promos.map((p, i) => {
+                      const ppu = p.precioTotal / p.cantidad
+                      const active = totalUnidades >= p.cantidad
+                      return (
+                        <span key={i} className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all ${
+                          active
+                            ? 'bg-green-50 border-green-300 text-green-700'
+                            : 'bg-gray-50 border-gray-200 text-gray-500'
+                        }`}>
+                          {p.cantidad}u → ${Math.round(ppu).toLocaleString('es-AR')}/u
+                        </span>
+                      )
+                    })}
+                  </div>
                 </div>
               )}
+
+              {totalUnidades > 0 && (() => {
+                const promos = product.promos ?? []
+                const applicable = promos
+                  .filter(p => totalUnidades >= p.cantidad)
+                  .sort((a, b) => b.cantidad - a.cantidad)[0]
+                const precioUnit = applicable
+                  ? applicable.precioTotal / applicable.cantidad
+                  : product.precio
+                const totalConPromo = Math.round(totalUnidades * precioUnit)
+                const totalSinPromo = totalUnidades * product.precio
+                const ahorro = totalSinPromo - totalConPromo
+
+                return (
+                  <div className="space-y-1.5">
+                    <div className="flex items-center justify-between bg-saro-light rounded-xl px-4 py-3">
+                      <span className="text-sm font-medium text-saro-dark">
+                        {totalUnidades} unidad{totalUnidades !== 1 ? 'es' : ''} seleccionada{totalUnidades !== 1 ? 's' : ''}
+                      </span>
+                      <div className="text-right">
+                        {ahorro > 0 && (
+                          <span className="text-xs text-gray-400 line-through mr-2">
+                            ${totalSinPromo.toLocaleString('es-AR')}
+                          </span>
+                        )}
+                        <span className="font-extrabold text-saro-blue">
+                          ${totalConPromo.toLocaleString('es-AR')}
+                        </span>
+                      </div>
+                    </div>
+                    {ahorro > 0 && (
+                      <div className="flex items-center justify-between bg-green-50 border border-green-200 rounded-xl px-4 py-2">
+                        <span className="text-xs text-green-700 font-medium">
+                          💰 Ahorrás ${ahorro.toLocaleString('es-AR')} con la promo de {applicable.cantidad}u
+                        </span>
+                        <span className="text-xs font-bold text-green-600">
+                          ${Math.round(precioUnit).toLocaleString('es-AR')}/u
+                        </span>
+                      </div>
+                    )}
+                  </div>
+                )
+              })()}
             </div>
           </div>
         </div>

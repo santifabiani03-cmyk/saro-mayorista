@@ -8,6 +8,7 @@ const BLANK = {
   nombre: '', precio: '', descripcion: '', tags: [],
   categoria: '', genero: '', parteCuerpo: '',
   colores: [], talles: [], noStock: [], emoji: '📦',
+  promos: [],
 }
 
 /**
@@ -534,6 +535,79 @@ function NoStockMatrix({ colores, talles, noStock, onChange }) {
   )
 }
 
+// ── Editor de promos por cantidad ─────────────────────────────────────────────
+
+function PromoEditor({ promos, onChange, precioBase }) {
+  const addPromo = () => onChange([...promos, { cantidad: '', precioTotal: '' }])
+
+  const updatePromo = (idx, field, val) => {
+    const next = promos.map((p, i) => i === idx ? { ...p, [field]: val } : p)
+    onChange(next)
+  }
+
+  const removePromo = (idx) => onChange(promos.filter((_, i) => i !== idx))
+
+  const sorted = [...promos]
+    .map((p, i) => ({ ...p, _idx: i }))
+    .sort((a, b) => (Number(a.cantidad) || 0) - (Number(b.cantidad) || 0))
+
+  return (
+    <div className="space-y-3">
+      {sorted.length === 0 ? (
+        <p className="text-xs text-gray-400">Sin promos. Agregá descuentos por cantidad para este producto.</p>
+      ) : (
+        <div className="space-y-2">
+          {sorted.map(p => {
+            const qty   = Number(p.cantidad) || 0
+            const total = Number(p.precioTotal) || 0
+            const ppu   = qty > 0 && total > 0 ? total / qty : 0
+            const base  = Number(precioBase) || 0
+            const ahorro = base > 0 && ppu > 0 ? Math.round((1 - ppu / base) * 100) : 0
+            return (
+              <div key={p._idx} className="flex items-center gap-2 bg-gray-50 rounded-xl p-2.5">
+                <div className="flex items-center gap-1.5 flex-1">
+                  <input
+                    type="number" min="1" placeholder="Cant."
+                    value={p.cantidad}
+                    onChange={e => updatePromo(p._idx, 'cantidad', e.target.value)}
+                    className="w-20 text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-saro-blue text-center"
+                  />
+                  <span className="text-xs text-gray-400">u. ×</span>
+                  <div className="relative flex-1">
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-gray-400">$</span>
+                    <input
+                      type="number" min="0" placeholder="Precio total"
+                      value={p.precioTotal}
+                      onChange={e => updatePromo(p._idx, 'precioTotal', e.target.value)}
+                      className="w-full text-sm border border-gray-200 rounded-lg pl-5 pr-2 py-1.5 focus:outline-none focus:border-saro-blue"
+                    />
+                  </div>
+                </div>
+                {ppu > 0 && (
+                  <span className="text-xs text-gray-500 whitespace-nowrap">
+                    ${Math.round(ppu).toLocaleString('es-AR')}/u
+                    {ahorro > 0 && <span className="text-green-600 font-bold ml-1">-{ahorro}%</span>}
+                  </span>
+                )}
+                <button
+                  type="button" onClick={() => removePromo(p._idx)}
+                  className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                >✕</button>
+              </div>
+            )
+          })}
+        </div>
+      )}
+      <button
+        type="button" onClick={addPromo}
+        className="text-sm text-saro-blue hover:text-saro-dark font-semibold transition-colors"
+      >
+        + Agregar promo por cantidad
+      </button>
+    </div>
+  )
+}
+
 // ── Formulario principal ──────────────────────────────────────────────────────
 
 export default function ProductForm({ initial, onSave, onCancel, saving }) {
@@ -588,11 +662,18 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
       }
     })
 
+    // Limpiar promos: convertir a números y filtrar vacías
+    const cleanPromos = (form.promos ?? [])
+      .filter(p => Number(p.cantidad) > 0 && Number(p.precioTotal) > 0)
+      .map(p => ({ cantidad: Number(p.cantidad), precioTotal: Number(p.precioTotal) }))
+      .sort((a, b) => a.cantidad - b.cantidad)
+
     const product = {
       ...form,
       id:       form.id ?? `p${Date.now()}`,
       precio:   Number(form.precio),
       imagenes,
+      promos:   cleanPromos,
       ...(Object.keys(colorDefs).length > 0 && { colorDefs }),
     }
     // Eliminar campos legacy
@@ -794,6 +875,21 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               />
             </div>
           )}
+
+          {/* Promos por cantidad */}
+          <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
+            <div>
+              <h3 className="font-semibold text-gray-800 text-sm">🔥 Promos por cantidad</h3>
+              <p className="text-xs text-gray-400 mt-0.5">
+                Definí precios especiales para compras por cantidad (ej: 20u × $33.000).
+              </p>
+            </div>
+            <PromoEditor
+              promos={form.promos ?? []}
+              onChange={v => set('promos', v)}
+              precioBase={form.precio}
+            />
+          </div>
 
           {/* Preview rápido */}
           <div className="bg-saro-light rounded-2xl p-4 flex items-center gap-4">
