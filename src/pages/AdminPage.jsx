@@ -210,49 +210,61 @@ export default function AdminPage() {
 
       {/* Header */}
       <header className="bg-saro-dark text-white shadow-lg">
-        <div className="max-w-6xl mx-auto px-5 py-4 flex items-center justify-between">
-          <div className="flex items-center gap-3">
-            <img
-              src="/assets/logo-horizontal.png"
-              alt="SARO"
-              className="h-10 w-auto brightness-0 invert"
-              onError={e => { e.target.style.display = 'none' }}
-            />
-            <div>
-              <p className="font-extrabold text-lg leading-none">Panel Admin</p>
-              <p className="text-xs text-saro-light opacity-80 mt-0.5">SARO Mayorista</p>
+        <div className="max-w-6xl mx-auto px-4 py-3 sm:py-4">
+
+          {/* Fila única: logo | acciones */}
+          <div className="flex items-center justify-between gap-3">
+
+            {/* Izquierda: logo + título */}
+            <div className="flex items-center gap-2.5 min-w-0">
+              <img
+                src="/assets/logo.png"
+                alt="SARO"
+                className="h-9 w-auto brightness-0 invert flex-shrink-0"
+                onError={e => { e.target.style.display = 'none' }}
+              />
+              <div className="min-w-0">
+                <p className="font-extrabold text-sm sm:text-lg leading-none">Panel Admin</p>
+                <p className="text-[11px] text-white/60 mt-0.5 hidden sm:block">SARO Mayorista</p>
+              </div>
             </div>
-          </div>
-          <div className="flex items-center gap-3">
-            {/* Indicador de sincronización */}
-            {publishedSnap !== null && (
-              <span className={`text-xs font-semibold flex items-center gap-1.5 ${isSynced ? 'text-green-400' : 'text-red-400'}`}>
-                <span className={`w-2 h-2 rounded-full ${isSynced ? 'bg-green-400' : 'bg-red-400 animate-pulse'}`} />
-                {isSynced ? 'En vivo' : 'Cambios sin publicar'}
-              </span>
-            )}
 
-            {/* Botón publicar */}
-            <button
-              onClick={handleDeploy}
-              disabled={deploying || isSynced}
-              className={`flex items-center gap-2 px-4 py-2 text-white text-sm font-bold rounded-xl transition-all ${
-                deploying
-                  ? 'bg-gray-500 opacity-60 cursor-not-allowed'
-                  : isSynced
-                  ? 'bg-gray-600 opacity-50 cursor-not-allowed'
-                  : 'bg-green-500 hover:bg-green-400 shadow-lg shadow-green-900/30'
-              }`}
-            >
-              {deploying ? '⏳ Publicando…' : '🚀 Publicar en sitio'}
-            </button>
+            {/* Derecha: indicador + publicar + ver tienda */}
+            <div className="flex items-center gap-2 flex-shrink-0">
 
-            <a
-              href="/"
-              className="text-sm text-saro-light hover:text-white flex items-center gap-1 transition-colors"
-            >
-              ← Ver tienda
-            </a>
+              {/* Indicador de sincronización — solo punto en mobile, texto en desktop */}
+              {publishedSnap !== null && (
+                <span className={`flex items-center gap-1.5 text-xs font-semibold ${isSynced ? 'text-green-400' : 'text-yellow-400'}`}>
+                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isSynced ? 'bg-green-400' : 'bg-yellow-400 animate-pulse'}`} />
+                  <span className="hidden sm:inline">{isSynced ? 'En vivo' : 'Sin publicar'}</span>
+                </span>
+              )}
+
+              {/* Botón publicar */}
+              <button
+                onClick={handleDeploy}
+                disabled={deploying || isSynced}
+                className={`flex items-center gap-1.5 px-3 py-2 text-white text-xs sm:text-sm font-bold rounded-xl transition-all ${
+                  deploying
+                    ? 'bg-gray-500 opacity-60 cursor-not-allowed'
+                    : isSynced
+                    ? 'bg-gray-600 opacity-50 cursor-not-allowed'
+                    : 'bg-green-500 hover:bg-green-400 shadow-lg shadow-green-900/30'
+                }`}
+              >
+                <span>{deploying ? '⏳' : '🚀'}</span>
+                <span className="hidden sm:inline">{deploying ? 'Publicando…' : 'Publicar en sitio'}</span>
+                <span className="sm:hidden">{deploying ? 'Publicando…' : 'Publicar'}</span>
+              </button>
+
+              {/* Ver tienda */}
+              <a
+                href="/"
+                className="text-xs sm:text-sm text-white/60 hover:text-white flex items-center gap-1 transition-colors whitespace-nowrap"
+              >
+                ← <span className="hidden sm:inline">Ver </span>tienda
+              </a>
+            </div>
           </div>
         </div>
       </header>
