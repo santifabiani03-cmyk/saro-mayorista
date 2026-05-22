@@ -15,7 +15,8 @@
     ],
     "noStock": [],
     "descripcion": "Pack de 3 pelotas de pádel homologadas. Alta durabilidad con presión constante para mayor consistencia de juego. Aptas para todo tipo de superficie.",
-    "tag": ""
+    "tag": "",
+    "visible": false
   },
   {
     "id": "p11",
@@ -35,7 +36,8 @@
     ],
     "noStock": [],
     "descripcion": "Pack de 10 overgrips para paleta de pádel. Tacto suave y antideslizante con alta absorción de sudor. Ultra-finos para mantener el feel original de la paleta.",
-    "tag": "oferta"
+    "tag": "oferta",
+    "visible": false
   },
   {
     "id": "p12",
@@ -61,7 +63,8 @@
       }
     ],
     "descripcion": "Muñequera deportiva de terry con alta absorción. Elástico cómodo sin perder sujeción. Ideal para pádel, tenis y todos los deportes de raqueta.",
-    "tag": ""
+    "tag": "",
+    "visible": false
   },
   {
     "nombre": "Buzo medio cierre micropolar unisex",
