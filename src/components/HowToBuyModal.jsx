@@ -16,20 +16,20 @@ const steps = [
   {
     number: '3',
     icon: '✅',
-    title: 'Rocío confirma el stock',
-    desc: 'Rocío va a revisar tu pedido y te confirma qué productos están disponibles en ese momento.',
+    title: 'Confirmamos el stock',
+    desc: 'Nosotros vamos a revisar tu pedido y te confirmamos qué productos están disponibles en ese momento.',
   },
   {
     number: '4',
     icon: '💳',
     title: 'Te indicamos cómo pagar',
-    desc: 'Rocío te comparte los datos de la cuenta para realizar la transferencia o el pago acordado.',
+    desc: 'Te compartimos los datos de la cuenta para realizar la transferencia o el pago acordado.',
   },
   {
     number: '5',
     icon: '📦',
     title: '¡Listo! Confirmamos el envío',
-    desc: 'Una vez acreditado el pago, Rocío confirma el envío y te da seguimiento hasta que llegue.',
+    desc: 'Una vez acreditado el pago, confirmamos el envío y te damos seguimiento hasta que llegue.',
   },
 ]
 
