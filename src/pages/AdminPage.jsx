@@ -94,7 +94,7 @@ function PinGate({ onAuth }) {
 
 export default function AdminPage() {
   const [authed, setAuthed]             = useState(() => sessionStorage.getItem(SESSION_KEY) === 'ok')
-  const [tab, setTab]                   = useState('nuevo')
+  const [tab, setTab]                   = useState(() => sessionStorage.getItem('saro_admin_tab') ?? 'editar')
   const [products, setProducts]         = useState([])
   const [publishedSnap, setPublishedSnap] = useState(null) // snapshot de lo que está publicado
   const [editingProduct, setEditing]    = useState(null)
@@ -103,6 +103,8 @@ export default function AdminPage() {
   const [deploying, setDeploying]       = useState(false)
   // isDev = true solo cuando corre en localhost (desarrollo local)
   const isDev = window.location.hostname === 'localhost'
+
+  const changeTab = (t) => { sessionStorage.setItem('saro_admin_tab', t); setTab(t) }
 
   // Sincronizado = el estado actual coincide con lo que está publicado
   const isSynced = publishedSnap !== null &&
@@ -146,14 +148,14 @@ export default function AdminPage() {
   const handleAdd = async (product) => {
     const withDate = { ...product, fechaPublicacion: new Date().toISOString() }
     await persistProducts([...products, withDate])
-    setTab('editar')
+    changeTab('editar')
   }
 
   const handleUpdate = async (updated) => {
     const withDate = { ...updated, fechaActualizacion: new Date().toISOString() }
     await persistProducts(products.map(p => p.id === updated.id ? withDate : p))
     setEditing(null)
-    setTab('editar')
+    changeTab('editar')
   }
 
   const handleDelete = async (id) => {
@@ -164,13 +166,13 @@ export default function AdminPage() {
 
   const handleEdit = (product) => {
     setEditing(product)
-    setTab('nuevo')
+    changeTab('nuevo')
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 
   const handleCancelEdit = () => {
     setEditing(null)
-    setTab('editar')
+    changeTab('editar')
   }
 
   const handleToggleVisible = async (id) => {
@@ -281,12 +283,12 @@ export default function AdminPage() {
       <div className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
         <div className="max-w-6xl mx-auto px-5 flex gap-1">
           {[
-            { key: 'nuevo', label: editingProduct ? '✏️ Editando producto' : '＋ Nuevo producto' },
             { key: 'editar', label: `📋 Publicados (${products.length})` },
+            { key: 'nuevo',  label: editingProduct ? '✏️ Editando producto' : '＋ Nuevo producto' },
           ].map(t => (
             <button
               key={t.key}
-              onClick={() => { setTab(t.key); if (t.key === 'editar') setEditing(null) }}
+              onClick={() => { changeTab(t.key); if (t.key === 'editar') setEditing(null) }}
               className={`px-5 py-3.5 text-sm font-semibold border-b-2 transition-colors ${
                 tab === t.key
                   ? 'border-saro-blue text-saro-blue'
