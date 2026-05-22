@@ -129,7 +129,7 @@ export default function ProductModal({ product, onClose }) {
                           <div className="flex items-center gap-1.5">
                             <span
                               className="w-3 h-3 rounded-full border border-gray-200 flex-shrink-0"
-                              style={getSwatchStyle(color)}
+                              style={getSwatchStyle(color, product.colorDefs)}
                             />
                             <span className="text-xs text-gray-700 whitespace-nowrap">{color}</span>
                           </div>

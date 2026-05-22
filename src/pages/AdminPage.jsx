@@ -1,6 +1,7 @@
 import { useState, useEffect } from 'react'
 import ProductForm from '../components/admin/ProductForm'
 import ProductList from '../components/admin/ProductList'
+import DemandDashboard from '../components/admin/DemandDashboard'
 
 
 const SESSION_KEY     = 'saro_admin_auth'
@@ -292,6 +293,7 @@ export default function AdminPage() {
           {[
             { key: 'editar', label: `📋 Publicados (${products.length})` },
             { key: 'nuevo',  label: editingProduct ? '✏️ Editando producto' : '＋ Nuevo producto' },
+            { key: 'demanda', label: '📊 Demanda' },
           ].map(t => (
             <button
               key={t.key}
@@ -327,6 +329,8 @@ export default function AdminPage() {
             onCancel={editingProduct ? handleCancelEdit : null}
             saving={saving}
           />
+        ) : tab === 'demanda' ? (
+          <DemandDashboard />
         ) : (
           <ProductList
             products={products}

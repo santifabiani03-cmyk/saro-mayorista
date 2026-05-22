@@ -578,11 +578,22 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     e.preventDefault()
     if (!validate()) return
 
+    // Incluir definiciones de colores custom para que se vean en la web pública
+    const allCustomDefs = loadCustomDefs()
+    const predefinedSet = new Set(PREDEFINED_COLORS)
+    const colorDefs = {}
+    form.colores.forEach(c => {
+      if (!predefinedSet.has(c) && allCustomDefs[c]) {
+        colorDefs[c] = allCustomDefs[c]
+      }
+    })
+
     const product = {
       ...form,
       id:       form.id ?? `p${Date.now()}`,
       precio:   Number(form.precio),
       imagenes,
+      ...(Object.keys(colorDefs).length > 0 && { colorDefs }),
     }
     // Eliminar campos legacy
     delete product.imagen

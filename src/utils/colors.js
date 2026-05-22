@@ -89,13 +89,24 @@ export const getAutoEmoji = (categoria, parteCuerpo) =>
   AUTO_EMOJI[categoria]?.[parteCuerpo] ?? '📦'
 
 /** Devuelve el style object para un swatch de color.
- *  Para colores compuestos como "Negro/Azul" devuelve un degradado diagonal partido. */
-export const getSwatchStyle = (colorName) => {
+ *  Para colores compuestos como "Negro/Azul" devuelve un degradado diagonal partido.
+ *  Acepta un mapa opcional de definiciones custom (colorDefs del producto). */
+export const getSwatchStyle = (colorName, colorDefs) => {
+  // 1. Custom defs del producto (ej: { "Turquesa": ["Celeste"], "BiColor": ["Negro","Azul"] })
+  if (colorDefs?.[colorName]) {
+    const bases = colorDefs[colorName]
+    if (bases.length === 1) return { backgroundColor: COLOR_MAP[bases[0]] ?? '#e5e7eb' }
+    const ca = COLOR_MAP[bases[0]] ?? '#e5e7eb'
+    const cb = COLOR_MAP[bases[1]] ?? '#e5e7eb'
+    return { background: `linear-gradient(135deg, ${ca} 50%, ${cb} 50%)` }
+  }
+  // 2. Colores compuestos con "/"
   if (colorName.includes('/')) {
     const [a, b] = colorName.split('/')
     const ca = COLOR_MAP[a] ?? '#e5e7eb'
     const cb = COLOR_MAP[b] ?? '#e5e7eb'
     return { background: `linear-gradient(135deg, ${ca} 50%, ${cb} 50%)` }
   }
+  // 3. Color simple
   return { backgroundColor: COLOR_MAP[colorName] ?? '#e5e7eb' }
 }

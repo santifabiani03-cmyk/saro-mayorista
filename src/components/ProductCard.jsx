@@ -57,7 +57,7 @@ export default function ProductCard({ product, onClick }) {
               key={c}
               title={c}
               className="w-3.5 h-3.5 rounded-full border border-white shadow-sm flex-shrink-0"
-              style={getSwatchStyle(c)}
+              style={getSwatchStyle(c, product.colorDefs)}
             />
           ))}
           {product.colores.length > 6 && (

@@ -37,6 +37,12 @@ export default function Cart({ config }) {
 
   const sendWhatsApp = () => {
     if (items.length === 0) return
+    // Registrar pedido para análisis de demanda (fire-and-forget)
+    fetch('/api/track-order', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ items, total, totalItems }),
+    }).catch(() => {}) // silencioso si falla
     window.open(`https://wa.me/${config.whatsappNumber}?text=${encodeURIComponent(buildMessage())}`, '_blank')
   }
 
