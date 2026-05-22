@@ -1,3 +1,4 @@
+import { useState } from 'react'
 import { CATEGORIA_LABELS, GENERO_LABELS, PARTE_LABELS, TAG_CONFIG, getProductTags } from '../utils/colors'
 
 function Chip({ active, onClick, children }) {
@@ -16,6 +17,8 @@ function Chip({ active, onClick, children }) {
 }
 
 export default function Filters({ products, filters, setFilters }) {
+  const [tagsOpen, setTagsOpen] = useState(false)
+
   const uniq = key => [...new Set(products.map(p => p[key]))]
 
   const toggle = (key, val) =>
@@ -23,9 +26,10 @@ export default function Filters({ products, filters, setFilters }) {
 
   const hasActive = Object.values(filters).some(Boolean)
 
-  // Etiquetas presentes en el catálogo actual
+  // Etiquetas presentes en el catálogo actual, ordenadas de más largo a más corto
   const activeTags = [...new Set(products.flatMap(p => getProductTags(p)))]
     .filter(k => TAG_CONFIG[k])
+    .sort((a, b) => TAG_CONFIG[b].label.length - TAG_CONFIG[a].label.length)
 
   const Group = ({ label, values, filterKey, labelMap }) => (
     <div className="flex flex-col gap-2">
@@ -63,9 +67,31 @@ export default function Filters({ products, filters, setFilters }) {
 
       {activeTags.length > 0 && (
         <div className="pt-3 border-t border-gray-100">
-          <div className="flex flex-col gap-2">
-            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Etiquetas</span>
-            <div className="flex flex-wrap gap-2">
+          {/* Cabecera del desplegable */}
+          <button
+            onClick={() => setTagsOpen(o => !o)}
+            className="flex items-center justify-between w-full group"
+          >
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Etiquetas
+              {filters.tag && (
+                <span className="ml-2 px-1.5 py-0.5 rounded-full bg-saro-blue text-white text-[10px] normal-case font-bold">
+                  {TAG_CONFIG[filters.tag]?.label}
+                </span>
+              )}
+            </span>
+            <svg
+              className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${tagsOpen ? 'rotate-180' : ''}`}
+              viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+              strokeLinecap="round" strokeLinejoin="round"
+            >
+              <polyline points="6 9 12 15 18 9" />
+            </svg>
+          </button>
+
+          {/* Chips desplegables */}
+          {tagsOpen && (
+            <div className="flex flex-wrap gap-2 mt-3">
               {activeTags.map(k => {
                 const tag = TAG_CONFIG[k]
                 return (
@@ -83,7 +109,7 @@ export default function Filters({ products, filters, setFilters }) {
                 )
               })}
             </div>
-          </div>
+          )}
         </div>
       )}
     </div>

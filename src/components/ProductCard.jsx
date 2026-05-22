@@ -5,7 +5,9 @@ import ImageCarousel from './ImageCarousel'
 const getImages = p => p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : []
 
 export default function ProductCard({ product, onClick }) {
-  const tags = getProductTags(product).map(k => TAG_CONFIG[k]).filter(Boolean)
+  const tags = getProductTags(product)
+    .map(k => TAG_CONFIG[k]).filter(Boolean)
+    .sort((a, b) => b.label.length - a.label.length)
   const imgs = getImages(product)
 
   // sinStock: campo explícito del admin, o calculado si todos los combos están sin stock
@@ -23,7 +25,7 @@ export default function ProductCard({ product, onClick }) {
         <ImageCarousel images={imgs} emoji={product.emoji} compact />
 
         {tags.length > 0 && (
-          <div className="absolute top-2 left-2 flex flex-col gap-1">
+          <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
             {tags.map((tag, i) => (
               <span key={i} className={`px-2 py-0.5 rounded-full text-xs font-semibold shadow-sm ${tag.cls}`}>
                 {tag.label}
