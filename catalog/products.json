@@ -1,12 +1,12 @@
 [
   {
-    "id": "p10",
-    "nombre": "Pelotitas Pádel Pack x3",
+    "nombre": "Tubo pelotas NOAC x2u. ",
+    "precio": 6500,
+    "descripcion": "Tubo de pelotas x2 unidades marca NOAC. Excelente paño y presurizacion \nIMPORTADAS",
+    "tags": [],
     "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "accesorio",
-    "emoji": "🎾",
-    "precio": 3200,
     "colores": [
       "Amarillo"
     ],
@@ -14,68 +14,20 @@
       "Única"
     ],
     "noStock": [],
-    "descripcion": "Pack de 3 pelotas de pádel homologadas. Alta durabilidad con presión constante para mayor consistencia de juego. Aptas para todo tipo de superficie.",
-    "tag": "",
-    "visible": false,
-    "sinStock": false
-  },
-  {
-    "id": "p11",
-    "nombre": "Grips para Paleta Pack x10",
-    "categoria": "padel",
-    "genero": "unisex",
-    "parteCuerpo": "accesorio",
-    "emoji": "🤚",
-    "precio": 5500,
-    "colores": [
-      "Negro",
-      "Blanco",
-      "Fucsia"
-    ],
-    "talles": [
-      "Única"
-    ],
-    "noStock": [],
-    "descripcion": "Pack de 10 overgrips para paleta de pádel. Tacto suave y antideslizante con alta absorción de sudor. Ultra-finos para mantener el feel original de la paleta.",
-    "tag": "oferta",
-    "visible": false
-  },
-  {
-    "id": "p12",
-    "nombre": "Muñequera Pádel Pro",
-    "categoria": "padel",
-    "genero": "unisex",
-    "parteCuerpo": "accesorio",
-    "emoji": "🤜",
-    "precio": 2800,
-    "colores": [
-      "Negro",
-      "Blanco",
-      "Rosa"
-    ],
-    "talles": [
-      "S/M",
-      "L/XL"
-    ],
-    "noStock": [
-      {
-        "color": "Rosa",
-        "talle": "L/XL"
-      }
-    ],
-    "descripcion": "Muñequera deportiva de terry con alta absorción. Elástico cómodo sin perder sujeción. Ideal para pádel, tenis y todos los deportes de raqueta.",
-    "tag": "",
+    "emoji": "🎾",
+    "id": "p10",
     "visible": true,
-    "sinStock": false
+    "sinStock": false,
+    "imagenes": [
+      "/assets/tubo-pelotas-noac-x2u-1779451593153.webp"
+    ],
+    "fechaActualizacion": "2026-05-22T12:06:41.973Z"
   },
   {
     "nombre": "Buzo medio cierre micropolar unisex",
     "precio": 20999,
     "descripcion": "Buzo medio cierre micropolar unisex calidad super premium usado por maradona",
-    "tags": [
-      "nuevo",
-      "oferta_relampago"
-    ],
+    "tags": [],
     "categoria": "ropa",
     "genero": "unisex",
     "parteCuerpo": "torso",
@@ -94,7 +46,7 @@
     "emoji": "👕",
     "id": "p1779317305009",
     "sinStock": false,
-    "fechaActualizacion": "2026-05-22T05:31:59.394Z",
+    "fechaActualizacion": "2026-05-22T05:49:21.413Z",
     "imagenes": [
       "/assets/buzo-medio-cierre-micropolar-unisex.jpeg"
     ]
@@ -103,7 +55,7 @@
     "nombre": "1111",
     "precio": 111,
     "descripcion": "11112",
-    "tag": "",
+    "tags": [],
     "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "piernas",
@@ -121,9 +73,13 @@
     ],
     "noStock": [],
     "emoji": "🩳",
-    "imagen": "/assets/1111.jpg",
     "id": "p1779399693858",
-    "fechaPublicacion": "2026-05-21T21:41:33.859Z"
+    "fechaPublicacion": "2026-05-21T21:41:33.859Z",
+    "visible": true,
+    "imagenes": [
+      "/assets/1111.jpg"
+    ],
+    "fechaActualizacion": "2026-05-22T15:20:52.918Z"
   },
   {
     "nombre": "2",
@@ -149,13 +105,14 @@
       "/assets/imagen-1779402076429.webp",
       "/assets/imagen-1779402093096.webp"
     ],
-    "fechaPublicacion": "2026-05-21T22:22:01.250Z"
+    "fechaPublicacion": "2026-05-21T22:22:01.250Z",
+    "visible": false
   },
   {
     "nombre": "qqq",
     "precio": 1231223,
     "descripcion": "22",
-    "tag": "nuevo",
+    "tags": [],
     "categoria": "padel",
     "genero": "femenino",
     "parteCuerpo": "torso",
@@ -170,10 +127,148 @@
     "noStock": [],
     "emoji": "🎽",
     "id": "p1779402221533",
+    "fechaPublicacion": "2026-05-21T22:23:41.533Z",
     "imagenes": [
       "/assets/imagen-1779402191024.webp",
       "/assets/imagen-1779402199893.webp"
     ],
-    "fechaPublicacion": "2026-05-21T22:23:41.533Z"
+    "fechaActualizacion": "2026-05-22T05:49:28.131Z",
+    "visible": false
+  },
+  {
+    "nombre": "MEDIAS ALGODON 3/4 ",
+    "precio": 3500,
+    "descripcion": "Medias algodon 3/4 \nPACK X DOCENA $35.000 ",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Blanco",
+      "Negro",
+      "Gris"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "id": "p1779452073976",
+    "imagenes": [
+      "/assets/imagen-1779451998087.webp"
+    ],
+    "fechaPublicacion": "2026-05-22T12:14:33.976Z"
+  },
+  {
+    "nombre": "CUBRE GRIP PERFORADO C/RELIEVE ",
+    "precio": 1800,
+    "descripcion": "CUBRE GRIP PERFORADO RELIEVE NOAC IMPORTADOS\n\nColores disponibles: ROJO-NEGRO-BLANCO-FUCSIA-AMARILLO-VERDE-NARANJA\n\n                          $1.800 c/u \n20u. x $33.000 \n40u. x $64.000 \n60u. x $93.000 \n100u. x $150.000 🔥",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Rojo",
+      "Negro",
+      "Blanco",
+      "Fucsia",
+      "Amarillo",
+      "Verde",
+      "Naranja"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "id": "p1779452132920",
+    "imagenes": [
+      "/assets/imagen-1779452087536.webp"
+    ],
+    "fechaPublicacion": "2026-05-22T12:15:32.920Z"
+  },
+  {
+    "nombre": "CANASTO PLEGABLE ALUMINIO NOAC ",
+    "precio": 160000,
+    "descripcion": "-CAPACIDAD 150 🎾\n-RED DE CONTENCIÓN \n-FUNDA \n-BOLSILLO LATERAL OBJ PEQUEÑOS\n-RUEDAS SÚPER DESLIZANTES CON TRABA\n\n*No incluye pelotas*",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "id": "p1779452295652",
+    "imagenes": [
+      "/assets/imagen-1779452173589.webp"
+    ],
+    "fechaPublicacion": "2026-05-22T12:18:15.652Z"
+  },
+  {
+    "nombre": "CARAMELERA NOAC PERFORADOS X60u. ",
+    "precio": 58000,
+    "descripcion": "Caramelera cubre grip importados NOAC \n60 unidades surtidas o todas blancas.\nimportados. ",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Blanco",
+      "Multicolor"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "id": "p1779452463276",
+    "imagenes": [
+      "/assets/imagen-1779452345276.webp"
+    ],
+    "fechaPublicacion": "2026-05-22T12:21:03.276Z"
+  },
+  {
+    "nombre": "TOALLA DE MANO MICROFIBRA ",
+    "precio": 4000,
+    "descripcion": "Toalla de mano micrifibra.\nSecado rapido \nIncluye estuche",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Gris",
+      "Rosa",
+      "Verde",
+      "Marino",
+      "Gris osc.",
+      "Violeta",
+      "Naranja",
+      "Surtido"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "id": "p1779452642845",
+    "imagenes": [
+      "/assets/imagen-1779452499007.webp"
+    ],
+    "fechaPublicacion": "2026-05-22T12:24:02.845Z"
   }
 ]
