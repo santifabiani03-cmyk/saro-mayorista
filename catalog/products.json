@@ -72,10 +72,7 @@
     "nombre": "Buzo medio cierre micropolar unisex",
     "precio": 20999,
     "descripcion": "Buzo medio cierre micropolar unisex calidad super premium usado por maradona",
-    "tags": [
-      "nuevo",
-      "oferta_relampago"
-    ],
+    "tags": [],
     "categoria": "ropa",
     "genero": "unisex",
     "parteCuerpo": "torso",
@@ -94,7 +91,7 @@
     "emoji": "👕",
     "id": "p1779317305009",
     "sinStock": false,
-    "fechaActualizacion": "2026-05-22T05:31:59.394Z",
+    "fechaActualizacion": "2026-05-22T05:49:21.413Z",
     "imagenes": [
       "/assets/buzo-medio-cierre-micropolar-unisex.jpeg"
     ]
@@ -155,7 +152,7 @@
     "nombre": "qqq",
     "precio": 1231223,
     "descripcion": "22",
-    "tag": "nuevo",
+    "tags": [],
     "categoria": "padel",
     "genero": "femenino",
     "parteCuerpo": "torso",
@@ -170,10 +167,11 @@
     "noStock": [],
     "emoji": "🎽",
     "id": "p1779402221533",
+    "fechaPublicacion": "2026-05-21T22:23:41.533Z",
     "imagenes": [
       "/assets/imagen-1779402191024.webp",
       "/assets/imagen-1779402199893.webp"
     ],
-    "fechaPublicacion": "2026-05-21T22:23:41.533Z"
+    "fechaActualizacion": "2026-05-22T05:49:28.131Z"
   }
 ]
