@@ -66,12 +66,13 @@ async function uploadFile(file, productName) {
   const slug = (productName || 'imagen').trim().toLowerCase()
     .replace(/[^a-z0-9]+/g, '-').replace(/^-|-$/g, '') || 'img'
   const name = `${slug}-${Date.now()}.${ext}`
+  const pin  = sessionStorage.getItem('saro_admin_pin') ?? ''
 
   try {
     const res  = await fetch('/api/upload-image', {
       method:  'POST',
       headers: { 'Content-Type': 'application/json' },
-      body:    JSON.stringify({ name, data: base64 }),
+      body:    JSON.stringify({ name, data: base64, pin }),
     })
     const json = await res.json()
     return json.path ?? null
@@ -451,7 +452,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
           {initial ? `Editando: ${initial.nombre}` : 'Nuevo producto'}
         </h2>
         <p className="text-sm text-gray-500 mt-0.5">
-          Los cambios se guardan directamente en <code>public/products.json</code>
+          Completá el formulario y guardá. Usá "Publicar en sitio" para que los cambios sean visibles.
         </p>
       </div>
 

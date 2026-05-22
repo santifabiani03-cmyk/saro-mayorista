@@ -3,7 +3,8 @@ import ProductForm from '../components/admin/ProductForm'
 import ProductList from '../components/admin/ProductList'
 
 
-const SESSION_KEY = 'saro_admin_auth'
+const SESSION_KEY     = 'saro_admin_auth'
+const SESSION_PIN_KEY = 'saro_admin_pin'
 
 function PinGate({ onAuth }) {
   const [pin, setPin]         = useState('')
@@ -23,6 +24,7 @@ function PinGate({ onAuth }) {
       const json = await res.json()
       if (json.ok) {
         sessionStorage.setItem(SESSION_KEY, 'ok')
+        sessionStorage.setItem(SESSION_PIN_KEY, pin)   // guardamos el PIN para enviarlo en requests de escritura
         onAuth()
       } else {
         setError(true)
@@ -166,7 +168,7 @@ export default function AdminPage() {
       const res  = await fetch('/api/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ products }),
+        body: JSON.stringify({ products, pin: sessionStorage.getItem(SESSION_PIN_KEY) ?? '' }),
       })
       const json = await res.json()
       if (!json.ok) throw new Error(json.error ?? 'Error desconocido')

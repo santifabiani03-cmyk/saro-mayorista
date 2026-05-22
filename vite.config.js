@@ -55,10 +55,14 @@ function adminApiPlugin() {
           return res.end(JSON.stringify({ ok: true }))
         }
 
-        // POST /api/upload  →  { name: "slug.jpg", data: "<base64>" }  (legacy, dev only)
+        // POST /api/upload  →  { name: "slug.jpg", data: "<base64>", pin }  (legacy, dev only)
         // POST /api/upload-image  →  mismo comportamiento (usado en prod también)
         if ((req.url === '/api/upload' || req.url === '/api/upload-image') && req.method === 'POST') {
-          const { name, data } = body
+          const { name, data, pin } = body
+          if (typeof pin !== 'string' || pin !== DEV_ADMIN_PIN) {
+            res.statusCode = 401
+            return res.end(JSON.stringify({ error: 'No autorizado' }))
+          }
           if (!name || !data) {
             res.statusCode = 400
             return res.end(JSON.stringify({ error: 'Faltan name/data' }))
@@ -77,7 +81,11 @@ function adminApiPlugin() {
 
         // POST /api/publish  →  guarda products.json localmente (en dev, equivale al serverless)
         if (req.url === '/api/publish' && req.method === 'POST') {
-          const { products } = body
+          const { products, pin } = body
+          if (typeof pin !== 'string' || pin !== DEV_ADMIN_PIN) {
+            res.statusCode = 401
+            return res.end(JSON.stringify({ error: 'No autorizado' }))
+          }
           if (!Array.isArray(products)) {
             res.statusCode = 400
             return res.end(JSON.stringify({ error: 'Body debe tener { products: [...] }' }))

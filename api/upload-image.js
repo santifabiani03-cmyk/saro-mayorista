@@ -30,19 +30,30 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
+  // ── Verificar PIN ───────────────────────────────────────────────────────────
+  const clean = val => (val ?? '').replace(/^﻿/, '').trim()
+  const correctPin = clean(process.env.ADMIN_PIN)
+  if (!correctPin) {
+    return res.status(500).json({ error: 'ADMIN_PIN no configurado en el servidor' })
+  }
+  const { name, data, pin } = req.body ?? {}
+  if (!pin || pin !== correctPin) {
+    return res.status(401).json({ error: 'No autorizado' })
+  }
+  // ───────────────────────────────────────────────────────────────────────────
+
   // Limpiar posibles caracteres BOM u espacios que se pegan al setear env vars
-  const token = (process.env.GITHUB_TOKEN ?? '').replace(/^﻿/, '').trim()
-  const owner = (process.env.GITHUB_OWNER ?? '').replace(/^﻿/, '').trim()
-  const repo  = (process.env.GITHUB_REPO  ?? '').replace(/^﻿/, '').trim()
+  const token = clean(process.env.GITHUB_TOKEN)
+  const owner = clean(process.env.GITHUB_OWNER)
+  const repo  = clean(process.env.GITHUB_REPO)
 
   if (!token || !owner || !repo) {
     return res.status(500).json({ error: 'Faltan variables de entorno del servidor' })
   }
-
-  const { name, data } = req.body ?? {}
   if (!name || !data) {
     return res.status(400).json({ error: 'Faltan name/data' })
   }
+
 
   const safe = name.toLowerCase().replace(/[^a-z0-9._-]/g, '-')
   const filePath = `public/assets/${safe}`

@@ -80,6 +80,17 @@ export default async function handler(req, res) {
     return res.status(405).json({ error: 'Method not allowed' })
   }
 
+  // ── Verificar PIN ───────────────────────────────────────────────────────────
+  const correctPin = clean(process.env.ADMIN_PIN)
+  if (!correctPin) {
+    return res.status(500).json({ error: 'ADMIN_PIN no configurado en el servidor' })
+  }
+  const { products, pin } = req.body ?? {}
+  if (!pin || pin !== correctPin) {
+    return res.status(401).json({ error: 'No autorizado' })
+  }
+  // ───────────────────────────────────────────────────────────────────────────
+
   const token = clean(process.env.GITHUB_TOKEN)
   const owner = clean(process.env.GITHUB_OWNER)
   const repo  = clean(process.env.GITHUB_REPO)
@@ -90,7 +101,6 @@ export default async function handler(req, res) {
     })
   }
 
-  const { products } = req.body ?? {}
   if (!Array.isArray(products)) {
     return res.status(400).json({ error: 'Body debe tener { products: [...] }' })
   }
