@@ -7,13 +7,15 @@ const SESSION_KEY     = 'saro_admin_auth'
 const SESSION_PIN_KEY = 'saro_admin_pin'
 
 function PinGate({ onAuth }) {
-  const [pin, setPin]         = useState('')
-  const [error, setError]     = useState(false)
-  const [shake, setShake]     = useState(false)
-  const [loading, setLoading] = useState(false)
+  const [pin, setPin]           = useState('')
+  const [error, setError]       = useState(null)   // null | string
+  const [shake, setShake]       = useState(false)
+  const [loading, setLoading]   = useState(false)
+  const [blocked, setBlocked]   = useState(false)  // true cuando la IP está bloqueada
 
   const handleSubmit = async (e) => {
     e.preventDefault()
+    if (blocked) return
     setLoading(true)
     try {
       const res  = await fetch('/api/verify-pin', {
@@ -22,18 +24,30 @@ function PinGate({ onAuth }) {
         body:    JSON.stringify({ pin }),
       })
       const json = await res.json()
+
+      if (res.status === 429) {
+        // IP bloqueada por fuerza bruta
+        setBlocked(true)
+        setError(json.error ?? 'Demasiados intentos. Esperá unos minutos.')
+        setPin('')
+        return
+      }
+
       if (json.ok) {
         sessionStorage.setItem(SESSION_KEY, 'ok')
-        sessionStorage.setItem(SESSION_PIN_KEY, pin)   // guardamos el PIN para enviarlo en requests de escritura
+        sessionStorage.setItem(SESSION_PIN_KEY, pin)
         onAuth()
       } else {
-        setError(true)
+        const left = json.attemptsLeft ?? null
+        setError(left !== null && left > 0
+          ? `Código incorrecto. Te quedan ${left} intento${left === 1 ? '' : 's'}.`
+          : 'Código incorrecto. Intentá de nuevo.')
         setShake(true)
         setPin('')
         setTimeout(() => setShake(false), 500)
       }
     } catch {
-      setError(true)
+      setError('Error de conexión. Intentá de nuevo.')
     } finally {
       setLoading(false)
     }
@@ -63,14 +77,14 @@ function PinGate({ onAuth }) {
             }`}
           />
           {error && (
-            <p className="text-sm text-red-500 font-medium">Código incorrecto. Intentá de nuevo.</p>
+            <p className="text-sm text-red-500 font-medium">{error}</p>
           )}
           <button
             type="submit"
-            disabled={loading}
+            disabled={loading || blocked}
             className="w-full py-3 bg-saro-blue hover:bg-saro-dark text-white font-bold rounded-xl transition-colors disabled:opacity-60"
           >
-            {loading ? 'Verificando…' : 'Ingresar'}
+            {loading ? 'Verificando…' : blocked ? 'Bloqueado temporalmente' : 'Ingresar'}
           </button>
         </form>
       </div>
@@ -95,7 +109,7 @@ export default function AdminPage() {
     JSON.stringify(products) === JSON.stringify(publishedSnap)
 
   useEffect(() => {
-    fetch('/products.json')
+    fetch('/api/catalog')
       .then(r => r.json())
       .then(data => {
         setProducts(data)

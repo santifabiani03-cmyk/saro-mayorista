@@ -20,7 +20,7 @@ export default function App() {
 
   useEffect(() => {
     Promise.all([
-      fetch('/products.json').then(r => r.json()),
+      fetch('/api/catalog').then(r => r.json()),
       fetch('/config.json').then(r => r.json()),
     ]).then(([prods, cfg]) => {
       setProducts(prods)

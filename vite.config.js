@@ -4,7 +4,7 @@ import fs from 'node:fs'
 import path from 'node:path'
 import { execSync } from 'node:child_process'
 
-const PRODUCTS_FILE = path.resolve('public/products.json')
+const PRODUCTS_FILE = path.resolve('catalog/products.json')
 const ASSETS_DIR    = path.resolve('public/assets')
 
 // Leer ADMIN_PIN del .env.local para el servidor de desarrollo
@@ -43,13 +43,20 @@ function adminApiPlugin() {
         res.setHeader('Content-Type', 'application/json')
         res.setHeader('Access-Control-Allow-Origin', '*')
 
-        // GET /api/products
+        // GET /api/catalog  →  sirve el catálogo (mismo comportamiento que el serverless de prod)
+        if (req.url === '/api/catalog' && req.method === 'GET') {
+          const data = fs.readFileSync(PRODUCTS_FILE, 'utf-8')
+          res.setHeader('Content-Type', 'application/json; charset=utf-8')
+          return res.end(data)
+        }
+
+        // GET /api/products  →  alias legacy para el admin (dev only)
         if (req.url === '/api/products' && req.method === 'GET') {
           const data = fs.readFileSync(PRODUCTS_FILE, 'utf-8')
           return res.end(data)
         }
 
-        // POST /api/products  →  guarda el array completo
+        // POST /api/products  →  guarda el array completo (dev only)
         if (req.url === '/api/products' && req.method === 'POST') {
           fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(body, null, 2))
           return res.end(JSON.stringify({ ok: true }))

@@ -106,8 +106,8 @@ export default async function handler(req, res) {
   }
 
   try {
-    // 1. Leer products.json actual para detectar productos eliminados
-    const currentFile = await getFile(owner, repo, 'public/products.json', token)
+    // 1. Leer catalog/products.json actual para detectar productos eliminados
+    const currentFile = await getFile(owner, repo, 'catalog/products.json', token)
     let orphanedPaths = []
 
     if (currentFile?.content) {
@@ -118,10 +118,10 @@ export default async function handler(req, res) {
       } catch { /* si no se puede parsear, seguimos igual */ }
     }
 
-    // 2. Actualizar products.json
+    // 2. Actualizar catalog/products.json (fuera de public/ → no accesible como URL estática)
     const json   = JSON.stringify(products, null, 2)
     const base64 = Buffer.from(json, 'utf-8').toString('base64')
-    await putFile(owner, repo, 'public/products.json', base64, 'actualizar catálogo', token, currentFile?.sha)
+    await putFile(owner, repo, 'catalog/products.json', base64, 'actualizar catálogo', token, currentFile?.sha)
 
     // 3. Borrar imágenes huérfanas (best-effort, en paralelo)
     if (orphanedPaths.length > 0) {
