@@ -20,7 +20,7 @@ export default function Cart({ config }) {
       grouped[i.productId].items.push(i)
     })
 
-    let msg = `📋 Quiero hacer un pedido mayorista:\n`
+    let msg = `*Hola!* 📋 Quiero hacer un pedido mayorista:\n`
 
     Object.values(grouped).forEach(prod => {
       const totalQty = prod.items.reduce((s, i) => s + i.cantidad, 0)
