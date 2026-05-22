@@ -44,8 +44,7 @@ export default function Header({ config }) {
               className="flex items-center gap-1.5 px-3 py-2 rounded-xl border-2 border-saro-blue text-saro-blue hover:bg-saro-blue hover:text-white transition-colors text-sm font-semibold"
               title="¿Cómo comprar?"
             >
-              <span>❓</span>
-              <span className="hidden sm:inline">¿Cómo comprar?</span>
+              ¿Cómo comprar?
             </button>
 
             {/* Botón WhatsApp */}
