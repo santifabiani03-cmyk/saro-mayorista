@@ -112,7 +112,7 @@ function adminApiPlugin() {
             return res.end(JSON.stringify({ error: 'GEMINI_API_KEY no configurada en .env.local' }))
           }
           const { nombre, keywords, precio } = body
-          const info = keywords?.trim() ? `${nombre} — ${keywords}` : nombre
+          const hasKw = keywords?.trim()
           const prompt = `Escribí una descripción corta de producto para una tienda online mayorista de indumentaria deportiva y pádel en Argentina.
 
 REGLAS ESTRICTAS:
@@ -121,10 +121,12 @@ REGLAS ESTRICTAS:
 - Describí qué ES el producto y por qué es bueno. Ejemplo: "Remera de entrenamiento con tejido dry-fit que mantiene el cuerpo fresco. Ideal para pádel y running."
 - Usá un tono confiable y profesional, sin exageraciones.
 - No uses emojis, hashtags ni signos de exclamación.
-- Si no tenés info suficiente, describí el producto de forma genérica basándote en su nombre.
 - Respondé ÚNICAMENTE con el texto de la descripción, nada más.
+${hasKw
+  ? `- IMPORTANTE: el usuario escribió palabras clave/ideas que DEBÉS incorporar y desarrollar en la descripción. Basate principalmente en esas palabras clave.`
+  : `- No tenés palabras clave, generá la descripción basándote únicamente en el nombre del producto.`}
 
-Producto: ${info}`
+Nombre del producto: ${nombre}${hasKw ? `\nPalabras clave a desarrollar: ${keywords}` : ''}`
 
           try {
             const geminiRes = await fetch(
