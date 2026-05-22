@@ -1,4 +1,4 @@
-import { CATEGORIA_LABELS, GENERO_LABELS, PARTE_LABELS } from '../utils/colors'
+import { CATEGORIA_LABELS, GENERO_LABELS, PARTE_LABELS, TAG_CONFIG, getProductTags } from '../utils/colors'
 
 function Chip({ active, onClick, children }) {
   return (
@@ -23,6 +23,10 @@ export default function Filters({ products, filters, setFilters }) {
 
   const hasActive = Object.values(filters).some(Boolean)
 
+  // Etiquetas presentes en el catálogo actual
+  const activeTags = [...new Set(products.flatMap(p => getProductTags(p)))]
+    .filter(k => TAG_CONFIG[k])
+
   const Group = ({ label, values, filterKey, labelMap }) => (
     <div className="flex flex-col gap-2">
       <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">{label}</span>
@@ -44,7 +48,7 @@ export default function Filters({ products, filters, setFilters }) {
         </h2>
         {hasActive && (
           <button
-            onClick={() => setFilters({ categoria: '', genero: '', parteCuerpo: '' })}
+            onClick={() => setFilters({ categoria: '', genero: '', parteCuerpo: '', tag: '' })}
             className="text-xs text-saro-blue hover:underline"
           >
             Limpiar filtros
@@ -56,6 +60,32 @@ export default function Filters({ products, filters, setFilters }) {
         <Group label="Género"          values={uniq('genero')}      filterKey="genero"      labelMap={GENERO_LABELS}    />
         <Group label="Parte del cuerpo" values={uniq('parteCuerpo')} filterKey="parteCuerpo" labelMap={PARTE_LABELS}     />
       </div>
+
+      {activeTags.length > 0 && (
+        <div className="pt-3 border-t border-gray-100">
+          <div className="flex flex-col gap-2">
+            <span className="text-xs font-semibold text-gray-400 uppercase tracking-wider">Etiquetas</span>
+            <div className="flex flex-wrap gap-2">
+              {activeTags.map(k => {
+                const tag = TAG_CONFIG[k]
+                return (
+                  <button
+                    key={k}
+                    onClick={() => toggle('tag', k)}
+                    className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all whitespace-nowrap ${
+                      filters.tag === k
+                        ? 'bg-saro-blue border-saro-blue text-white shadow-sm'
+                        : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue hover:text-saro-blue'
+                    }`}
+                  >
+                    {tag.label}
+                  </button>
+                )
+              })}
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   )
 }

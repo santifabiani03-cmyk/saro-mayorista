@@ -1,11 +1,11 @@
-import { COLOR_MAP, TAG_CONFIG } from '../utils/colors'
+import { COLOR_MAP, TAG_CONFIG, getProductTags } from '../utils/colors'
 import ImageCarousel from './ImageCarousel'
 
 // Compatibilidad: soporta campo legacy `imagen` (string) y nuevo `imagenes` (array)
 const getImages = p => p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : []
 
 export default function ProductCard({ product, onClick }) {
-  const tag  = TAG_CONFIG[product.tag]
+  const tags = getProductTags(product).map(k => TAG_CONFIG[k]).filter(Boolean)
   const imgs = getImages(product)
 
   // sinStock: campo explícito del admin, o calculado si todos los combos están sin stock
@@ -22,10 +22,14 @@ export default function ProductCard({ product, onClick }) {
       <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
         <ImageCarousel images={imgs} emoji={product.emoji} compact />
 
-        {tag && (
-          <span className={`absolute top-2 left-2 px-2 py-0.5 rounded-full text-xs font-semibold ${tag.cls}`}>
-            {tag.label}
-          </span>
+        {tags.length > 0 && (
+          <div className="absolute top-2 left-2 flex flex-col gap-1">
+            {tags.map((tag, i) => (
+              <span key={i} className={`px-2 py-0.5 rounded-full text-xs font-semibold shadow-sm ${tag.cls}`}>
+                {tag.label}
+              </span>
+            ))}
+          </div>
         )}
 
         {sinStock && (

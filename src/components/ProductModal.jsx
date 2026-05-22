@@ -1,6 +1,6 @@
 import { useState, useEffect } from 'react'
 import { useCart } from '../context/CartContext'
-import { COLOR_MAP, TAG_CONFIG, SIZE_ORDER } from '../utils/colors'
+import { COLOR_MAP, TAG_CONFIG, SIZE_ORDER, getProductTags } from '../utils/colors'
 import ImageCarousel from './ImageCarousel'
 
 // Compatibilidad: soporta campo legacy `imagen` (string) y nuevo `imagenes` (array)
@@ -61,7 +61,7 @@ export default function ProductModal({ product, onClose }) {
     onClose()
   }
 
-  const tag = TAG_CONFIG[product.tag]
+  const tags = getProductTags(product).map(k => TAG_CONFIG[k]).filter(Boolean)
 
   return (
     <div
@@ -77,11 +77,11 @@ export default function ProductModal({ product, onClose }) {
           <div>
             <div className="flex items-center gap-2 flex-wrap">
               <h2 className="text-lg sm:text-xl font-bold text-gray-900">{product.nombre}</h2>
-              {tag && (
-                <span className={`px-2 py-0.5 rounded-full text-xs font-semibold ${tag.cls}`}>
+              {tags.map((tag, i) => (
+                <span key={i} className={`px-2 py-0.5 rounded-full text-xs font-semibold ${tag.cls}`}>
                   {tag.label}
                 </span>
-              )}
+              ))}
             </div>
             <p className="text-2xl font-extrabold text-saro-blue mt-0.5">
               ${product.precio.toLocaleString('es-AR')}

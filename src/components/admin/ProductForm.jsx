@@ -1,11 +1,11 @@
 import { useState, useEffect, useRef } from 'react'
 import {
   COLOR_MAP, PREDEFINED_COLORS, PREDEFINED_TALLES,
-  getAutoEmoji, TAG_CONFIG,
+  getAutoEmoji, TAG_CONFIG, getProductTags,
 } from '../../utils/colors'
 
 const BLANK = {
-  nombre: '', precio: '', descripcion: '', tag: '',
+  nombre: '', precio: '', descripcion: '', tags: [],
   categoria: 'ropa', genero: 'masculino', parteCuerpo: 'torso',
   colores: [], talles: [], noStock: [], emoji: '👕',
 }
@@ -395,7 +395,9 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
   const [form, setForm] = useState(() => {
     if (!initial) return { ...BLANK }
     const { imagen: _img, imagenes: _imgs, ...rest } = initial
-    return { ...BLANK, ...rest, precio: String(initial.precio) }
+    // Migrar campo legacy `tag` → `tags` array
+    const tags = getProductTags(initial)
+    return { ...BLANK, ...rest, tags, precio: String(initial.precio) }
   })
   // imagenes: array de URLs ya subidas
   const [imagenes, setImagenes] = useState(
@@ -436,8 +438,9 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
       precio:   Number(form.precio),
       imagenes,
     }
-    // Eliminar campo legacy si existía
+    // Eliminar campos legacy
     delete product.imagen
+    delete product.tag
 
     onSave(product)
   }
@@ -499,17 +502,29 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
           </Field>
 
           <Field>
-            <Label>Tag / etiqueta</Label>
-            <select
-              value={form.tag}
-              onChange={e => set('tag', e.target.value)}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue bg-white"
-            >
-              <option value="">Sin etiqueta</option>
-              {Object.entries(TAG_CONFIG).map(([k, v]) => (
-                <option key={k} value={k}>{v.label}</option>
-              ))}
-            </select>
+            <Label>Etiquetas</Label>
+            <div className="flex flex-wrap gap-2">
+              {Object.entries(TAG_CONFIG).map(([k, v]) => {
+                const active = form.tags.includes(k)
+                return (
+                  <button
+                    key={k}
+                    type="button"
+                    onClick={() => set('tags', active ? form.tags.filter(t => t !== k) : [...form.tags, k])}
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition-all ${
+                      active
+                        ? `${v.cls} border-transparent shadow-sm`
+                        : 'bg-white border-gray-200 text-gray-500 hover:border-gray-400'
+                    }`}
+                  >
+                    {v.label}
+                  </button>
+                )
+              })}
+            </div>
+            {form.tags.length === 0 && (
+              <p className="text-xs text-gray-400">Sin etiqueta</p>
+            )}
           </Field>
 
           <Field>

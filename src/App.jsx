@@ -14,7 +14,7 @@ export default function App() {
 
   const [products, setProducts]        = useState([])
   const [config,   setConfig]          = useState(null)
-  const [filters,  setFilters]         = useState({ categoria: '', genero: '', parteCuerpo: '' })
+  const [filters,  setFilters]         = useState({ categoria: '', genero: '', parteCuerpo: '', tag: '' })
   const [selectedProduct, setSelected] = useState(null)
   const [loading,  setLoading]         = useState(true)
 
@@ -30,10 +30,14 @@ export default function App() {
   }, [])
 
   const filtered = products.filter(p => {
-    if (p.visible === false) return false  // productos ocultos por el admin
+    if (p.visible === false) return false
     if (filters.categoria   && p.categoria   !== filters.categoria)   return false
     if (filters.genero      && p.genero      !== filters.genero)      return false
     if (filters.parteCuerpo && p.parteCuerpo !== filters.parteCuerpo) return false
+    if (filters.tag) {
+      const ptags = Array.isArray(p.tags) ? p.tags : p.tag ? [p.tag] : []
+      if (!ptags.includes(filters.tag)) return false
+    }
     return true
   })
 
@@ -75,7 +79,7 @@ export default function App() {
               <span className="text-5xl">🔍</span>
               <p className="font-medium">No hay productos con esos filtros.</p>
               <button
-                onClick={() => setFilters({ categoria: '', genero: '', parteCuerpo: '' })}
+                onClick={() => setFilters({ categoria: '', genero: '', parteCuerpo: '', tag: '' })}
                 className="text-sm text-saro-blue hover:underline"
               >
                 Limpiar filtros

@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import { COLOR_MAP, TAG_CONFIG } from '../../utils/colors'
+import { COLOR_MAP, TAG_CONFIG, getProductTags } from '../../utils/colors'
 
 function EyeIcon() {
   return (
@@ -80,7 +80,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
             </thead>
             <tbody className="divide-y divide-gray-50">
               {filtered.map(p => {
-                const tag      = TAG_CONFIG[p.tag]
+                const ptags    = getProductTags(p).map(k => TAG_CONFIG[k]).filter(Boolean)
                 const visible  = p.visible !== false
                 const sinStock = p.sinStock === true
                 return (
@@ -115,11 +115,11 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                         <div>
                           <p className="font-semibold text-gray-900 leading-tight">{p.nombre}</p>
                           <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
-                            {tag && (
-                              <span className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${tag.cls}`}>
+                            {ptags.map((tag, i) => (
+                              <span key={i} className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${tag.cls}`}>
                                 {tag.label}
                               </span>
-                            )}
+                            ))}
                             {!visible && (
                               <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">
                                 Oculto

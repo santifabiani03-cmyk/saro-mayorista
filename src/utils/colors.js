@@ -38,10 +38,18 @@ export const COLOR_BG_MAP = {
 }
 
 export const TAG_CONFIG = {
-  nuevo:      { label: 'Nuevo',      cls: 'bg-emerald-100 text-emerald-700' },
-  destacado:  { label: 'Destacado',  cls: 'bg-amber-100   text-amber-700'   },
-  oferta:     { label: 'Oferta',     cls: 'bg-red-100     text-red-600'     },
-  sale:       { label: 'Sale',       cls: 'bg-red-500     text-white'       },
+  nuevo:             { label: 'Nuevo',             cls: 'bg-emerald-500 text-white'  },
+  destacado:         { label: 'Destacado',         cls: 'bg-amber-400   text-white'  },
+  oferta:            { label: 'Oferta',            cls: 'bg-red-500     text-white'  },
+  sale:              { label: 'Sale',              cls: 'bg-red-700     text-white'  },
+  oferta_relampago:  { label: '⚡ Oferta Relámpago', cls: 'bg-orange-500 text-white' },
+}
+
+/** Devuelve el array de tags de un producto, compatible con el campo legacy `tag` (string) */
+export const getProductTags = (p) => {
+  if (Array.isArray(p.tags) && p.tags.length) return p.tags
+  if (p.tag) return [p.tag]
+  return []
 }
 
 export const CATEGORIA_LABELS  = { ropa: '👕 Ropa', padel: '🏓 Pádel' }
