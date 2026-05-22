@@ -20,7 +20,7 @@ export default function Filters({ products, filters, setFilters }) {
   const [open, setOpen]         = useState(true)
   const [tagsOpen, setTagsOpen] = useState(false)
 
-  const uniq = key => [...new Set(products.map(p => p[key]))]
+  const uniq = key => [...new Set(products.map(p => p[key]).filter(Boolean))]
 
   const toggle = (key, val) =>
     setFilters(prev => ({ ...prev, [key]: prev[key] === val ? '' : val }))

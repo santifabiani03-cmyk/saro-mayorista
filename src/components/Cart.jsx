@@ -11,10 +11,26 @@ export default function Cart({ config }) {
   const canSend     = total >= minPurchase
 
   const buildMessage = () => {
-    let msg = `¡Hola SARO! 👋 Quiero hacer un pedido mayorista:\n\n`
+    // Agrupar items por producto
+    const grouped = {}
     items.forEach(i => {
-      msg += `• *${i.nombre}* — ${i.color} / ${i.talle} × ${i.cantidad} = $${(i.precio * i.cantidad).toLocaleString('es-AR')}\n`
+      if (!grouped[i.productId]) {
+        grouped[i.productId] = { nombre: i.nombre, precio: i.precio, items: [] }
+      }
+      grouped[i.productId].items.push(i)
     })
+
+    let msg = `📋 Quiero hacer un pedido mayorista:\n`
+
+    Object.values(grouped).forEach(prod => {
+      const totalQty = prod.items.reduce((s, i) => s + i.cantidad, 0)
+      msg += `\n*${prod.nombre}* $${prod.precio.toLocaleString('es-AR')} C/u\n\n`
+      prod.items.forEach(i => {
+        msg += `• ${i.color} - ${i.talle} x${i.cantidad}\n`
+      })
+      msg += `= ${totalQty} x $${prod.precio.toLocaleString('es-AR')} = $${(totalQty * prod.precio).toLocaleString('es-AR')}\n`
+    })
+
     msg += `\n*TOTAL: $${total.toLocaleString('es-AR')}*\n\nGracias!`
     return msg
   }

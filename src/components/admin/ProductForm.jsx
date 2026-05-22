@@ -6,8 +6,8 @@ import {
 
 const BLANK = {
   nombre: '', precio: '', descripcion: '', tags: [],
-  categoria: 'ropa', genero: 'masculino', parteCuerpo: 'torso',
-  colores: [], talles: [], noStock: [], emoji: '👕',
+  categoria: '', genero: '', parteCuerpo: '',
+  colores: [], talles: [], noStock: [], emoji: '📦',
 }
 
 /**
@@ -694,19 +694,19 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
             <h3 className="font-semibold text-gray-800 text-sm">Filtros de catálogo</h3>
 
             <Field>
-              <Label required>Categoría</Label>
+              <Label>Categoría</Label>
               <RadioGroup
                 value={form.categoria}
-                onChange={v => set('categoria', v)}
+                onChange={v => set('categoria', v === form.categoria ? '' : v)}
                 options={[{ val: 'ropa', label: '👕 Ropa' }, { val: 'padel', label: '🏓 Pádel' }]}
               />
             </Field>
 
             <Field>
-              <Label required>Género</Label>
+              <Label>Género</Label>
               <RadioGroup
                 value={form.genero}
-                onChange={v => set('genero', v)}
+                onChange={v => set('genero', v === form.genero ? '' : v)}
                 options={[
                   { val: 'masculino', label: '♂ Masculino' },
                   { val: 'femenino',  label: '♀ Femenino'  },
@@ -716,15 +716,13 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
             </Field>
 
             <Field>
-              <Label required>Parte del cuerpo</Label>
+              <Label>Parte del cuerpo</Label>
               <RadioGroup
                 value={form.parteCuerpo}
-                onChange={v => set('parteCuerpo', v)}
+                onChange={v => set('parteCuerpo', v === form.parteCuerpo ? '' : v)}
                 options={[
                   { val: 'torso',     label: '👕 Torso'     },
                   { val: 'piernas',   label: '🩳 Piernas'   },
-                  { val: 'pies',      label: '🧦 Pies'      },
-                  { val: 'manos',     label: '🤚 Manos'     },
                   { val: 'accesorio', label: '🎒 Accesorio' },
                 ]}
               />

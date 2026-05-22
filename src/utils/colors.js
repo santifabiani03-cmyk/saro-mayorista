@@ -59,8 +59,6 @@ export const GENERO_LABELS     = { masculino: 'Masculino', femenino: 'Femenino',
 export const PARTE_LABELS      = {
   torso:     '👕 Torso',
   piernas:   '🩳 Piernas',
-  pies:      '🧦 Pies',
-  manos:     '🤚 Manos',
   accesorio: '🎒 Accesorio',
 }
 
