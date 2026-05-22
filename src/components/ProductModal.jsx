@@ -165,6 +165,16 @@ export default function ProductModal({ product, onClose }) {
                 </table>
               </div>
 
+              {product.sinStock && (
+                <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                  <span className="text-red-500 text-base flex-shrink-0 mt-0.5">⚠️</span>
+                  <p className="text-xs text-red-700 leading-relaxed">
+                    <span className="font-bold">Es muy probable que ya no contemos con stock de este producto.</span>
+                    {' '}Igualmente podés consultarnos, con gusto te ayudamos a encontrar una alternativa.
+                  </p>
+                </div>
+              )}
+
               {totalUnidades > 0 && (
                 <div className="flex items-center justify-between bg-saro-light rounded-xl px-4 py-3">
                   <span className="text-sm font-medium text-saro-dark">
