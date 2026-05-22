@@ -23,6 +23,10 @@ const DEV_ADMIN_PIN = process.env.ADMIN_PIN
   ?? _envLocal.VITE_ADMIN_PIN
   ?? 'saro2025'
 
+const DEV_GEMINI_KEY = process.env.GEMINI_API_KEY
+  ?? _envLocal.GEMINI_API_KEY
+  ?? ''
+
 function adminApiPlugin() {
   return {
     name: 'admin-api',
@@ -99,6 +103,54 @@ function adminApiPlugin() {
           }
           fs.writeFileSync(PRODUCTS_FILE, JSON.stringify(products, null, 2))
           return res.end(JSON.stringify({ ok: true }))
+        }
+
+        // POST /api/generate-description  →  proxy a Gemini API
+        if (req.url === '/api/generate-description' && req.method === 'POST') {
+          if (!DEV_GEMINI_KEY) {
+            res.statusCode = 500
+            return res.end(JSON.stringify({ error: 'GEMINI_API_KEY no configurada en .env.local' }))
+          }
+          const { nombre, keywords, precio } = body
+          const info = keywords?.trim() ? `${nombre} — ${keywords}` : nombre
+          const prompt = `Escribí una descripción corta de producto para una tienda online mayorista de indumentaria deportiva y pádel en Argentina.
+
+REGLAS ESTRICTAS:
+- Entre 2 y 4 oraciones, máximo 80 palabras en total.
+- Hablá en tercera persona describiendo el producto, NUNCA uses "ofrezca", "sus clientes", "usted" ni te dirijas al lector.
+- Describí qué ES el producto y por qué es bueno. Ejemplo: "Remera de entrenamiento con tejido dry-fit que mantiene el cuerpo fresco. Ideal para pádel y running."
+- Usá un tono confiable y profesional, sin exageraciones.
+- No uses emojis, hashtags ni signos de exclamación.
+- Si no tenés info suficiente, describí el producto de forma genérica basándote en su nombre.
+- Respondé ÚNICAMENTE con el texto de la descripción, nada más.
+
+Producto: ${info}`
+
+          try {
+            const geminiRes = await fetch(
+              `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${DEV_GEMINI_KEY}`,
+              {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                  contents: [{ parts: [{ text: prompt }] }],
+                  generationConfig: { temperature: 0.8, maxOutputTokens: 2048, thinkingConfig: { thinkingBudget: 0 } },
+                }),
+              }
+            )
+            const geminiData = await geminiRes.json()
+            console.log('[Gemini response]', JSON.stringify(geminiData, null, 2))
+            const text = geminiData.candidates?.[0]?.content?.parts?.[0]?.text?.trim()
+            if (text) {
+              return res.end(JSON.stringify({ ok: true, descripcion: text }))
+            }
+            res.statusCode = 502
+            const errDetail = geminiData.error?.message || JSON.stringify(geminiData)
+            return res.end(JSON.stringify({ error: 'Gemini no devolvió texto: ' + errDetail }))
+          } catch (e) {
+            res.statusCode = 500
+            return res.end(JSON.stringify({ error: 'Error al conectar con Gemini: ' + (e.message ?? '') }))
+          }
         }
 
         // POST /api/deploy  →  vercel --prod (deploy directo desde la PC)

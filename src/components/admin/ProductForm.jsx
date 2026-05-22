@@ -201,6 +201,26 @@ function MultiImageUploader({ images, onChange, productName }) {
 
 // ── Selector de colores ───────────────────────────────────────────────────────
 
+// ── Contador de usos diarios de IA ───────────────────────────────────────────
+const AI_USAGE_KEY = 'saro_ai_usage'
+const AI_DAILY_LIMIT = 25  // límite diario recomendado para no agotar la cuota
+
+function getAiUsage() {
+  try {
+    const data = JSON.parse(localStorage.getItem(AI_USAGE_KEY) || '{}')
+    const today = new Date().toISOString().slice(0, 10)
+    if (data.date !== today) return { date: today, count: 0 }
+    return data
+  } catch { return { date: new Date().toISOString().slice(0, 10), count: 0 } }
+}
+
+function incrementAiUsage() {
+  const usage = getAiUsage()
+  usage.count++
+  localStorage.setItem(AI_USAGE_KEY, JSON.stringify(usage))
+  return usage.count
+}
+
 const PINNED_KEY = 'saro_pinned_colors'
 const CUSTOM_DEFS_KEY = 'saro_custom_color_defs'
 const loadPinned     = () => { try { return JSON.parse(localStorage.getItem(PINNED_KEY) || '[]') } catch { return [] } }
@@ -641,7 +661,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     const e = {}
     if (!form.nombre.trim())         e.nombre   = 'Requerido'
     if (!form.precio || isNaN(+form.precio) || +form.precio <= 0) e.precio = 'Precio inválido'
-    if (!form.descripcion.trim())    e.descripcion = 'Requerido'
+    // Descripción es opcional
     if (form.colores.length === 0)   e.colores  = 'Elegí al menos un color'
     if (form.talles.length === 0)    e.talles   = 'Elegí al menos un talle'
     setErrors(e)
@@ -766,15 +786,73 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
           </Field>
 
           <Field>
-            <Label required>Descripción</Label>
+            <Label>Descripción</Label>
             <textarea
               rows={4}
               value={form.descripcion}
               onChange={e => set('descripcion', e.target.value)}
-              placeholder="Describí el producto: material, tecnología, uso…"
+              placeholder="Escribí palabras clave y usá ✨ para generar, o dejalo vacío y la IA usa el nombre"
               className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue resize-none ${errors.descripcion ? 'border-red-400' : 'border-gray-200'}`}
             />
-            {errors.descripcion && <p className="text-xs text-red-500">{errors.descripcion}</p>}
+            <div className="flex items-center gap-2 flex-wrap">
+              <button
+                type="button"
+                onClick={async () => {
+                  if (!form.nombre.trim()) return
+                  set('_aiLoading', true)
+                  try {
+                    const res = await fetch('/api/generate-description', {
+                      method: 'POST',
+                      headers: { 'Content-Type': 'application/json' },
+                      body: JSON.stringify({
+                        nombre: form.nombre,
+                        keywords: form.descripcion,
+                        precio: form.precio,
+                      }),
+                    })
+                    const json = await res.json()
+                    if (json.ok && json.descripcion) {
+                      set('descripcion', json.descripcion)
+                      const newCount = incrementAiUsage()
+                      set('_aiCount', newCount)
+                    } else {
+                      alert(json.error || 'No se pudo generar la descripción')
+                    }
+                  } catch {
+                    alert('Error de conexión con el generador de descripciones')
+                  } finally {
+                    set('_aiLoading', false)
+                  }
+                }}
+                disabled={form._aiLoading || !form.nombre.trim()}
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                  form._aiLoading
+                    ? 'bg-purple-100 text-purple-400 cursor-not-allowed'
+                    : 'bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-200 hover:border-purple-300'
+                }`}
+              >
+                {form._aiLoading ? (
+                  <><span className="animate-spin">⏳</span> Generando…</>
+                ) : (
+                  <><span>✨</span> Generar con IA</>
+                )}
+              </button>
+              <span className="text-[10px] text-gray-400 tabular-nums">
+                {form._aiCount ?? getAiUsage().count}/{AI_DAILY_LIMIT} hoy
+              </span>
+              <div className="relative group">
+                <span className="w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-[10px] font-bold flex items-center justify-center cursor-help select-none">i</span>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-[11px] leading-relaxed rounded-xl px-3 py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+                  <p className="font-semibold mb-1.5">✨ Generador con IA</p>
+                  <p>• Escribí palabras clave en la descripción y tocá ✨ para que la IA las desarrolle en un texto atractivo.</p>
+                  <p className="mt-1">• Si dejás la descripción vacía, la IA genera a partir del nombre del producto.</p>
+                  <p className="mt-1">• Siempre podés editar el resultado antes de guardar.</p>
+                  <hr className="border-gray-700 my-1.5" />
+                  <p className="text-gray-400">Usa la API gratuita de Google Gemini. Límite aprox: {AI_DAILY_LIMIT} usos por día. Si se agota, vuelve a estar disponible al día siguiente.</p>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45 -mt-1"></div>
+                </div>
+              </div>
+            </div>
           </Field>
         </div>
 
