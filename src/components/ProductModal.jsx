@@ -189,7 +189,7 @@ export default function ProductModal({ product, onClose }) {
                             ? 'bg-green-50 border-green-300 text-green-700'
                             : 'bg-gray-50 border-gray-200 text-gray-500'
                         }`}>
-                          {p.cantidad}u → ${Math.round(ppu).toLocaleString('es-AR')}/u
+                          {p.cantidad}u → ${p.precioTotal.toLocaleString('es-AR')} (${Math.round(ppu).toLocaleString('es-AR')}/u)
                         </span>
                       )
                     })}
