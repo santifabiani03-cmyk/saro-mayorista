@@ -200,11 +200,33 @@ function MultiImageUploader({ images, onChange, productName }) {
 
 // ── Selector de colores ───────────────────────────────────────────────────────
 
-function ColorPicker({ selected, onChange }) {
-  const [custom, setCustom] = useState('')
+const PINNED_KEY = 'saro_pinned_colors'
+const loadPinned = () => { try { return JSON.parse(localStorage.getItem(PINNED_KEY) || '[]') } catch { return [] } }
+const savePinned = (arr) => localStorage.setItem(PINNED_KEY, JSON.stringify(arr))
 
-  const toggle = (c) =>
-    onChange(selected.includes(c) ? selected.filter(x => x !== c) : [...selected, c])
+function ColorPicker({ selected, onChange }) {
+  const [pickerSel, setPickerSel] = useState([])   // 0-2 colores de la paleta
+  const [custom, setCustom]       = useState('')
+  const [pinned, setPinned]       = useState(loadPinned)
+
+  // Lista visible = seleccionados + fijados (sin duplicar)
+  const listColors = [...new Set([...selected, ...pinned])]
+
+  // ── Paleta: seleccionar hasta 2 ──
+  const togglePicker = (c) => {
+    setPickerSel(prev => {
+      if (prev.includes(c)) return prev.filter(x => x !== c)
+      if (prev.length >= 2) return [prev[1], c]
+      return [...prev, c]
+    })
+  }
+
+  const addFromPicker = () => {
+    if (pickerSel.length === 0) return
+    const name = pickerSel.length === 2 ? `${pickerSel[0]}/${pickerSel[1]}` : pickerSel[0]
+    if (!selected.includes(name)) onChange([...selected, name])
+    setPickerSel([])
+  }
 
   const addCustom = () => {
     const v = custom.trim()
@@ -212,34 +234,89 @@ function ColorPicker({ selected, onChange }) {
     setCustom('')
   }
 
+  // ── Lista: acciones ──
+  const toggleCheck = (c) => {
+    if (selected.includes(c)) onChange(selected.filter(x => x !== c))
+    else onChange([...selected, c])
+  }
+
+  const togglePin = (c) => {
+    const next = pinned.includes(c) ? pinned.filter(x => x !== c) : [...pinned, c]
+    setPinned(next)
+    savePinned(next)
+  }
+
+  const removeColor = (c) => {
+    onChange(selected.filter(x => x !== c))
+    const nextPinned = pinned.filter(x => x !== c)
+    setPinned(nextPinned)
+    savePinned(nextPinned)
+  }
+
+  // Nombre para el botón agregar
+  const pickerLabel = pickerSel.length === 2
+    ? `${pickerSel[0]}/${pickerSel[1]}`
+    : pickerSel[0] ?? ''
+
   return (
-    <div className="space-y-3">
-      <div className="flex flex-wrap gap-2">
-        {PREDEFINED_COLORS.map(c => {
-          const active = selected.includes(c)
-          return (
-            <button
-              key={c}
-              type="button"
-              onClick={() => toggle(c)}
-              title={c}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
-                active
-                  ? 'border-saro-blue bg-saro-light text-saro-dark ring-2 ring-saro-blue/20'
-                  : 'border-gray-200 text-gray-600 hover:border-gray-400'
-              }`}
-            >
-              <span
-                className="w-3 h-3 rounded-full border border-white shadow-sm flex-shrink-0"
-                style={getSwatchStyle(c)}
-              />
-              {c}
-              {active && <span className="text-saro-blue font-bold">✓</span>}
-            </button>
-          )
-        })}
+    <div className="space-y-4">
+      {/* ── Paleta de colores (seleccionar 1 o 2) ── */}
+      <div>
+        <p className="text-xs text-gray-400 mb-2">Seleccioná 1 o 2 colores de la paleta y hacé clic en "Agregar"</p>
+        <div className="flex flex-wrap gap-2">
+          {PREDEFINED_COLORS.filter(c => !c.includes('/')).map(c => {
+            const picked = pickerSel.includes(c)
+            return (
+              <button
+                key={c}
+                type="button"
+                onClick={() => togglePicker(c)}
+                title={c}
+                className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+                  picked
+                    ? 'border-saro-blue bg-saro-light text-saro-dark ring-2 ring-saro-blue/20'
+                    : 'border-gray-200 text-gray-600 hover:border-gray-400'
+                }`}
+              >
+                <span
+                  className="w-3 h-3 rounded-full border border-white shadow-sm flex-shrink-0"
+                  style={getSwatchStyle(c)}
+                />
+                {c}
+              </button>
+            )
+          })}
+        </div>
+
+        {/* Botón agregar desde paleta */}
+        <div className="flex items-center gap-2 mt-2">
+          {pickerSel.length > 0 && (
+            <>
+              <div className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-50 rounded-lg border border-gray-200">
+                <span className="w-4 h-4 rounded-full border border-gray-300 flex-shrink-0"
+                  style={getSwatchStyle(pickerLabel)} />
+                <span className="text-sm font-medium text-gray-700">{pickerLabel}</span>
+              </div>
+              <button
+                type="button"
+                onClick={addFromPicker}
+                className="px-3 py-1.5 text-sm bg-saro-blue hover:bg-saro-dark text-white rounded-lg font-semibold transition-colors"
+              >
+                + Agregar
+              </button>
+              <button
+                type="button"
+                onClick={() => setPickerSel([])}
+                className="px-2 py-1.5 text-xs text-gray-400 hover:text-gray-600"
+              >
+                Cancelar
+              </button>
+            </>
+          )}
+        </div>
       </div>
-      {/* Color custom */}
+
+      {/* ── Color personalizado ── */}
       <div className="flex gap-2">
         <input
           type="text"
@@ -252,15 +329,74 @@ function ColorPicker({ selected, onChange }) {
         <button
           type="button"
           onClick={addCustom}
-          className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-saro-light text-gray-700 rounded-lg font-medium"
+          disabled={!custom.trim()}
+          className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-saro-light text-gray-700 rounded-lg font-medium disabled:opacity-40"
         >
           + Agregar
         </button>
       </div>
-      {selected.length > 0 && (
-        <p className="text-xs text-gray-500">
-          Seleccionados: <strong>{selected.join(', ')}</strong>
-        </p>
+
+      {/* ── Lista de colores agregados ── */}
+      {listColors.length > 0 && (
+        <div className="border border-gray-100 rounded-xl overflow-hidden">
+          <div className="bg-gray-50 px-3 py-1.5 border-b border-gray-100">
+            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+              Colores del producto ({selected.length} activo{selected.length !== 1 ? 's' : ''})
+            </p>
+          </div>
+          <div className="divide-y divide-gray-50">
+            {listColors.map(c => {
+              const checked = selected.includes(c)
+              const isPinned = pinned.includes(c)
+              return (
+                <div key={c} className={`flex items-center gap-2 px-3 py-2 transition-colors ${checked ? 'bg-white' : 'bg-gray-50/50 opacity-60'}`}>
+                  {/* Checkbox seleccionar */}
+                  <button
+                    type="button"
+                    onClick={() => toggleCheck(c)}
+                    title={checked ? 'Quitar del producto' : 'Incluir en producto'}
+                    className={`w-5 h-5 rounded-md border-2 flex items-center justify-center text-xs font-bold transition-all flex-shrink-0 ${
+                      checked
+                        ? 'bg-saro-blue border-saro-blue text-white'
+                        : 'bg-white border-gray-300 text-transparent hover:border-saro-blue'
+                    }`}
+                  >
+                    ✓
+                  </button>
+
+                  {/* Swatch + nombre */}
+                  <span className="w-4 h-4 rounded-full border border-gray-200 flex-shrink-0"
+                    style={getSwatchStyle(c)} />
+                  <span className={`text-sm flex-1 ${checked ? 'text-gray-800 font-medium' : 'text-gray-400'}`}>{c}</span>
+
+                  {/* Pin */}
+                  <button
+                    type="button"
+                    onClick={() => togglePin(c)}
+                    title={isPinned ? 'Quitar de fijos' : 'Fijar para futuras publicaciones'}
+                    className={`p-1 rounded-md transition-colors text-sm ${
+                      isPinned
+                        ? 'text-amber-500 hover:bg-amber-50'
+                        : 'text-gray-300 hover:text-amber-400 hover:bg-gray-100'
+                    }`}
+                  >
+                    📌
+                  </button>
+
+                  {/* Eliminar */}
+                  <button
+                    type="button"
+                    onClick={() => removeColor(c)}
+                    title="Eliminar color"
+                    className="p-1 rounded-md text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors text-sm"
+                  >
+                    ✕
+                  </button>
+                </div>
+              )
+            })}
+          </div>
+        </div>
       )}
     </div>
   )
