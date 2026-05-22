@@ -11,22 +11,17 @@ export default function Header({ config }) {
       <header className="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
 
-          {/* Logo */}
+          {/* Logo — ícono SR en mobile, horizontal completo en desktop */}
+          <img
+            src="/assets/logo-icon.png"
+            alt={config.storeName}
+            className="block sm:hidden h-11 w-auto object-contain"
+          />
           <img
             src="/assets/logo-horizontal.png"
             alt={config.storeName}
-            className="h-14 w-auto object-contain"
-            onError={e => {
-              e.target.style.display = 'none'
-              e.target.nextSibling.style.display = 'block'
-            }}
+            className="hidden sm:block h-14 w-auto object-contain"
           />
-          <span
-            className="hidden text-2xl font-extrabold text-saro-blue tracking-tight"
-            style={{ display: 'none' }}
-          >
-            SARO
-          </span>
 
           <div className="flex items-center gap-3">
 
