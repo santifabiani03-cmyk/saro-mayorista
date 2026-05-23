@@ -78,7 +78,7 @@ export async function exportCatalogPdf(products, onProgress) {
   const cols = 2
   const gap = 8
   const cardW = (contentW - gap) / cols
-  const imgH = cardW * 1.2
+  const imgH = cardW * 0.9
   const cardH = imgH + 20   // imagen + nombre + colores
   const sectionHeaderH = 22
 
@@ -89,7 +89,7 @@ export async function exportCatalogPdf(products, onProgress) {
 
   for (const section of sections) {
     sectionPages.push(simulatedPage)
-    let y = 30  // despues del header
+    let y = sectionHeaderH + 6  // despues del header (igual que en renderizado real)
     let col = 0
     for (let i = 0; i < section.items.length; i++) {
       if (y + cardH > pageH - margin) {
@@ -187,11 +187,6 @@ export async function exportCatalogPdf(products, onProgress) {
     doc.setFontSize(16)
     doc.setFont('helvetica', 'bold')
     doc.text(section.title.toUpperCase(), margin, 15)
-
-    // Cantidad
-    doc.setFontSize(9)
-    doc.setFont('helvetica', 'normal')
-    doc.text(`${section.items.length} productos`, pageW - margin - (logoIcon ? 18 : 0), 15, { align: 'right' })
 
     // Logo SR en la esquina superior derecha
     if (logoIcon) {
@@ -324,6 +319,8 @@ export async function exportCatalogPdf(products, onProgress) {
     doc.setFontSize(7)
     doc.setFont('helvetica', 'normal')
     doc.text('Catalogo SARO - Precios y stock sujetos a disponibilidad', margin, pageH - 6)
+    doc.setFontSize(9)
+    doc.setFont('helvetica', 'bold')
     doc.text(`${i}`, pageW - margin, pageH - 6, { align: 'right' })
   }
 
