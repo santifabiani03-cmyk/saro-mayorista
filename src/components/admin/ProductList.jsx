@@ -111,7 +111,11 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
             </button>
           ))}
         </div>
-        <p className="text-sm text-gray-400">{filtered.length} producto{filtered.length !== 1 ? 's' : ''}</p>
+        <p className="text-sm text-gray-400">
+          {filtered.length} producto{filtered.length !== 1 ? 's' : ''}
+          {' · '}
+          <span className="text-green-500 font-medium">{filtered.filter(p => p.visible !== false).length} visibles</span>
+        </p>
       </div>
 
       {/* Lista */}

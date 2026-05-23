@@ -326,7 +326,7 @@ export default function AdminPage() {
       <div className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
         <div className="max-w-6xl mx-auto px-5 flex gap-1">
           {[
-            { key: 'editar', label: `📋 Publicados (${products.length} — ${products.filter(p => p.visible !== false).length} visibles)` },
+            { key: 'editar', label: `📋 Publicados (${products.length})` },
             { key: 'nuevo',  label: editingProduct ? '✏️ Editando producto' : '＋ Nuevo producto' },
             { key: 'demanda', label: '📊 Demanda' },
           ].map(t => (
