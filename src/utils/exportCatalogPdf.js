@@ -1,5 +1,6 @@
 import { jsPDF } from 'jspdf'
 import { COLOR_MAP } from './colors'
+import orbitronBase64 from '../fonts/orbitron-base64'
 
 /**
  * Carga una imagen y la devuelve con esquinas superiores redondeadas.
@@ -96,6 +97,11 @@ export async function exportCatalogPdf(products, onProgress) {
   }
 
   const doc = new jsPDF({ orientation: 'portrait', unit: 'mm', format: 'a4' })
+
+  // ── Registrar fuente Orbitron ──
+  doc.addFileToVFS('Orbitron.ttf', orbitronBase64)
+  doc.addFont('Orbitron.ttf', 'Orbitron', 'normal')
+
   const pageW = 210
   const pageH = 297
   const margin = 12
@@ -124,15 +130,22 @@ export async function exportCatalogPdf(products, onProgress) {
 
   // ── Layout ──
   const cols = 2
-  const gap = 6
-  const cardW = (contentW - gap) / cols
-  const imgH = cardW * 0.69
+  const hGap = 6                               // espacio horizontal entre columnas
+  const cardW = (contentW - hGap) / cols
+  const imgH = cardW                           // ratio 1:1 (cuadrado)
   const infoH = 20
   const cardH = imgH + infoH
+  const rows = 2                               // 2 filas × 2 cols = 4 productos/pagina
   const sectionHeaderH = 22
   const contHeaderH = 10
-  const firstPageStartY = sectionHeaderH + 5
-  const contPageStartY = contHeaderH + 5
+
+  // Calcular gap vertical dinamico para llenar la pagina sin espacio blanco
+  const firstAvail = maxY - (sectionHeaderH + 2)
+  const contAvail  = maxY - (contHeaderH + 2)
+  const firstVGap  = (firstAvail - rows * cardH) / (rows + 1)   // gap arriba, entre filas, abajo
+  const contVGap   = (contAvail  - rows * cardH) / (rows + 1)
+  const firstPageStartY = sectionHeaderH + 2 + firstVGap
+  const contPageStartY  = contHeaderH + 2 + contVGap
 
   // ── Calcular paginas por seccion (para el indice) ──
   const sectionPages = []
@@ -142,16 +155,18 @@ export async function exportCatalogPdf(products, onProgress) {
     sectionPages.push(simulatedPage)
     let y = firstPageStartY
     let col = 0
+    let isFirst = true
     for (let i = 0; i < section.items.length; i++) {
       if (y + cardH > maxY) {
         simulatedPage++
         y = contPageStartY
         col = 0
+        isFirst = false
       }
       col++
       if (col >= cols) {
         col = 0
-        y += cardH + gap
+        y += cardH + (isFirst ? firstVGap : contVGap)
       }
     }
     simulatedPage++
@@ -172,8 +187,8 @@ export async function exportCatalogPdf(products, onProgress) {
 
   doc.setTextColor(255, 255, 255)
   doc.setFontSize(14)
-  doc.setFont('helvetica', 'normal')
-  doc.text('Catalogo de Productos', pageW / 2, logoBottom, { align: 'center' })
+  doc.setFont('Orbitron', 'normal')
+  doc.text('CATALOGO DE PRODUCTOS', pageW / 2, logoBottom, { align: 'center' })
 
   doc.setFontSize(10)
   doc.setTextColor(180, 180, 180)
@@ -189,7 +204,7 @@ export async function exportCatalogPdf(products, onProgress) {
 
   doc.setTextColor(255, 255, 255)
   doc.setFontSize(9)
-  doc.setFont('helvetica', 'bold')
+  doc.setFont('Orbitron', 'normal')
   doc.text('INDICE', pageW / 2, idxStartY - 6, { align: 'center' })
 
   doc.setFont('helvetica', 'normal')
@@ -233,7 +248,7 @@ export async function exportCatalogPdf(products, onProgress) {
 
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(16)
-    doc.setFont('helvetica', 'bold')
+    doc.setFont('Orbitron', 'normal')
     doc.text(section.title.toUpperCase(), margin, 15)
 
     if (logoIcon) {
@@ -245,8 +260,11 @@ export async function exportCatalogPdf(products, onProgress) {
 
     let y = firstPageStartY
     let col = 0
+    let isFirstPage = true
 
     for (const product of section.items) {
+      const vGap = isFirstPage ? firstVGap : contVGap
+
       // Nueva pagina si no cabe
       if (y + cardH > maxY) {
         doc.addPage()
@@ -268,9 +286,10 @@ export async function exportCatalogPdf(products, onProgress) {
 
         y = contPageStartY
         col = 0
+        isFirstPage = false
       }
 
-      const x = margin + col * (cardW + gap)
+      const x = margin + col * (cardW + hGap)
 
       // ── Dibujar card ──
       // 1) Imagen con esquinas superiores redondeadas
@@ -349,7 +368,7 @@ export async function exportCatalogPdf(products, onProgress) {
       col++
       if (col >= cols) {
         col = 0
-        y += cardH + gap
+        y += cardH + vGap
       }
 
       processed++

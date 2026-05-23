@@ -17,6 +17,7 @@ export default function App() {
   const [filters,  setFilters]         = useState({ categoria: '', genero: '', parteCuerpo: '', tag: '' })
   const [selectedProduct, setSelected] = useState(null)
   const [loading,  setLoading]         = useState(true)
+  const [priceSort, setPriceSort]      = useState(null)  // null | 'asc' | 'desc'
 
   useEffect(() => {
     Promise.all([
@@ -73,13 +74,34 @@ export default function App() {
                   : `${filtered.length} de ${totalVisible} productos`
               })()}
             </p>
+
+            {/* Ordenar por precio */}
+            <button
+              onClick={() => setPriceSort(s => s === null ? 'asc' : s === 'asc' ? 'desc' : null)}
+              className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-xl border transition-all ${
+                priceSort
+                  ? 'border-saro-blue text-saro-blue bg-saro-light font-semibold'
+                  : 'border-gray-200 text-gray-500 hover:border-gray-300'
+              }`}
+            >
+              <span>Precio</span>
+              <svg viewBox="0 0 10 14" className="w-3 h-3.5" fill="currentColor">
+                <path d="M5 0l4 5H1z" className={priceSort === 'asc' ? 'text-saro-blue' : 'text-gray-300'} />
+                <path d="M5 14l-4-5h8z" className={priceSort === 'desc' ? 'text-saro-blue' : 'text-gray-300'} />
+              </svg>
+            </button>
           </div>
 
           {filtered.length > 0 ? (
             <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {filtered.map(p => (
-                <ProductCard key={p.id} product={p} onClick={() => setSelected(p)} />
-              ))}
+              {(() => {
+                const list = priceSort
+                  ? [...filtered].sort((a, b) => (priceSort === 'asc' ? 1 : -1) * (Number(a.precio) - Number(b.precio)))
+                  : filtered
+                return list.map(p => (
+                  <ProductCard key={p.id} product={p} onClick={() => setSelected(p)} />
+                ))
+              })()}
             </div>
           ) : (
             <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-4">

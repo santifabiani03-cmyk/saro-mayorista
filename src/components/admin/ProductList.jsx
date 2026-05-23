@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useMemo } from 'react'
 import { COLOR_MAP, TAG_CONFIG, getProductTags, getSwatchStyle } from '../../utils/colors'
 
 function EyeIcon() {
@@ -19,15 +19,70 @@ function EyeOffIcon() {
   )
 }
 
+/** Chevron arriba/abajo para indicar orden */
+function SortChevron({ active, dir }) {
+  return (
+    <span className={`inline-flex flex-col ml-1 leading-none ${active ? 'text-saro-blue' : 'text-gray-300'}`}>
+      <svg viewBox="0 0 10 5" className={`w-2.5 h-1.5 ${active && dir === 'asc' ? 'text-saro-blue' : ''}`} fill="currentColor">
+        <path d="M5 0l5 5H0z"/>
+      </svg>
+      <svg viewBox="0 0 10 5" className={`w-2.5 h-1.5 ${active && dir === 'desc' ? 'text-saro-blue' : ''}`} fill="currentColor">
+        <path d="M5 5L0 0h10z"/>
+      </svg>
+    </span>
+  )
+}
+
 export default function ProductList({ products, onEdit, onDelete, onToggleVisible, onToggleSinStock, saving }) {
-  const [search, setSearch] = useState('')
+  const [search, setSearch]     = useState('')
   const [filterCat, setFilterCat] = useState('')
+  const [sortKey, setSortKey]   = useState(null)   // 'nombre' | 'precio' | 'visible' | 'fecha'
+  const [sortDir, setSortDir]   = useState('asc')  // 'asc' | 'desc'
+
+  const handleSort = (key) => {
+    if (sortKey === key) {
+      // Mismo campo: toggle dirección
+      setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+    } else {
+      // Nuevo campo: activar ascendente
+      setSortKey(key)
+      setSortDir('asc')
+    }
+  }
 
   const filtered = products.filter(p => {
     const matchSearch = p.nombre.toLowerCase().includes(search.toLowerCase())
     const matchCat    = filterCat ? p.categoria === filterCat : true
     return matchSearch && matchCat
   })
+
+  const sorted = useMemo(() => {
+    if (!sortKey) return filtered
+    const mult = sortDir === 'asc' ? 1 : -1
+    return [...filtered].sort((a, b) => {
+      switch (sortKey) {
+        case 'nombre':
+          return mult * a.nombre.localeCompare(b.nombre, 'es')
+        case 'precio':
+          return mult * (Number(a.precio) - Number(b.precio))
+        case 'visible': {
+          const va = a.visible === false ? 0 : 1
+          const vb = b.visible === false ? 0 : 1
+          return mult * (va - vb)
+        }
+        case 'fecha': {
+          const da = a.fechaPublicacion ? new Date(a.fechaPublicacion).getTime() : 0
+          const db = b.fechaPublicacion ? new Date(b.fechaPublicacion).getTime() : 0
+          return mult * (da - db)
+        }
+        default:
+          return 0
+      }
+    })
+  }, [filtered, sortKey, sortDir])
+
+  const thClass = 'text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide'
+  const thButton = 'inline-flex items-center cursor-pointer hover:text-saro-blue transition-colors select-none'
 
   return (
     <div className="space-y-5">
@@ -70,16 +125,36 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
           <table className="w-full text-sm">
             <thead className="bg-gray-50 border-b border-gray-100">
               <tr>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Producto</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden sm:table-cell">Filtros</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden md:table-cell">Variantes</th>
-                <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">Precio</th>
-                <th className="text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide hidden lg:table-cell">Fechas</th>
-                <th className="px-4 py-3"></th>
+                <th className={thClass}>
+                  <button type="button" onClick={() => handleSort('nombre')} className={thButton}>
+                    Producto
+                    <SortChevron active={sortKey === 'nombre'} dir={sortDir} />
+                  </button>
+                </th>
+                <th className={`${thClass} hidden sm:table-cell`}>Filtros</th>
+                <th className={`${thClass} hidden md:table-cell`}>Variantes</th>
+                <th className={`text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide`}>
+                  <button type="button" onClick={() => handleSort('precio')} className={`${thButton} justify-end`}>
+                    Precio
+                    <SortChevron active={sortKey === 'precio'} dir={sortDir} />
+                  </button>
+                </th>
+                <th className={`${thClass} hidden lg:table-cell`}>
+                  <button type="button" onClick={() => handleSort('fecha')} className={thButton}>
+                    Fechas
+                    <SortChevron active={sortKey === 'fecha'} dir={sortDir} />
+                  </button>
+                </th>
+                <th className="px-4 py-3">
+                  <button type="button" onClick={() => handleSort('visible')} className={thButton} title="Ordenar por visibilidad">
+                    <EyeIcon />
+                    <SortChevron active={sortKey === 'visible'} dir={sortDir} />
+                  </button>
+                </th>
               </tr>
             </thead>
             <tbody className="divide-y divide-gray-50">
-              {filtered.map(p => {
+              {sorted.map(p => {
                 const ptags    = getProductTags(p).map(k => TAG_CONFIG[k]).filter(Boolean)
                 const visible  = p.visible !== false
                 const sinStock = p.sinStock === true
