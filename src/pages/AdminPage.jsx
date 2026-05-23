@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import ProductForm from '../components/admin/ProductForm'
 import ProductList from '../components/admin/ProductList'
 import DemandDashboard from '../components/admin/DemandDashboard'
+import { exportCatalogPdf } from '../utils/exportCatalogPdf'
 
 
 const SESSION_KEY     = 'saro_admin_auth'
@@ -102,6 +103,8 @@ export default function AdminPage() {
   const [toast, setToast]               = useState(null)
   const [saving, setSaving]             = useState(false)
   const [deploying, setDeploying]       = useState(false)
+  const [exporting, setExporting]       = useState(false)
+  const [exportProgress, setExportProgress] = useState('')
   // isDev = true solo cuando corre en localhost (desarrollo local)
   const isDev = window.location.hostname === 'localhost'
 
@@ -220,6 +223,22 @@ export default function AdminPage() {
     }
   }
 
+  const handleExportPdf = async () => {
+    setExporting(true)
+    setExportProgress('Preparando...')
+    try {
+      await exportCatalogPdf(products, (current, total) => {
+        setExportProgress(`${current}/${total} productos`)
+      })
+      showToast('PDF exportado correctamente')
+    } catch (e) {
+      showToast('Error al exportar PDF: ' + (e?.message ?? ''), 'error')
+    } finally {
+      setExporting(false)
+      setExportProgress('')
+    }
+  }
+
   if (!authed) return <PinGate onAuth={() => setAuthed(true)} />
 
   return (
@@ -272,6 +291,22 @@ export default function AdminPage() {
                 <span>{deploying ? '⏳' : '🚀'}</span>
                 <span className="hidden sm:inline">{deploying ? 'Publicando…' : 'Publicar en sitio'}</span>
                 <span className="sm:hidden">{deploying ? 'Publicando…' : 'Publicar'}</span>
+              </button>
+
+              {/* Exportar PDF */}
+              <button
+                onClick={handleExportPdf}
+                disabled={exporting}
+                className={`flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all ${
+                  exporting
+                    ? 'bg-gray-500 opacity-60 cursor-not-allowed text-white'
+                    : 'bg-white/15 hover:bg-white/25 text-white'
+                }`}
+                title="Exportar catalogo de productos visibles a PDF"
+              >
+                <span>{exporting ? '⏳' : '📄'}</span>
+                <span className="hidden sm:inline">{exporting ? exportProgress : 'Exportar PDF'}</span>
+                <span className="sm:hidden">{exporting ? '...' : 'PDF'}</span>
               </button>
 
               {/* Ver tienda */}
