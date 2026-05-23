@@ -1,10 +1,10 @@
 import { jsPDF } from 'jspdf'
+import { COLOR_MAP } from './colors'
 
 /**
- * Carga una imagen desde URL y la convierte a base64 dataURL.
- * Retorna null si falla.
+ * Carga una imagen desde URL y devuelve { dataUrl, width, height } o null.
  */
-function loadImageAsBase64(url) {
+function loadImage(url) {
   return new Promise(resolve => {
     const img = new Image()
     img.crossOrigin = 'anonymous'
@@ -14,22 +14,32 @@ function loadImageAsBase64(url) {
       canvas.height = img.naturalHeight
       canvas.getContext('2d').drawImage(img, 0, 0)
       try {
-        resolve(canvas.toDataURL('image/jpeg', 0.85))
-      } catch {
-        resolve(null)
-      }
+        resolve({
+          dataUrl: canvas.toDataURL('image/png'),
+          width: img.naturalWidth,
+          height: img.naturalHeight,
+        })
+      } catch { resolve(null) }
     }
     img.onerror = () => resolve(null)
     img.src = url
   })
 }
 
+/** Convierte hex (#rrggbb) a [r, g, b] */
+function hexToRgb(hex) {
+  const h = hex.replace('#', '')
+  return [
+    parseInt(h.substring(0, 2), 16),
+    parseInt(h.substring(2, 4), 16),
+    parseInt(h.substring(4, 6), 16),
+  ]
+}
+
 /**
- * Exporta un catálogo PDF con los productos visibles.
- * Muestra nombre + imagen principal. Sin precio ni descripción.
- *
- * @param {Array} products - Array completo de productos
- * @param {Function} onProgress - Callback (current, total) para mostrar progreso
+ * Exporta un catalogo PDF con los productos visibles.
+ * Ropa separada por genero (Mujer, Hombre, Unisex), Padel aparte.
+ * Sin precio ni descripcion.
  */
 export async function exportCatalogPdf(products, onProgress) {
   const visible = products.filter(p => p.visible !== false)
@@ -44,86 +54,178 @@ export async function exportCatalogPdf(products, onProgress) {
   const margin = 12
   const contentW = pageW - margin * 2
 
-  // ── Portada ──
-  doc.setFillColor(17, 24, 39) // saro-dark
-  doc.rect(0, 0, pageW, pageH, 'F')
+  // ── Precargar logos ──
+  const logoMain = await loadImage('/assets/logo.png')
+  const logoIcon = await loadImage('/assets/logo-icon.png')
 
-  // Intentar cargar logo
-  const logoData = await loadImageAsBase64('/assets/logo.png')
-  if (logoData) {
-    doc.addImage(logoData, 'PNG', pageW / 2 - 25, 90, 50, 50)
-  }
+  // ── Agrupar productos ──
+  const ropaFem  = visible.filter(p => p.categoria === 'ropa' && p.genero === 'femenino')
+  const ropaMasc = visible.filter(p => p.categoria === 'ropa' && p.genero === 'masculino')
+  const ropaUni  = visible.filter(p => p.categoria === 'ropa' && p.genero === 'unisex')
+  const ropaSin  = visible.filter(p => p.categoria === 'ropa' && !p.genero)
+  const padel    = visible.filter(p => p.categoria === 'padel')
+  const other    = visible.filter(p => p.categoria !== 'ropa' && p.categoria !== 'padel')
 
-  doc.setTextColor(255, 255, 255)
-  doc.setFontSize(28)
-  doc.setFont('helvetica', 'bold')
-  doc.text('SARO', pageW / 2, logoData ? 155 : 130, { align: 'center' })
+  const sections = []
+  if (ropaFem.length)  sections.push({ title: 'Ropa Mujer',   items: ropaFem })
+  if (ropaMasc.length) sections.push({ title: 'Ropa Hombre',  items: ropaMasc })
+  if (ropaUni.length)  sections.push({ title: 'Ropa Unisex',  items: ropaUni })
+  if (ropaSin.length)  sections.push({ title: 'Ropa',         items: ropaSin })
+  if (padel.length)    sections.push({ title: 'Padel',        items: padel })
+  if (other.length)    sections.push({ title: 'Otros',        items: other })
 
-  doc.setFontSize(14)
-  doc.setFont('helvetica', 'normal')
-  doc.text('Indumentaria Deportiva & Padel', pageW / 2, logoData ? 165 : 142, { align: 'center' })
-
-  doc.setFontSize(10)
-  doc.setTextColor(180, 180, 180)
-  const dateStr = new Date().toLocaleDateString('es-AR', { month: 'long', year: 'numeric' })
-  doc.text(`Catalogo Mayorista - ${dateStr}`, pageW / 2, logoData ? 178 : 158, { align: 'center' })
-  doc.text(`${visible.length} productos`, pageW / 2, logoData ? 185 : 165, { align: 'center' })
-
-  // ── Grid de productos: 2 columnas ──
+  // ── Layout config ──
   const cols = 2
   const gap = 8
   const cardW = (contentW - gap) / cols
-  const imgH = cardW * 1.2  // aspect ratio de la imagen
-  const cardH = imgH + 14   // imagen + espacio para nombre
-  const startY = margin + 8
+  const imgH = cardW * 1.2
+  const cardH = imgH + 20   // imagen + nombre + colores
+  const sectionHeaderH = 22
 
-  let col = 0
-  let y = startY
-  let pageStarted = false
+  // ── Calcular paginas por seccion (para el indice) ──
+  // Pagina 1 = portada, secciones empiezan en pagina 2+
+  const sectionPages = []
+  let simulatedPage = 2 // portada = 1
 
-  // Separar por categoría
-  const ropa = visible.filter(p => p.categoria === 'ropa')
-  const padel = visible.filter(p => p.categoria === 'padel')
-  const grouped = []
-  if (ropa.length) grouped.push({ title: 'Ropa', items: ropa })
-  if (padel.length) grouped.push({ title: 'Padel', items: padel })
-  // Si hay productos sin categoría
-  const other = visible.filter(p => p.categoria !== 'ropa' && p.categoria !== 'padel')
-  if (other.length) grouped.push({ title: 'Otros', items: other })
+  for (const section of sections) {
+    sectionPages.push(simulatedPage)
+    let y = 30  // despues del header
+    let col = 0
+    for (let i = 0; i < section.items.length; i++) {
+      if (y + cardH > pageH - margin) {
+        simulatedPage++
+        y = 16
+        col = 0
+      }
+      col++
+      if (col >= cols) {
+        col = 0
+        y += cardH + gap
+      }
+    }
+    simulatedPage++ // nueva pagina para siguiente seccion
+  }
 
+  // ── PORTADA ──
+  doc.setFillColor(17, 24, 39)
+  doc.rect(0, 0, pageW, pageH, 'F')
+
+  // Logo centrado, manteniendo proporciones, con transparencia (PNG)
+  if (logoMain) {
+    const logoAspect = logoMain.width / logoMain.height
+    const logoW = 100
+    const logoH = logoW / logoAspect
+    doc.addImage(logoMain.dataUrl, 'PNG', pageW / 2 - logoW / 2, 75, logoW, logoH)
+  }
+
+  // Subtitulo
+  const logoBottom = logoMain ? 75 + (100 / (logoMain.width / logoMain.height)) + 12 : 130
+
+  doc.setTextColor(255, 255, 255)
+  doc.setFontSize(14)
+  doc.setFont('helvetica', 'normal')
+  doc.text('Catalogo de Productos', pageW / 2, logoBottom, { align: 'center' })
+
+  // Fecha completa
+  doc.setFontSize(10)
+  doc.setTextColor(180, 180, 180)
+  const now = new Date()
+  const fechaCompleta = now.toLocaleDateString('es-AR', { day: 'numeric', month: 'long', year: 'numeric' })
+  doc.text(fechaCompleta, pageW / 2, logoBottom + 10, { align: 'center' })
+
+  doc.setFontSize(9)
+  doc.text(`${visible.length} productos`, pageW / 2, logoBottom + 18, { align: 'center' })
+
+  // ── Indice en la parte inferior de la portada ──
+  const idxStartY = pageH - 30 - sections.length * 8
+  doc.setFillColor(255, 255, 255, 0.08)
+
+  doc.setTextColor(255, 255, 255)
+  doc.setFontSize(9)
+  doc.setFont('helvetica', 'bold')
+  doc.text('INDICE', pageW / 2, idxStartY - 6, { align: 'center' })
+
+  doc.setFont('helvetica', 'normal')
+  doc.setFontSize(9)
+  sections.forEach((section, i) => {
+    const lineY = idxStartY + i * 8 + 2
+    // Nombre de seccion
+    doc.setTextColor(220, 220, 220)
+    doc.text(section.title, margin + 30, lineY)
+    // Puntitos
+    const dotsX1 = margin + 30 + doc.getTextWidth(section.title) + 3
+    const dotsX2 = pageW - margin - 30 - 8
+    doc.setTextColor(100, 100, 100)
+    let dx = dotsX1
+    while (dx < dotsX2) {
+      doc.text('.', dx, lineY)
+      dx += 2
+    }
+    // Numero de pagina
+    doc.setTextColor(220, 220, 220)
+    doc.text(`${sectionPages[i]}`, pageW - margin - 30, lineY, { align: 'right' })
+  })
+
+  // ── SECCIONES ──
   let processed = 0
   const total = visible.length
+  let currentPage = 1 // portada
 
-  for (const group of grouped) {
-    // Nueva página para cada categoría
+  for (let si = 0; si < sections.length; si++) {
+    const section = sections[si]
+
+    // Nueva pagina para la seccion
     doc.addPage()
-    pageStarted = true
+    currentPage++
 
-    // Header de categoría
+    // Header de seccion
     doc.setFillColor(17, 24, 39)
-    doc.rect(0, 0, pageW, 22, 'F')
+    doc.rect(0, 0, pageW, sectionHeaderH, 'F')
+
+    // Titulo
     doc.setTextColor(255, 255, 255)
     doc.setFontSize(16)
     doc.setFont('helvetica', 'bold')
-    doc.text(group.title.toUpperCase(), margin, 15)
+    doc.text(section.title.toUpperCase(), margin, 15)
+
+    // Cantidad
     doc.setFontSize(9)
     doc.setFont('helvetica', 'normal')
-    doc.text(`${group.items.length} productos`, pageW - margin, 15, { align: 'right' })
+    doc.text(`${section.items.length} productos`, pageW - margin - (logoIcon ? 18 : 0), 15, { align: 'right' })
 
-    y = 30
-    col = 0
+    // Logo SR en la esquina superior derecha
+    if (logoIcon) {
+      const iconAspect = logoIcon.width / logoIcon.height
+      const iconH = 12
+      const iconW = iconH * iconAspect
+      doc.addImage(logoIcon.dataUrl, 'PNG', pageW - margin - iconW + 2, (sectionHeaderH - iconH) / 2, iconW, iconH)
+    }
 
-    for (const product of group.items) {
-      // Verificar si necesitamos nueva página
+    let y = sectionHeaderH + 6
+    let col = 0
+
+    for (const product of section.items) {
+      // Nueva pagina si no cabe
       if (y + cardH > pageH - margin) {
         doc.addPage()
-        // Mini header en continuación
+        currentPage++
+
+        // Mini header en continuacion
         doc.setFillColor(240, 240, 240)
         doc.rect(0, 0, pageW, 10, 'F')
         doc.setTextColor(120, 120, 120)
         doc.setFontSize(8)
         doc.setFont('helvetica', 'normal')
-        doc.text(`${group.title} (cont.)`, margin, 7)
+        doc.text(`${section.title} (cont.)`, margin, 7)
+
+        // Logo SR en mini header tambien
+        if (logoIcon) {
+          const iconAspect = logoIcon.width / logoIcon.height
+          const iconH = 6
+          const iconW = iconH * iconAspect
+          doc.addImage(logoIcon.dataUrl, 'PNG', pageW - margin - iconW + 2, 2, iconW, iconH)
+        }
+
         y = 16
         col = 0
       }
@@ -137,41 +239,72 @@ export async function exportCatalogPdf(products, onProgress) {
       // Imagen
       const imgUrl = product.imagenes?.[0] ?? product.imagen
       if (imgUrl) {
-        const imgData = await loadImageAsBase64(imgUrl)
+        const imgData = await loadImage(imgUrl)
         if (imgData) {
-          // Clip con bordes redondeados (simulado con rect)
-          doc.addImage(imgData, 'JPEG', x + 1, y + 1, cardW - 2, imgH - 2)
+          doc.addImage(imgData.dataUrl, 'PNG', x + 1, y + 1, cardW - 2, imgH - 2)
         } else {
-          // Placeholder
           doc.setFillColor(230, 230, 230)
           doc.rect(x + 1, y + 1, cardW - 2, imgH - 2, 'F')
-          doc.setTextColor(180, 180, 180)
-          doc.setFontSize(24)
-          doc.text(product.emoji || '📦', x + cardW / 2, y + imgH / 2 + 4, { align: 'center' })
         }
       }
 
       // Nombre del producto
       doc.setTextColor(30, 30, 30)
-      doc.setFontSize(8)
+      doc.setFontSize(7.5)
       doc.setFont('helvetica', 'bold')
-      const nombre = product.nombre.length > 38
-        ? product.nombre.substring(0, 36) + '...'
+      const nombre = product.nombre.length > 40
+        ? product.nombre.substring(0, 38) + '...'
         : product.nombre
       doc.text(nombre, x + 3, y + imgH + 5)
 
-      // Info secundaria (colores disponibles)
+      // Colores con circulos
       if (product.colores?.length > 0) {
-        doc.setTextColor(140, 140, 140)
-        doc.setFontSize(6)
-        doc.setFont('helvetica', 'normal')
-        const coloresText = product.colores.length <= 4
-          ? product.colores.join(' - ')
-          : product.colores.slice(0, 3).join(' - ') + ` +${product.colores.length - 3}`
-        doc.text(coloresText, x + 3, y + imgH + 10)
+        const colorY = y + imgH + 10
+        let colorX = x + 3
+        const circleR = 1.8
+        const maxColorsToShow = 7
+
+        const colorsToShow = product.colores.slice(0, maxColorsToShow)
+        for (const colorName of colorsToShow) {
+          const hex = COLOR_MAP[colorName] ?? '#e5e7eb'
+          const [r, g, b] = hexToRgb(hex)
+
+          // Borde gris claro
+          doc.setDrawColor(200, 200, 200)
+          doc.setLineWidth(0.2)
+          doc.setFillColor(r, g, b)
+          doc.circle(colorX + circleR, colorY, circleR, 'FD')
+
+          // Nombre del color al lado
+          doc.setTextColor(120, 120, 120)
+          doc.setFontSize(5)
+          doc.setFont('helvetica', 'normal')
+          doc.text(colorName, colorX + circleR * 2 + 1.2, colorY + 1.2)
+
+          const textW = doc.getTextWidth(colorName)
+          colorX += circleR * 2 + 1.2 + textW + 3
+
+          // Si no cabe mas, agregar "+N" y cortar
+          if (colorX > x + cardW - 12 && colorsToShow.indexOf(colorName) < colorsToShow.length - 1) {
+            const remaining = product.colores.length - colorsToShow.indexOf(colorName) - 1
+            if (remaining > 0) {
+              doc.setTextColor(140, 140, 140)
+              doc.setFontSize(5)
+              doc.text(`+${remaining}`, colorX, colorY + 1.2)
+            }
+            break
+          }
+        }
+
+        // Si hay mas colores que los mostrados
+        if (product.colores.length > maxColorsToShow) {
+          doc.setTextColor(140, 140, 140)
+          doc.setFontSize(5)
+          doc.text(`+${product.colores.length - maxColorsToShow}`, colorX, colorY + 1.2)
+        }
       }
 
-      // Siguiente posición
+      // Siguiente posicion
       col++
       if (col >= cols) {
         col = 0
@@ -183,20 +316,19 @@ export async function exportCatalogPdf(products, onProgress) {
     }
   }
 
-  // ── Footer en última página ──
-  const lastPageH = doc.internal.pageSize.getHeight()
-  doc.setTextColor(160, 160, 160)
-  doc.setFontSize(7)
-  doc.setFont('helvetica', 'normal')
-  doc.text(
-    'SARO Mayorista - Precios y stock sujetos a disponibilidad - Consultas por WhatsApp',
-    pageW / 2,
-    lastPageH - 8,
-    { align: 'center' }
-  )
+  // ── Footer en todas las paginas (excepto portada) ──
+  const totalPages = doc.internal.getNumberOfPages()
+  for (let i = 2; i <= totalPages; i++) {
+    doc.setPage(i)
+    doc.setTextColor(160, 160, 160)
+    doc.setFontSize(7)
+    doc.setFont('helvetica', 'normal')
+    doc.text('Catalogo SARO - Precios y stock sujetos a disponibilidad', margin, pageH - 6)
+    doc.text(`${i}`, pageW - margin, pageH - 6, { align: 'right' })
+  }
 
   // Guardar
-  const fileName = `catalogo-saro-${new Date().toISOString().slice(0, 10)}.pdf`
+  const fileName = `catalogo-saro-${now.toISOString().slice(0, 10)}.pdf`
   doc.save(fileName)
   return fileName
 }
