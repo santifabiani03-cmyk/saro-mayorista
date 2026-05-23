@@ -2028,45 +2028,5 @@
       "/assets/pelotas-winar-p78.png"
     ],
     "fechaPublicacion": "2026-05-22T21:21:19.000Z"
-  },
-  {
-    "nombre": "Pelotas Noac Pro",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495679219",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/pelotas-noac-pro-p78.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:21:27.000Z"
-  },
-  {
-    "nombre": "Carro Recogepelotas Noac",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495687778",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/carro-recogepelotas-noac-p78.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:21:36.000Z"
   }
 ]
