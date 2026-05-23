@@ -1,8 +1,107 @@
-import { useState, useEffect, useRef } from 'react'
+import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   COLOR_MAP, PREDEFINED_COLORS, PREDEFINED_TALLES,
   getAutoEmoji, TAG_CONFIG, getProductTags, getSwatchStyle,
 } from '../../utils/colors'
+
+/* ── Lightbox para admin ──────────────────────────────────────────── */
+function AdminLightbox({ images, startIdx, onClose }) {
+  const [idx, setIdx] = useState(startIdx)
+  const [touchX, setTouchX] = useState(null)
+  const n = images.length
+
+  const go = useCallback((dir) => {
+    setIdx(i => (i + dir + n) % n)
+  }, [n])
+
+  useEffect(() => {
+    document.body.style.overflow = 'hidden'
+    const onKey = (e) => {
+      if (e.key === 'Escape') onClose()
+      if (e.key === 'ArrowLeft') go(-1)
+      if (e.key === 'ArrowRight') go(1)
+    }
+    window.addEventListener('keydown', onKey)
+    return () => {
+      document.body.style.overflow = ''
+      window.removeEventListener('keydown', onKey)
+    }
+  }, [onClose, go])
+
+  return (
+    <div
+      className="fixed inset-0 z-[100] bg-black/90 backdrop-blur-md flex items-center justify-center"
+      onClick={onClose}
+    >
+      <button
+        onClick={onClose}
+        className="absolute top-4 right-4 z-10 w-10 h-10 rounded-full bg-white/15 hover:bg-white/30 text-white text-2xl flex items-center justify-center transition-colors"
+      >
+        ✕
+      </button>
+
+      {n > 1 && (
+        <span className="absolute top-4 left-4 text-white/70 text-sm font-medium">
+          {idx + 1} / {n}
+        </span>
+      )}
+
+      <div
+        className="relative w-full h-full flex items-center justify-center p-4 sm:p-10"
+        onClick={e => e.stopPropagation()}
+        onTouchStart={e => setTouchX(e.touches[0].clientX)}
+        onTouchEnd={e => {
+          if (touchX == null) return
+          const dx = e.changedTouches[0].clientX - touchX
+          if (Math.abs(dx) > 40) go(dx < 0 ? 1 : -1)
+          setTouchX(null)
+        }}
+      >
+        <img
+          src={images[idx]}
+          alt=""
+          className="max-w-full max-h-full object-contain rounded-lg select-none"
+          draggable={false}
+          onClick={onClose}
+        />
+      </div>
+
+      {n > 1 && (
+        <>
+          <button
+            onClick={e => { e.stopPropagation(); go(-1) }}
+            className="absolute left-3 sm:left-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 text-white text-2xl flex items-center justify-center transition-colors"
+          >
+            ‹
+          </button>
+          <button
+            onClick={e => { e.stopPropagation(); go(1) }}
+            className="absolute right-3 sm:right-6 top-1/2 -translate-y-1/2 w-11 h-11 rounded-full bg-white/15 hover:bg-white/30 text-white text-2xl flex items-center justify-center transition-colors"
+          >
+            ›
+          </button>
+        </>
+      )}
+
+      {n > 1 && (
+        <div className="absolute bottom-4 inset-x-0 flex justify-center gap-2 px-4">
+          {images.map((src, i) => (
+            <button
+              key={i}
+              onClick={e => { e.stopPropagation(); setIdx(i) }}
+              className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all
+                ${i === idx
+                  ? 'border-white scale-110'
+                  : 'border-transparent opacity-50 hover:opacity-80'}`}
+            >
+              <img src={src} alt="" className="w-full h-full object-cover" />
+            </button>
+          ))}
+        </div>
+      )}
+    </div>
+  )
+}
 
 const BLANK = {
   nombre: '', precio: '', descripcion: '', tags: [],
@@ -121,6 +220,7 @@ function MultiImageUploader({ images, onChange, productName }) {
   const inputRef    = useRef()
   const [pending, setPending] = useState(0)   // cuántas imágenes se están subiendo
   const [dragging, setDragging] = useState(false)
+  const [lightboxIdx, setLightboxIdx] = useState(null)
 
   const handleFiles = async (files) => {
     const list = Array.from(files).filter(f => f.type.startsWith('image/'))
@@ -145,7 +245,9 @@ function MultiImageUploader({ images, onChange, productName }) {
 
         {/* Imágenes existentes */}
         {images.map((url, i) => (
-          <div key={url + i} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 group">
+          <div key={url + i} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 group cursor-zoom-in"
+            onClick={() => setLightboxIdx(i)}
+          >
             <img src={url} alt="" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors" />
             {/* Badge "Principal" en la primera */}
@@ -157,7 +259,7 @@ function MultiImageUploader({ images, onChange, productName }) {
             {/* Botón eliminar */}
             <button
               type="button"
-              onClick={() => remove(i)}
+              onClick={e => { e.stopPropagation(); remove(i) }}
               className="absolute top-1 right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
             >✕</button>
           </div>
@@ -195,6 +297,15 @@ function MultiImageUploader({ images, onChange, productName }) {
         hidden
         onChange={e => handleFiles(e.target.files)}
       />
+
+      {/* Lightbox */}
+      {lightboxIdx !== null && images.length > 0 && (
+        <AdminLightbox
+          images={images}
+          startIdx={lightboxIdx}
+          onClose={() => setLightboxIdx(null)}
+        />
+      )}
     </div>
   )
 }
