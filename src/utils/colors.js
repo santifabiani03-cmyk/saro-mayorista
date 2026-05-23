@@ -47,11 +47,21 @@ export const TAG_CONFIG = {
   oferta_relampago:  { label: '⚡ Oferta Relámpago', cls: 'bg-orange-500 text-white' },
 }
 
-/** Devuelve el array de tags de un producto, compatible con el campo legacy `tag` (string) */
+/** Devuelve el array de tags de un producto, compatible con el campo legacy `tag` (string).
+ *  Filtra automaticamente la etiqueta "nuevo" si pasó más de 30 días desde fechaPublicacion. */
 export const getProductTags = (p) => {
-  if (Array.isArray(p.tags) && p.tags.length) return p.tags
-  if (p.tag) return [p.tag]
-  return []
+  let tags = Array.isArray(p.tags) && p.tags.length ? p.tags
+           : p.tag ? [p.tag]
+           : []
+
+  if (tags.includes('nuevo') && p.fechaPublicacion) {
+    const ms = Date.now() - new Date(p.fechaPublicacion).getTime()
+    if (ms > 30 * 24 * 60 * 60 * 1000) {
+      tags = tags.filter(t => t !== 'nuevo')
+    }
+  }
+
+  return tags
 }
 
 export const CATEGORIA_LABELS  = { ropa: '👕 Ropa', padel: '🏓 Pádel' }
