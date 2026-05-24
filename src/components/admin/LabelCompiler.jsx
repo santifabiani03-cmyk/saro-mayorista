@@ -17,10 +17,27 @@ const MM_TO_PT = 72 / 25.4
 const DETECT_SCALE = 2 // resolución para escaneo (2x = ~144 DPI)
 
 /**
+ * Devuelve true si la fila `y` del imageData tiene al menos un píxel no-blanco.
+ */
+function rowHasContent(data, width, y, threshold) {
+  for (let x = 0; x < width; x++) {
+    const idx = (y * width + x) * 4
+    if (data[idx] < threshold || data[idx + 1] < threshold || data[idx + 2] < threshold) {
+      return true
+    }
+  }
+  return false
+}
+
+/**
  * Detecta el bounding box de la etiqueta en la primera página
  * renderizando a canvas y escaneando píxeles no-blancos.
+ * Ignora elementos aislados (líneas de corte, footers) separados
+ * por gaps verticales grandes (>GAP_THRESHOLD px de blanco).
  * Devuelve { x0, y0, x1, y1 } en coordenadas PDF (origen bottom-left).
  */
+const GAP_THRESHOLD_PX = 40 // ~20pt @ 2x — gap mínimo para considerar "separado"
+
 async function detectLabelBbox(pdfBytes) {
   const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise
   const page = await pdf.getPage(1)
@@ -39,39 +56,56 @@ async function detectLabelBbox(pdfBytes) {
   const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
   const { data, width, height } = imgData
 
-  // Escanear filas y columnas para encontrar contenido (píxeles no-blancos)
   const threshold = 240 // debajo de esto se considera "contenido"
 
-  // Encontrar límites verticales (top y bottom)
-  let topPx = 0, bottomPx = height - 1
-  // Top: primera fila con contenido
+  // 1) Encontrar primera y última fila con contenido (bruto)
+  let rawTop = 0, rawBottom = height - 1
   for (let y = 0; y < height; y++) {
-    let hasContent = false
-    for (let x = 0; x < width; x++) {
-      const idx = (y * width + x) * 4
-      if (data[idx] < threshold || data[idx + 1] < threshold || data[idx + 2] < threshold) {
-        hasContent = true
-        break
-      }
-    }
-    if (hasContent) { topPx = y; break }
+    if (rowHasContent(data, width, y, threshold)) { rawTop = y; break }
   }
-  // Bottom: última fila con contenido
   for (let y = height - 1; y >= 0; y--) {
-    let hasContent = false
-    for (let x = 0; x < width; x++) {
-      const idx = (y * width + x) * 4
-      if (data[idx] < threshold || data[idx + 1] < threshold || data[idx + 2] < threshold) {
-        hasContent = true
-        break
-      }
-    }
-    if (hasContent) { bottomPx = y; break }
+    if (rowHasContent(data, width, y, threshold)) { rawBottom = y; break }
   }
 
-  // Encontrar límites horizontales (left y right)
+  // 2) Construir mapa de filas con contenido y detectar bloques contiguos
+  //    Un "bloque" es un rango de filas donde no hay gaps > GAP_THRESHOLD_PX
+  const blocks = [] // { top, bottom }
+  let blockStart = null
+  let blankRun = 0
+
+  for (let y = rawTop; y <= rawBottom; y++) {
+    if (rowHasContent(data, width, y, threshold)) {
+      if (blockStart === null) {
+        blockStart = y
+      }
+      blankRun = 0
+    } else {
+      blankRun++
+      if (blockStart !== null && blankRun >= GAP_THRESHOLD_PX) {
+        // Cerrar bloque anterior (el bottom es la última fila con contenido)
+        blocks.push({ top: blockStart, bottom: y - blankRun })
+        blockStart = null
+        blankRun = 0
+      }
+    }
+  }
+  // Cerrar último bloque
+  if (blockStart !== null) {
+    blocks.push({ top: blockStart, bottom: rawBottom })
+  }
+
+  // 3) Tomar el bloque más alto (mayor cantidad de filas) = la etiqueta real
+  //    Esto ignora líneas de corte aisladas arriba o abajo
+  let best = blocks[0] || { top: rawTop, bottom: rawBottom }
+  for (const b of blocks) {
+    if ((b.bottom - b.top) > (best.bottom - best.top)) best = b
+  }
+
+  const topPx = best.top
+  const bottomPx = best.bottom
+
+  // 4) Encontrar límites horizontales dentro del bloque detectado
   let leftPx = 0, rightPx = width - 1
-  // Left: primera columna con contenido
   for (let x = 0; x < width; x++) {
     let hasContent = false
     for (let y = topPx; y <= bottomPx; y++) {
@@ -83,7 +117,6 @@ async function detectLabelBbox(pdfBytes) {
     }
     if (hasContent) { leftPx = x; break }
   }
-  // Right: última columna con contenido
   for (let x = width - 1; x >= 0; x--) {
     let hasContent = false
     for (let y = topPx; y <= bottomPx; y++) {
@@ -96,17 +129,17 @@ async function detectLabelBbox(pdfBytes) {
     if (hasContent) { rightPx = x; break }
   }
 
-  // Convertir píxeles a coordenadas PDF (puntos)
+  // 5) Convertir píxeles a coordenadas PDF (puntos)
   const pageW = page.getViewport({ scale: 1 }).width
   const pageH = page.getViewport({ scale: 1 }).height
   const pxToPt = 1 / DETECT_SCALE
 
   const pad = 2 // padding en puntos
-  const x0 = leftPx * pxToPt - pad
-  const x1 = rightPx * pxToPt + pad
+  const x0 = Math.max(0, leftPx * pxToPt - pad)
+  const x1 = Math.min(pageW, rightPx * pxToPt + pad)
   // PDF tiene origen bottom-left, canvas tiene origen top-left
-  const y0 = pageH - (bottomPx * pxToPt) - pad
-  const y1 = pageH - (topPx * pxToPt) + pad
+  const y0 = Math.max(0, pageH - (bottomPx * pxToPt) - pad)
+  const y1 = Math.min(pageH, pageH - (topPx * pxToPt) + pad)
 
   pdf.destroy()
   return { x0, y0, x1, y1, pageW, pageH }
@@ -226,11 +259,26 @@ export default function LabelCompiler() {
         onStatus: setStatusMsg,
       })
 
+      // Nombre del archivo: etiquetas-YYYY-MM-DD.pdf
+      const today = new Date()
+      const yyyy = today.getFullYear()
+      const mm = String(today.getMonth() + 1).padStart(2, '0')
+      const dd = String(today.getDate()).padStart(2, '0')
+      const fileName = `etiquetas-${yyyy}-${mm}-${dd}.pdf`
+
       // Abrir en nueva pestaña para imprimir
       const blob = new Blob([info.pdfBytes], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
+
+      // Crear link invisible para asignar nombre al archivo (útil si descarga)
+      const link = document.createElement('a')
+      link.href = url
+      link.download = fileName
+
+      // Abrir en nueva pestaña con diálogo de impresión
       const win = window.open(url, '_blank')
       if (win) {
+        win.document.title = fileName
         win.onload = () => { try { win.print() } catch {} }
         setTimeout(() => { try { win.print() } catch {} }, 1500)
       }
