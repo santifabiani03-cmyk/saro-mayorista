@@ -151,7 +151,8 @@ async function detectLabelBbox(pdfBytes) {
  */
 async function compileLabels(pdfBytes, { perPage = 4, marginMm = 8, gapMm = 4, onStatus }) {
   onStatus?.('Detectando etiqueta…')
-  const bbox = await detectLabelBbox(pdfBytes)
+  // pdf.js puede transferir el ArrayBuffer, así que pasamos una copia
+  const bbox = await detectLabelBbox(new Uint8Array(pdfBytes))
 
   onStatus?.('Compilando…')
   const srcDoc = await PDFDocument.load(pdfBytes)
