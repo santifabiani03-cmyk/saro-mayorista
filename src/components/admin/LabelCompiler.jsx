@@ -175,6 +175,18 @@ export default function LabelCompiler() {
 
       {/* Configuración */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4 shadow-sm">
+        <div className="flex items-center justify-between mb-1">
+          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Configuración</span>
+          {(perPage !== 4 || marginMm !== 8 || gapMm !== 4) && (
+            <button
+              type="button"
+              onClick={() => { setPerPage(4); setMarginMm(8); setGapMm(4) }}
+              className="text-xs text-saro-blue hover:text-saro-dark font-medium transition-colors"
+            >
+              ↺ Restablecer valores
+            </button>
+          )}
+        </div>
         <div className="grid grid-cols-3 gap-4">
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
