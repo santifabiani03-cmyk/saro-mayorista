@@ -109,14 +109,22 @@
       {
         "cantidad": 40,
         "precioTotal": 60000
+      },
+      {
+        "cantidad": 60,
+        "precioTotal": 93000
+      },
+      {
+        "cantidad": 100,
+        "precioTotal": 150000
       }
     ],
     "id": "p1779452132920",
     "fechaPublicacion": "2026-05-22T12:15:32.920Z",
+    "fechaActualizacion": "2026-05-24T20:22:32.324Z",
     "imagenes": [
       "/assets/imagen-1779452087536.webp"
-    ],
-    "fechaActualizacion": "2026-05-22T21:49:58.525Z"
+    ]
   },
   {
     "nombre": "CANASTO PLEGABLE ALUMINIO NOAC ",
