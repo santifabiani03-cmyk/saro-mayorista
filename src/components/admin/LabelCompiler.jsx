@@ -16,6 +16,7 @@ const LETTER_W = 612
 const LETTER_H = 792
 const MM_TO_PT = 72 / 25.4
 const DETECT_SCALE = 2 // resolución para escaneo (2x = ~144 DPI)
+const BOTTOM_CROP_MM = 21 // recorte inferior para eliminar cuadro blanco de la etiqueta
 
 /**
  * Devuelve true si la fila `y` del imageData tiene al menos un píxel no-blanco.
@@ -136,11 +137,14 @@ async function detectLabelBbox(pdfBytes) {
   const pxToPt = 1 / DETECT_SCALE
 
   const pad = 2 // padding en puntos
+  const bottomCrop = BOTTOM_CROP_MM * MM_TO_PT // recorte cuadro blanco inferior
   const x0 = Math.max(0, leftPx * pxToPt - pad)
   const x1 = Math.min(pageW, rightPx * pxToPt + pad)
   // PDF tiene origen bottom-left, canvas tiene origen top-left
-  const y0 = Math.max(0, pageH - (bottomPx * pxToPt) - pad)
+  const y0raw = Math.max(0, pageH - (bottomPx * pxToPt) - pad)
   const y1 = Math.min(pageH, pageH - (topPx * pxToPt) + pad)
+  // Subir el borde inferior para recortar el cuadro blanco
+  const y0 = y0raw + bottomCrop
 
   pdf.destroy()
   return { x0, y0, x1, y1, pageW, pageH }
