@@ -1,5 +1,9 @@
 import { useState, useRef, useCallback } from 'react'
 import { PDFDocument } from 'pdf-lib'
+import * as pdfjsLib from 'pdfjs-dist'
+
+// Worker de pdf.js — carga desde CDN
+pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
 
 const LAYOUTS = {
   2: { cols: 2, rows: 1 },
@@ -7,16 +11,115 @@ const LAYOUTS = {
   4: { cols: 2, rows: 2 },
 }
 
-// Letter size in points
 const LETTER_W = 612
 const LETTER_H = 792
 const MM_TO_PT = 72 / 25.4
+const DETECT_SCALE = 2 // resolución para escaneo (2x = ~144 DPI)
 
 /**
- * Compila etiquetas de envío: toma un PDF con 1 etiqueta por página
- * y las agrupa en hojas de 2, 3 o 4 para imprimir.
+ * Detecta el bounding box de la etiqueta en la primera página
+ * renderizando a canvas y escaneando píxeles no-blancos.
+ * Devuelve { x0, y0, x1, y1 } en coordenadas PDF (origen bottom-left).
  */
-async function compileLabels(pdfBytes, { perPage = 4, marginMm = 8, gapMm = 4 }) {
+async function detectLabelBbox(pdfBytes) {
+  const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise
+  const page = await pdf.getPage(1)
+  const viewport = page.getViewport({ scale: DETECT_SCALE })
+
+  // Renderizar a canvas offscreen
+  const canvas = document.createElement('canvas')
+  canvas.width = viewport.width
+  canvas.height = viewport.height
+  const ctx = canvas.getContext('2d')
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+
+  await page.render({ canvasContext: ctx, viewport }).promise
+
+  const imgData = ctx.getImageData(0, 0, canvas.width, canvas.height)
+  const { data, width, height } = imgData
+
+  // Escanear filas y columnas para encontrar contenido (píxeles no-blancos)
+  const threshold = 240 // debajo de esto se considera "contenido"
+
+  // Encontrar límites verticales (top y bottom)
+  let topPx = 0, bottomPx = height - 1
+  // Top: primera fila con contenido
+  for (let y = 0; y < height; y++) {
+    let hasContent = false
+    for (let x = 0; x < width; x++) {
+      const idx = (y * width + x) * 4
+      if (data[idx] < threshold || data[idx + 1] < threshold || data[idx + 2] < threshold) {
+        hasContent = true
+        break
+      }
+    }
+    if (hasContent) { topPx = y; break }
+  }
+  // Bottom: última fila con contenido
+  for (let y = height - 1; y >= 0; y--) {
+    let hasContent = false
+    for (let x = 0; x < width; x++) {
+      const idx = (y * width + x) * 4
+      if (data[idx] < threshold || data[idx + 1] < threshold || data[idx + 2] < threshold) {
+        hasContent = true
+        break
+      }
+    }
+    if (hasContent) { bottomPx = y; break }
+  }
+
+  // Encontrar límites horizontales (left y right)
+  let leftPx = 0, rightPx = width - 1
+  // Left: primera columna con contenido
+  for (let x = 0; x < width; x++) {
+    let hasContent = false
+    for (let y = topPx; y <= bottomPx; y++) {
+      const idx = (y * width + x) * 4
+      if (data[idx] < threshold || data[idx + 1] < threshold || data[idx + 2] < threshold) {
+        hasContent = true
+        break
+      }
+    }
+    if (hasContent) { leftPx = x; break }
+  }
+  // Right: última columna con contenido
+  for (let x = width - 1; x >= 0; x--) {
+    let hasContent = false
+    for (let y = topPx; y <= bottomPx; y++) {
+      const idx = (y * width + x) * 4
+      if (data[idx] < threshold || data[idx + 1] < threshold || data[idx + 2] < threshold) {
+        hasContent = true
+        break
+      }
+    }
+    if (hasContent) { rightPx = x; break }
+  }
+
+  // Convertir píxeles a coordenadas PDF (puntos)
+  const pageW = page.getViewport({ scale: 1 }).width
+  const pageH = page.getViewport({ scale: 1 }).height
+  const pxToPt = 1 / DETECT_SCALE
+
+  const pad = 2 // padding en puntos
+  const x0 = leftPx * pxToPt - pad
+  const x1 = rightPx * pxToPt + pad
+  // PDF tiene origen bottom-left, canvas tiene origen top-left
+  const y0 = pageH - (bottomPx * pxToPt) - pad
+  const y1 = pageH - (topPx * pxToPt) + pad
+
+  pdf.destroy()
+  return { x0, y0, x1, y1, pageW, pageH }
+}
+
+/**
+ * Compila etiquetas recortando solo el área de la etiqueta.
+ */
+async function compileLabels(pdfBytes, { perPage = 4, marginMm = 8, gapMm = 4, onStatus }) {
+  onStatus?.('Detectando etiqueta…')
+  const bbox = await detectLabelBbox(pdfBytes)
+
+  onStatus?.('Compilando…')
   const srcDoc = await PDFDocument.load(pdfBytes)
   const totalPages = srcDoc.getPageCount()
   const { cols, rows } = LAYOUTS[perPage]
@@ -25,6 +128,13 @@ async function compileLabels(pdfBytes, { perPage = 4, marginMm = 8, gapMm = 4 })
   const gap = gapMm * MM_TO_PT
   const cellW = (LETTER_W - 2 * margin - (cols - 1) * gap) / cols
   const cellH = (LETTER_H - 2 * margin - (rows - 1) * gap) / rows
+
+  // Dimensiones de la etiqueta recortada
+  const labelW = bbox.x1 - bbox.x0
+  const labelH = bbox.y1 - bbox.y0
+  const scale = Math.min(cellW / labelW, cellH / labelH)
+  const drawW = labelW * scale
+  const drawH = labelH * scale
 
   const outDoc = await PDFDocument.create()
 
@@ -37,17 +147,15 @@ async function compileLabels(pdfBytes, { perPage = 4, marginMm = 8, gapMm = 4 })
       const col = slot % cols
       const row = Math.floor(slot / cols)
 
-      // Embeber la página original
-      const [embedded] = await outDoc.embedPages([srcDoc.getPage(i)])
-      const srcW = embedded.width
-      const srcH = embedded.height
+      // Embeber la página con crop al área de la etiqueta
+      const [embedded] = await outDoc.embedPages([srcDoc.getPage(i)], [{
+        left: bbox.x0,
+        bottom: bbox.y0,
+        right: bbox.x1,
+        top: bbox.y1,
+      }])
 
-      // Escalar para que quepa en la celda
-      const scale = Math.min(cellW / srcW, cellH / srcH)
-      const drawW = srcW * scale
-      const drawH = srcH * scale
-
-      // Posición (origen bottom-left en PDF)
+      // Posición en la hoja de salida
       const cellX = margin + col * (cellW + gap)
       const cellY = LETTER_H - margin - (row + 1) * cellH - row * gap
       const destX = cellX + (cellW - drawW) / 2
@@ -59,6 +167,8 @@ async function compileLabels(pdfBytes, { perPage = 4, marginMm = 8, gapMm = 4 })
         width: drawW,
         height: drawH,
       })
+
+      onStatus?.(`${i + 1}/${totalPages} etiquetas`)
     }
   }
 
@@ -67,6 +177,7 @@ async function compileLabels(pdfBytes, { perPage = 4, marginMm = 8, gapMm = 4 })
     totalLabels: totalPages,
     sheets: Math.ceil(totalPages / perPage),
     layout: `${cols}×${rows}`,
+    scale: Math.round(scale * 100),
   }
 }
 
@@ -76,10 +187,13 @@ export default function LabelCompiler() {
   const [marginMm, setMarginMm] = useState(8)
   const [gapMm, setGapMm] = useState(4)
   const [processing, setProcessing] = useState(false)
+  const [statusMsg, setStatusMsg] = useState('')
   const [result, setResult] = useState(null)
   const [error, setError] = useState(null)
   const [dragOver, setDragOver] = useState(false)
   const inputRef = useRef(null)
+
+  const isDefault = perPage === 4 && marginMm === 8 && gapMm === 4
 
   const handleFile = useCallback((f) => {
     if (f && f.name.toLowerCase().endsWith('.pdf')) {
@@ -101,6 +215,7 @@ export default function LabelCompiler() {
     setProcessing(true)
     setError(null)
     setResult(null)
+    setStatusMsg('Preparando…')
 
     try {
       const arrayBuf = await file.arrayBuffer()
@@ -108,6 +223,7 @@ export default function LabelCompiler() {
         perPage,
         marginMm,
         gapMm,
+        onStatus: setStatusMsg,
       })
 
       // Abrir en nueva pestaña para imprimir
@@ -115,7 +231,6 @@ export default function LabelCompiler() {
       const url = URL.createObjectURL(blob)
       const win = window.open(url, '_blank')
       if (win) {
-        // Intentar abrir diálogo de impresión
         win.onload = () => { try { win.print() } catch {} }
         setTimeout(() => { try { win.print() } catch {} }, 1500)
       }
@@ -124,11 +239,13 @@ export default function LabelCompiler() {
         totalLabels: info.totalLabels,
         sheets: info.sheets,
         layout: info.layout,
+        scale: info.scale,
       })
     } catch (e) {
       setError('Error al procesar el PDF: ' + (e.message || 'desconocido'))
     } finally {
       setProcessing(false)
+      setStatusMsg('')
     }
   }
 
@@ -177,7 +294,7 @@ export default function LabelCompiler() {
       <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4 shadow-sm">
         <div className="flex items-center justify-between mb-1">
           <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Configuración</span>
-          {(perPage !== 4 || marginMm !== 8 || gapMm !== 4) && (
+          {!isDefault && (
             <button
               type="button"
               onClick={() => { setPerPage(4); setMarginMm(8); setGapMm(4) }}
@@ -244,7 +361,7 @@ export default function LabelCompiler() {
                 <circle className="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" strokeWidth="4" />
                 <path className="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z" />
               </svg>
-              Procesando…
+              {statusMsg || 'Procesando…'}
             </>
           ) : (
             <>
