@@ -151,50 +151,65 @@ async function detectLabelBbox(pdfBytes) {
 }
 
 /**
- * Compila etiquetas recortando solo el área de la etiqueta.
+ * Compila etiquetas de múltiples PDFs.
+ * Cada PDF se analiza por separado (bbox propio) y todas las páginas
+ * se compilan en un único documento de salida.
  */
-async function compileLabels(pdfBytes, { perPage = 4, marginMm = 8, gapMm = 4, onStatus }) {
-  onStatus?.('Detectando etiqueta…')
-  // pdf.js puede transferir el ArrayBuffer, así que pasamos una copia
-  const bbox = await detectLabelBbox(new Uint8Array(pdfBytes))
-
-  onStatus?.('Compilando…')
-  const srcDoc = await PDFDocument.load(pdfBytes)
-  const totalPages = srcDoc.getPageCount()
+async function compileLabels(pdfBuffers, { perPage = 4, marginMm = 8, gapMm = 4, onStatus }) {
   const { cols, rows } = LAYOUTS[perPage]
-
   const margin = marginMm * MM_TO_PT
   const gap = gapMm * MM_TO_PT
   const cellW = (LETTER_W - 2 * margin - (cols - 1) * gap) / cols
   const cellH = (LETTER_H - 2 * margin - (rows - 1) * gap) / rows
 
-  // Dimensiones de la etiqueta recortada
-  const labelW = bbox.x1 - bbox.x0
-  const labelH = bbox.y1 - bbox.y0
-  const scale = Math.min(cellW / labelW, cellH / labelH)
-  const drawW = labelW * scale
-  const drawH = labelH * scale
+  // 1) Analizar cada PDF: detectar bbox y extraer páginas
+  //    Cada PDF puede tener distinto tamaño de etiqueta
+  const sources = [] // { srcDoc, bbox, pageCount }
+  for (let f = 0; f < pdfBuffers.length; f++) {
+    onStatus?.(`Detectando etiquetas (${f + 1}/${pdfBuffers.length})…`)
+    const bytes = pdfBuffers[f]
+    const bbox = await detectLabelBbox(new Uint8Array(bytes))
+    const srcDoc = await PDFDocument.load(bytes)
+    sources.push({ srcDoc, bbox, pageCount: srcDoc.getPageCount() })
+  }
+
+  // 2) Construir lista plana de { srcDoc, pageIndex, bbox }
+  const allPages = []
+  for (const src of sources) {
+    for (let i = 0; i < src.pageCount; i++) {
+      allPages.push({ srcDoc: src.srcDoc, pageIndex: i, bbox: src.bbox })
+    }
+  }
+
+  const totalLabels = allPages.length
+  onStatus?.('Compilando…')
 
   const outDoc = await PDFDocument.create()
 
-  for (let pageStart = 0; pageStart < totalPages; pageStart += perPage) {
+  for (let pageStart = 0; pageStart < totalLabels; pageStart += perPage) {
     const sheet = outDoc.addPage([LETTER_W, LETTER_H])
-    const batchEnd = Math.min(pageStart + perPage, totalPages)
+    const batchEnd = Math.min(pageStart + perPage, totalLabels)
 
     for (let i = pageStart; i < batchEnd; i++) {
+      const { srcDoc, pageIndex, bbox } = allPages[i]
       const slot = i - pageStart
       const col = slot % cols
       const row = Math.floor(slot / cols)
 
-      // Embeber la página con crop al área de la etiqueta
-      const [embedded] = await outDoc.embedPages([srcDoc.getPage(i)], [{
+      // Escala según el bbox de este PDF en particular
+      const labelW = bbox.x1 - bbox.x0
+      const labelH = bbox.y1 - bbox.y0
+      const scale = Math.min(cellW / labelW, cellH / labelH)
+      const drawW = labelW * scale
+      const drawH = labelH * scale
+
+      const [embedded] = await outDoc.embedPages([srcDoc.getPage(pageIndex)], [{
         left: bbox.x0,
         bottom: bbox.y0,
         right: bbox.x1,
         top: bbox.y1,
       }])
 
-      // Posición en la hoja de salida
       const cellX = margin + col * (cellW + gap)
       const cellY = LETTER_H - margin - (row + 1) * cellH - row * gap
       const destX = cellX + (cellW - drawW) / 2
@@ -207,21 +222,20 @@ async function compileLabels(pdfBytes, { perPage = 4, marginMm = 8, gapMm = 4, o
         height: drawH,
       })
 
-      onStatus?.(`${i + 1}/${totalPages} etiquetas`)
+      onStatus?.(`${i + 1}/${totalLabels} etiquetas`)
     }
   }
 
   return {
     pdfBytes: await outDoc.save(),
-    totalLabels: totalPages,
-    sheets: Math.ceil(totalPages / perPage),
+    totalLabels,
+    sheets: Math.ceil(totalLabels / perPage),
     layout: `${cols}×${rows}`,
-    scale: Math.round(scale * 100),
   }
 }
 
 export default function LabelCompiler() {
-  const [file, setFile] = useState(null)
+  const [files, setFiles] = useState([]) // Array de File
   const [perPage, setPerPage] = useState(4)
   const [marginMm, setMarginMm] = useState(8)
   const [gapMm, setGapMm] = useState(4)
@@ -234,31 +248,41 @@ export default function LabelCompiler() {
 
   const isDefault = perPage === 4 && marginMm === 8 && gapMm === 4
 
-  const handleFile = useCallback((f) => {
-    if (f && f.name.toLowerCase().endsWith('.pdf')) {
-      setFile(f)
+  const addFiles = useCallback((newFiles) => {
+    const pdfs = Array.from(newFiles).filter(f => f.name.toLowerCase().endsWith('.pdf'))
+    if (pdfs.length > 0) {
+      setFiles(prev => [...prev, ...pdfs])
       setResult(null)
       setError(null)
     }
   }, [])
 
+  const removeFile = useCallback((index) => {
+    setFiles(prev => prev.filter((_, i) => i !== index))
+    setResult(null)
+    setError(null)
+  }, [])
+
   const handleDrop = useCallback((e) => {
     e.preventDefault()
     setDragOver(false)
-    const f = e.dataTransfer.files[0]
-    handleFile(f)
-  }, [handleFile])
+    addFiles(e.dataTransfer.files)
+  }, [addFiles])
 
   const handleCompile = async () => {
-    if (!file) return
+    if (files.length === 0) return
     setProcessing(true)
     setError(null)
     setResult(null)
     setStatusMsg('Preparando…')
 
     try {
-      const arrayBuf = await file.arrayBuffer()
-      const info = await compileLabels(new Uint8Array(arrayBuf), {
+      // Leer todos los archivos en paralelo
+      const buffers = await Promise.all(
+        files.map(async f => new Uint8Array(await f.arrayBuffer()))
+      )
+
+      const info = await compileLabels(buffers, {
         perPage,
         marginMm,
         gapMm,
@@ -276,12 +300,10 @@ export default function LabelCompiler() {
       const blob = new Blob([info.pdfBytes], { type: 'application/pdf' })
       const url = URL.createObjectURL(blob)
 
-      // Crear link invisible para asignar nombre al archivo (útil si descarga)
       const link = document.createElement('a')
       link.href = url
       link.download = fileName
 
-      // Abrir en nueva pestaña con diálogo de impresión
       const win = window.open(url, '_blank')
       if (win) {
         win.document.title = fileName
@@ -293,7 +315,6 @@ export default function LabelCompiler() {
         totalLabels: info.totalLabels,
         sheets: info.sheets,
         layout: info.layout,
-        scale: info.scale,
       })
     } catch (e) {
       setError('Error al procesar el PDF: ' + (e.message || 'desconocido'))
@@ -308,7 +329,7 @@ export default function LabelCompiler() {
       <div>
         <h2 className="text-xl font-extrabold text-gray-900">Compilador de Etiquetas</h2>
         <p className="text-sm text-gray-400 mt-1">
-          Subí un PDF con etiquetas de envío (una por página) y se agrupan para imprimir.
+          Subí uno o varios PDFs con etiquetas de envío y se agrupan para imprimir.
         </p>
       </div>
 
@@ -321,7 +342,7 @@ export default function LabelCompiler() {
         className={`relative border-2 border-dashed rounded-2xl px-6 py-12 text-center cursor-pointer transition-all ${
           dragOver
             ? 'border-saro-blue bg-saro-light'
-            : file
+            : files.length > 0
             ? 'border-green-300 bg-green-50'
             : 'border-gray-200 hover:border-saro-blue hover:bg-gray-50'
         }`}
@@ -330,19 +351,51 @@ export default function LabelCompiler() {
           ref={inputRef}
           type="file"
           accept=".pdf"
+          multiple
           className="hidden"
-          onChange={e => { if (e.target.files[0]) handleFile(e.target.files[0]) }}
+          onChange={e => { addFiles(e.target.files); e.target.value = '' }}
         />
-        <span className="text-4xl block mb-3">{file ? '✅' : '📄'}</span>
+        <span className="text-4xl block mb-3">{files.length > 0 ? '✅' : '📄'}</span>
         <p className="font-bold text-gray-800 text-sm">
-          {file ? file.name : 'Arrastrá tu PDF aquí'}
+          {files.length > 0
+            ? `${files.length} archivo${files.length > 1 ? 's' : ''} cargado${files.length > 1 ? 's' : ''}`
+            : 'Arrastrá tus PDFs aquí'}
         </p>
         <p className="text-xs text-gray-400 mt-1">
-          {file
-            ? `${(file.size / 1024).toFixed(0)} KB — Tocá para cambiar`
-            : 'o hacé click para seleccionar'}
+          {files.length > 0
+            ? 'Tocá para agregar más'
+            : 'o hacé click para seleccionar (uno o varios)'}
         </p>
       </div>
+
+      {/* Lista de archivos */}
+      {files.length > 0 && (
+        <div className="space-y-1.5">
+          {files.map((f, idx) => (
+            <div key={`${f.name}-${idx}`} className="flex items-center justify-between bg-white border border-gray-100 rounded-xl px-4 py-2.5 shadow-sm">
+              <div className="min-w-0">
+                <p className="text-sm font-medium text-gray-800 truncate">{f.name}</p>
+                <p className="text-xs text-gray-400">{(f.size / 1024).toFixed(0)} KB</p>
+              </div>
+              <button
+                type="button"
+                onClick={(e) => { e.stopPropagation(); removeFile(idx) }}
+                className="text-gray-300 hover:text-red-500 transition-colors ml-3 flex-shrink-0 text-lg leading-none"
+                title="Quitar archivo"
+              >
+                ✕
+              </button>
+            </div>
+          ))}
+          <button
+            type="button"
+            onClick={() => { setFiles([]); setResult(null); setError(null) }}
+            className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+          >
+            Quitar todos
+          </button>
+        </div>
+      )}
 
       {/* Configuración */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4 shadow-sm">
@@ -402,9 +455,9 @@ export default function LabelCompiler() {
         {/* Botón compilar */}
         <button
           onClick={handleCompile}
-          disabled={!file || processing}
+          disabled={files.length === 0 || processing}
           className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
-            !file || processing
+            files.length === 0 || processing
               ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
               : 'bg-saro-dark hover:bg-saro-blue text-white shadow-lg'
           }`}
@@ -440,8 +493,8 @@ export default function LabelCompiler() {
               <p className="text-xs text-gray-500 mt-0.5">Hojas</p>
             </div>
             <div className="bg-white rounded-xl p-3 text-center">
-              <p className="text-2xl font-extrabold text-gray-800">{result.layout}</p>
-              <p className="text-xs text-gray-500 mt-0.5">Layout</p>
+              <p className="text-2xl font-extrabold text-gray-800">{result.totalLabels > 1 ? result.layout : '1'}</p>
+              <p className="text-xs text-gray-500 mt-0.5">Por hoja</p>
             </div>
           </div>
         </div>
