@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react'
 import ProductForm from '../components/admin/ProductForm'
 import ProductList from '../components/admin/ProductList'
 import DemandDashboard from '../components/admin/DemandDashboard'
+import LabelCompiler from '../components/admin/LabelCompiler'
 import { exportCatalogPdf } from '../utils/exportCatalogPdf'
 
 
@@ -328,6 +329,7 @@ export default function AdminPage() {
           {[
             { key: 'editar', label: `📋 Publicados (${products.length})` },
             { key: 'nuevo',  label: editingProduct ? '✏️ Editando producto' : '＋ Nuevo producto' },
+            { key: 'etiquetas', label: '🏷️ Etiquetas' },
             { key: 'demanda', label: '📊 Demanda' },
           ].map(t => (
             <button
@@ -364,6 +366,8 @@ export default function AdminPage() {
             onCancel={editingProduct ? handleCancelEdit : null}
             saving={saving}
           />
+        ) : tab === 'etiquetas' ? (
+          <LabelCompiler />
         ) : tab === 'demanda' ? (
           <DemandDashboard />
         ) : (
