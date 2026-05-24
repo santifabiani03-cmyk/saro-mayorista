@@ -1,4 +1,4 @@
-import { useState, useRef, useCallback } from 'react'
+import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { PDFDocument } from 'pdf-lib'
 import * as pdfjsLib from 'pdfjs-dist'
 import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
@@ -17,6 +17,26 @@ const LETTER_H = 792
 const MM_TO_PT = 72 / 25.4
 const DETECT_SCALE = 2 // resolución para escaneo (2x = ~144 DPI)
 const BOTTOM_CROP_MM = 21 // recorte inferior para eliminar cuadro blanco de la etiqueta
+
+// ── Historial de envíos compilados (persistido en localStorage) ──
+const HISTORY_KEY = 'saro_label_history'
+
+function loadHistory() {
+  try {
+    return JSON.parse(localStorage.getItem(HISTORY_KEY) || '[]')
+  } catch { return [] }
+}
+
+function saveHistory(history) {
+  localStorage.setItem(HISTORY_KEY, JSON.stringify(history))
+}
+
+function addToHistory(count) {
+  const history = loadHistory()
+  history.push({ date: new Date().toISOString(), count })
+  saveHistory(history)
+  return history
+}
 
 /**
  * Devuelve true si la fila `y` del imageData tiene al menos un píxel no-blanco.
@@ -246,7 +266,28 @@ export default function LabelCompiler() {
   const [dragOver, setDragOver] = useState(false)
   const inputRef = useRef(null)
 
+  // Historial de envíos
+  const [history, setHistory] = useState(loadHistory)
+  const [statFilter, setStatFilter] = useState('todo') // 'semana' | 'mes' | 'todo'
+
   const isDefault = perPage === 4 && marginMm === 8 && gapMm === 4
+
+  const filteredStats = useMemo(() => {
+    const now = Date.now()
+    const week = 7 * 24 * 60 * 60 * 1000
+    const month = 30 * 24 * 60 * 60 * 1000
+
+    let filtered = history
+    if (statFilter === 'semana') {
+      filtered = history.filter(h => now - new Date(h.date).getTime() < week)
+    } else if (statFilter === 'mes') {
+      filtered = history.filter(h => now - new Date(h.date).getTime() < month)
+    }
+
+    const totalLabels = filtered.reduce((sum, h) => sum + h.count, 0)
+    const compilations = filtered.length
+    return { totalLabels, compilations }
+  }, [history, statFilter])
 
   const addFiles = useCallback((newFiles) => {
     const pdfs = Array.from(newFiles).filter(f => f.name.toLowerCase().endsWith('.pdf'))
@@ -311,6 +352,9 @@ export default function LabelCompiler() {
         setTimeout(() => { try { win.print() } catch {} }, 1500)
       }
 
+      // Registrar en historial
+      setHistory(addToHistory(info.totalLabels))
+
       setResult({
         totalLabels: info.totalLabels,
         sheets: info.sheets,
@@ -326,6 +370,43 @@ export default function LabelCompiler() {
 
   return (
     <div className="max-w-xl mx-auto space-y-6">
+
+      {/* Contador de envíos */}
+      <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+        <div className="flex items-center justify-between mb-3">
+          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Envíos compilados</span>
+          <div className="flex gap-1">
+            {[
+              { key: 'semana', label: '7 días' },
+              { key: 'mes', label: '30 días' },
+              { key: 'todo', label: 'Todo' },
+            ].map(f => (
+              <button
+                key={f.key}
+                onClick={() => setStatFilter(f.key)}
+                className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors ${
+                  statFilter === f.key
+                    ? 'bg-saro-blue text-white'
+                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                }`}
+              >
+                {f.label}
+              </button>
+            ))}
+          </div>
+        </div>
+        <div className="flex items-end gap-6">
+          <div>
+            <p className="text-3xl font-extrabold text-saro-blue leading-none">{filteredStats.totalLabels}</p>
+            <p className="text-xs text-gray-400 mt-1">etiquetas</p>
+          </div>
+          <div>
+            <p className="text-xl font-bold text-gray-600 leading-none">{filteredStats.compilations}</p>
+            <p className="text-xs text-gray-400 mt-1">compilaciones</p>
+          </div>
+        </div>
+      </div>
+
       <div>
         <h2 className="text-xl font-extrabold text-gray-900">Compilador de Etiquetas</h2>
         <p className="text-sm text-gray-400 mt-1">
