@@ -4,6 +4,65 @@ import {
   getAutoEmoji, TAG_CONFIG, getProductTags, getSwatchStyle,
 } from '../../utils/colors'
 
+// ── Background removal (lazy load) ────────────────────────────────────────────
+// El fondo estandarizado: gradiente gris claro sutil (profesional, neutro)
+const STD_BG_GRADIENT = [
+  { pos: 0, color: '#f8f9fa' },
+  { pos: 1, color: '#e9ecef' },
+]
+
+/**
+ * Remueve el fondo de una imagen y la coloca sobre un fondo estandarizado.
+ * Usa @imgly/background-removal (ONNX, corre 100% en el browser).
+ * Devuelve un Blob (image/webp o image/png).
+ */
+async function removeAndStandardize(imageUrl, onProgress) {
+  onProgress?.('Cargando modelo IA…')
+  const { removeBackground } = await import('@imgly/background-removal')
+
+  onProgress?.('Removiendo fondo…')
+  const blob = await removeBackground(imageUrl, {
+    progress: (key, current, total) => {
+      if (key === 'compute:inference') {
+        const pct = total > 0 ? Math.round((current / total) * 100) : 0
+        onProgress?.(`Procesando… ${pct}%`)
+      }
+    },
+  })
+
+  // Componer sobre fondo estandarizado
+  onProgress?.('Aplicando fondo…')
+  const img = new Image()
+  img.src = URL.createObjectURL(blob)
+  await new Promise(r => { img.onload = r })
+
+  const size = Math.max(img.width, img.height)
+  const padding = Math.round(size * 0.08) // 8% padding
+  const canvasSize = size + padding * 2
+
+  const canvas = document.createElement('canvas')
+  canvas.width = canvasSize
+  canvas.height = canvasSize
+  const ctx = canvas.getContext('2d')
+
+  // Dibujar gradiente de fondo
+  const grad = ctx.createLinearGradient(0, 0, 0, canvasSize)
+  STD_BG_GRADIENT.forEach(s => grad.addColorStop(s.pos, s.color))
+  ctx.fillStyle = grad
+  ctx.fillRect(0, 0, canvasSize, canvasSize)
+
+  // Centrar producto
+  const dx = padding + (size - img.width) / 2
+  const dy = padding + (size - img.height) / 2
+  ctx.drawImage(img, dx, dy)
+
+  URL.revokeObjectURL(img.src)
+
+  return new Promise(resolve => {
+    canvas.toBlob(b => resolve(b), 'image/webp', 0.9)
+  })
+}
+
 /* ── Lightbox para admin ──────────────────────────────────────────── */
 function AdminLightbox({ images, startIdx, onClose }) {
   const [idx, setIdx] = useState(startIdx)
@@ -221,6 +280,7 @@ function MultiImageUploader({ images, onChange, productName }) {
   const [pending, setPending] = useState(0)   // cuántas imágenes se están subiendo
   const [dragging, setDragging] = useState(false)
   const [lightboxIdx, setLightboxIdx] = useState(null)
+  const [bgRemoval, setBgRemoval] = useState({}) // { [index]: 'status text' | null }
 
   const handleFiles = async (files) => {
     const list = Array.from(files).filter(f => f.type.startsWith('image/'))
@@ -234,6 +294,31 @@ function MultiImageUploader({ images, onChange, productName }) {
 
   const remove = (i) => onChange(images.filter((_, j) => j !== i))
 
+  const handleRemoveBg = async (i) => {
+    const url = images[i]
+    setBgRemoval(prev => ({ ...prev, [i]: 'Iniciando…' }))
+    try {
+      const resultBlob = await removeAndStandardize(url, (msg) => {
+        setBgRemoval(prev => ({ ...prev, [i]: msg }))
+      })
+
+      // Subir la imagen procesada
+      setBgRemoval(prev => ({ ...prev, [i]: 'Subiendo…' }))
+      const file = new File([resultBlob], 'processed.webp', { type: 'image/webp' })
+      const newUrl = await uploadFile(file, productName)
+      if (newUrl) {
+        const next = [...images]
+        next[i] = newUrl
+        onChange(next)
+      }
+      setBgRemoval(prev => { const n = { ...prev }; delete n[i]; return n })
+    } catch (e) {
+      console.error('Error removing background:', e)
+      setBgRemoval(prev => ({ ...prev, [i]: '❌ Error' }))
+      setTimeout(() => setBgRemoval(prev => { const n = { ...prev }; delete n[i]; return n }), 3000)
+    }
+  }
+
   return (
     <div
       onDragOver={e => { e.preventDefault(); setDragging(true) }}
@@ -246,22 +331,42 @@ function MultiImageUploader({ images, onChange, productName }) {
         {/* Imágenes existentes */}
         {images.map((url, i) => (
           <div key={url + i} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 group cursor-zoom-in"
-            onClick={() => setLightboxIdx(i)}
+            onClick={() => !bgRemoval[i] && setLightboxIdx(i)}
           >
-            <img src={url} alt="" className="w-full h-full object-cover" />
+            <img src={url} alt="" className={`w-full h-full object-cover transition-opacity ${bgRemoval[i] ? 'opacity-40' : ''}`} />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors" />
+
+            {/* Overlay de procesamiento */}
+            {bgRemoval[i] && (
+              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70">
+                <span className="text-lg animate-pulse">🪄</span>
+                <span className="text-[10px] font-medium text-gray-600 mt-1 px-2 text-center leading-tight">{bgRemoval[i]}</span>
+              </div>
+            )}
+
             {/* Badge "Principal" en la primera */}
-            {i === 0 && (
+            {i === 0 && !bgRemoval[i] && (
               <span className="absolute bottom-1 left-1 text-[10px] bg-saro-blue text-white px-1.5 py-0.5 rounded-full font-semibold">
                 Principal
               </span>
             )}
+            {/* Botón quitar fondo */}
+            {!bgRemoval[i] && (
+              <button
+                type="button"
+                onClick={e => { e.stopPropagation(); handleRemoveBg(i) }}
+                className="absolute top-1 left-1 px-1.5 py-0.5 bg-violet-500 hover:bg-violet-600 text-white rounded-full text-[10px] font-semibold flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow"
+                title="Quitar fondo"
+              >🪄 Fondo</button>
+            )}
             {/* Botón eliminar */}
-            <button
-              type="button"
-              onClick={e => { e.stopPropagation(); remove(i) }}
-              className="absolute top-1 right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
-            >✕</button>
+            {!bgRemoval[i] && (
+              <button
+                type="button"
+                onClick={e => { e.stopPropagation(); remove(i) }}
+                className="absolute top-1 right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
+              >✕</button>
+            )}
           </div>
         ))}
 
