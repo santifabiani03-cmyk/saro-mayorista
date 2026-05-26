@@ -62,19 +62,40 @@ export default function DemandDashboard() {
   const totalPedidos  = filtered.length
   const totalUnidades = filtered.reduce((s, o) => s + (o.totalItems ?? 0), 0)
   const totalRevenue  = filtered.reduce((s, o) => s + (o.total ?? 0), 0)
+  const ticketPromedio = totalPedidos > 0 ? Math.round(totalRevenue / totalPedidos) : 0
+  const unidadesPromedio = totalPedidos > 0 ? Math.round(totalUnidades / totalPedidos) : 0
 
   // Ranking de productos
   const productCount = {}
   const colorCount   = {}
   const talleCount   = {}
+  const comboCount   = {} // color + talle
+  const dayOfWeekCount = [0, 0, 0, 0, 0, 0, 0] // Dom, Lun, ..., Sáb
+  const DAY_NAMES = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado']
+
   filtered.forEach(o => {
+    // Día de la semana
+    const dow = new Date(o.fecha).getDay()
+    dayOfWeekCount[dow]++
+
     o.items?.forEach(i => {
       const key = i.nombre ?? i.productId
       productCount[key] = (productCount[key] ?? 0) + i.cantidad
       colorCount[i.color] = (colorCount[i.color] ?? 0) + i.cantidad
       talleCount[i.talle] = (talleCount[i.talle] ?? 0) + i.cantidad
+      // Combinación color + talle
+      const combo = `${i.color} / ${i.talle}`
+      comboCount[combo] = (comboCount[combo] ?? 0) + i.cantidad
     })
   })
+
+  // Top combinaciones color+talle
+  const sortedCombos = Object.entries(comboCount).sort((a, b) => b[1] - a[1]).slice(0, 8)
+  const maxCombo = sortedCombos[0]?.[1] ?? 0
+
+  // Día más activo
+  const maxDayCount = Math.max(...dayOfWeekCount)
+  const bestDayIdx = dayOfWeekCount.indexOf(maxDayCount)
 
   const sortedProducts = Object.entries(productCount).sort((a, b) => b[1] - a[1]).slice(0, 10)
   const sortedColors   = Object.entries(colorCount).sort((a, b) => b[1] - a[1]).slice(0, 10)
@@ -133,10 +154,12 @@ export default function DemandDashboard() {
       </div>
 
       {/* Stats generales */}
-      <div className="grid grid-cols-3 gap-4">
+      <div className="grid grid-cols-3 sm:grid-cols-5 gap-3">
         <StatCard icon="📦" label="Pedidos" value={totalPedidos} />
-        <StatCard icon="🏷️" label="Unidades pedidas" value={totalUnidades.toLocaleString('es-AR')} />
+        <StatCard icon="🏷️" label="Unidades" value={totalUnidades.toLocaleString('es-AR')} />
         <StatCard icon="💰" label="Valor total" value={`$${totalRevenue.toLocaleString('es-AR')}`} />
+        <StatCard icon="🎟️" label="Ticket promedio" value={`$${ticketPromedio.toLocaleString('es-AR')}`} />
+        <StatCard icon="📊" label="Unid./pedido" value={unidadesPromedio} />
       </div>
 
       {/* Pedidos por día */}
@@ -190,6 +213,56 @@ export default function DemandDashboard() {
             ))}
           </div>
         </div>
+      </div>
+
+      {/* Combinaciones más pedidas + Día de la semana */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
+        {/* Top combinaciones color + talle */}
+        {sortedCombos.length > 0 && (
+          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+            <h3 className="font-semibold text-gray-800 text-sm mb-4">🔗 Top combinaciones (color + talle)</h3>
+            <div className="space-y-2.5">
+              {sortedCombos.map(([name, count]) => (
+                <Bar key={name} label={name} value={count} max={maxCombo} color="bg-violet-500" />
+              ))}
+            </div>
+          </div>
+        )}
+
+        {/* Pedidos por día de la semana */}
+        {totalPedidos > 0 && (
+          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+            <h3 className="font-semibold text-gray-800 text-sm mb-4">📅 Pedidos por día de la semana</h3>
+            <div className="flex items-end gap-2 h-36">
+              {DAY_NAMES.map((name, idx) => {
+                const count = dayOfWeekCount[idx]
+                const pct = maxDayCount > 0 ? (count / maxDayCount) * 100 : 0
+                const isBest = idx === bestDayIdx && count > 0
+                return (
+                  <div key={name} className="flex-1 flex flex-col items-center gap-1">
+                    <span className={`text-[10px] font-bold ${isBest ? 'text-saro-blue' : 'text-gray-400'}`}>
+                      {count || ''}
+                    </span>
+                    <div className="w-full bg-gray-100 rounded-t-md overflow-hidden" style={{ height: '80px' }}>
+                      <div
+                        className={`w-full rounded-t-md transition-all duration-500 ${isBest ? 'bg-saro-blue' : 'bg-gray-300'}`}
+                        style={{ height: `${pct}%`, position: 'relative', top: `${100 - pct}%` }}
+                      />
+                    </div>
+                    <span className={`text-[10px] ${isBest ? 'font-bold text-saro-blue' : 'text-gray-400'}`}>
+                      {name.slice(0, 3)}
+                    </span>
+                  </div>
+                )
+              })}
+            </div>
+            {maxDayCount > 0 && (
+              <p className="text-xs text-gray-400 mt-3 text-center">
+                Día más activo: <span className="font-semibold text-saro-blue">{DAY_NAMES[bestDayIdx]}</span>
+              </p>
+            )}
+          </div>
+        )}
       </div>
 
       {/* Lista de pedidos recientes */}
