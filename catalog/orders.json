@@ -1,1 +1,26 @@
-[]
+[
+  {
+    "id": "o1779758005807",
+    "fecha": "2026-05-26T01:13:25.807Z",
+    "items": [
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 6
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 6
+      }
+    ],
+    "total": 42000,
+    "totalItems": 12
+  }
+]
