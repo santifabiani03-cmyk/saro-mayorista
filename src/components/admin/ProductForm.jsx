@@ -400,7 +400,25 @@ function MultiImageUploader({ images, onChange, productName }) {
 
 // ── Selector de colores ───────────────────────────────────────────────────────
 
-// (La herramienta de fondo es 100% client-side, sin API, sin límites)
+// ── Contador de usos diarios de IA (para generador de descripciones con Gemini) ─
+const AI_USAGE_KEY = 'saro_ai_usage'
+const AI_DAILY_LIMIT = 25
+
+function getAiUsage() {
+  try {
+    const data = JSON.parse(localStorage.getItem(AI_USAGE_KEY) || '{}')
+    const today = new Date().toISOString().slice(0, 10)
+    if (data.date !== today) return { date: today, count: 0 }
+    return data
+  } catch { return { date: new Date().toISOString().slice(0, 10), count: 0 } }
+}
+
+function incrementAiUsage() {
+  const usage = getAiUsage()
+  usage.count++
+  localStorage.setItem(AI_USAGE_KEY, JSON.stringify(usage))
+  return usage.count
+}
 
 // ── Sección de remoción de fondo ─────────────────────────────────────────────
 
