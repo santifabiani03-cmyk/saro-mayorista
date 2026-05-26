@@ -17,11 +17,17 @@ const STD_BG_GRADIENT = [
  * Devuelve un Blob (image/webp o image/png).
  */
 async function removeAndStandardize(imageUrl, onProgress) {
+  // Primero descargar la imagen como blob para evitar CORS con URLs de GitHub
+  onProgress?.('Descargando imagen…')
+  const imgResp = await fetch(imageUrl)
+  if (!imgResp.ok) throw new Error('No se pudo descargar la imagen')
+  const srcBlob = await imgResp.blob()
+
   onProgress?.('Cargando modelo IA…')
   const { removeBackground } = await import('@imgly/background-removal')
 
   onProgress?.('Removiendo fondo…')
-  const blob = await removeBackground(imageUrl, {
+  const blob = await removeBackground(srcBlob, {
     progress: (key, current, total) => {
       if (key === 'compute:inference') {
         const pct = total > 0 ? Math.round((current / total) * 100) : 0
@@ -280,7 +286,6 @@ function MultiImageUploader({ images, onChange, productName }) {
   const [pending, setPending] = useState(0)   // cuántas imágenes se están subiendo
   const [dragging, setDragging] = useState(false)
   const [lightboxIdx, setLightboxIdx] = useState(null)
-  const [bgRemoval, setBgRemoval] = useState({}) // { [index]: 'status text' | null }
 
   const handleFiles = async (files) => {
     const list = Array.from(files).filter(f => f.type.startsWith('image/'))
@@ -294,31 +299,6 @@ function MultiImageUploader({ images, onChange, productName }) {
 
   const remove = (i) => onChange(images.filter((_, j) => j !== i))
 
-  const handleRemoveBg = async (i) => {
-    const url = images[i]
-    setBgRemoval(prev => ({ ...prev, [i]: 'Iniciando…' }))
-    try {
-      const resultBlob = await removeAndStandardize(url, (msg) => {
-        setBgRemoval(prev => ({ ...prev, [i]: msg }))
-      })
-
-      // Subir la imagen procesada
-      setBgRemoval(prev => ({ ...prev, [i]: 'Subiendo…' }))
-      const file = new File([resultBlob], 'processed.webp', { type: 'image/webp' })
-      const newUrl = await uploadFile(file, productName)
-      if (newUrl) {
-        const next = [...images]
-        next[i] = newUrl
-        onChange(next)
-      }
-      setBgRemoval(prev => { const n = { ...prev }; delete n[i]; return n })
-    } catch (e) {
-      console.error('Error removing background:', e)
-      setBgRemoval(prev => ({ ...prev, [i]: '❌ Error' }))
-      setTimeout(() => setBgRemoval(prev => { const n = { ...prev }; delete n[i]; return n }), 3000)
-    }
-  }
-
   return (
     <div
       onDragOver={e => { e.preventDefault(); setDragging(true) }}
@@ -331,42 +311,23 @@ function MultiImageUploader({ images, onChange, productName }) {
         {/* Imágenes existentes */}
         {images.map((url, i) => (
           <div key={url + i} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 group cursor-zoom-in"
-            onClick={() => !bgRemoval[i] && setLightboxIdx(i)}
+            onClick={() => setLightboxIdx(i)}
           >
-            <img src={url} alt="" className={`w-full h-full object-cover transition-opacity ${bgRemoval[i] ? 'opacity-40' : ''}`} />
+            <img src={url} alt="" className="w-full h-full object-cover" />
             <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors" />
 
-            {/* Overlay de procesamiento */}
-            {bgRemoval[i] && (
-              <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/70">
-                <span className="text-lg animate-pulse">🪄</span>
-                <span className="text-[10px] font-medium text-gray-600 mt-1 px-2 text-center leading-tight">{bgRemoval[i]}</span>
-              </div>
-            )}
-
             {/* Badge "Principal" en la primera */}
-            {i === 0 && !bgRemoval[i] && (
+            {i === 0 && (
               <span className="absolute bottom-1 left-1 text-[10px] bg-saro-blue text-white px-1.5 py-0.5 rounded-full font-semibold">
                 Principal
               </span>
             )}
-            {/* Botón quitar fondo */}
-            {!bgRemoval[i] && (
-              <button
-                type="button"
-                onClick={e => { e.stopPropagation(); handleRemoveBg(i) }}
-                className="absolute top-1 left-1 px-1.5 py-0.5 bg-violet-500 hover:bg-violet-600 text-white rounded-full text-[10px] font-semibold flex items-center gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity shadow"
-                title="Quitar fondo"
-              >🪄 Fondo</button>
-            )}
             {/* Botón eliminar */}
-            {!bgRemoval[i] && (
-              <button
-                type="button"
-                onClick={e => { e.stopPropagation(); remove(i) }}
-                className="absolute top-1 right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
-              >✕</button>
-            )}
+            <button
+              type="button"
+              onClick={e => { e.stopPropagation(); remove(i) }}
+              className="absolute top-1 right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
+            >✕</button>
           </div>
         ))}
 
@@ -435,6 +396,125 @@ function incrementAiUsage() {
   usage.count++
   localStorage.setItem(AI_USAGE_KEY, JSON.stringify(usage))
   return usage.count
+}
+
+// ── Sección de remoción de fondo ─────────────────────────────────────────────
+
+function BgRemovalSection({ images, onChange, productName }) {
+  const [processing, setProcessing] = useState({}) // { [index]: 'status' }
+  const [selected, setSelected] = useState(new Set())
+
+  const toggle = (i) => {
+    setSelected(prev => {
+      const next = new Set(prev)
+      next.has(i) ? next.delete(i) : next.add(i)
+      return next
+    })
+  }
+
+  const processOne = async (i) => {
+    const url = images[i]
+    setProcessing(prev => ({ ...prev, [i]: 'Iniciando…' }))
+    try {
+      const resultBlob = await removeAndStandardize(url, (msg) => {
+        setProcessing(prev => ({ ...prev, [i]: msg }))
+      })
+      setProcessing(prev => ({ ...prev, [i]: 'Subiendo…' }))
+      const file = new File([resultBlob], 'processed.webp', { type: 'image/webp' })
+      const newUrl = await uploadFile(file, productName)
+      if (newUrl) {
+        const next = [...images]
+        next[i] = newUrl
+        onChange(next)
+        incrementAiUsage()
+      }
+      setProcessing(prev => { const n = { ...prev }; delete n[i]; return n })
+      setSelected(prev => { const n = new Set(prev); n.delete(i); return n })
+    } catch (e) {
+      console.error('Error removing background:', e)
+      setProcessing(prev => ({ ...prev, [i]: '❌ Error' }))
+      setTimeout(() => setProcessing(prev => { const n = { ...prev }; delete n[i]; return n }), 3000)
+    }
+  }
+
+  const processSelected = async () => {
+    const indices = [...selected].sort()
+    for (const i of indices) {
+      await processOne(i)
+    }
+  }
+
+  const anyProcessing = Object.keys(processing).length > 0
+  const usage = getAiUsage()
+
+  return (
+    <div className="bg-violet-50 border border-violet-200 rounded-2xl p-4 space-y-3">
+      <div className="flex items-center justify-between">
+        <div className="flex items-center gap-2">
+          <span className="text-lg">🪄</span>
+          <div>
+            <h4 className="text-sm font-bold text-violet-800">Fondo estandarizado</h4>
+            <p className="text-[11px] text-violet-500">Seleccioná imágenes para quitar fondo con IA</p>
+          </div>
+        </div>
+        <span className="text-[10px] text-violet-400 bg-violet-100 px-2 py-0.5 rounded-full">
+          {usage.count}/{AI_DAILY_LIMIT} hoy
+        </span>
+      </div>
+
+      {/* Grid de miniaturas seleccionables */}
+      <div className="grid grid-cols-4 gap-2">
+        {images.map((url, i) => {
+          const isProc = !!processing[i]
+          const isSel = selected.has(i)
+          return (
+            <button
+              key={url + i}
+              type="button"
+              disabled={isProc}
+              onClick={() => !isProc && toggle(i)}
+              className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all ${
+                isProc ? 'border-violet-300 opacity-70'
+                : isSel ? 'border-violet-500 ring-2 ring-violet-300'
+                : 'border-transparent hover:border-violet-300'
+              }`}
+            >
+              <img src={url} alt="" className="w-full h-full object-cover" />
+              {isProc && (
+                <div className="absolute inset-0 flex flex-col items-center justify-center bg-white/80">
+                  <span className="text-base animate-pulse">🪄</span>
+                  <span className="text-[9px] font-medium text-violet-600 mt-0.5 px-1 text-center leading-tight">{processing[i]}</span>
+                </div>
+              )}
+              {isSel && !isProc && (
+                <div className="absolute top-1 right-1 w-5 h-5 bg-violet-500 text-white rounded-full text-xs flex items-center justify-center shadow">
+                  ✓
+                </div>
+              )}
+            </button>
+          )
+        })}
+      </div>
+
+      {/* Botón de procesar */}
+      <button
+        type="button"
+        disabled={selected.size === 0 || anyProcessing}
+        onClick={processSelected}
+        className={`w-full py-2 rounded-xl text-sm font-bold transition-all ${
+          selected.size > 0 && !anyProcessing
+            ? 'bg-violet-500 hover:bg-violet-600 text-white shadow-sm'
+            : 'bg-violet-100 text-violet-300 cursor-not-allowed'
+        }`}
+      >
+        {anyProcessing
+          ? 'Procesando…'
+          : selected.size > 0
+            ? `Quitar fondo de ${selected.size} imagen${selected.size > 1 ? 'es' : ''}`
+            : 'Seleccioná imágenes arriba'}
+      </button>
+    </div>
+  )
 }
 
 const PINNED_KEY = 'saro_pinned_colors'
@@ -946,6 +1026,15 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               productName={form.nombre}
             />
           </Field>
+
+          {/* ── Herramienta de fondo IA ── */}
+          {imagenes.length > 0 && (
+            <BgRemovalSection
+              images={imagenes}
+              onChange={setImagenes}
+              productName={form.nombre}
+            />
+          )}
 
           <Field>
             <Label required>Nombre</Label>
