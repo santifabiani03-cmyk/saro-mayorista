@@ -12,22 +12,41 @@ const STD_BG_GRADIENT = [
 ]
 
 /**
+ * Carga una imagen desde URL en un canvas y devuelve un Blob.
+ * Esto evita problemas de CORS al pasar datos a la librería de IA.
+ */
+function loadImageAsBlob(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const c = document.createElement('canvas')
+      c.width = img.naturalWidth
+      c.height = img.naturalHeight
+      c.getContext('2d').drawImage(img, 0, 0)
+      c.toBlob(b => b ? resolve(b) : reject(new Error('Canvas toBlob falló')), 'image/png')
+    }
+    img.onerror = () => reject(new Error('No se pudo cargar la imagen'))
+    img.src = url
+  })
+}
+
+/**
  * Remueve el fondo de una imagen y la coloca sobre un fondo estandarizado.
- * Usa @imgly/background-removal (ONNX, corre 100% en el browser).
- * Devuelve un Blob (image/webp o image/png).
+ * Usa @imgly/background-removal (ONNX, corre 100% en el browser, gratis, sin límites).
+ * Devuelve un Blob (image/webp).
  */
 async function removeAndStandardize(imageUrl, onProgress) {
-  // Primero descargar la imagen como blob para evitar CORS con URLs de GitHub
-  onProgress?.('Descargando imagen…')
-  const imgResp = await fetch(imageUrl)
-  if (!imgResp.ok) throw new Error('No se pudo descargar la imagen')
-  const srcBlob = await imgResp.blob()
+  // Cargar imagen vía canvas para obtener un blob local (evita CORS)
+  onProgress?.('Cargando imagen…')
+  const srcBlob = await loadImageAsBlob(imageUrl)
 
-  onProgress?.('Cargando modelo IA…')
+  onProgress?.('Cargando modelo IA… (primera vez descarga ~30MB)')
   const { removeBackground } = await import('@imgly/background-removal')
 
   onProgress?.('Removiendo fondo…')
   const blob = await removeBackground(srcBlob, {
+    proxyToWorker: false,  // evita requerir SharedArrayBuffer/COOP headers
     progress: (key, current, total) => {
       if (key === 'compute:inference') {
         const pct = total > 0 ? Math.round((current / total) * 100) : 0
@@ -40,7 +59,10 @@ async function removeAndStandardize(imageUrl, onProgress) {
   onProgress?.('Aplicando fondo…')
   const img = new Image()
   img.src = URL.createObjectURL(blob)
-  await new Promise(r => { img.onload = r })
+  await new Promise((resolve, reject) => {
+    img.onload = resolve
+    img.onerror = () => reject(new Error('Error cargando resultado'))
+  })
 
   const size = Math.max(img.width, img.height)
   const padding = Math.round(size * 0.08) // 8% padding
@@ -378,25 +400,7 @@ function MultiImageUploader({ images, onChange, productName }) {
 
 // ── Selector de colores ───────────────────────────────────────────────────────
 
-// ── Contador de usos diarios de IA ───────────────────────────────────────────
-const AI_USAGE_KEY = 'saro_ai_usage'
-const AI_DAILY_LIMIT = 25  // límite diario recomendado para no agotar la cuota
-
-function getAiUsage() {
-  try {
-    const data = JSON.parse(localStorage.getItem(AI_USAGE_KEY) || '{}')
-    const today = new Date().toISOString().slice(0, 10)
-    if (data.date !== today) return { date: today, count: 0 }
-    return data
-  } catch { return { date: new Date().toISOString().slice(0, 10), count: 0 } }
-}
-
-function incrementAiUsage() {
-  const usage = getAiUsage()
-  usage.count++
-  localStorage.setItem(AI_USAGE_KEY, JSON.stringify(usage))
-  return usage.count
-}
+// (La herramienta de fondo es 100% client-side, sin API, sin límites)
 
 // ── Sección de remoción de fondo ─────────────────────────────────────────────
 
@@ -426,14 +430,14 @@ function BgRemovalSection({ images, onChange, productName }) {
         const next = [...images]
         next[i] = newUrl
         onChange(next)
-        incrementAiUsage()
       }
       setProcessing(prev => { const n = { ...prev }; delete n[i]; return n })
       setSelected(prev => { const n = new Set(prev); n.delete(i); return n })
     } catch (e) {
       console.error('Error removing background:', e)
-      setProcessing(prev => ({ ...prev, [i]: '❌ Error' }))
-      setTimeout(() => setProcessing(prev => { const n = { ...prev }; delete n[i]; return n }), 3000)
+      const errMsg = e?.message?.slice(0, 60) || 'Error desconocido'
+      setProcessing(prev => ({ ...prev, [i]: `❌ ${errMsg}` }))
+      setTimeout(() => setProcessing(prev => { const n = { ...prev }; delete n[i]; return n }), 5000)
     }
   }
 
@@ -445,21 +449,15 @@ function BgRemovalSection({ images, onChange, productName }) {
   }
 
   const anyProcessing = Object.keys(processing).length > 0
-  const usage = getAiUsage()
 
   return (
     <div className="bg-violet-50 border border-violet-200 rounded-2xl p-4 space-y-3">
-      <div className="flex items-center justify-between">
-        <div className="flex items-center gap-2">
-          <span className="text-lg">🪄</span>
-          <div>
-            <h4 className="text-sm font-bold text-violet-800">Fondo estandarizado</h4>
-            <p className="text-[11px] text-violet-500">Seleccioná imágenes para quitar fondo con IA</p>
-          </div>
+      <div className="flex items-center gap-2">
+        <span className="text-lg">🪄</span>
+        <div>
+          <h4 className="text-sm font-bold text-violet-800">Fondo estandarizado</h4>
+          <p className="text-[11px] text-violet-500">Seleccioná imágenes para quitar fondo con IA · 100% gratis</p>
         </div>
-        <span className="text-[10px] text-violet-400 bg-violet-100 px-2 py-0.5 rounded-full">
-          {usage.count}/{AI_DAILY_LIMIT} hoy
-        </span>
       </div>
 
       {/* Grid de miniaturas seleccionables */}
