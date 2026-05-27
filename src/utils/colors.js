@@ -46,6 +46,7 @@ export const TAG_CONFIG = {
   sale:              { label: 'Sale',              cls: 'bg-red-700     text-white'  },
   oferta_relampago:  { label: '⚡ Oferta Relámpago', cls: 'bg-orange-500 text-white' },
   stock_limitado:    { label: 'Stock Limitado',    cls: 'bg-purple-500  text-white'  },
+  carbono:           { label: 'Carbono',           cls: 'tag-carbono text-white'     },
 }
 
 /** Devuelve el array de tags de un producto, compatible con el campo legacy `tag` (string).

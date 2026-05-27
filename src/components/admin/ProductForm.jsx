@@ -7,7 +7,7 @@ import {
 // ── Background removal & logo watermark ──────────────────────────────────────
 const LOGO_URL = '/assets/logo-icon.png'
 const BG_OPTIONS = {
-  gradient: { label: 'Gradiente gris', colors: [{ pos: 0, color: '#f8f9fa' }, { pos: 1, color: '#e9ecef' }] },
+  gradient: { label: 'Gradiente gris (sutil)', colors: [{ pos: 0, color: '#f8f9fa' }, { pos: 1, color: '#e9ecef' }] },
   white:    { label: 'Blanco puro',    colors: [{ pos: 0, color: '#ffffff' }, { pos: 1, color: '#ffffff' }] },
 }
 
