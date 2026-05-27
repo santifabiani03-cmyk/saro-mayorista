@@ -321,16 +321,6 @@ export default function AdminPage() {
             </div>
           </div>
 
-          {/* Link discreto a Vercel Analytics */}
-          <a
-            href="https://vercel.com/santifabiani03-9326s-projects/saro-mayorista/analytics"
-            target="_blank"
-            rel="noopener noreferrer"
-            className="absolute bottom-1 right-4 text-[9px] text-white/15 hover:text-white/50 transition-colors"
-            title="Vercel Analytics"
-          >
-            analytics
-          </a>
         </div>
       </header>
 
@@ -393,6 +383,17 @@ export default function AdminPage() {
           />
         )}
       </div>
+
+      {/* Link discreto a Vercel Analytics */}
+      <a
+        href="https://vercel.com/santifabiani03-9326s-projects/saro-mayorista/analytics"
+        target="_blank"
+        rel="noopener noreferrer"
+        className="fixed bottom-3 right-4 text-[10px] text-gray-300 hover:text-gray-500 transition-colors"
+        title="Vercel Analytics"
+      >
+        analytics ↗
+      </a>
     </div>
   )
 }

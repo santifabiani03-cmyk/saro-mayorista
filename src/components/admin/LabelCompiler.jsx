@@ -3,9 +3,9 @@ import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { PDFDocument } from 'pdf-lib'
 import * as pdfjsLib from 'pdfjs-dist'
 
-// Worker de pdf.js — carga desde CDN (compatible con Next.js)
+// Worker de pdf.js — carga desde unpkg (siempre tiene la versión exacta de npm)
 if (typeof window !== 'undefined') {
-  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://unpkg.com/pdfjs-dist@${pdfjsLib.version}/build/pdf.worker.min.mjs`
 }
 
 const LAYOUTS = {
