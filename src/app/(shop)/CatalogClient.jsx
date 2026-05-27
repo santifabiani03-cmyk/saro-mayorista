@@ -42,35 +42,10 @@ export default function CatalogClient({ products }) {
   return (
     <>
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-        {/* Buscador */}
-        <div className="relative">
-          <svg
-            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
-            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"
-          >
-            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
-          </svg>
-          <input
-            type="text"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            placeholder="Buscar producto..."
-            className="w-full pl-10 pr-10 py-3 bg-white border border-gray-200 rounded-2xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-saro-blue focus:ring-1 focus:ring-saro-blue/20 transition-all shadow-sm"
-          />
-          {search && (
-            <button
-              onClick={() => setSearch('')}
-              className="absolute right-3.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-500 text-xs flex items-center justify-center transition-colors"
-            >
-              x
-            </button>
-          )}
-        </div>
-
         <Filters products={products} filters={filters} setFilters={setFilters} />
 
-        <div className="flex items-center justify-between">
-          <p className="text-sm text-gray-500">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-sm text-gray-500 flex-shrink-0">
             {(() => {
               const totalVisible = products.filter(p => p.visible !== false).length
               return filtered.length === totalVisible
@@ -79,28 +54,55 @@ export default function CatalogClient({ products }) {
             })()}
           </p>
 
-          <button
-            onClick={() =>
-              setPriceSort(s => (s === null ? 'asc' : s === 'asc' ? 'desc' : null))
-            }
-            className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-xl border transition-all ${
-              priceSort
-                ? 'border-saro-blue text-saro-blue bg-saro-light font-semibold'
-                : 'border-gray-200 text-gray-500 hover:border-gray-300'
-            }`}
-          >
-            <span>Precio</span>
-            <svg viewBox="0 0 10 14" className="w-3 h-3.5" fill="currentColor">
-              <path
-                d="M5 0l4 5H1z"
-                className={priceSort === 'asc' ? 'text-saro-blue' : 'text-gray-300'}
+          <div className="flex items-center gap-2">
+            {/* Buscador compacto */}
+            <div className="relative">
+              <svg
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-300 pointer-events-none"
+                fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"
+              >
+                <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+              </svg>
+              <input
+                type="text"
+                value={search}
+                onChange={e => setSearch(e.target.value)}
+                placeholder="Buscar..."
+                className="w-32 sm:w-40 pl-8 pr-7 py-1.5 bg-gray-50 border border-gray-200 rounded-xl text-xs text-gray-700 placeholder-gray-300 focus:outline-none focus:border-saro-blue focus:bg-white focus:w-48 sm:focus:w-56 transition-all"
               />
-              <path
-                d="M5 14l-4-5h8z"
-                className={priceSort === 'desc' ? 'text-saro-blue' : 'text-gray-300'}
-              />
-            </svg>
-          </button>
+              {search && (
+                <button
+                  onClick={() => setSearch('')}
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-500 text-[10px] flex items-center justify-center transition-colors leading-none"
+                >
+                  x
+                </button>
+              )}
+            </div>
+
+            <button
+              onClick={() =>
+                setPriceSort(s => (s === null ? 'asc' : s === 'asc' ? 'desc' : null))
+              }
+              className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-xl border transition-all flex-shrink-0 ${
+                priceSort
+                  ? 'border-saro-blue text-saro-blue bg-saro-light font-semibold'
+                  : 'border-gray-200 text-gray-500 hover:border-gray-300'
+              }`}
+            >
+              <span>Precio</span>
+              <svg viewBox="0 0 10 14" className="w-3 h-3.5" fill="currentColor">
+                <path
+                  d="M5 0l4 5H1z"
+                  className={priceSort === 'asc' ? 'text-saro-blue' : 'text-gray-300'}
+                />
+                <path
+                  d="M5 14l-4-5h8z"
+                  className={priceSort === 'desc' ? 'text-saro-blue' : 'text-gray-300'}
+                />
+              </svg>
+            </button>
+          </div>
         </div>
 
         {filtered.length > 0 ? (
