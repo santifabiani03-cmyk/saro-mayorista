@@ -4,7 +4,7 @@ import ImageCarousel from './ImageCarousel'
 // Compatibilidad: soporta campo legacy `imagen` (string) y nuevo `imagenes` (array)
 const getImages = p => p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : []
 
-export default function ProductCard({ product, onClick }) {
+export default function ProductCard({ product, onClick, onNavigate }) {
   const tags = getProductTags(product)
     .map(k => TAG_CONFIG[k]).filter(Boolean)
     .sort((a, b) => b.label.length - a.label.length)

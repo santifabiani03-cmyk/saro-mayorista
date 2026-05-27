@@ -62,6 +62,7 @@ function Lightbox({ images, startIdx, onClose }) {
           alt=""
           className="max-w-full max-h-full object-contain rounded-lg select-none"
           draggable={false}
+          decoding="async"
           onClick={onClose}
         />
       </div>
@@ -96,7 +97,7 @@ function Lightbox({ images, startIdx, onClose }) {
                   ? 'border-white scale-110'
                   : 'border-transparent opacity-50 hover:opacity-80'}`}
             >
-              <img src={src} alt="" className="w-full h-full object-cover" />
+              <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
             </button>
           ))}
         </div>
@@ -170,6 +171,8 @@ export default function ImageCarousel({
         alt={altText ? `${altText} - imagen ${idx + 1}` : ''}
         className={`w-full h-full object-cover
           ${compact ? 'transition-transform duration-200 group-hover:scale-105' : ''}`}
+        loading="lazy"
+        decoding="async"
         onError={e => { e.currentTarget.style.opacity = '0.3' }}
         onClick={compact ? undefined : openLightbox}
       />
@@ -244,7 +247,7 @@ export default function ImageCarousel({
                   ? 'border-saro-blue scale-105'
                   : 'border-gray-100 opacity-60 hover:opacity-100 hover:border-gray-300'}`}
             >
-              <img src={src} alt="" className="w-full h-full object-cover" />
+              <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
             </button>
           ))}
         </div>

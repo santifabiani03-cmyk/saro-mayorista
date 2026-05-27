@@ -1,16 +1,21 @@
 import { useState, useEffect } from 'react'
+import { Routes, Route, useNavigate, useLocation } from 'react-router-dom'
 import { CartProvider } from './context/CartContext'
 import Header       from './components/Header'
 import Filters      from './components/Filters'
 import ProductCard  from './components/ProductCard'
 import ProductModal from './components/ProductModal'
 import Cart         from './components/Cart'
+import FaqSection   from './components/FaqSection'
 import AdminPage    from './pages/AdminPage'
-
-const IS_ADMIN = window.location.pathname.startsWith('/admin')
+import ProductPage  from './pages/ProductPage'
+import { toSlug }   from './utils/slug'
 
 export default function App() {
-  if (IS_ADMIN) return <AdminPage />
+  const location = useLocation()
+
+  // Admin: ruta independiente sin CartProvider ni Header
+  if (location.pathname.startsWith('/admin')) return <AdminPage />
 
   const [products, setProducts]        = useState([])
   const [config,   setConfig]          = useState(null)
@@ -62,60 +67,29 @@ export default function App() {
       <div className="min-h-screen bg-gray-50">
         <Header config={config} />
 
-        <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
-          <Filters products={products} filters={filters} setFilters={setFilters} />
+        <Routes>
+          {/* Página de producto individual — SEO friendly */}
+          <Route
+            path="/producto/:slug"
+            element={<ProductPage products={products} />}
+          />
 
-          <div className="flex items-center justify-between">
-            <p className="text-sm text-gray-500">
-              {(() => {
-                const totalVisible = products.filter(p => p.visible !== false).length
-                return filtered.length === totalVisible
-                  ? `${totalVisible} productos`
-                  : `${filtered.length} de ${totalVisible} productos`
-              })()}
-            </p>
-
-            {/* Ordenar por precio */}
-            <button
-              onClick={() => setPriceSort(s => s === null ? 'asc' : s === 'asc' ? 'desc' : null)}
-              className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-xl border transition-all ${
-                priceSort
-                  ? 'border-saro-blue text-saro-blue bg-saro-light font-semibold'
-                  : 'border-gray-200 text-gray-500 hover:border-gray-300'
-              }`}
-            >
-              <span>Precio</span>
-              <svg viewBox="0 0 10 14" className="w-3 h-3.5" fill="currentColor">
-                <path d="M5 0l4 5H1z" className={priceSort === 'asc' ? 'text-saro-blue' : 'text-gray-300'} />
-                <path d="M5 14l-4-5h8z" className={priceSort === 'desc' ? 'text-saro-blue' : 'text-gray-300'} />
-              </svg>
-            </button>
-          </div>
-
-          {filtered.length > 0 ? (
-            <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
-              {(() => {
-                const list = priceSort
-                  ? [...filtered].sort((a, b) => (priceSort === 'asc' ? 1 : -1) * (Number(a.precio) - Number(b.precio)))
-                  : filtered
-                return list.map(p => (
-                  <ProductCard key={p.id} product={p} onClick={() => setSelected(p)} />
-                ))
-              })()}
-            </div>
-          ) : (
-            <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-4">
-              <span className="text-5xl">🔍</span>
-              <p className="font-medium">No hay productos con esos filtros.</p>
-              <button
-                onClick={() => setFilters({ categoria: '', genero: '', parteCuerpo: '', tag: '' })}
-                className="text-sm text-saro-blue hover:underline"
-              >
-                Limpiar filtros
-              </button>
-            </div>
-          )}
-        </main>
+          {/* Catálogo principal */}
+          <Route
+            path="*"
+            element={
+              <CatalogView
+                products={products}
+                filtered={filtered}
+                filters={filters}
+                setFilters={setFilters}
+                priceSort={priceSort}
+                setPriceSort={setPriceSort}
+                setSelected={setSelected}
+              />
+            }
+          />
+        </Routes>
 
         {selectedProduct && (
           <ProductModal product={selectedProduct} onClose={() => setSelected(null)} />
@@ -126,7 +100,7 @@ export default function App() {
         {/* Footer SEO — texto para crawlers y branding */}
         <footer className="bg-white border-t border-gray-100 mt-12 py-8 px-4">
           <div className="max-w-7xl mx-auto text-center space-y-3">
-            <img src="/assets/logo-icon.png" alt="SARO" className="h-10 mx-auto opacity-40" />
+            <img src="/assets/logo-icon.png" alt="SARO" className="h-10 mx-auto opacity-40" loading="lazy" />
             <p className="text-xs text-gray-400 max-w-xl mx-auto leading-relaxed">
               SARO Mayorista — Indumentaria deportiva, ropa de entrenamiento, paletas de pádel, bolsos, mochilas y accesorios deportivos. Venta mayorista en Argentina con precios exclusivos por cantidad.
             </p>
@@ -137,5 +111,75 @@ export default function App() {
         </footer>
       </div>
     </CartProvider>
+  )
+}
+
+/* ── Vista del catálogo (extraída para que App use Routes) ─────────── */
+function CatalogView({ products, filtered, filters, setFilters, priceSort, setPriceSort, setSelected }) {
+  const navigate = useNavigate()
+
+  return (
+    <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+      <Filters products={products} filters={filters} setFilters={setFilters} />
+
+      <div className="flex items-center justify-between">
+        <p className="text-sm text-gray-500">
+          {(() => {
+            const totalVisible = products.filter(p => p.visible !== false).length
+            return filtered.length === totalVisible
+              ? `${totalVisible} productos`
+              : `${filtered.length} de ${totalVisible} productos`
+          })()}
+        </p>
+
+        {/* Ordenar por precio */}
+        <button
+          onClick={() => setPriceSort(s => s === null ? 'asc' : s === 'asc' ? 'desc' : null)}
+          className={`flex items-center gap-1.5 text-sm px-3 py-1.5 rounded-xl border transition-all ${
+            priceSort
+              ? 'border-saro-blue text-saro-blue bg-saro-light font-semibold'
+              : 'border-gray-200 text-gray-500 hover:border-gray-300'
+          }`}
+        >
+          <span>Precio</span>
+          <svg viewBox="0 0 10 14" className="w-3 h-3.5" fill="currentColor">
+            <path d="M5 0l4 5H1z" className={priceSort === 'asc' ? 'text-saro-blue' : 'text-gray-300'} />
+            <path d="M5 14l-4-5h8z" className={priceSort === 'desc' ? 'text-saro-blue' : 'text-gray-300'} />
+          </svg>
+        </button>
+      </div>
+
+      {filtered.length > 0 ? (
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4">
+          {(() => {
+            const list = priceSort
+              ? [...filtered].sort((a, b) => (priceSort === 'asc' ? 1 : -1) * (Number(a.precio) - Number(b.precio)))
+              : filtered
+            return list.map(p => (
+              <ProductCard
+                key={p.id}
+                product={p}
+                onClick={() => setSelected(p)}
+                onNavigate={() => navigate(`/producto/${toSlug(p.nombre, p.id)}`)}
+              />
+            ))
+          })()}
+        </div>
+      ) : (
+        <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-4">
+          <span className="text-5xl">🔍</span>
+          <p className="font-medium">No hay productos con esos filtros.</p>
+          <button
+            onClick={() => setFilters({ categoria: '', genero: '', parteCuerpo: '', tag: '' })}
+            className="text-sm text-saro-blue hover:underline"
+          >
+            Limpiar filtros
+          </button>
+        </div>
+      )}
+
+      {/* Sección de preguntas frecuentes — contenido SEO */}
+      <FaqSection />
+    </main>
   )
 }
