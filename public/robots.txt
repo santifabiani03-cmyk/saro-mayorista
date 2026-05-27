@@ -4,4 +4,4 @@ Allow: /
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://saro-mayorista.vercel.app/api/sitemap
+Sitemap: https://saro.com.ar/api/sitemap

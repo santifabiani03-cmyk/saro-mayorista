@@ -114,7 +114,7 @@ export default function ProductPage({ products }) {
     '@type': 'Product',
     name: product.nombre,
     description: product.descripcion || `${product.nombre} - ${product.categoria}`,
-    image: imgs[0] ? `https://saro-mayorista.vercel.app${imgs[0]}` : undefined,
+    image: imgs[0] ? `https://saro.com.ar${imgs[0]}` : undefined,
     brand: { '@type': 'Brand', name: 'SARO' },
     offers: {
       '@type': 'Offer',

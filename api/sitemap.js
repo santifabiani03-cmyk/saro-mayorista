@@ -6,7 +6,7 @@ import fs   from 'node:fs'
 import path from 'node:path'
 
 const CATALOG_FILE = path.resolve('catalog/products.json')
-const BASE_URL = 'https://saro-mayorista.vercel.app'
+const BASE_URL = 'https://saro.com.ar'
 
 function toSlug(name, id) {
   const base = name
