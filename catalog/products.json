@@ -2041,5 +2041,28 @@
       "/assets/pelotas-winar-p78.png"
     ],
     "fechaPublicacion": "2026-05-22T21:21:19.000Z"
+  },
+  {
+    "nombre": "c",
+    "precio": 8,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Rojo"
+    ],
+    "talles": [
+      "L"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1779851770186",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/c-sr-1779851768084.webp"
+    ],
+    "fechaPublicacion": "2026-05-27T03:16:10.186Z"
   }
 ]
