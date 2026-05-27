@@ -12,34 +12,16 @@ const STD_BG_GRADIENT = [
 ]
 
 /**
- * Carga una imagen desde URL en un canvas y devuelve un Blob.
- * Esto evita problemas de CORS al pasar datos a la librería de IA.
- */
-function loadImageAsBlob(url) {
-  return new Promise((resolve, reject) => {
-    const img = new Image()
-    img.crossOrigin = 'anonymous'
-    img.onload = () => {
-      const c = document.createElement('canvas')
-      c.width = img.naturalWidth
-      c.height = img.naturalHeight
-      c.getContext('2d').drawImage(img, 0, 0)
-      c.toBlob(b => b ? resolve(b) : reject(new Error('Canvas toBlob falló')), 'image/png')
-    }
-    img.onerror = () => reject(new Error('No se pudo cargar la imagen'))
-    img.src = url
-  })
-}
-
-/**
  * Remueve el fondo de una imagen y la coloca sobre un fondo estandarizado.
  * Usa @imgly/background-removal (ONNX, corre 100% en el browser, gratis, sin límites).
  * Devuelve un Blob (image/webp).
  */
 async function removeAndStandardize(imageUrl, onProgress) {
-  // Cargar imagen vía canvas para obtener un blob local (evita CORS)
-  onProgress?.('Cargando imagen…')
-  const srcBlob = await loadImageAsBlob(imageUrl)
+  // Descargar la imagen como blob (las URLs de GitHub tienen CORS habilitado)
+  onProgress?.('Descargando imagen…')
+  const resp = await fetch(imageUrl)
+  if (!resp.ok) throw new Error(`Error ${resp.status} descargando imagen`)
+  const srcBlob = await resp.blob()
 
   onProgress?.('Cargando modelo IA… (primera vez descarga ~30MB)')
   const { removeBackground } = await import('@imgly/background-removal')
@@ -262,7 +244,8 @@ async function uploadFile(file, productName) {
       body:    JSON.stringify({ name, data: base64, pin }),
     })
     const json = await res.json()
-    return json.path ?? null
+    // Preferir la URL directa de GitHub (funciona al instante, sin esperar redeploy)
+    return json.rawUrl ?? json.path ?? null
   } catch { return null }
 }
 

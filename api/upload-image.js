@@ -70,7 +70,10 @@ export default async function handler(req, res) {
       const err = await putRes.json().catch(() => ({}))
       throw new Error(err.message ?? `GitHub API error ${putRes.status}`)
     }
-    return res.status(200).json({ ok: true, path: `/assets/${safe}` })
+    const putJson = await putRes.json()
+    // URL directa de GitHub que funciona al instante (sin esperar redeploy de Vercel)
+    const rawUrl = putJson.content?.download_url ?? null
+    return res.status(200).json({ ok: true, path: `/assets/${safe}`, rawUrl })
   } catch (e) {
     return res.status(500).json({ error: e.message ?? 'Error desconocido' })
   }
