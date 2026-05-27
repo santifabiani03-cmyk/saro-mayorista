@@ -2,10 +2,11 @@
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { PDFDocument } from 'pdf-lib'
 import * as pdfjsLib from 'pdfjs-dist'
-import pdfjsWorkerUrl from 'pdfjs-dist/build/pdf.worker.min.mjs?url'
 
-// Worker de pdf.js — importado desde node_modules via Vite
-pdfjsLib.GlobalWorkerOptions.workerSrc = pdfjsWorkerUrl
+// Worker de pdf.js — carga desde CDN (compatible con Next.js)
+if (typeof window !== 'undefined') {
+  pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`
+}
 
 const LAYOUTS = {
   2: { cols: 2, rows: 1 },
