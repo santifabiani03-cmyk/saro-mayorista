@@ -248,7 +248,7 @@ export default function AdminPage() {
 
       {/* Header */}
       <header className="bg-saro-dark text-white shadow-lg">
-        <div className="max-w-6xl mx-auto px-4 py-3 sm:py-4">
+        <div className="max-w-6xl mx-auto px-4 py-3 sm:py-4 relative">
 
           {/* Fila única: logo | acciones */}
           <div className="flex items-center justify-between gap-3">
@@ -320,6 +320,17 @@ export default function AdminPage() {
               </a>
             </div>
           </div>
+
+          {/* Link discreto a Vercel Analytics */}
+          <a
+            href="https://vercel.com/santifabiani03-9326s-projects/saro-mayorista/analytics"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="absolute bottom-1 right-4 text-[9px] text-white/15 hover:text-white/50 transition-colors"
+            title="Vercel Analytics"
+          >
+            analytics
+          </a>
         </div>
       </header>
 

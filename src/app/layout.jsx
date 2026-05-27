@@ -1,4 +1,6 @@
 import './globals.css'
+import { Analytics } from '@vercel/analytics/react'
+import { SpeedInsights } from '@vercel/speed-insights/next'
 
 export const metadata = {
   title: 'SARO Mayorista | Ropa Deportiva y Accesorios de Padel al por Mayor',
@@ -7,6 +9,13 @@ export const metadata = {
   keywords:
     'ropa deportiva mayorista, SARO, padel, paletas de padel, accesorios de padel, indumentaria deportiva, ropa de entrenamiento, mayorista Argentina, buzos deportivos, remeras deportivas, shorts deportivos, bolsos deportivos',
   authors: [{ name: 'SARO' }],
+  icons: {
+    icon: [
+      { url: '/assets/logo-icon.png', type: 'image/png' },
+    ],
+    apple: '/assets/logo-icon.png',
+  },
+  manifest: '/manifest.json',
   verification: {
     google: [
       '4K1evDt4misktUKPI7Kw_ykqqrezzmopC3Pw-zz0cpo',
@@ -110,6 +119,8 @@ export default function RootLayout({ children }) {
           </p>
         </noscript>
         {children}
+        <Analytics />
+        <SpeedInsights />
       </body>
     </html>
   )

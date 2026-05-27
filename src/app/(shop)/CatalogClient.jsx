@@ -16,6 +16,7 @@ export default function CatalogClient({ products }) {
     parteCuerpo: '',
     tag: '',
   })
+  const [search, setSearch] = useState('')
   const [selectedProduct, setSelected] = useState(null)
   const [priceSort, setPriceSort] = useState(null)
 
@@ -28,12 +29,44 @@ export default function CatalogClient({ products }) {
       const ptags = Array.isArray(p.tags) ? p.tags : p.tag ? [p.tag] : []
       if (!ptags.includes(filters.tag)) return false
     }
+    if (search.trim()) {
+      const q = search.toLowerCase().trim()
+      const hay = [p.nombre, p.categoria, p.genero, p.descripcion]
+        .filter(Boolean)
+        .some(s => s.toLowerCase().includes(q))
+      if (!hay) return false
+    }
     return true
   })
 
   return (
     <>
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        {/* Buscador */}
+        <div className="relative">
+          <svg
+            className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-gray-400 pointer-events-none"
+            fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"
+          >
+            <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
+          </svg>
+          <input
+            type="text"
+            value={search}
+            onChange={e => setSearch(e.target.value)}
+            placeholder="Buscar producto..."
+            className="w-full pl-10 pr-10 py-3 bg-white border border-gray-200 rounded-2xl text-sm text-gray-800 placeholder-gray-400 focus:outline-none focus:border-saro-blue focus:ring-1 focus:ring-saro-blue/20 transition-all shadow-sm"
+          />
+          {search && (
+            <button
+              onClick={() => setSearch('')}
+              className="absolute right-3.5 top-1/2 -translate-y-1/2 w-5 h-5 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-500 text-xs flex items-center justify-center transition-colors"
+            >
+              x
+            </button>
+          )}
+        </div>
+
         <Filters products={products} filters={filters} setFilters={setFilters} />
 
         <div className="flex items-center justify-between">

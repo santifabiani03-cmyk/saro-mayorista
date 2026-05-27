@@ -1,6 +1,7 @@
 'use client'
 
 import { useState } from 'react'
+import Image from 'next/image'
 import { useCart } from '../context/CartContext'
 import HowToBuyModal from './HowToBuyModal'
 
@@ -15,15 +16,21 @@ export default function Header({ config }) {
 
           {/* Logo — ícono SR en mobile, horizontal completo en desktop */}
           <a href="/" className="flex-shrink-0" aria-label="SARO Mayorista - Inicio">
-            <img
+            <Image
               src="/assets/logo-icon.png"
-              alt="SARO - Ropa deportiva y accesorios de pádel mayorista"
+              alt="SARO - Ropa deportiva y accesorios de padel mayorista"
+              width={44}
+              height={44}
               className="block sm:hidden h-11 w-auto object-contain"
+              priority
             />
-            <img
+            <Image
               src="/assets/logo-horizontal.png"
-              alt="SARO Mayorista - Indumentaria deportiva y pádel al por mayor"
+              alt="SARO Mayorista - Indumentaria deportiva y padel al por mayor"
+              width={220}
+              height={56}
               className="hidden sm:block h-14 w-auto object-contain"
+              priority
             />
           </a>
 
