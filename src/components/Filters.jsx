@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { CATEGORIA_LABELS, GENERO_LABELS, PARTE_LABELS, TAG_CONFIG, getProductTags } from '../utils/colors'
 

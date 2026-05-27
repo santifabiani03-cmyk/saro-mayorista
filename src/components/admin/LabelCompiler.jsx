@@ -1,3 +1,4 @@
+'use client'
 import { useState, useRef, useCallback, useEffect, useMemo } from 'react'
 import { PDFDocument } from 'pdf-lib'
 import * as pdfjsLib from 'pdfjs-dist'

@@ -1,8 +1,4 @@
-/**
- * Vercel serverless — POST /api/track-order
- * Registra un pedido para análisis de demanda.
- * Almacena en catalog/orders.json vía GitHub API.
- */
+import { NextResponse } from 'next/server'
 
 const GITHUB_API = 'https://api.github.com'
 
@@ -10,7 +6,7 @@ function ghHeaders(token) {
   return {
     Authorization: `Bearer ${token}`,
     'Content-Type': 'application/json',
-    'User-Agent':   'saro-admin',
+    'User-Agent': 'saro-admin',
   }
 }
 
@@ -39,37 +35,40 @@ async function putFile(owner, repo, path, base64Content, message, token, sha) {
   }
 }
 
-export default async function handler(req, res) {
-  if (req.method !== 'POST') {
-    return res.status(405).json({ error: 'Method not allowed' })
-  }
-
+export async function POST(request) {
   const token = clean(process.env.GITHUB_TOKEN)
   const owner = clean(process.env.GITHUB_OWNER)
-  const repo  = clean(process.env.GITHUB_REPO)
+  const repo = clean(process.env.GITHUB_REPO)
 
   if (!token || !owner || !repo) {
-    return res.status(500).json({ error: 'Faltan variables de entorno' })
+    return NextResponse.json(
+      { error: 'Faltan variables de entorno' },
+      { status: 500 }
+    )
   }
 
-  const { items, total, totalItems } = req.body ?? {}
+  const body = await request.json().catch(() => ({}))
+  const { items, total, totalItems } = body
 
   if (!Array.isArray(items) || items.length === 0) {
-    return res.status(400).json({ error: 'No hay items en el pedido' })
+    return NextResponse.json(
+      { error: 'No hay items en el pedido' },
+      { status: 400 }
+    )
   }
 
   const order = {
-    id:         `o${Date.now()}`,
-    fecha:      new Date().toISOString(),
-    items:      items.map(i => ({
+    id: `o${Date.now()}`,
+    fecha: new Date().toISOString(),
+    items: items.map(i => ({
       productId: i.productId,
-      nombre:    i.nombre,
-      precio:    i.precio,
-      color:     i.color,
-      talle:     i.talle,
-      cantidad:  i.cantidad,
+      nombre: i.nombre,
+      precio: i.precio,
+      color: i.color,
+      talle: i.talle,
+      cantidad: i.cantidad,
     })),
-    total:      total ?? 0,
+    total: total ?? 0,
     totalItems: totalItems ?? 0,
   }
 
@@ -87,12 +86,15 @@ export default async function handler(req, res) {
 
     orders.push(order)
 
-    const json   = JSON.stringify(orders, null, 2)
+    const json = JSON.stringify(orders, null, 2)
     const base64 = Buffer.from(json, 'utf-8').toString('base64')
     await putFile(owner, repo, ORDERS_PATH, base64, `pedido ${order.id}`, token, file?.sha)
 
-    return res.status(200).json({ ok: true, orderId: order.id })
+    return NextResponse.json({ ok: true, orderId: order.id })
   } catch (e) {
-    return res.status(500).json({ error: e.message ?? 'Error al registrar pedido' })
+    return NextResponse.json(
+      { error: e.message ?? 'Error al registrar pedido' },
+      { status: 500 }
+    )
   }
 }

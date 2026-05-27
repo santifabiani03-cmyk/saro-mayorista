@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect, useRef, useCallback } from 'react'
 import {
   COLOR_MAP, PREDEFINED_COLORS, PREDEFINED_TALLES,

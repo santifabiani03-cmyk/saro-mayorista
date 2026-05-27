@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect } from 'react'
 import ProductForm from '../components/admin/ProductForm'
 import ProductList from '../components/admin/ProductList'

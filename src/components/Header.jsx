@@ -1,3 +1,5 @@
+'use client'
+
 import { useState } from 'react'
 import { useCart } from '../context/CartContext'
 import HowToBuyModal from './HowToBuyModal'

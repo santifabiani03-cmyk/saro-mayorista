@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect } from 'react'
 
 const SESSION_PIN_KEY = 'saro_admin_pin'

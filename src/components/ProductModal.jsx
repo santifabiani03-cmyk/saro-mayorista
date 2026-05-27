@@ -1,3 +1,4 @@
+'use client'
 import { useState, useEffect } from 'react'
 import { useCart } from '../context/CartContext'
 import { COLOR_MAP, TAG_CONFIG, SIZE_ORDER, getProductTags, getSwatchStyle } from '../utils/colors'

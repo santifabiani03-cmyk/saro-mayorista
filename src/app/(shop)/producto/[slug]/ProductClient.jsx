@@ -1,59 +1,35 @@
-import { useState, useEffect } from 'react'
-import { useParams, useNavigate, Link } from 'react-router-dom'
-import { useCart } from '../context/CartContext'
-import { COLOR_MAP, TAG_CONFIG, SIZE_ORDER, getProductTags, getSwatchStyle } from '../utils/colors'
-import { findBySlug } from '../utils/slug'
-import ImageCarousel from '../components/ImageCarousel'
+'use client'
 
-const getImages = p => p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : []
+import { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { useCart } from '../../../../context/CartContext'
+import {
+  COLOR_MAP,
+  TAG_CONFIG,
+  SIZE_ORDER,
+  getProductTags,
+  getSwatchStyle,
+} from '../../../../utils/colors'
+import ImageCarousel from '../../../../components/ImageCarousel'
+
+const getImages = p =>
+  p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : []
 
 function buildMatrix(colores, talles) {
   const m = {}
-  colores.forEach(c => { m[c] = {}; talles.forEach(t => { m[c][t] = 0 }) })
+  colores.forEach(c => {
+    m[c] = {}
+    talles.forEach(t => {
+      m[c][t] = 0
+    })
+  })
   return m
 }
 
-export default function ProductPage({ products }) {
-  const { slug } = useParams()
-  const navigate = useNavigate()
+export default function ProductClient({ product }) {
+  const router = useRouter()
   const { addItems } = useCart()
-
-  const product = findBySlug(products, slug)
-
-  // SEO: actualizar título de la página
-  useEffect(() => {
-    if (product) {
-      document.title = `${product.nombre} | SARO Mayorista`
-      // Meta description dinámica
-      const meta = document.querySelector('meta[name="description"]')
-      if (meta) {
-        meta.setAttribute('content',
-          product.descripcion
-            ? `${product.nombre} - ${product.descripcion.slice(0, 140)}`
-            : `${product.nombre} - Comprá al por mayor en SARO Mayorista. ${product.categoria}, ${product.genero}. Precio: $${product.precio}`
-        )
-      }
-    }
-    return () => {
-      document.title = 'SARO Mayorista | Ropa Deportiva y Accesorios de Pádel al por Mayor'
-    }
-  }, [product])
-
-  if (!product) {
-    return (
-      <div className="min-h-screen bg-gray-50 flex flex-col items-center justify-center gap-4">
-        <span className="text-6xl">🔍</span>
-        <h1 className="text-xl font-bold text-gray-800">Producto no encontrado</h1>
-        <p className="text-gray-500">Es posible que haya sido removido o el enlace sea incorrecto.</p>
-        <Link
-          to="/"
-          className="mt-2 px-5 py-2.5 bg-saro-blue hover:bg-saro-dark text-white rounded-xl font-semibold text-sm transition-colors"
-        >
-          ← Volver al catálogo
-        </Link>
-      </div>
-    )
-  }
 
   const sortedTalles = [...product.talles].sort((a, b) => {
     const ia = SIZE_ORDER.indexOf(a)
@@ -64,7 +40,9 @@ export default function ProductPage({ products }) {
     return ia - ib
   })
 
-  const [matrix, setMatrix] = useState(() => buildMatrix(product.colores, sortedTalles))
+  const [matrix, setMatrix] = useState(() =>
+    buildMatrix(product.colores, sortedTalles)
+  )
   const imgs = getImages(product)
 
   const isNoStock = (color, talle) =>
@@ -74,12 +52,17 @@ export default function ProductPage({ products }) {
     if (isNoStock(color, talle)) return
     setMatrix(prev => ({
       ...prev,
-      [color]: { ...prev[color], [talle]: Math.max(0, (prev[color][talle] ?? 0) + delta) },
+      [color]: {
+        ...prev[color],
+        [talle]: Math.max(0, (prev[color][talle] ?? 0) + delta),
+      },
     }))
   }
 
   const totalUnidades = product.colores.reduce(
-    (s, c) => s + sortedTalles.reduce((ss, t) => ss + (matrix[c]?.[t] ?? 0), 0), 0
+    (s, c) =>
+      s + sortedTalles.reduce((ss, t) => ss + (matrix[c]?.[t] ?? 0), 0),
+    0
   )
 
   const handleAgregar = () => {
@@ -91,10 +74,12 @@ export default function ProductPage({ products }) {
       })
     )
     if (selections.length > 0) addItems(product, selections)
-    navigate('/')
+    router.push('/')
   }
 
-  const tags = getProductTags(product).map(k => TAG_CONFIG[k]).filter(Boolean)
+  const tags = getProductTags(product)
+    .map(k => TAG_CONFIG[k])
+    .filter(Boolean)
 
   // Promos
   const promos = product.promos ?? []
@@ -108,42 +93,28 @@ export default function ProductPage({ products }) {
   const totalSinPromo = totalUnidades * product.precio
   const ahorro = totalSinPromo - totalConPromo
 
-  // JSON-LD para producto individual (SEO)
-  const jsonLd = {
-    '@context': 'https://schema.org',
-    '@type': 'Product',
-    name: product.nombre,
-    description: product.descripcion || `${product.nombre} - ${product.categoria}`,
-    image: imgs[0] ? `https://saro.com.ar${imgs[0]}` : undefined,
-    brand: { '@type': 'Brand', name: 'SARO' },
-    offers: {
-      '@type': 'Offer',
-      price: product.precio,
-      priceCurrency: 'ARS',
-      availability: product.sinStock
-        ? 'https://schema.org/OutOfStock'
-        : 'https://schema.org/InStock',
-    },
-  }
-
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* JSON-LD del producto */}
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
-
       {/* Breadcrumb + Volver */}
       <div className="max-w-5xl mx-auto px-4 py-4">
         <Link
-          to="/"
+          href="/"
           className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-saro-blue transition-colors"
         >
-          <svg className="w-4 h-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2">
-            <path strokeLinecap="round" strokeLinejoin="round" d="M15 19l-7-7 7-7" />
+          <svg
+            className="w-4 h-4"
+            fill="none"
+            viewBox="0 0 24 24"
+            stroke="currentColor"
+            strokeWidth="2"
+          >
+            <path
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              d="M15 19l-7-7 7-7"
+            />
           </svg>
-          Volver al catálogo
+          Volver al catalogo
         </Link>
       </div>
 
@@ -151,31 +122,44 @@ export default function ProductPage({ products }) {
       <article className="max-w-5xl mx-auto px-4 pb-12">
         <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
-
-            {/* Galería */}
+            {/* Galeria */}
             <div className="p-5 sm:p-6">
-              <ImageCarousel images={imgs} emoji={product.emoji} thumbs altText={product.nombre} />
+              <ImageCarousel
+                images={imgs}
+                emoji={product.emoji}
+                thumbs
+                altText={product.nombre}
+              />
             </div>
 
             {/* Info */}
             <div className="p-5 sm:p-6 space-y-4 border-t md:border-t-0 md:border-l border-gray-100">
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900">{product.nombre}</h1>
+                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900">
+                    {product.nombre}
+                  </h1>
                   {tags.map((tag, i) => (
-                    <span key={i} className={`px-2 py-0.5 rounded-full text-xs font-semibold ${tag.cls}`}>
+                    <span
+                      key={i}
+                      className={`px-2 py-0.5 rounded-full text-xs font-semibold ${tag.cls}`}
+                    >
                       {tag.label}
                     </span>
                   ))}
                 </div>
                 <p className="text-2xl font-extrabold text-saro-blue mt-1">
                   ${product.precio.toLocaleString('es-AR')}
-                  <span className="text-sm font-normal text-gray-400 ml-1">c/u</span>
+                  <span className="text-sm font-normal text-gray-400 ml-1">
+                    c/u
+                  </span>
                 </p>
               </div>
 
               {product.descripcion && (
-                <p className="text-sm text-gray-600 leading-relaxed">{product.descripcion}</p>
+                <p className="text-sm text-gray-600 leading-relaxed">
+                  {product.descripcion}
+                </p>
               )}
 
               <p className="text-xs text-gray-400 capitalize">
@@ -185,14 +169,21 @@ export default function ProductPage({ products }) {
 
               {/* Matriz color x talle */}
               <div className="space-y-3">
-                <h2 className="font-semibold text-gray-800">Seleccioná cantidades</h2>
+                <h2 className="font-semibold text-gray-800">
+                  Selecciona cantidades
+                </h2>
                 <div className="overflow-x-auto rounded-xl border border-gray-100">
                   <table className="w-full text-sm min-w-max">
                     <thead className="bg-gray-50">
                       <tr>
-                        <th className="text-left py-2 px-3 text-gray-500 font-medium text-xs">Color</th>
+                        <th className="text-left py-2 px-3 text-gray-500 font-medium text-xs">
+                          Color
+                        </th>
                         {sortedTalles.map(t => (
-                          <th key={t} className="py-2 px-2 text-center text-gray-500 font-medium text-xs min-w-[68px]">
+                          <th
+                            key={t}
+                            className="py-2 px-2 text-center text-gray-500 font-medium text-xs min-w-[68px]"
+                          >
                             {t}
                           </th>
                         ))}
@@ -200,36 +191,62 @@ export default function ProductPage({ products }) {
                     </thead>
                     <tbody>
                       {product.colores.map((color, ci) => (
-                        <tr key={color} className={ci % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
+                        <tr
+                          key={color}
+                          className={
+                            ci % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'
+                          }
+                        >
                           <td className="py-2 px-3">
                             <div className="flex items-center gap-1.5">
                               <span
                                 className="w-3 h-3 rounded-full border border-gray-200 flex-shrink-0"
                                 style={getSwatchStyle(color, product.colorDefs)}
                               />
-                              <span className="text-xs text-gray-700 whitespace-nowrap">{color}</span>
+                              <span className="text-xs text-gray-700 whitespace-nowrap">
+                                {color}
+                              </span>
                             </div>
                           </td>
                           {sortedTalles.map(talle => {
                             const noStock = isNoStock(color, talle)
                             const qty = matrix[color]?.[talle] ?? 0
                             return (
-                              <td key={talle} className="py-1.5 px-1 text-center">
+                              <td
+                                key={talle}
+                                className="py-1.5 px-1 text-center"
+                              >
                                 {noStock ? (
-                                  <span className="text-gray-300 text-base">✕</span>
+                                  <span className="text-gray-300 text-base">
+                                    ✕
+                                  </span>
                                 ) : (
                                   <div className="flex items-center justify-center gap-0.5">
                                     <button
-                                      onClick={() => updateQty(color, talle, -1)}
+                                      onClick={() =>
+                                        updateQty(color, talle, -1)
+                                      }
                                       className="w-6 h-6 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-600 text-gray-600 text-xs font-bold transition-colors flex items-center justify-center"
-                                    >−</button>
-                                    <span className={`w-6 text-center text-xs font-bold tabular-nums ${qty > 0 ? 'text-saro-blue' : 'text-gray-300'}`}>
+                                    >
+                                      −
+                                    </button>
+                                    <span
+                                      className={`w-6 text-center text-xs font-bold tabular-nums ${
+                                        qty > 0
+                                          ? 'text-saro-blue'
+                                          : 'text-gray-300'
+                                      }`}
+                                    >
                                       {qty}
                                     </span>
                                     <button
-                                      onClick={() => updateQty(color, talle, 1)}
+                                      onClick={() =>
+                                        updateQty(color, talle, 1)
+                                      }
                                       className="w-6 h-6 rounded-md bg-gray-100 hover:bg-green-100 hover:text-green-700 text-gray-600 text-xs font-bold transition-colors flex items-center justify-center"
-                                    >+</button>
+                                    >
+                                      +
+                                    </button>
                                   </div>
                                 )}
                               </td>
@@ -244,10 +261,16 @@ export default function ProductPage({ products }) {
 
               {product.sinStock && (
                 <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
-                  <span className="text-red-500 text-base flex-shrink-0 mt-0.5">⚠️</span>
+                  <span className="text-red-500 text-base flex-shrink-0 mt-0.5">
+                    ⚠️
+                  </span>
                   <p className="text-xs text-red-700 leading-relaxed">
-                    <span className="font-bold">Es muy probable que ya no contemos con stock de este producto.</span>
-                    {' '}Igualmente podés consultarnos, con gusto te ayudamos a encontrar una alternativa.
+                    <span className="font-bold">
+                      Es muy probable que ya no contemos con stock de este
+                      producto.
+                    </span>{' '}
+                    Igualmente podes consultarnos, con gusto te ayudamos a
+                    encontrar una alternativa.
                   </p>
                 </div>
               )}
@@ -255,16 +278,21 @@ export default function ProductPage({ products }) {
               {/* Promos por cantidad */}
               {product.promos?.length > 0 && (
                 <div className="space-y-1.5">
-                  <p className="text-xs font-semibold text-gray-500">🔥 Promos por cantidad:</p>
+                  <p className="text-xs font-semibold text-gray-500">
+                    🔥 Promos por cantidad:
+                  </p>
                   <div className="flex flex-wrap gap-1.5">
                     {product.promos.map((p, i) => {
                       const active = totalUnidades >= p.cantidad
                       return (
-                        <span key={i} className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all ${
-                          active
-                            ? 'bg-green-50 border-green-300 text-green-700'
-                            : 'bg-gray-50 border-gray-200 text-gray-500'
-                        }`}>
+                        <span
+                          key={i}
+                          className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all ${
+                            active
+                              ? 'bg-green-50 border-green-300 text-green-700'
+                              : 'bg-gray-50 border-gray-200 text-gray-500'
+                          }`}
+                        >
                           {p.cantidad}u → ${p.precioTotal.toLocaleString('es-AR')}
                         </span>
                       )
@@ -277,7 +305,9 @@ export default function ProductPage({ products }) {
                 <div className="space-y-1.5">
                   <div className="flex items-center justify-between bg-saro-light rounded-xl px-4 py-3">
                     <span className="text-sm font-medium text-saro-dark">
-                      {totalUnidades} unidad{totalUnidades !== 1 ? 'es' : ''} seleccionada{totalUnidades !== 1 ? 's' : ''}
+                      {totalUnidades} unidad
+                      {totalUnidades !== 1 ? 'es' : ''} seleccionada
+                      {totalUnidades !== 1 ? 's' : ''}
                     </span>
                     <div className="text-right">
                       {ahorro > 0 && (
@@ -293,7 +323,8 @@ export default function ProductPage({ products }) {
                   {ahorro > 0 && (
                     <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-2">
                       <span className="text-xs text-green-700 font-medium">
-                        💰 Ahorrás ${ahorro.toLocaleString('es-AR')} con la promo de {applicable.cantidad}u
+                        💰 Ahorras ${ahorro.toLocaleString('es-AR')} con la
+                        promo de {applicable.cantidad}u
                       </span>
                     </div>
                   )}
@@ -303,10 +334,10 @@ export default function ProductPage({ products }) {
               {/* Botones */}
               <div className="flex gap-3 pt-2">
                 <Link
-                  to="/"
+                  href="/"
                   className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium text-sm transition-colors text-center"
                 >
-                  ← Catálogo
+                  ← Catalogo
                 </Link>
                 <button
                   onClick={handleAgregar}
@@ -319,7 +350,7 @@ export default function ProductPage({ products }) {
                 >
                   {totalUnidades > 0
                     ? `Agregar ${totalUnidades} al carrito`
-                    : 'Seleccioná cantidades'}
+                    : 'Selecciona cantidades'}
                 </button>
               </div>
             </div>

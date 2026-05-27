@@ -7,15 +7,15 @@ const GITHUB_API = 'https://api.github.com'
 
 function headers() {
   return {
-    Authorization: `Bearer ${import.meta.env.VITE_GITHUB_TOKEN}`,
+    Authorization: `Bearer ${process.env.NEXT_PUBLIC_GITHUB_TOKEN}`,
     'Content-Type': 'application/json',
     'User-Agent':   'saro-admin',
   }
 }
 
 function repoBase() {
-  const owner = import.meta.env.VITE_GITHUB_OWNER
-  const repo  = import.meta.env.VITE_GITHUB_REPO
+  const owner = process.env.NEXT_PUBLIC_GITHUB_OWNER
+  const repo  = process.env.NEXT_PUBLIC_GITHUB_REPO
   return `${GITHUB_API}/repos/${owner}/${repo}/contents`
 }
 
