@@ -102,7 +102,7 @@ export default function ProductModal({ product, onClose }) {
 
             {/* ── Galería con carrusel ── */}
             <div className="space-y-3">
-              <ImageCarousel images={imgs} emoji={product.emoji} thumbs />
+              <ImageCarousel images={imgs} emoji={product.emoji} thumbs altText={product.nombre} />
               <p className="text-sm text-gray-600 leading-relaxed">{product.descripcion}</p>
             </div>
 

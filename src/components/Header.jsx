@@ -12,16 +12,18 @@ export default function Header({ config }) {
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
 
           {/* Logo — ícono SR en mobile, horizontal completo en desktop */}
-          <img
-            src="/assets/logo-icon.png"
-            alt={config.storeName}
-            className="block sm:hidden h-11 w-auto object-contain"
-          />
-          <img
-            src="/assets/logo-horizontal.png"
-            alt={config.storeName}
-            className="hidden sm:block h-14 w-auto object-contain"
-          />
+          <a href="/" className="flex-shrink-0" aria-label="SARO Mayorista - Inicio">
+            <img
+              src="/assets/logo-icon.png"
+              alt="SARO - Ropa deportiva y accesorios de pádel mayorista"
+              className="block sm:hidden h-11 w-auto object-contain"
+            />
+            <img
+              src="/assets/logo-horizontal.png"
+              alt="SARO Mayorista - Indumentaria deportiva y pádel al por mayor"
+              className="hidden sm:block h-14 w-auto object-contain"
+            />
+          </a>
 
           <div className="flex items-center gap-3">
 

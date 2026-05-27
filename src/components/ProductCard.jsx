@@ -22,7 +22,7 @@ export default function ProductCard({ product, onClick }) {
     >
       {/* Imagen / carrusel */}
       <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
-        <ImageCarousel images={imgs} emoji={product.emoji} compact />
+        <ImageCarousel images={imgs} emoji={product.emoji} compact altText={product.nombre} />
 
         {tags.length > 0 && (
           <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">

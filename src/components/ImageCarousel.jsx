@@ -119,6 +119,7 @@ export default function ImageCarousel({
   emoji  = '📦',
   compact = false,
   thumbs  = false,
+  altText = '',
 }) {
   const [idx, setIdx]     = useState(0)
   const [touchX, setTouchX] = useState(null)
@@ -166,7 +167,7 @@ export default function ImageCarousel({
     >
       <img
         src={images[idx]}
-        alt=""
+        alt={altText ? `${altText} - imagen ${idx + 1}` : ''}
         className={`w-full h-full object-cover
           ${compact ? 'transition-transform duration-200 group-hover:scale-105' : ''}`}
         onError={e => { e.currentTarget.style.opacity = '0.3' }}

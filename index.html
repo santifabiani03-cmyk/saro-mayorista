@@ -1,16 +1,75 @@
 <!doctype html>
-<html lang="es">
+<html lang="es-AR">
   <head>
     <meta charset="UTF-8" />
     <link rel="icon" href="/assets/logo.png" />
+    <link rel="apple-touch-icon" href="/assets/logo.png" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <title>SARO Mayorista</title>
+
+    <!-- SEO: Título y descripción -->
+    <title>SARO Mayorista | Ropa Deportiva y Accesorios de Pádel al por Mayor</title>
+    <meta name="description" content="SARO Mayorista: catálogo completo de ropa deportiva, indumentaria de entrenamiento, paletas de pádel, bolsos y accesorios. Venta mayorista en Argentina con precios exclusivos por cantidad." />
+    <meta name="keywords" content="ropa deportiva mayorista, SARO, pádel, paletas de pádel, accesorios de pádel, indumentaria deportiva, ropa de entrenamiento, mayorista Argentina, buzos deportivos, remeras deportivas, shorts deportivos, bolsos deportivos" />
+    <meta name="author" content="SARO" />
+    <meta name="robots" content="index, follow" />
+    <link rel="canonical" href="https://saro-mayorista.vercel.app/" />
+
+    <!-- Open Graph (Facebook, WhatsApp, etc.) -->
+    <meta property="og:type" content="website" />
+    <meta property="og:title" content="SARO Mayorista | Ropa Deportiva y Pádel" />
+    <meta property="og:description" content="Catálogo mayorista de ropa deportiva, indumentaria de entrenamiento, paletas y accesorios de pádel. Precios exclusivos por cantidad." />
+    <meta property="og:image" content="https://saro-mayorista.vercel.app/assets/logo-horizontal.png" />
+    <meta property="og:url" content="https://saro-mayorista.vercel.app/" />
+    <meta property="og:site_name" content="SARO Mayorista" />
+    <meta property="og:locale" content="es_AR" />
+
+    <!-- Twitter Card -->
+    <meta name="twitter:card" content="summary_large_image" />
+    <meta name="twitter:title" content="SARO Mayorista | Ropa Deportiva y Pádel" />
+    <meta name="twitter:description" content="Catálogo mayorista de ropa deportiva, paletas y accesorios de pádel. Venta al por mayor en Argentina." />
+    <meta name="twitter:image" content="https://saro-mayorista.vercel.app/assets/logo-horizontal.png" />
+
+    <!-- Structured Data: Organization + WebSite -->
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "Organization",
+      "name": "SARO",
+      "url": "https://saro-mayorista.vercel.app",
+      "logo": "https://saro-mayorista.vercel.app/assets/logo-horizontal.png",
+      "description": "Marca de indumentaria deportiva y accesorios de pádel. Venta mayorista en Argentina.",
+      "contactPoint": {
+        "@type": "ContactPoint",
+        "contactType": "sales",
+        "availableLanguage": "Spanish"
+      }
+    }
+    </script>
+    <script type="application/ld+json">
+    {
+      "@context": "https://schema.org",
+      "@type": "WebSite",
+      "name": "SARO Mayorista",
+      "url": "https://saro-mayorista.vercel.app",
+      "description": "Catálogo mayorista de ropa deportiva y accesorios de pádel",
+      "inLanguage": "es-AR"
+    }
+    </script>
+
+    <!-- Fonts -->
     <link rel="preconnect" href="https://fonts.googleapis.com" />
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
     <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap" rel="stylesheet" />
   </head>
   <body>
-    <div id="root"></div>
+    <!-- Contenido para crawlers (visible antes de que cargue React) -->
+    <div id="root">
+      <noscript>
+        <h1>SARO Mayorista</h1>
+        <p>Ropa deportiva, indumentaria de entrenamiento, paletas de pádel y accesorios. Venta mayorista en Argentina.</p>
+        <p>Categorías: remeras deportivas, buzos de entrenamiento, shorts, calzas, camperas, bolsos, mochilas, paletas de pádel, accesorios de pádel.</p>
+      </noscript>
+    </div>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
