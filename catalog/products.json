@@ -3,7 +3,9 @@
     "nombre": "Tubo pelotas NOAC x2u. ",
     "precio": 6500,
     "descripcion": "Tubo de pelotas x2 unidades marca NOAC. Excelente paño y presurizacion \nIMPORTADAS",
-    "tags": [],
+    "tags": [
+      "carbono"
+    ],
     "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "accesorio",
@@ -15,13 +17,14 @@
     ],
     "noStock": [],
     "emoji": "🎾",
+    "promos": [],
     "id": "p10",
     "visible": true,
     "sinStock": false,
+    "fechaActualizacion": "2026-05-27T03:22:59.304Z",
     "imagenes": [
-      "/assets/tubo-pelotas-noac-x2u-1779451593153.webp"
-    ],
-    "fechaActualizacion": "2026-05-22T12:06:41.973Z"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/tubo-pelotas-noac-x2u-sr-1779852177344.webp"
+    ]
   },
   {
     "nombre": "Buzo medio cierre micropolar unisex",
