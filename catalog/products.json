@@ -583,7 +583,7 @@
   {
     "nombre": "Calza Biker Lycra Morley Dama",
     "precio": 0,
-    "descripcion": "",
+    "descripcion": "La Calza Biker Lycra Morley Dama es una prenda versátil para actividad deportiva y uso casual. Está confeccionada con lycra morley de alta calidad, proporcionando elasticidad y un ajuste cómodo. Su diseño ofrece libertad de movimiento y resistencia al uso frecuente. Es una opción duradera que combina estilo y funcionalidad.",
     "tags": [],
     "categoria": "ropa",
     "genero": "",
@@ -604,7 +604,7 @@
   {
     "nombre": "Calza Termica Combinada C/Bolsillo",
     "precio": 0,
-    "descripcion": "",
+    "descripcion": "La calza térmica combinada con bolsillo ofrece un diseño funcional y rendimiento óptimo. Su confección con tejidos técnicos proporciona aislamiento térmico y libertad de movimiento, ideal para actividades deportivas. El bolsillo integrado añade practicidad para guardar objetos pequeños de forma segura. Es una prenda esencial para quienes buscan confort y funcionalidad en indumentaria deportiva de alto rendimiento.",
     "tags": [],
     "categoria": "ropa",
     "genero": "",
@@ -684,7 +684,7 @@
   {
     "nombre": "Jogger Microfriza Elast. C/Cierre Dama",
     "precio": 0,
-    "descripcion": "",
+    "descripcion": "Este jogger para dama, confeccionado en microfriza elastizada de alta calidad, ofrece confort y libertad de movimiento. Su diseño incorpora cierres funcionales, brindando un ajuste seguro y práctico. Es una prenda ideal para actividades deportivas como pádel o para uso casual. Su composición asegura durabilidad y una excelente retención de calor.",
     "tags": [],
     "categoria": "ropa",
     "genero": "",
@@ -705,7 +705,7 @@
   {
     "nombre": "Jogger Micropolar Darlon Dama",
     "precio": 0,
-    "descripcion": "",
+    "descripcion": "El Jogger Micropolar Darlon Dama es una prenda versátil para actividad deportiva y uso casual. Confeccionado con tejido micropolar, ofrece una excelente retención térmica y comodidad. Su diseño proporciona libertad de movimiento y un ajuste adecuado para diversas rutinas. Es una opción confiable para el inventario de indumentaria deportiva.",
     "tags": [],
     "categoria": "ropa",
     "genero": "",
@@ -2046,26 +2046,43 @@
     "fechaPublicacion": "2026-05-22T21:21:19.000Z"
   },
   {
-    "nombre": "c",
-    "precio": 8,
+    "nombre": "Pelotas Noac Pro",
+    "precio": 0,
     "descripcion": "",
     "tags": [],
-    "categoria": "ropa",
+    "categoria": "padel",
     "genero": "",
     "parteCuerpo": "",
-    "colores": [
-      "Rojo"
-    ],
-    "talles": [
-      "L"
-    ],
+    "colores": [],
+    "talles": [],
     "noStock": [],
-    "emoji": "📦",
-    "promos": [],
-    "id": "p1779851770186",
+    "emoji": "🎾",
+    "id": "p1779495679219",
+    "visible": false,
+    "sinStock": false,
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/c-sr-1779851768084.webp"
+      "/assets/pelotas-noac-pro-p78.png"
     ],
-    "fechaPublicacion": "2026-05-27T03:16:10.186Z"
+    "fechaPublicacion": "2026-05-22T21:21:27.000Z"
+  },
+  {
+    "nombre": "Carro Recogepelotas Noac",
+    "precio": 0,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [],
+    "talles": [],
+    "noStock": [],
+    "emoji": "🎾",
+    "id": "p1779495687778",
+    "visible": false,
+    "sinStock": false,
+    "imagenes": [
+      "/assets/carro-recogepelotas-noac-p78.png"
+    ],
+    "fechaPublicacion": "2026-05-22T21:21:36.000Z"
   }
 ]

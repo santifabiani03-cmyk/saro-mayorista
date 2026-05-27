@@ -104,33 +104,6 @@ async function applyLogoWatermark(imageUrl, onProgress) {
   return new Promise(resolve => { canvas.toBlob(b => resolve(b), 'image/webp', 0.92) })
 }
 
-/**
- * Procesa TODAS las imágenes de un producto: aplica logo SR.
- * Devuelve nuevo array de URLs (las ya procesadas no se re-procesan).
- */
-const LOGO_MARKER = '_sr' // las URLs con este sufijo ya tienen logo
-async function applyLogoToAll(images, productName, onProgress) {
-  const results = []
-  for (let i = 0; i < images.length; i++) {
-    const url = images[i]
-    // Si ya tiene logo (fue procesada antes), skip
-    if (url.includes(LOGO_MARKER + '.') || url.includes(LOGO_MARKER + '-')) {
-      results.push(url)
-      continue
-    }
-    onProgress?.(`Aplicando logo ${i + 1}/${images.length}…`)
-    try {
-      const blob = await applyLogoWatermark(url, () => {})
-      const file = new File([blob], `processed_sr.webp`, { type: 'image/webp' })
-      const newUrl = await uploadFile(file, productName + '_sr')
-      results.push(newUrl ?? url)
-    } catch (e) {
-      console.error(`Error aplicando logo a imagen ${i + 1}:`, e)
-      results.push(url) // mantener original si falla
-    }
-  }
-  return results
-}
 
 /* ── Lightbox para admin ──────────────────────────────────────────── */
 function AdminLightbox({ images, startIdx, onClose }) {
@@ -345,7 +318,7 @@ function RadioGroup({ options, value, onChange }) {
 
 // ── Multi-image uploader ──────────────────────────────────────────────────────
 
-function MultiImageUploader({ images, onChange, productName }) {
+function MultiImageUploader({ images, onChange, productName, applyLogo }) {
   const inputRef    = useRef()
   const [pending, setPending] = useState(0)   // cuántas imágenes se están subiendo
   const [dragging, setDragging] = useState(false)
@@ -355,8 +328,25 @@ function MultiImageUploader({ images, onChange, productName }) {
     const list = Array.from(files).filter(f => f.type.startsWith('image/'))
     if (!list.length) return
     setPending(p => p + list.length)
-    const urls = await Promise.all(list.map(f => uploadFile(f, productName)))
-    onChange([...images, ...urls.filter(Boolean)])
+
+    const urls = []
+    for (const f of list) {
+      let url = await uploadFile(f, productName)
+      // Aplicar logo SR si está activado
+      if (url && applyLogo) {
+        try {
+          const logoBlob = await applyLogoWatermark(url, () => {})
+          const logoFile = new File([logoBlob], 'logo.webp', { type: 'image/webp' })
+          const logoUrl = await uploadFile(logoFile, productName)
+          if (logoUrl) url = logoUrl
+        } catch (e) {
+          console.error('Error aplicando logo al subir:', e)
+        }
+      }
+      if (url) urls.push(url)
+    }
+
+    onChange([...images, ...urls])
     setPending(p => p - list.length)
     inputRef.current.value = ''
   }
@@ -464,7 +454,7 @@ function incrementAiUsage() {
 
 // ── Sección de remoción de fondo ─────────────────────────────────────────────
 
-function BgRemovalSection({ images, onChange, productName }) {
+function BgRemovalSection({ images, onChange, productName, applyLogo }) {
   const [processing, setProcessing] = useState({}) // { [index]: 'status' }
   const [selected, setSelected] = useState(new Set())
   const [bgType, setBgType] = useState('gradient') // 'gradient' | 'white'
@@ -486,7 +476,17 @@ function BgRemovalSection({ images, onChange, productName }) {
       }, bgType)
       setProcessing(prev => ({ ...prev, [i]: 'Subiendo…' }))
       const file = new File([resultBlob], 'processed.webp', { type: 'image/webp' })
-      const newUrl = await uploadFile(file, productName)
+      let newUrl = await uploadFile(file, productName)
+      // Re-aplicar logo SR si está activado (el bg removal lo borra)
+      if (newUrl && applyLogo) {
+        setProcessing(prev => ({ ...prev, [i]: 'Aplicando logo…' }))
+        try {
+          const logoBlob = await applyLogoWatermark(newUrl, () => {})
+          const logoFile = new File([logoBlob], 'logo.webp', { type: 'image/webp' })
+          const logoUrl = await uploadFile(logoFile, productName)
+          if (logoUrl) newUrl = logoUrl
+        } catch {}
+      }
       if (newUrl) {
         const next = [...images]
         next[i] = newUrl
@@ -1016,6 +1016,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
   const [imagenes, setImagenes] = useState(
     () => initial?.imagenes?.length ? initial.imagenes : initial?.imagen ? [initial.imagen] : []
   )
+  const [applyLogo, setApplyLogo] = useState(true) // Logo SR al subir imágenes
   const [errors, setErrors] = useState({})
 
   // Auto emoji cuando cambia categoría o parteCuerpo
@@ -1041,25 +1042,9 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     return Object.keys(e).length === 0
   }
 
-  const handleSubmit = async (e) => {
+  const handleSubmit = (e) => {
     e.preventDefault()
     if (!validate()) return
-
-    // Aplicar logo SR a todas las imágenes que no lo tengan
-    let finalImages = imagenes
-    if (imagenes.length > 0) {
-      set('_logoStatus', 'Aplicando logo SR…')
-      try {
-        finalImages = await applyLogoToAll(imagenes, form.nombre, (msg) => {
-          set('_logoStatus', msg)
-        })
-        setImagenes(finalImages)
-      } catch (e) {
-        console.error('Error aplicando logo:', e)
-      } finally {
-        set('_logoStatus', null)
-      }
-    }
 
     // Incluir definiciones de colores custom para que se vean en la web pública
     const allCustomDefs = loadCustomDefs()
@@ -1081,7 +1066,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
       ...form,
       id:       form.id ?? `p${Date.now()}`,
       precio:   Number(form.precio),
-      imagenes: finalImages,
+      imagenes,
       promos:   cleanPromos,
       ...(Object.keys(colorDefs).length > 0 && { colorDefs }),
     }
@@ -1092,7 +1077,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     onSave(product)
   }
 
-  const busy = saving || !!form._logoStatus
+  const busy = saving
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -1126,7 +1111,8 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                   <p className="mt-1">• Corre 100% en tu navegador, es gratis y sin límites. La primera vez descarga el modelo (~30MB, queda cacheado).</p>
                   <hr className="border-gray-700 my-1.5" />
                   <p className="font-semibold mb-1">SR Logo</p>
-                  <p>• Al guardar el producto, se aplica automáticamente el logo SR (marca de agua sutil) en la esquina superior derecha de cada imagen.</p>
+                  <p>• Si está activado el checkbox, al subir cada imagen se aplica automáticamente el logo SR (marca de agua sutil) en la esquina superior derecha.</p>
+                  <p className="mt-1">• También se re-aplica después de quitar el fondo con IA.</p>
                   <div className="absolute top-3 -left-1 w-2 h-2 bg-gray-900 rotate-45"></div>
                 </div>
               </div>
@@ -1135,8 +1121,20 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               images={imagenes}
               onChange={setImagenes}
               productName={form.nombre}
+              applyLogo={applyLogo}
             />
           </Field>
+
+          {/* Toggle logo SR */}
+          <label className="flex items-center gap-2 cursor-pointer select-none">
+            <input
+              type="checkbox"
+              checked={applyLogo}
+              onChange={e => setApplyLogo(e.target.checked)}
+              className="w-4 h-4 rounded border-gray-300 text-saro-blue focus:ring-saro-blue"
+            />
+            <span className="text-xs text-gray-600">Aplicar logo <span className="font-bold text-saro-blue">SR</span> al subir imágenes</span>
+          </label>
 
           {/* ── Herramienta de fondo IA ── */}
           {imagenes.length > 0 && (
@@ -1144,6 +1142,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               images={imagenes}
               onChange={setImagenes}
               productName={form.nombre}
+              applyLogo={applyLogo}
             />
           )}
 
@@ -1427,7 +1426,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                   : 'bg-saro-blue hover:bg-saro-dark text-white shadow-sm'
               }`}
             >
-              {form._logoStatus ? `🪄 ${form._logoStatus}` : saving ? '💾 Guardando…' : initial ? '💾 Guardar cambios' : '✅ Publicar producto'}
+              {saving ? '💾 Guardando…' : initial ? '💾 Guardar cambios' : '✅ Publicar producto'}
             </button>
           </div>
         </div>
