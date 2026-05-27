@@ -2084,5 +2084,33 @@
       "/assets/carro-recogepelotas-noac-p78.png"
     ],
     "fechaPublicacion": "2026-05-22T21:21:36.000Z"
+  },
+  {
+    "nombre": "Paleta MAX Carbono Pro",
+    "precio": 130000,
+    "descripcion": "La Paleta MAX Carbono Pro es una paleta de pádel con formato redondo, diseñada para un equilibrio óptimo entre control y potencia en cada golpe. Su composición íntegra de carbono garantiza una alta durabilidad y resistencia, ideal para jugadores que buscan rendimiento constante. Ofrece una experiencia de juego superior, adaptándose a diversas situaciones en la cancha.",
+    "tags": [
+      "stock_limitado",
+      "carbono"
+    ],
+    "categoria": "padel",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Rojo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 1,
+    "id": "p1779916282248",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1779915794067.jpg"
+    ],
+    "fechaPublicacion": "2026-05-27T21:11:22.249Z"
   }
 ]
