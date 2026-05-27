@@ -4,20 +4,29 @@ import {
   getAutoEmoji, TAG_CONFIG, getProductTags, getSwatchStyle,
 } from '../../utils/colors'
 
-// ── Background removal (lazy load) ────────────────────────────────────────────
-// El fondo estandarizado: gradiente gris claro sutil (profesional, neutro)
-const STD_BG_GRADIENT = [
-  { pos: 0, color: '#f8f9fa' },
-  { pos: 1, color: '#e9ecef' },
-]
+// ── Background removal & logo watermark ──────────────────────────────────────
+const LOGO_URL = '/assets/logo-icon.png'
+const BG_OPTIONS = {
+  gradient: { label: 'Gradiente gris', colors: [{ pos: 0, color: '#f8f9fa' }, { pos: 1, color: '#e9ecef' }] },
+  white:    { label: 'Blanco puro',    colors: [{ pos: 0, color: '#ffffff' }, { pos: 1, color: '#ffffff' }] },
+}
+
+/** Carga una imagen por URL y devuelve un HTMLImageElement listo */
+function loadImg(url) {
+  return new Promise((resolve, reject) => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => resolve(img)
+    img.onerror = () => reject(new Error(`No se pudo cargar: ${url}`))
+    img.src = url
+  })
+}
 
 /**
  * Remueve el fondo de una imagen y la coloca sobre un fondo estandarizado.
- * Usa @imgly/background-removal (ONNX, corre 100% en el browser, gratis, sin límites).
- * Devuelve un Blob (image/webp).
+ * bgType: 'gradient' | 'white'
  */
-async function removeAndStandardize(imageUrl, onProgress) {
-  // Descargar la imagen como blob (las URLs de GitHub tienen CORS habilitado)
+async function removeAndStandardize(imageUrl, onProgress, bgType = 'gradient') {
   onProgress?.('Descargando imagen…')
   const resp = await fetch(imageUrl)
   if (!resp.ok) throw new Error(`Error ${resp.status} descargando imagen`)
@@ -28,7 +37,7 @@ async function removeAndStandardize(imageUrl, onProgress) {
 
   onProgress?.('Removiendo fondo…')
   const blob = await removeBackground(srcBlob, {
-    proxyToWorker: false,  // evita requerir SharedArrayBuffer/COOP headers
+    proxyToWorker: false,
     progress: (key, current, total) => {
       if (key === 'compute:inference') {
         const pct = total > 0 ? Math.round((current / total) * 100) : 0
@@ -37,40 +46,90 @@ async function removeAndStandardize(imageUrl, onProgress) {
     },
   })
 
-  // Componer sobre fondo estandarizado
   onProgress?.('Aplicando fondo…')
   const img = new Image()
   img.src = URL.createObjectURL(blob)
-  await new Promise((resolve, reject) => {
-    img.onload = resolve
-    img.onerror = () => reject(new Error('Error cargando resultado'))
-  })
+  await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject })
 
   const size = Math.max(img.width, img.height)
-  const padding = Math.round(size * 0.08) // 8% padding
+  const padding = Math.round(size * 0.08)
   const canvasSize = size + padding * 2
-
   const canvas = document.createElement('canvas')
-  canvas.width = canvasSize
-  canvas.height = canvasSize
+  canvas.width = canvasSize; canvas.height = canvasSize
   const ctx = canvas.getContext('2d')
 
-  // Dibujar gradiente de fondo
+  // Fondo
+  const bgCfg = BG_OPTIONS[bgType] ?? BG_OPTIONS.gradient
   const grad = ctx.createLinearGradient(0, 0, 0, canvasSize)
-  STD_BG_GRADIENT.forEach(s => grad.addColorStop(s.pos, s.color))
+  bgCfg.colors.forEach(s => grad.addColorStop(s.pos, s.color))
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, canvasSize, canvasSize)
 
   // Centrar producto
-  const dx = padding + (size - img.width) / 2
-  const dy = padding + (size - img.height) / 2
-  ctx.drawImage(img, dx, dy)
-
+  ctx.drawImage(img, padding + (size - img.width) / 2, padding + (size - img.height) / 2)
   URL.revokeObjectURL(img.src)
 
-  return new Promise(resolve => {
-    canvas.toBlob(b => resolve(b), 'image/webp', 0.9)
-  })
+  return new Promise(resolve => { canvas.toBlob(b => resolve(b), 'image/webp', 0.9) })
+}
+
+/**
+ * Aplica el logo SR como watermark en la esquina superior derecha.
+ * Devuelve un Blob (webp). Tamaño del logo: ~12% del ancho de la imagen.
+ */
+async function applyLogoWatermark(imageUrl, onProgress) {
+  onProgress?.('Descargando…')
+  const resp = await fetch(imageUrl)
+  if (!resp.ok) throw new Error(`Error ${resp.status}`)
+  const imgBlob = await resp.blob()
+  const imgSrc = URL.createObjectURL(imgBlob)
+
+  onProgress?.('Aplicando logo…')
+  const img = await loadImg(imgSrc)
+  const logo = await loadImg(LOGO_URL)
+
+  const canvas = document.createElement('canvas')
+  canvas.width = img.naturalWidth; canvas.height = img.naturalHeight
+  const ctx = canvas.getContext('2d')
+  ctx.drawImage(img, 0, 0)
+
+  // Logo: 12% del ancho, esquina superior derecha con margen 3%
+  const logoW = Math.round(canvas.width * 0.12)
+  const logoH = Math.round(logoW * (logo.naturalHeight / logo.naturalWidth))
+  const margin = Math.round(canvas.width * 0.03)
+  ctx.globalAlpha = 0.35
+  ctx.drawImage(logo, canvas.width - logoW - margin, margin, logoW, logoH)
+  ctx.globalAlpha = 1
+
+  URL.revokeObjectURL(imgSrc)
+  return new Promise(resolve => { canvas.toBlob(b => resolve(b), 'image/webp', 0.92) })
+}
+
+/**
+ * Procesa TODAS las imágenes de un producto: aplica logo SR.
+ * Devuelve nuevo array de URLs (las ya procesadas no se re-procesan).
+ */
+const LOGO_MARKER = '_sr' // las URLs con este sufijo ya tienen logo
+async function applyLogoToAll(images, productName, onProgress) {
+  const results = []
+  for (let i = 0; i < images.length; i++) {
+    const url = images[i]
+    // Si ya tiene logo (fue procesada antes), skip
+    if (url.includes(LOGO_MARKER + '.') || url.includes(LOGO_MARKER + '-')) {
+      results.push(url)
+      continue
+    }
+    onProgress?.(`Aplicando logo ${i + 1}/${images.length}…`)
+    try {
+      const blob = await applyLogoWatermark(url, () => {})
+      const file = new File([blob], `processed_sr.webp`, { type: 'image/webp' })
+      const newUrl = await uploadFile(file, productName + '_sr')
+      results.push(newUrl ?? url)
+    } catch (e) {
+      console.error(`Error aplicando logo a imagen ${i + 1}:`, e)
+      results.push(url) // mantener original si falla
+    }
+  }
+  return results
 }
 
 /* ── Lightbox para admin ──────────────────────────────────────────── */
@@ -408,6 +467,7 @@ function incrementAiUsage() {
 function BgRemovalSection({ images, onChange, productName }) {
   const [processing, setProcessing] = useState({}) // { [index]: 'status' }
   const [selected, setSelected] = useState(new Set())
+  const [bgType, setBgType] = useState('gradient') // 'gradient' | 'white'
 
   const toggle = (i) => {
     setSelected(prev => {
@@ -423,7 +483,7 @@ function BgRemovalSection({ images, onChange, productName }) {
     try {
       const resultBlob = await removeAndStandardize(url, (msg) => {
         setProcessing(prev => ({ ...prev, [i]: msg }))
-      })
+      }, bgType)
       setProcessing(prev => ({ ...prev, [i]: 'Subiendo…' }))
       const file = new File([resultBlob], 'processed.webp', { type: 'image/webp' })
       const newUrl = await uploadFile(file, productName)
@@ -456,9 +516,27 @@ function BgRemovalSection({ images, onChange, productName }) {
       <div className="flex items-center gap-2">
         <span className="text-lg">🪄</span>
         <div>
-          <h4 className="text-sm font-bold text-violet-800">Fondo estandarizado</h4>
+          <h4 className="text-sm font-bold text-violet-800">Quitar fondo</h4>
           <p className="text-[11px] text-violet-500">Seleccioná imágenes para quitar fondo con IA · 100% gratis</p>
         </div>
+      </div>
+
+      {/* Selector de tipo de fondo */}
+      <div className="flex gap-2">
+        {Object.entries(BG_OPTIONS).map(([key, opt]) => (
+          <button
+            key={key}
+            type="button"
+            onClick={() => setBgType(key)}
+            className={`flex-1 py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${
+              bgType === key
+                ? 'bg-violet-500 border-violet-500 text-white'
+                : 'bg-white border-violet-200 text-violet-600 hover:border-violet-400'
+            }`}
+          >
+            {key === 'gradient' ? '◐' : '○'} {opt.label}
+          </button>
+        ))}
       </div>
 
       {/* Grid de miniaturas seleccionables */}
@@ -963,9 +1041,25 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     return Object.keys(e).length === 0
   }
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault()
     if (!validate()) return
+
+    // Aplicar logo SR a todas las imágenes que no lo tengan
+    let finalImages = imagenes
+    if (imagenes.length > 0) {
+      set('_logoStatus', 'Aplicando logo SR…')
+      try {
+        finalImages = await applyLogoToAll(imagenes, form.nombre, (msg) => {
+          set('_logoStatus', msg)
+        })
+        setImagenes(finalImages)
+      } catch (e) {
+        console.error('Error aplicando logo:', e)
+      } finally {
+        set('_logoStatus', null)
+      }
+    }
 
     // Incluir definiciones de colores custom para que se vean en la web pública
     const allCustomDefs = loadCustomDefs()
@@ -987,7 +1081,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
       ...form,
       id:       form.id ?? `p${Date.now()}`,
       precio:   Number(form.precio),
-      imagenes,
+      imagenes: finalImages,
       promos:   cleanPromos,
       ...(Object.keys(colorDefs).length > 0 && { colorDefs }),
     }
@@ -998,7 +1092,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     onSave(product)
   }
 
-  const busy = saving
+  const busy = saving || !!form._logoStatus
 
   return (
     <form onSubmit={handleSubmit} className="space-y-8">
@@ -1018,7 +1112,25 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
         {/* ── Columna izquierda: imagen + info básica ── */}
         <div className="space-y-5">
           <Field>
-            <Label>Imágenes del producto</Label>
+            <div className="flex items-center gap-2 mb-1.5">
+              <Label>Imágenes del producto</Label>
+              <div className="relative group">
+                <span className="w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-[10px] font-bold flex items-center justify-center cursor-help select-none">i</span>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 bg-gray-900 text-white text-[11px] leading-relaxed rounded-xl px-3 py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+                  <p className="font-semibold mb-1.5">Imágenes del producto</p>
+                  <p>• Subí una o más fotos (JPG, PNG, WEBP). La primera es la imagen principal que se muestra en el catálogo.</p>
+                  <p className="mt-1">• Arrastrá para reordenar o hacé clic en + para agregar más.</p>
+                  <hr className="border-gray-700 my-1.5" />
+                  <p className="font-semibold mb-1">🪄 Herramienta de fondo</p>
+                  <p>• Seleccioná imágenes y quitá el fondo con IA. Podés elegir fondo gris degradado o blanco puro.</p>
+                  <p className="mt-1">• Corre 100% en tu navegador, es gratis y sin límites. La primera vez descarga el modelo (~30MB, queda cacheado).</p>
+                  <hr className="border-gray-700 my-1.5" />
+                  <p className="font-semibold mb-1">SR Logo</p>
+                  <p>• Al guardar el producto, se aplica automáticamente el logo SR (marca de agua sutil) en la esquina superior derecha de cada imagen.</p>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45 -mt-1"></div>
+                </div>
+              </div>
+            </div>
             <MultiImageUploader
               images={imagenes}
               onChange={setImagenes}
@@ -1315,7 +1427,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                   : 'bg-saro-blue hover:bg-saro-dark text-white shadow-sm'
               }`}
             >
-              {saving ? '💾 Guardando…' : initial ? '💾 Guardar cambios' : '✅ Publicar producto'}
+              {form._logoStatus ? `🪄 ${form._logoStatus}` : saving ? '💾 Guardando…' : initial ? '💾 Guardar cambios' : '✅ Publicar producto'}
             </button>
           </div>
         </div>
