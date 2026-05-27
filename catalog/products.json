@@ -2112,5 +2112,31 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1779915794067.jpg"
     ],
     "fechaPublicacion": "2026-05-27T21:11:22.249Z"
+  },
+  {
+    "nombre": "Saro SR Junior ",
+    "precio": 85000,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "padel",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Celeste",
+      "Blanco"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1779922130410",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1779921966660.webp"
+    ],
+    "fechaPublicacion": "2026-05-27T22:48:50.410Z"
   }
 ]
