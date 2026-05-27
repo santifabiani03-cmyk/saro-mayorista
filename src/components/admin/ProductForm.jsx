@@ -1116,7 +1116,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               <Label>Imágenes del producto</Label>
               <div className="relative group">
                 <span className="w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-[10px] font-bold flex items-center justify-center cursor-help select-none">i</span>
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-72 bg-gray-900 text-white text-[11px] leading-relaxed rounded-xl px-3 py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+                <div className="absolute top-0 left-full ml-2 w-72 bg-gray-900 text-white text-[11px] leading-relaxed rounded-xl px-3 py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
                   <p className="font-semibold mb-1.5">Imágenes del producto</p>
                   <p>• Subí una o más fotos (JPG, PNG, WEBP). La primera es la imagen principal que se muestra en el catálogo.</p>
                   <p className="mt-1">• Arrastrá para reordenar o hacé clic en + para agregar más.</p>
@@ -1127,7 +1127,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                   <hr className="border-gray-700 my-1.5" />
                   <p className="font-semibold mb-1">SR Logo</p>
                   <p>• Al guardar el producto, se aplica automáticamente el logo SR (marca de agua sutil) en la esquina superior derecha de cada imagen.</p>
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45 -mt-1"></div>
+                  <div className="absolute top-3 -left-1 w-2 h-2 bg-gray-900 rotate-45"></div>
                 </div>
               </div>
             </div>
