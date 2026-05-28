@@ -107,6 +107,7 @@ export default function AdminPage() {
   const [deploying, setDeploying]       = useState(false)
   const [exporting, setExporting]       = useState(false)
   const [exportProgress, setExportProgress] = useState('')
+  const [showQr, setShowQr]             = useState(false)
   // isDev = true solo cuando corre en localhost (desarrollo local)
   const isDev = window.location.hostname === 'localhost'
 
@@ -311,6 +312,16 @@ export default function AdminPage() {
                 <span className="sm:hidden">{exporting ? '…' : 'PDF'}</span>
               </button>
 
+              {/* QR catálogo */}
+              <button
+                onClick={() => setShowQr(true)}
+                className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold rounded-lg sm:rounded-xl bg-white/15 hover:bg-white/25 text-white transition-all"
+                title="QR del catálogo PDF"
+              >
+                <span className="text-xs sm:text-base">📱</span>
+                <span className="hidden sm:inline">QR</span>
+              </button>
+
               {/* Ver tienda */}
               <a
                 href="/"
@@ -383,6 +394,29 @@ export default function AdminPage() {
           />
         )}
       </div>
+
+      {/* Modal QR */}
+      {showQr && (
+        <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowQr(false)}>
+          <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl" onClick={e => e.stopPropagation()}>
+            <h3 className="font-extrabold text-lg text-gray-900 mb-1">QR del Catálogo</h3>
+            <p className="text-sm text-gray-400 mb-4">Escaneá para descargar el PDF actualizado</p>
+            <img
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://saro.com.ar/catalogo')}&color=2d3748&bgcolor=ffffff`}
+              alt="QR Catálogo SARO"
+              className="w-48 h-48 sm:w-56 sm:h-56 mx-auto rounded-xl"
+            />
+            <p className="text-xs text-gray-400 mt-3">saro.com.ar/catalogo</p>
+            <p className="text-[10px] text-gray-300 mt-1">Se actualiza cada vez que exportás el PDF</p>
+            <button
+              onClick={() => setShowQr(false)}
+              className="mt-4 px-6 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium transition-colors"
+            >
+              Cerrar
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Link discreto a Vercel Analytics */}
       <a

@@ -389,8 +389,22 @@ export async function exportCatalogPdf(products, onProgress) {
     doc.text(`${i}`, pageW - margin, pageH - 6, { align: 'right' })
   }
 
-  // Guardar
+  // Guardar localmente
   const fileName = `catalogo-saro-${now.toISOString().slice(0, 10)}.pdf`
   doc.save(fileName)
+
+  // Subir a GitHub para que esté disponible en /catalogo
+  try {
+    const pdfBase64 = doc.output('datauristring').split(',')[1]
+    const pin = sessionStorage.getItem('saro_admin_pin') ?? ''
+    await fetch('/api/upload-catalog', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ data: pdfBase64, pin }),
+    })
+  } catch (e) {
+    console.error('Error subiendo catálogo PDF:', e)
+  }
+
   return fileName
 }

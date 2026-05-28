@@ -703,6 +703,10 @@ function BgRemovalSection({ images, onChange, productName, applyLogo }) {
   const [selected, setSelected] = useState(new Set())
   const [bgType, setBgType] = useState('gradient') // 'gradient' | 'white'
 
+  // Ref para tener siempre el array actualizado (evita stale closure al procesar múltiples)
+  const imagesRef = useRef(images)
+  useEffect(() => { imagesRef.current = images }, [images])
+
   const toggle = (i) => {
     setSelected(prev => {
       const next = new Set(prev)
@@ -712,7 +716,7 @@ function BgRemovalSection({ images, onChange, productName, applyLogo }) {
   }
 
   const processOne = async (i) => {
-    const url = images[i]
+    const url = imagesRef.current[i]
     setProcessing(prev => ({ ...prev, [i]: 'Iniciando…' }))
     try {
       const resultBlob = await removeAndStandardize(url, (msg) => {
@@ -732,7 +736,8 @@ function BgRemovalSection({ images, onChange, productName, applyLogo }) {
         } catch {}
       }
       if (newUrl) {
-        const next = [...images]
+        // Usar imagesRef.current para siempre tener la versión más actual
+        const next = [...imagesRef.current]
         next[i] = newUrl
         onChange(next)
       }

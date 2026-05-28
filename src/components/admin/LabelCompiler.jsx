@@ -371,7 +371,7 @@ export default function LabelCompiler() {
   }
 
   return (
-    <div className="max-w-xl mx-auto space-y-6">
+    <div className="max-w-xl mx-auto space-y-6 overflow-hidden">
 
       {/* Contador de envíos */}
       <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
@@ -494,7 +494,7 @@ export default function LabelCompiler() {
             </button>
           )}
         </div>
-        <div className="grid grid-cols-3 gap-4">
+        <div className="grid grid-cols-3 gap-2 sm:gap-4">
           <div>
             <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
               Por hoja
