@@ -84,12 +84,12 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
       {/* aspect-square para coincidir con la grilla de otros productos */}
       <div className="relative aspect-square bg-gradient-to-b from-gray-50 via-white to-gray-100 overflow-hidden">
 
-        {/* Imagen de la paleta — contain anclada abajo, mango al fondo de la card */}
+        {/* Imagen de la paleta — cover anclada abajo, mango al fondo, recorta arriba si hace falta */}
         {imgs.length > 0 ? (
           <img
             src={imgs[0]}
             alt={product.nombre}
-            className="absolute inset-0 w-full h-full object-contain object-bottom pt-2 px-2 pb-1 transition-transform duration-300 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-cover object-bottom transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
             decoding="async"
             onError={e => { e.currentTarget.style.opacity = '0.3' }}
