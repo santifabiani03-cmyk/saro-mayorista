@@ -48,6 +48,86 @@ function loadImageRounded(url, cornerPct = 3) {
   })
 }
 
+/**
+ * Carga una imagen de paleta centrada con contain (sin recortar).
+ * La imagen se dibuja centrada sobre un fondo con gradiente sutil,
+ * con esquinas superiores redondeadas.
+ */
+function loadPaletaImage(url, targetW, targetH, cornerPct = 3) {
+  return new Promise(resolve => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const cw = Math.round(targetW * 4) // resolución interna
+      const ch = Math.round(targetH * 4)
+      const r = Math.round(cw * cornerPct / 100)
+
+      const canvas = document.createElement('canvas')
+      canvas.width = cw
+      canvas.height = ch
+      const ctx = canvas.getContext('2d')
+
+      // Fondo gradiente sutil
+      const grad = ctx.createLinearGradient(0, 0, 0, ch)
+      grad.addColorStop(0, '#f8f9fa')
+      grad.addColorStop(0.5, '#ffffff')
+      grad.addColorStop(1, '#f3f4f6')
+      ctx.fillStyle = grad
+      ctx.fillRect(0, 0, cw, ch)
+
+      // Clip: esquinas superiores redondeadas
+      ctx.save()
+      ctx.beginPath()
+      ctx.moveTo(r, 0)
+      ctx.lineTo(cw - r, 0)
+      ctx.quadraticCurveTo(cw, 0, cw, r)
+      ctx.lineTo(cw, ch)
+      ctx.lineTo(0, ch)
+      ctx.lineTo(0, r)
+      ctx.quadraticCurveTo(0, 0, r, 0)
+      ctx.closePath()
+      ctx.clip()
+
+      // Fondo nuevamente dentro del clip
+      ctx.fillStyle = grad
+      ctx.fillRect(0, 0, cw, ch)
+
+      // Calcular tamaño contain con padding
+      const padding = cw * 0.08
+      const availW = cw - padding * 2
+      const availH = ch - padding * 2
+      const imgAspect = img.naturalWidth / img.naturalHeight
+      const areaAspect = availW / availH
+
+      let drawW, drawH
+      if (imgAspect > areaAspect) {
+        drawW = availW
+        drawH = availW / imgAspect
+      } else {
+        drawH = availH
+        drawW = availH * imgAspect
+      }
+
+      const drawX = (cw - drawW) / 2
+      const drawY = (ch - drawH) / 2
+
+      // Sombra sutil
+      ctx.shadowColor = 'rgba(0,0,0,0.12)'
+      ctx.shadowBlur = cw * 0.04
+      ctx.shadowOffsetY = cw * 0.02
+
+      ctx.drawImage(img, drawX, drawY, drawW, drawH)
+      ctx.restore()
+
+      try {
+        resolve({ dataUrl: canvas.toDataURL('image/jpeg', 0.90), width: cw, height: ch })
+      } catch { resolve(null) }
+    }
+    img.onerror = () => resolve(null)
+    img.src = url
+  })
+}
+
 /** Carga imagen sin modificar (para logos). */
 function loadImage(url) {
   return new Promise(resolve => {
@@ -87,14 +167,7 @@ function makeSplitCircle(hexA, hexB, size = 64) {
   ctx.fillStyle = hexA
   ctx.fillRect(0, 0, size, size)
 
-  // Color B — triangulo inferior-derecho (diagonal de esquina sup-izq a inf-der)
-  ctx.beginPath()
-  ctx.moveTo(0, 0)
-  ctx.lineTo(size, 0)
-  ctx.lineTo(size, size)
-  ctx.lineTo(0, size)
-  ctx.closePath()
-  // Solo la mitad inferior-derecha
+  // Color B — triangulo inferior-derecho
   ctx.beginPath()
   ctx.moveTo(size, 0)
   ctx.lineTo(size, size)
@@ -125,8 +198,68 @@ function bottomRoundedRect(doc, x, y, w, h, r) {
 }
 
 /**
+ * Dibuja los circulos de color para un producto en el PDF.
+ */
+function drawColorCircles(doc, product, x, y, maxWidth) {
+  if (!product.colores?.length) return
+
+  let colorX = x
+  const circleR = 1.6
+  const maxShow = 7
+  const showing = product.colores.slice(0, maxShow)
+
+  for (let ci = 0; ci < showing.length; ci++) {
+    const colorName = showing[ci]
+    const cx = colorX + circleR
+    const cy = y
+
+    if (colorName.includes('/')) {
+      const [partA, partB] = colorName.split('/')
+      const hexA = COLOR_MAP[partA.trim()] ?? '#e5e7eb'
+      const hexB = COLOR_MAP[partB.trim()] ?? '#e5e7eb'
+      const swatchImg = makeSplitCircle(hexA, hexB)
+      const diam = circleR * 2
+      doc.addImage(swatchImg, 'PNG', cx - circleR, cy - circleR, diam, diam)
+      doc.setDrawColor(180, 180, 180)
+      doc.setLineWidth(0.2)
+      doc.circle(cx, cy, circleR, 'S')
+    } else {
+      const hex = COLOR_MAP[colorName] ?? '#e5e7eb'
+      const [r, g, b] = hexToRgb(hex)
+      doc.setDrawColor(180, 180, 180)
+      doc.setLineWidth(0.2)
+      doc.setFillColor(r, g, b)
+      doc.circle(cx, cy, circleR, 'FD')
+    }
+
+    doc.setTextColor(90, 90, 90)
+    doc.setFontSize(5)
+    doc.setFont('helvetica', 'normal')
+    doc.text(colorName, colorX + circleR * 2 + 1, y + 1)
+
+    const tw = doc.getTextWidth(colorName)
+    colorX += circleR * 2 + 1 + tw + 2.5
+
+    if (colorX > x + maxWidth - 10 && ci < showing.length - 1) {
+      const left = product.colores.length - ci - 1
+      if (left > 0) {
+        doc.setTextColor(120, 120, 120)
+        doc.text(`+${left}`, colorX, y + 1)
+      }
+      break
+    }
+  }
+
+  if (product.colores.length > maxShow && colorX <= x + maxWidth - 10) {
+    doc.setTextColor(120, 120, 120)
+    doc.setFontSize(5)
+    doc.text(`+${product.colores.length - maxShow}`, colorX, y + 1)
+  }
+}
+
+/**
  * Exporta un catalogo PDF con los productos visibles.
- * Ropa separada por genero (Mujer, Hombre, Unisex), Padel aparte.
+ * Ropa separada por genero (Mujer, Hombre, Unisex), Padel y Paletas aparte.
  */
 export async function exportCatalogPdf(products, onProgress, { skipDownload = false } = {}) {
   const visible = products.filter(p => p.visible !== false)
@@ -157,34 +290,48 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
   const ropaUni  = visible.filter(p => p.categoria === 'ropa' && p.genero === 'unisex')
   const ropaSin  = visible.filter(p => p.categoria === 'ropa' && !p.genero)
   const padel    = visible.filter(p => p.categoria === 'padel')
-  const other    = visible.filter(p => p.categoria !== 'ropa' && p.categoria !== 'padel')
+  const paletas  = visible.filter(p => p.categoria === 'paleta')
+  const other    = visible.filter(p => !['ropa','padel','paleta'].includes(p.categoria))
 
   const sections = []
-  if (ropaFem.length)  sections.push({ title: 'Ropa Mujer',   items: ropaFem })
-  if (ropaMasc.length) sections.push({ title: 'Ropa Hombre',  items: ropaMasc })
-  if (ropaUni.length)  sections.push({ title: 'Ropa Unisex',  items: ropaUni })
-  if (ropaSin.length)  sections.push({ title: 'Ropa',         items: ropaSin })
-  if (padel.length)    sections.push({ title: 'Padel',        items: padel })
-  if (other.length)    sections.push({ title: 'Otros',        items: other })
+  if (ropaFem.length)  sections.push({ title: 'Ropa Mujer',   items: ropaFem,  type: 'standard' })
+  if (ropaMasc.length) sections.push({ title: 'Ropa Hombre',  items: ropaMasc, type: 'standard' })
+  if (ropaUni.length)  sections.push({ title: 'Ropa Unisex',  items: ropaUni,  type: 'standard' })
+  if (ropaSin.length)  sections.push({ title: 'Ropa',         items: ropaSin,  type: 'standard' })
+  if (padel.length)    sections.push({ title: 'Padel',        items: padel,    type: 'standard' })
+  if (paletas.length)  sections.push({ title: 'Paletas',      items: paletas,  type: 'paleta'   })
+  if (other.length)    sections.push({ title: 'Otros',        items: other,    type: 'standard' })
 
-  // ── Layout ──
+  // ── Layout estándar (ropa/padel) ──
   const cols = 2
-  const hGap = 6                               // espacio horizontal entre columnas
+  const hGap = 6
   const cardW = (contentW - hGap) / cols
-  const imgH = cardW                           // ratio 1:1 (cuadrado)
+  const imgH = cardW                           // ratio 1:1
   const infoH = 20
   const cardH = imgH + infoH
-  const rows = 2                               // 2 filas × 2 cols = 4 productos/pagina
+  const rows = 2
   const sectionHeaderH = 22
   const contHeaderH = 10
 
-  // Calcular gap vertical dinamico para llenar la pagina sin espacio blanco
+  // ── Layout paletas: 2 columnas, imagen más alta (3:4) ──
+  const paletaImgH = cardW * 1.25              // aspect 3:4
+  const paletaInfoH = 22
+  const paletaCardH = paletaImgH + paletaInfoH
+  const paletaRows = 2
+
+  // Gap vertical dinámico
   const firstAvail = maxY - (sectionHeaderH + 2)
   const contAvail  = maxY - (contHeaderH + 2)
-  const firstVGap  = (firstAvail - rows * cardH) / (rows + 1)   // gap arriba, entre filas, abajo
+
+  const firstVGap  = (firstAvail - rows * cardH) / (rows + 1)
   const contVGap   = (contAvail  - rows * cardH) / (rows + 1)
   const firstPageStartY = sectionHeaderH + 2 + firstVGap
   const contPageStartY  = contHeaderH + 2 + contVGap
+
+  const paletaFirstVGap  = (firstAvail - paletaRows * paletaCardH) / (paletaRows + 1)
+  const paletaContVGap   = (contAvail  - paletaRows * paletaCardH) / (paletaRows + 1)
+  const paletaFirstStartY = sectionHeaderH + 2 + paletaFirstVGap
+  const paletaContStartY  = contHeaderH + 2 + paletaContVGap
 
   // ── Calcular paginas por seccion (para el indice) ──
   const sectionPages = []
@@ -192,20 +339,27 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
 
   for (const section of sections) {
     sectionPages.push(simulatedPage)
-    let y = firstPageStartY
+    const isPaleta = section.type === 'paleta'
+    const cH = isPaleta ? paletaCardH : cardH
+    const startY = isPaleta ? paletaFirstStartY : firstPageStartY
+    const contSY = isPaleta ? paletaContStartY : contPageStartY
+    const vg1 = isPaleta ? paletaFirstVGap : firstVGap
+    const vg2 = isPaleta ? paletaContVGap : contVGap
+
+    let y = startY
     let col = 0
     let isFirst = true
     for (let i = 0; i < section.items.length; i++) {
-      if (y + cardH > maxY) {
+      if (y + cH > maxY) {
         simulatedPage++
-        y = contPageStartY
+        y = contSY
         col = 0
         isFirst = false
       }
       col++
       if (col >= cols) {
         col = 0
-        y += cardH + (isFirst ? firstVGap : contVGap)
+        y += cH + (isFirst ? vg1 : vg2)
       }
     }
     simulatedPage++
@@ -218,8 +372,8 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
   if (logoMain) {
     const logoAspect = logoMain.width / logoMain.height
     const logoW = 100
-    const logoH = logoW / logoAspect
-    doc.addImage(logoMain.dataUrl, 'PNG', pageW / 2 - logoW / 2, 75, logoW, logoH)
+    const logoH2 = logoW / logoAspect
+    doc.addImage(logoMain.dataUrl, 'PNG', pageW / 2 - logoW / 2, 75, logoW, logoH2)
   }
 
   const logoBottom = logoMain ? 75 + (100 / (logoMain.width / logoMain.height)) + 12 : 130
@@ -268,7 +422,6 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
     doc.setTextColor(220, 220, 220)
     doc.text(`${sectionPages[i]}`, pageW - margin - 30, lineY, { align: 'right' })
 
-    // Link clickeable a la pagina de la seccion
     doc.link(linkX, lineY - 5, linkW, 7, { pageNumber: sectionPages[i] })
   })
 
@@ -278,6 +431,14 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
 
   for (let si = 0; si < sections.length; si++) {
     const section = sections[si]
+    const isPaletaSection = section.type === 'paleta'
+    const cH   = isPaletaSection ? paletaCardH   : cardH
+    const iH   = isPaletaSection ? paletaImgH    : imgH
+    const nfoH = isPaletaSection ? paletaInfoH   : infoH
+    const vg1  = isPaletaSection ? paletaFirstVGap : firstVGap
+    const vg2  = isPaletaSection ? paletaContVGap  : contVGap
+    const startY = isPaletaSection ? paletaFirstStartY : firstPageStartY
+    const contSY = isPaletaSection ? paletaContStartY  : contPageStartY
 
     doc.addPage()
 
@@ -292,23 +453,22 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
 
     if (logoIcon) {
       const iconAspect = logoIcon.width / logoIcon.height
-      const iconH = 12
-      const iconW = iconH * iconAspect
-      doc.addImage(logoIcon.dataUrl, 'PNG', pageW - margin - iconW + 2, (sectionHeaderH - iconH) / 2, iconW, iconH)
+      const iconH2 = 12
+      const iconW2 = iconH2 * iconAspect
+      doc.addImage(logoIcon.dataUrl, 'PNG', pageW - margin - iconW2 + 2, (sectionHeaderH - iconH2) / 2, iconW2, iconH2)
     }
 
-    let y = firstPageStartY
+    let y = startY
     let col = 0
     let isFirstPage = true
 
     for (const product of section.items) {
-      const vGap = isFirstPage ? firstVGap : contVGap
+      const vGap = isFirstPage ? vg1 : vg2
 
       // Nueva pagina si no cabe
-      if (y + cardH > maxY) {
+      if (y + cH > maxY) {
         doc.addPage()
 
-        // Mini header
         doc.setFillColor(240, 240, 240)
         doc.rect(0, 0, pageW, contHeaderH, 'F')
         doc.setTextColor(120, 120, 120)
@@ -318,12 +478,12 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
 
         if (logoIcon) {
           const iconAspect = logoIcon.width / logoIcon.height
-          const iconH2 = 6
-          const iconW2 = iconH2 * iconAspect
-          doc.addImage(logoIcon.dataUrl, 'PNG', pageW - margin - iconW2 + 2, 2, iconW2, iconH2)
+          const iconH3 = 6
+          const iconW3 = iconH3 * iconAspect
+          doc.addImage(logoIcon.dataUrl, 'PNG', pageW - margin - iconW3 + 2, 2, iconW3, iconH3)
         }
 
-        y = contPageStartY
+        y = contSY
         col = 0
         isFirstPage = false
       }
@@ -331,99 +491,81 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
       const x = margin + col * (cardW + hGap)
 
       // ── Dibujar card ──
-      // 1) Imagen con esquinas superiores redondeadas
       const imgUrl = product.imagenes?.[0] ?? product.imagen
-      if (imgUrl) {
-        const imgData = await loadImageRounded(imgUrl, 4)
-        if (imgData) {
-          doc.addImage(imgData.dataUrl, 'JPEG', x, y, cardW, imgH)
+
+      if (isPaletaSection) {
+        // ═══ CARD PALETA: imagen contain con fondo gradiente ═══
+        if (imgUrl) {
+          const imgData = await loadPaletaImage(imgUrl, cardW, iH, 4)
+          if (imgData) {
+            doc.addImage(imgData.dataUrl, 'JPEG', x, y, cardW, iH)
+          } else {
+            doc.setFillColor(245, 245, 245)
+            doc.roundedRect(x, y, cardW, iH, 3, 3, 'F')
+          }
+        } else {
+          doc.setFillColor(245, 245, 245)
+          doc.roundedRect(x, y, cardW, iH, 3, 3, 'F')
+        }
+
+        // Info box
+        doc.setFillColor(240, 240, 240)
+        bottomRoundedRect(doc, x, y + iH, cardW, nfoH, 3)
+
+        // Nombre (más grande para paletas)
+        doc.setTextColor(30, 30, 30)
+        doc.setFontSize(8)
+        doc.setFont('helvetica', 'bold')
+        const nombre = product.nombre.length > 35
+          ? product.nombre.substring(0, 33) + '...'
+          : product.nombre
+        doc.text(nombre, x + 3, y + iH + 6)
+
+        // Colores en línea
+        drawColorCircles(doc, product, x + 3, y + iH + 13, cardW)
+
+        // "Ver →" alineado a la derecha
+        doc.setTextColor(37, 99, 235) // saro-blue
+        doc.setFontSize(6)
+        doc.setFont('helvetica', 'bold')
+        doc.text('Ver →', x + cardW - 3, y + iH + 19, { align: 'right' })
+      } else {
+        // ═══ CARD ESTÁNDAR (ropa / padel) ═══
+        if (imgUrl) {
+          const imgData = await loadImageRounded(imgUrl, 4)
+          if (imgData) {
+            doc.addImage(imgData.dataUrl, 'JPEG', x, y, cardW, iH)
+          } else {
+            doc.setFillColor(230, 230, 230)
+            doc.roundedRect(x, y, cardW, iH, 3, 3, 'F')
+          }
         } else {
           doc.setFillColor(230, 230, 230)
-          doc.roundedRect(x, y, cardW, imgH, 3, 3, 'F')
-        }
-      } else {
-        doc.setFillColor(230, 230, 230)
-        doc.roundedRect(x, y, cardW, imgH, 3, 3, 'F')
-      }
-
-      // 2) Info box con fondo mas oscuro y esquinas inferiores redondeadas
-      doc.setFillColor(232, 232, 232)
-      bottomRoundedRect(doc, x, y + imgH, cardW, infoH, 3)
-
-      // 3) Nombre del producto
-      doc.setTextColor(30, 30, 30)
-      doc.setFontSize(7.5)
-      doc.setFont('helvetica', 'bold')
-      const nombre = product.nombre.length > 40
-        ? product.nombre.substring(0, 38) + '...'
-        : product.nombre
-      doc.text(nombre, x + 3, y + imgH + 6)
-
-      // 4) Colores con circulos
-      if (product.colores?.length > 0) {
-        const colorY = y + imgH + 12
-        let colorX = x + 3
-        const circleR = 1.6
-        const maxShow = 7
-
-        const showing = product.colores.slice(0, maxShow)
-        for (let ci = 0; ci < showing.length; ci++) {
-          const colorName = showing[ci]
-          const cx = colorX + circleR
-          const cy = colorY
-
-          if (colorName.includes('/')) {
-            // Circulo dividido en diagonal para colores compuestos
-            const [partA, partB] = colorName.split('/')
-            const hexA = COLOR_MAP[partA.trim()] ?? '#e5e7eb'
-            const hexB = COLOR_MAP[partB.trim()] ?? '#e5e7eb'
-            const swatchImg = makeSplitCircle(hexA, hexB)
-            const diam = circleR * 2
-            doc.addImage(swatchImg, 'PNG', cx - circleR, cy - circleR, diam, diam)
-            // Borde
-            doc.setDrawColor(180, 180, 180)
-            doc.setLineWidth(0.2)
-            doc.circle(cx, cy, circleR, 'S')
-          } else {
-            const hex = COLOR_MAP[colorName] ?? '#e5e7eb'
-            const [r, g, b] = hexToRgb(hex)
-            doc.setDrawColor(180, 180, 180)
-            doc.setLineWidth(0.2)
-            doc.setFillColor(r, g, b)
-            doc.circle(cx, cy, circleR, 'FD')
-          }
-
-          doc.setTextColor(90, 90, 90)
-          doc.setFontSize(5)
-          doc.setFont('helvetica', 'normal')
-          doc.text(colorName, colorX + circleR * 2 + 1, colorY + 1)
-
-          const tw = doc.getTextWidth(colorName)
-          colorX += circleR * 2 + 1 + tw + 2.5
-
-          // Cortar si no cabe
-          if (colorX > x + cardW - 10 && ci < showing.length - 1) {
-            const left = product.colores.length - ci - 1
-            if (left > 0) {
-              doc.setTextColor(120, 120, 120)
-              doc.text(`+${left}`, colorX, colorY + 1)
-            }
-            break
-          }
+          doc.roundedRect(x, y, cardW, iH, 3, 3, 'F')
         }
 
-        if (product.colores.length > maxShow && colorX <= x + cardW - 10) {
-          doc.setTextColor(120, 120, 120)
-          doc.setFontSize(5)
-          doc.text(`+${product.colores.length - maxShow}`, colorX, colorY + 1)
-        }
+        // Info box
+        doc.setFillColor(232, 232, 232)
+        bottomRoundedRect(doc, x, y + iH, cardW, nfoH, 3)
+
+        // Nombre
+        doc.setTextColor(30, 30, 30)
+        doc.setFontSize(7.5)
+        doc.setFont('helvetica', 'bold')
+        const nombre = product.nombre.length > 40
+          ? product.nombre.substring(0, 38) + '...'
+          : product.nombre
+        doc.text(nombre, x + 3, y + iH + 6)
+
+        // Colores
+        drawColorCircles(doc, product, x + 3, y + iH + 12, cardW)
       }
 
       // Siguiente posicion
       col++
       if (col >= cols) {
         col = 0
-        y += cardH + vGap
+        y += cH + vGap
       }
 
       processed++

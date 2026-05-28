@@ -52,8 +52,9 @@ function getTrimBounds(img) {
  * Remueve el fondo de una imagen y la coloca sobre un fondo estandarizado.
  * Recorta automáticamente el espacio transparente y centra el producto.
  * bgType: 'gradient' | 'white'
+ * isPaleta: si es true, genera un canvas 3:4 (portrait) en vez de cuadrado
  */
-async function removeAndStandardize(imageUrl, onProgress, bgType = 'gradient') {
+async function removeAndStandardize(imageUrl, onProgress, bgType = 'gradient', isPaleta = false) {
   onProgress?.('Descargando imagen…')
   const resp = await fetch(imageUrl)
   if (!resp.ok) throw new Error(`Error ${resp.status} descargando imagen`)
@@ -80,24 +81,40 @@ async function removeAndStandardize(imageUrl, onProgress, bgType = 'gradient') {
   // Detectar bounding box real del producto (sin transparencia)
   const bounds = getTrimBounds(img)
 
-  // Canvas cuadrado basado en el lado mayor del producto recortado
-  const productSize = Math.max(bounds.w, bounds.h)
-  const padding = Math.round(productSize * 0.10)
-  const canvasSize = productSize + padding * 2
+  // Canvas: cuadrado para ropa/padel, 3:4 portrait para paletas
+  const padding = Math.round(Math.max(bounds.w, bounds.h) * 0.10)
+  let canvasW, canvasH
+  if (isPaleta) {
+    // Paleta: canvas 3:4 portrait, fit contain
+    const baseW = bounds.w + padding * 2
+    const baseH = bounds.h + padding * 2
+    // Asegurar ratio 3:4 (w:h)
+    if (baseW / baseH > 3 / 4) {
+      canvasW = baseW
+      canvasH = Math.round(baseW * 4 / 3)
+    } else {
+      canvasH = baseH
+      canvasW = Math.round(baseH * 3 / 4)
+    }
+  } else {
+    const productSize = Math.max(bounds.w, bounds.h)
+    canvasW = productSize + padding * 2
+    canvasH = canvasW
+  }
   const canvas = document.createElement('canvas')
-  canvas.width = canvasSize; canvas.height = canvasSize
+  canvas.width = canvasW; canvas.height = canvasH
   const ctx = canvas.getContext('2d')
 
   // Fondo
   const bgCfg = BG_OPTIONS[bgType] ?? BG_OPTIONS.gradient
-  const grad = ctx.createLinearGradient(0, 0, 0, canvasSize)
+  const grad = ctx.createLinearGradient(0, 0, 0, canvasH)
   bgCfg.colors.forEach(s => grad.addColorStop(s.pos, s.color))
   ctx.fillStyle = grad
-  ctx.fillRect(0, 0, canvasSize, canvasSize)
+  ctx.fillRect(0, 0, canvasW, canvasH)
 
   // Centrar producto recortado
-  const drawX = padding + (productSize - bounds.w) / 2
-  const drawY = padding + (productSize - bounds.h) / 2
+  const drawX = (canvasW - bounds.w) / 2
+  const drawY = (canvasH - bounds.h) / 2
   ctx.drawImage(img, bounds.x, bounds.y, bounds.w, bounds.h, drawX, drawY, bounds.w, bounds.h)
   URL.revokeObjectURL(img.src)
 
@@ -698,7 +715,7 @@ function incrementAiUsage() {
 
 // ── Sección de remoción de fondo ─────────────────────────────────────────────
 
-function BgRemovalSection({ images, onChange, productName, applyLogo }) {
+function BgRemovalSection({ images, onChange, productName, applyLogo, isPaleta = false }) {
   const [processing, setProcessing] = useState({}) // { [index]: 'status' }
   const [selected, setSelected] = useState(new Set())
   const [bgType, setBgType] = useState('gradient') // 'gradient' | 'white'
@@ -721,7 +738,7 @@ function BgRemovalSection({ images, onChange, productName, applyLogo }) {
     try {
       const resultBlob = await removeAndStandardize(url, (msg) => {
         setProcessing(prev => ({ ...prev, [i]: msg }))
-      }, bgType)
+      }, bgType, isPaleta)
       setProcessing(prev => ({ ...prev, [i]: 'Subiendo…' }))
       const file = new File([resultBlob], 'processed.webp', { type: 'image/webp' })
       let newUrl = await uploadFile(file, productName)
@@ -1392,6 +1409,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               onChange={setImagenes}
               productName={form.nombre}
               applyLogo={applyLogo}
+              isPaleta={form.categoria === 'paleta'}
             />
           )}
 
@@ -1529,38 +1547,58 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
 
             <Field>
               <Label>Categoría</Label>
-              <RadioGroup
-                value={form.categoria}
-                onChange={v => set('categoria', v === form.categoria ? '' : v)}
-                options={[{ val: 'ropa', label: '👕 Ropa' }, { val: 'padel', label: '🏓 Pádel' }]}
-              />
+              <div className="flex flex-wrap gap-2">
+                {[
+                  { val: 'ropa', label: 'Ropa', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"/></svg> },
+                  { val: 'padel', label: 'Pádel', icon: <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4"><circle cx="12" cy="12" r="4.5"/><circle cx="12" cy="12" r="3" fill="none" stroke="currentColor" strokeWidth="0.5" opacity="0.3"/></svg> },
+                  { val: 'paleta', label: 'Paleta', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-4 h-4"><ellipse cx="12" cy="9" rx="6" ry="8"/><line x1="12" y1="17" x2="12" y2="23" strokeLinecap="round"/><circle cx="10" cy="7" r="0.8" fill="currentColor" stroke="none"/><circle cx="14" cy="7" r="0.8" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r="0.8" fill="currentColor" stroke="none"/><circle cx="10" cy="12" r="0.8" fill="currentColor" stroke="none"/><circle cx="14" cy="12" r="0.8" fill="currentColor" stroke="none"/></svg> },
+                ].map(opt => (
+                  <button
+                    key={opt.val}
+                    type="button"
+                    onClick={() => set('categoria', opt.val === form.categoria ? '' : opt.val)}
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
+                      form.categoria === opt.val
+                        ? 'bg-saro-blue border-saro-blue text-white shadow-sm'
+                        : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue hover:text-saro-blue'
+                    }`}
+                  >
+                    {opt.icon}
+                    {opt.label}
+                  </button>
+                ))}
+              </div>
             </Field>
 
+            {form.categoria !== 'paleta' && (
             <Field>
               <Label>Género</Label>
               <RadioGroup
                 value={form.genero}
                 onChange={v => set('genero', v === form.genero ? '' : v)}
                 options={[
-                  { val: 'masculino', label: '♂ Masculino' },
-                  { val: 'femenino',  label: '♀ Femenino'  },
-                  { val: 'unisex',    label: '⚡ Unisex'    },
+                  { val: 'masculino', label: 'Masculino' },
+                  { val: 'femenino',  label: 'Femenino'  },
+                  { val: 'unisex',    label: 'Unisex'    },
                 ]}
               />
             </Field>
+            )}
 
+            {form.categoria !== 'paleta' && (
             <Field>
               <Label>Parte del cuerpo</Label>
               <RadioGroup
                 value={form.parteCuerpo}
                 onChange={v => set('parteCuerpo', v === form.parteCuerpo ? '' : v)}
                 options={[
-                  { val: 'torso',     label: '👕 Torso'     },
-                  { val: 'piernas',   label: '🩳 Piernas'   },
-                  { val: 'accesorio', label: '🎒 Accesorio' },
+                  { val: 'torso',     label: 'Torso'     },
+                  { val: 'piernas',   label: 'Piernas'   },
+                  { val: 'accesorio', label: 'Accesorio' },
                 ]}
               />
             </Field>
+            )}
 
             <div className="flex items-center gap-3 pt-1">
               <span className="text-xs text-gray-500">Emoji automático:</span>

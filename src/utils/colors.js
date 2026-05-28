@@ -66,12 +66,12 @@ export const getProductTags = (p) => {
   return tags
 }
 
-export const CATEGORIA_LABELS  = { ropa: '👕 Ropa', padel: '🏓 Pádel' }
+export const CATEGORIA_LABELS  = { ropa: 'Ropa', padel: 'Pádel', paleta: 'Paleta' }
 export const GENERO_LABELS     = { masculino: 'Masculino', femenino: 'Femenino', unisex: 'Unisex' }
 export const PARTE_LABELS      = {
-  torso:     '👕 Torso',
-  piernas:   '🩳 Piernas',
-  accesorio: '🎒 Accesorio',
+  torso:     'Torso',
+  piernas:   'Piernas',
+  accesorio: 'Accesorio',
 }
 
 // ── Admin helpers ──────────────────────────────────────
@@ -93,12 +93,13 @@ export const SIZE_ORDER = [
 ]
 
 export const AUTO_EMOJI = {
-  ropa:  { torso:'👕', piernas:'🩳', pies:'🧦', manos:'🧤', accesorio:'🎒' },
-  padel: { manos:'🏓', accesorio:'🎾', torso:'🎽', piernas:'🩳', pies:'👟' },
+  ropa:   { torso:'👕', piernas:'🩳', pies:'🧦', manos:'🧤', accesorio:'🎒' },
+  padel:  { manos:'🏓', accesorio:'🎾', torso:'🎽', piernas:'🩳', pies:'👟' },
+  paleta: { accesorio:'🏓' },
 }
 
 export const getAutoEmoji = (categoria, parteCuerpo) =>
-  AUTO_EMOJI[categoria]?.[parteCuerpo] ?? '📦'
+  AUTO_EMOJI[categoria]?.[parteCuerpo] ?? (categoria === 'paleta' ? '🏓' : '📦')
 
 /** Devuelve el style object para un swatch de color.
  *  Para colores compuestos como "Negro/Azul" devuelve un degradado diagonal partido.
