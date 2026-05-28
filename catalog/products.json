@@ -1950,7 +1950,7 @@
     "_aiCount": 1,
     "id": "p1779916282248",
     "fechaPublicacion": "2026-05-27T21:11:22.249Z",
-    "fechaActualizacion": "2026-05-28T17:27:59.307Z",
+    "fechaActualizacion": "2026-05-28T17:39:03.876Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779989234833.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779986492622.webp"
@@ -1959,11 +1959,11 @@
   {
     "nombre": "Saro SR Junior ",
     "precio": 85000,
-    "descripcion": "",
+    "descripcion": "La paleta Saro SR Junior es un modelo especializado para niños. Su diseño incorpora una matriz especial que optimiza el control y la manejabilidad, características esenciales para el desarrollo de jóvenes jugadores. Es una opción confiable para iniciarse y progresar en el pádel.",
     "tags": [
       "nuevo"
     ],
-    "categoria": "padel",
+    "categoria": "paleta",
     "genero": "",
     "parteCuerpo": "",
     "colores": [
@@ -1973,7 +1973,7 @@
       "Única"
     ],
     "noStock": [],
-    "emoji": "📦",
+    "emoji": "🏓",
     "promos": [],
     "id": "p1779922130410",
     "fechaPublicacion": "2026-05-27T22:48:50.410Z",
@@ -1983,9 +1983,11 @@
         "Celeste"
       ]
     },
-    "fechaActualizacion": "2026-05-28T04:31:29.367Z",
+    "fechaActualizacion": "2026-05-28T17:47:57.232Z",
+    "_aiLoading": false,
+    "_aiCount": 1,
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/rotated-1779942678417.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1779990365623.webp"
     ]
   },
   {
