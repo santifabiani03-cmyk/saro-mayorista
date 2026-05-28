@@ -72,28 +72,30 @@ function StandardCard({ product, onClick, tags, imgs, sinStock }) {
 }
 
 /* ── Card especial para paletas ─────────────────────────────────── */
-/* Sin rectángulo blanco inferior: la imagen llena toda la card     */
-/* y la info (nombre, precio, colores, ver) va superpuesta.         */
+/* Mismo tamaño que las demás cards (aspect-square imagen).         */
+/* Sin rectángulo blanco inferior: toda la card es imagen con       */
+/* la info superpuesta con gradiente oscuro abajo.                  */
 function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
   return (
     <div
       onClick={onClick}
       className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer group hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
     >
-      {/* Contenedor full-bleed — mismo aspect ratio que las cards estándar (imagen + info) */}
-      <div className="relative aspect-[3/4] bg-gradient-to-b from-gray-50 via-white to-gray-100 overflow-hidden">
-        {/* Imagen centrada contain */}
+      {/* aspect-square para coincidir con la grilla de otros productos */}
+      <div className="relative aspect-square bg-gradient-to-b from-gray-50 via-white to-gray-100 overflow-hidden">
+
+        {/* Imagen de la paleta — object-cover centrada arriba para mostrar la cabeza */}
         {imgs.length > 0 ? (
           <img
             src={imgs[0]}
             alt={product.nombre}
-            className="absolute inset-0 w-full h-full object-contain p-3 pt-2 pb-16 drop-shadow-lg transition-transform duration-300 group-hover:scale-105"
+            className="absolute inset-0 w-full h-full object-cover object-top transition-transform duration-300 group-hover:scale-105"
             loading="lazy"
             decoding="async"
             onError={e => { e.currentTarget.style.opacity = '0.3' }}
           />
         ) : (
-          <div className="absolute inset-0 flex items-center justify-center">
+          <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100">
             <span className="text-7xl select-none">🏓</span>
           </div>
         )}
@@ -122,36 +124,33 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
           </span>
         )}
 
-        {/* ── Info superpuesta en la parte inferior ── */}
-        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/70 via-black/40 to-transparent pt-10 pb-3 px-3 z-10">
-          {/* Nombre */}
-          <p className="font-bold text-white text-sm leading-tight line-clamp-2 drop-shadow-sm">
-            {product.nombre}
-          </p>
-
-          {/* Precio + Colores */}
-          <div className="flex items-center justify-between mt-1.5">
-            <span className="font-bold text-white text-base drop-shadow-sm">
-              ${product.precio.toLocaleString('es-AR')}
-            </span>
-
-            <div className="flex items-center gap-1">
-              {product.colores.slice(0, 5).map(c => (
+        {/* ── Info superpuesta abajo con gradiente oscuro ── */}
+        <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/75 via-black/50 to-transparent pt-12 pb-3 px-3 z-10">
+          {/* Fila: Nombre a la izq, Colores a la der */}
+          <div className="flex items-start justify-between gap-2">
+            <p className="font-bold text-white text-sm leading-tight line-clamp-2 drop-shadow-sm flex-1">
+              {product.nombre}
+            </p>
+            <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
+              {product.colores.slice(0, 4).map(c => (
                 <span
                   key={c}
                   title={c}
-                  className="w-4 h-4 rounded-full border-2 border-white/60 shadow-sm flex-shrink-0"
+                  className="w-3.5 h-3.5 rounded-full border-2 border-white/50 shadow-sm flex-shrink-0"
                   style={getSwatchStyle(c, product.colorDefs)}
                 />
               ))}
-              {product.colores.length > 5 && (
-                <span className="text-[10px] text-white/70 ml-0.5">+{product.colores.length - 5}</span>
+              {product.colores.length > 4 && (
+                <span className="text-[10px] text-white/70">+{product.colores.length - 4}</span>
               )}
             </div>
           </div>
 
-          {/* Ver → */}
-          <div className="flex justify-end mt-1.5">
+          {/* Fila: Precio a la izq, Ver → a la der */}
+          <div className="flex items-center justify-between mt-1.5">
+            <span className="font-bold text-white text-base drop-shadow-sm">
+              ${product.precio.toLocaleString('es-AR')}
+            </span>
             <span className="text-xs bg-white/20 backdrop-blur-sm text-white px-2.5 py-1 rounded-full font-semibold border border-white/30">
               Ver →
             </span>
