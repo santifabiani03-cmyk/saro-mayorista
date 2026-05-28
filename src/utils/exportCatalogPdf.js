@@ -383,7 +383,7 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
     doc.setTextColor(160, 160, 160)
     doc.setFontSize(7)
     doc.setFont('helvetica', 'normal')
-    doc.text('Catalogo SARO - Precios y stock sujetos a disponibilidad', margin, pageH - 6)
+    doc.text('Catalogo SARO - Stock sujeto a disponibilidad', margin, pageH - 6)
     doc.setFontSize(9)
     doc.setFont('helvetica', 'bold')
     doc.text(`${i}`, pageW - margin, pageH - 6, { align: 'right' })

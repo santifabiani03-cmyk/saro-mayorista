@@ -42,12 +42,6 @@ export default function CatalogoPage() {
         <p className="text-white/50 text-sm mb-6">
           El catálogo PDF se está generando. Volvé a intentar en unos minutos.
         </p>
-        <a
-          href="/"
-          className="inline-block bg-white/10 hover:bg-white/20 text-white text-sm font-semibold px-6 py-2.5 rounded-xl transition-colors"
-        >
-          ← Ir a la tienda
-        </a>
       </div>
     </div>
   )
