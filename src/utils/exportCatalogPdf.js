@@ -89,7 +89,7 @@ function bottomRoundedRect(doc, x, y, w, h, r) {
  * Exporta un catalogo PDF con los productos visibles.
  * Ropa separada por genero (Mujer, Hombre, Unisex), Padel aparte.
  */
-export async function exportCatalogPdf(products, onProgress) {
+export async function exportCatalogPdf(products, onProgress, { skipDownload = false } = {}) {
   const visible = products.filter(p => p.visible !== false)
   if (visible.length === 0) {
     alert('No hay productos visibles para exportar.')
@@ -389,22 +389,37 @@ export async function exportCatalogPdf(products, onProgress) {
     doc.text(`${i}`, pageW - margin, pageH - 6, { align: 'right' })
   }
 
-  // Guardar localmente
+  // Guardar localmente (si no se pidió skipDownload)
   const fileName = `catalogo-saro-${now.toISOString().slice(0, 10)}.pdf`
-  doc.save(fileName)
+  if (!skipDownload) doc.save(fileName)
 
-  // Subir a GitHub para que esté disponible en /catalogo
+  // Devolver el doc para poder reutilizarlo
+  return { fileName, doc }
+}
+
+/**
+ * Genera el catálogo PDF y lo sube a GitHub (sin descargar).
+ * Se llama automáticamente después de publicar.
+ */
+export async function uploadCatalogPdf(products, onProgress) {
+  const visible = products.filter(p => p.visible !== false)
+  if (visible.length === 0) return
+
   try {
-    const pdfBase64 = doc.output('datauristring').split(',')[1]
+    const result = await exportCatalogPdf(products, onProgress, { skipDownload: true })
+    if (!result?.doc) return
+
+    onProgress?.('Subiendo catálogo…')
+    const pdfBase64 = result.doc.output('datauristring').split(',')[1]
     const pin = sessionStorage.getItem('saro_admin_pin') ?? ''
-    await fetch('/api/upload-catalog', {
+    const res = await fetch('/api/upload-catalog', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ data: pdfBase64, pin }),
     })
+    const json = await res.json()
+    if (!json.ok) throw new Error(json.error)
   } catch (e) {
     console.error('Error subiendo catálogo PDF:', e)
   }
-
-  return fileName
 }

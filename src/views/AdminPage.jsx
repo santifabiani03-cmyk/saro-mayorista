@@ -4,7 +4,7 @@ import ProductForm from '../components/admin/ProductForm'
 import ProductList from '../components/admin/ProductList'
 import DemandDashboard from '../components/admin/DemandDashboard'
 import LabelCompiler from '../components/admin/LabelCompiler'
-import { exportCatalogPdf } from '../utils/exportCatalogPdf'
+import { exportCatalogPdf, uploadCatalogPdf } from '../utils/exportCatalogPdf'
 
 
 const SESSION_KEY     = 'saro_admin_auth'
@@ -108,6 +108,7 @@ export default function AdminPage() {
   const [exporting, setExporting]       = useState(false)
   const [exportProgress, setExportProgress] = useState('')
   const [showQr, setShowQr]             = useState(false)
+  const [showShare, setShowShare]       = useState(false)
   // isDev = true solo cuando corre en localhost (desarrollo local)
   const isDev = window.location.hostname === 'localhost'
 
@@ -218,7 +219,12 @@ export default function AdminPage() {
       }
 
       setPublishedSnap([...products]) // marca como sincronizado
-      showToast('🚀 ¡Publicado! El sitio se actualiza en ~40s', 'ok', 6000)
+      showToast('🚀 ¡Publicado! Actualizando catálogo PDF…', 'ok', 6000)
+
+      // Subir catálogo PDF en background después de publicar
+      uploadCatalogPdf(products, () => {}).then(() => {
+        showToast('📄 Catálogo PDF actualizado', 'ok', 3000)
+      }).catch(() => {})
     } catch (e) {
       showToast('❌ Error al publicar: ' + (e?.message ?? 'desconocido'), 'error', 6000)
     } finally {
@@ -296,31 +302,48 @@ export default function AdminPage() {
                 <span className="sm:hidden">{deploying ? '…' : 'Publicar'}</span>
               </button>
 
-              {/* Exportar PDF */}
-              <button
-                onClick={handleExportPdf}
-                disabled={exporting}
-                className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold rounded-lg sm:rounded-xl transition-all ${
-                  exporting
-                    ? 'bg-gray-500 opacity-60 cursor-not-allowed text-white'
-                    : 'bg-white/15 hover:bg-white/25 text-white'
-                }`}
-                title="Exportar catalogo de productos visibles a PDF"
-              >
-                <span className="text-xs sm:text-base">{exporting ? '⏳' : '📄'}</span>
-                <span className="hidden sm:inline">{exporting ? exportProgress : 'Exportar PDF'}</span>
-                <span className="sm:hidden">{exporting ? '…' : 'PDF'}</span>
-              </button>
-
-              {/* QR catálogo */}
-              <button
-                onClick={() => setShowQr(true)}
-                className="flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold rounded-lg sm:rounded-xl bg-white/15 hover:bg-white/25 text-white transition-all"
-                title="QR del catálogo PDF"
-              >
-                <span className="text-xs sm:text-base">📱</span>
-                <span className="hidden sm:inline">QR</span>
-              </button>
+              {/* Compartir (dropdown) */}
+              <div className="relative">
+                <button
+                  onClick={() => setShowShare(s => !s)}
+                  className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold rounded-lg sm:rounded-xl transition-all ${
+                    exporting
+                      ? 'bg-gray-500 opacity-60 text-white'
+                      : 'bg-white/15 hover:bg-white/25 text-white'
+                  }`}
+                >
+                  <span className="text-xs sm:text-base">{exporting ? '⏳' : '📤'}</span>
+                  <span className="hidden sm:inline">{exporting ? exportProgress : 'Compartir'}</span>
+                </button>
+                {showShare && (
+                  <>
+                    <div className="fixed inset-0 z-30" onClick={() => setShowShare(false)} />
+                    <div className="absolute right-0 top-full mt-1 z-40 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 w-52 overflow-hidden">
+                      <button
+                        onClick={() => { setShowShare(false); handleExportPdf() }}
+                        disabled={exporting}
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                      >
+                        <span>📄</span>
+                        <div>
+                          <p className="font-semibold text-xs">Exportar PDF</p>
+                          <p className="text-[10px] text-gray-400">Descargar catálogo</p>
+                        </div>
+                      </button>
+                      <button
+                        onClick={() => { setShowShare(false); setShowQr(true) }}
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                      >
+                        <span>📱</span>
+                        <div>
+                          <p className="font-semibold text-xs">QR catálogo</p>
+                          <p className="text-[10px] text-gray-400">Link permanente al PDF</p>
+                        </div>
+                      </button>
+                    </div>
+                  </>
+                )}
+              </div>
 
               {/* Ver tienda */}
               <a
