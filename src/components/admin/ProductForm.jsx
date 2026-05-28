@@ -81,26 +81,12 @@ async function removeAndStandardize(imageUrl, onProgress, bgType = 'gradient', i
   // Detectar bounding box real del producto (sin transparencia)
   const bounds = getTrimBounds(img)
 
-  // Canvas: cuadrado para ropa/padel, 3:4 portrait para paletas
-  const padding = Math.round(Math.max(bounds.w, bounds.h) * 0.10)
-  let canvasW, canvasH
-  if (isPaleta) {
-    // Paleta: canvas 3:4 portrait, fit contain
-    const baseW = bounds.w + padding * 2
-    const baseH = bounds.h + padding * 2
-    // Asegurar ratio 3:4 (w:h)
-    if (baseW / baseH > 3 / 4) {
-      canvasW = baseW
-      canvasH = Math.round(baseW * 4 / 3)
-    } else {
-      canvasH = baseH
-      canvasW = Math.round(baseH * 3 / 4)
-    }
-  } else {
-    const productSize = Math.max(bounds.w, bounds.h)
-    canvasW = productSize + padding * 2
-    canvasH = canvasW
-  }
+  // Canvas: cuadrado siempre. Paletas usan padding mínimo para llenar más la card.
+  const paddingPct = isPaleta ? 0.04 : 0.10
+  const productSize = Math.max(bounds.w, bounds.h)
+  const padding = Math.round(productSize * paddingPct)
+  const canvasW = productSize + padding * 2
+  const canvasH = canvasW
   const canvas = document.createElement('canvas')
   canvas.width = canvasW; canvas.height = canvasH
   const ctx = canvas.getContext('2d')
