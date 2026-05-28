@@ -65,6 +65,77 @@ function findOrphanedImages(oldProducts, newProducts) {
   return paths
 }
 
+// ── Three-way merge por producto ──────────────────────────────────
+// base:    lo que el usuario cargó cuando abrió el admin
+// mine:    lo que el usuario quiere publicar (con sus ediciones)
+// theirs:  lo que está actualmente en GitHub (puede haber sido editado por otra persona)
+//
+// Resultado: lista fusionada donde los cambios de ambos se preservan.
+// Conflicto real = ambos editaron el MISMO producto → gana el usuario que publica (mine).
+function mergeProducts(base, mine, theirs) {
+  const baseMap   = new Map(base.map(p => [p.id, p]))
+  const mineMap   = new Map(mine.map(p => [p.id, p]))
+  const theirsMap = new Map(theirs.map(p => [p.id, p]))
+
+  const merged = []
+  const mergeInfo = { added: 0, updated: 0, keptTheirs: 0, deletedByMe: 0, addedByOther: 0 }
+
+  // 1. Recorrer todos los productos que están en "theirs" (versión actual de GitHub)
+  for (const [id, theirProd] of theirsMap) {
+    const baseProd = baseMap.get(id)
+    const myProd   = mineMap.get(id)
+
+    if (!baseProd) {
+      // Producto agregado por otra persona (no estaba cuando yo cargué)
+      if (myProd) {
+        // Yo también tengo este ID (raro, pero posible) → uso mi versión
+        merged.push(myProd)
+      } else {
+        // Lo agregó otro → lo mantengo
+        merged.push(theirProd)
+        mergeInfo.addedByOther++
+      }
+    } else if (!myProd) {
+      // Yo lo eliminé (estaba en base, pero no en mine)
+      // → lo elimino, a menos que el otro lo haya modificado
+      if (JSON.stringify(baseProd) !== JSON.stringify(theirProd)) {
+        // El otro lo modificó después → lo mantengo para no perder sus cambios
+        merged.push(theirProd)
+        mergeInfo.keptTheirs++
+      } else {
+        mergeInfo.deletedByMe++
+      }
+    } else {
+      // Existe en base, mine y theirs
+      const iChangedIt   = JSON.stringify(baseProd) !== JSON.stringify(myProd)
+      const theyChangedIt = JSON.stringify(baseProd) !== JSON.stringify(theirProd)
+
+      if (iChangedIt) {
+        // Yo lo modifiqué → uso mi versión (incluso si el otro también lo cambió)
+        merged.push(myProd)
+        mergeInfo.updated++
+      } else if (theyChangedIt) {
+        // Solo el otro lo modificó → uso la versión del otro
+        merged.push(theirProd)
+        mergeInfo.keptTheirs++
+      } else {
+        // Nadie lo cambió → uso cualquiera (son iguales)
+        merged.push(theirProd)
+      }
+    }
+  }
+
+  // 2. Productos que yo agregué (están en mine pero no en base ni en theirs)
+  for (const [id, myProd] of mineMap) {
+    if (!baseMap.has(id) && !theirsMap.has(id)) {
+      merged.push(myProd)
+      mergeInfo.added++
+    }
+  }
+
+  return { merged, mergeInfo }
+}
+
 export async function POST(request) {
   const correctPin = clean(process.env.ADMIN_PIN)
   if (!correctPin) {
@@ -75,7 +146,7 @@ export async function POST(request) {
   }
 
   const body = await request.json().catch(() => ({}))
-  const { products, pin } = body
+  const { products, baseProducts, pin } = body
 
   if (!pin || pin !== correctPin) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
@@ -101,17 +172,33 @@ export async function POST(request) {
 
   try {
     const currentFile = await getFile(owner, repo, 'catalog/products.json', token)
+    let currentProducts = []
     let orphanedPaths = []
 
     if (currentFile?.content) {
       try {
         const raw = Buffer.from(currentFile.content.replace(/\n/g, ''), 'base64').toString('utf-8')
-        const oldProds = JSON.parse(raw)
-        orphanedPaths = findOrphanedImages(oldProds, products)
-      } catch { /* si no se puede parsear, seguimos */ }
+        currentProducts = JSON.parse(raw)
+      } catch { /* si no se puede parsear, seguimos con array vacío */ }
     }
 
-    const json = JSON.stringify(products, null, 2)
+    // ── Merge o reemplazo directo ──
+    let finalProducts
+    let mergeInfo = null
+
+    if (Array.isArray(baseProducts) && baseProducts.length > 0 && currentProducts.length > 0) {
+      // Tenemos base → hacemos three-way merge
+      const result = mergeProducts(baseProducts, products, currentProducts)
+      finalProducts = result.merged
+      mergeInfo = result.mergeInfo
+    } else {
+      // Sin base (fallback legacy) → reemplazo directo como antes
+      finalProducts = products
+    }
+
+    orphanedPaths = findOrphanedImages(currentProducts, finalProducts)
+
+    const json = JSON.stringify(finalProducts, null, 2)
     const base64 = Buffer.from(json, 'utf-8').toString('base64')
     await putFile(owner, repo, 'catalog/products.json', base64, 'actualizar catalogo', token, currentFile?.sha)
 
@@ -121,7 +208,12 @@ export async function POST(request) {
       )
     }
 
-    return NextResponse.json({ ok: true, deletedImages: orphanedPaths.length })
+    return NextResponse.json({
+      ok: true,
+      deletedImages: orphanedPaths.length,
+      merge: mergeInfo,
+      totalProducts: finalProducts.length,
+    })
   } catch (e) {
     return NextResponse.json(
       { error: e.message ?? 'Error desconocido' },

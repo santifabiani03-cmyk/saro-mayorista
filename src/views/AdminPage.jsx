@@ -101,6 +101,7 @@ export default function AdminPage() {
   const [tab, setTab]                   = useState(() => sessionStorage.getItem('saro_admin_tab') ?? 'editar')
   const [products, setProducts]         = useState([])
   const [publishedSnap, setPublishedSnap] = useState(null) // snapshot de lo que está publicado
+  const [baseProducts, setBaseProducts]   = useState(null) // base para three-way merge (lo que cargamos del server)
   const [editingProduct, setEditing]    = useState(null)
   const [toast, setToast]               = useState(null)
   const [saving, setSaving]             = useState(false)
@@ -124,6 +125,7 @@ export default function AdminPage() {
       .then(data => {
         setProducts(data)
         setPublishedSnap(data) // guardamos snapshot de lo publicado
+        setBaseProducts(JSON.parse(JSON.stringify(data))) // deep copy para merge
       })
       .catch(() => showToast('No se pudo cargar el catálogo.', 'error'))
   }, [])
@@ -206,7 +208,11 @@ export default function AdminPage() {
       const res  = await fetch('/api/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ products, pin: sessionStorage.getItem(SESSION_PIN_KEY) ?? '' }),
+        body: JSON.stringify({
+          products,
+          baseProducts: baseProducts ?? [],
+          pin: sessionStorage.getItem(SESSION_PIN_KEY) ?? '',
+        }),
       })
       const json = await res.json()
       if (!json.ok) throw new Error(json.error ?? 'Error desconocido')
@@ -218,8 +224,27 @@ export default function AdminPage() {
         if (!deployJson.ok) throw new Error(deployJson.error ?? 'Error al deployar')
       }
 
-      setPublishedSnap([...products]) // marca como sincronizado
-      showToast('🚀 ¡Publicado! Actualizando catálogo PDF…', 'ok', 6000)
+      // Si el server hizo merge y el total cambió, recargar productos fusionados
+      if (json.merge && json.totalProducts !== products.length) {
+        // Recargar desde el server para tener la versión fusionada
+        try {
+          const fresh = await fetch('/api/catalog').then(r => r.json())
+          setProducts(fresh)
+          setPublishedSnap(fresh)
+          setBaseProducts(JSON.parse(JSON.stringify(fresh)))
+        } catch { /* fallback: usar lo que tenemos */ }
+      } else {
+        setPublishedSnap([...products])
+        setBaseProducts(JSON.parse(JSON.stringify(products)))
+      }
+
+      // Notificar merge si hubo cambios de otra persona
+      const m = json.merge
+      if (m && (m.addedByOther > 0 || m.keptTheirs > 0)) {
+        showToast(`🚀 ¡Publicado con merge! Se preservaron ${m.addedByOther + m.keptTheirs} cambios de otro usuario. Actualizando PDF…`, 'ok', 6000)
+      } else {
+        showToast('🚀 ¡Publicado! Actualizando catálogo PDF…', 'ok', 6000)
+      }
 
       // Subir catálogo PDF en background después de publicar
       uploadCatalogPdf(products, () => {}).then(() => {
