@@ -98,9 +98,11 @@ async function removeAndStandardize(imageUrl, onProgress, bgType = 'gradient', i
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, canvasW, canvasH)
 
-  // Centrar producto recortado
+  // Posicionar producto: paletas ancladas abajo (mango al fondo), resto centrado
   const drawX = (canvasW - bounds.w) / 2
-  const drawY = (canvasH - bounds.h) / 2
+  const drawY = isPaleta
+    ? canvasH - bounds.h - padding   // paleta: pegada abajo con margen mínimo
+    : (canvasH - bounds.h) / 2       // ropa/padel: centrado vertical
   ctx.drawImage(img, bounds.x, bounds.y, bounds.w, bounds.h, drawX, drawY, bounds.w, bounds.h)
   URL.revokeObjectURL(img.src)
 
