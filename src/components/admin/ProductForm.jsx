@@ -81,16 +81,13 @@ async function removeAndStandardize(imageUrl, onProgress, bgType = 'gradient', i
   // Detectar bounding box real del producto (sin transparencia)
   const bounds = getTrimBounds(img)
 
-  // Canvas: cuadrado para ropa/padel, landscape 4:3 para paletas.
-  // El canvas ancho para paletas hace que object-cover muestre la paleta más grande
-  // al escalar por la altura de la card (que es portrait).
+  // Canvas siempre cuadrado 1:1 — se agrega fondo a los costados si hace falta
   const paddingPct = isPaleta ? 0.04 : 0.10
   const productSize = Math.max(bounds.w, bounds.h)
   const padding = Math.round(productSize * paddingPct)
-  const canvasH = productSize + padding * 2
-  const canvasW = isPaleta
-    ? Math.round(canvasH * (4 / 3))   // paleta: canvas landscape 4:3
-    : canvasH                           // ropa/padel: cuadrado 1:1
+  const canvasSize = productSize + padding * 2
+  const canvasW = canvasSize
+  const canvasH = canvasSize
   const canvas = document.createElement('canvas')
   canvas.width = canvasW; canvas.height = canvasH
   const ctx = canvas.getContext('2d')
@@ -110,7 +107,7 @@ async function removeAndStandardize(imageUrl, onProgress, bgType = 'gradient', i
   ctx.drawImage(img, bounds.x, bounds.y, bounds.w, bounds.h, drawX, drawY, bounds.w, bounds.h)
   URL.revokeObjectURL(img.src)
 
-  return new Promise(resolve => { canvas.toBlob(b => resolve(b), 'image/webp', 0.9) })
+  return new Promise(resolve => { canvas.toBlob(b => resolve(b), 'image/webp', 0.95) })
 }
 
 /**
