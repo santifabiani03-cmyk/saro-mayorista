@@ -137,19 +137,189 @@ async function applyLogoWatermark(imageUrl, onProgress) {
 }
 
 
+/* ── Helpers para edición de imagen en lightbox ──────────────────── */
+
+/** Rota una imagen 90° en sentido horario y devuelve un Blob webp */
+async function rotateImage90(imageUrl) {
+  const img = await loadImg(imageUrl)
+  const canvas = document.createElement('canvas')
+  canvas.width = img.naturalHeight
+  canvas.height = img.naturalWidth
+  const ctx = canvas.getContext('2d')
+  ctx.translate(canvas.width / 2, canvas.height / 2)
+  ctx.rotate(Math.PI / 2)
+  ctx.drawImage(img, -img.naturalWidth / 2, -img.naturalHeight / 2)
+  return new Promise(resolve => canvas.toBlob(b => resolve(b), 'image/webp', 0.92))
+}
+
+/** Recorta una imagen según un rect {x,y,w,h} en coordenadas normalizadas (0-1) */
+async function cropImage(imageUrl, rect) {
+  const img = await loadImg(imageUrl)
+  const sx = Math.round(rect.x * img.naturalWidth)
+  const sy = Math.round(rect.y * img.naturalHeight)
+  const sw = Math.round(rect.w * img.naturalWidth)
+  const sh = Math.round(rect.h * img.naturalHeight)
+  const canvas = document.createElement('canvas')
+  canvas.width = sw; canvas.height = sh
+  const ctx = canvas.getContext('2d')
+  ctx.drawImage(img, sx, sy, sw, sh, 0, 0, sw, sh)
+  return new Promise(resolve => canvas.toBlob(b => resolve(b), 'image/webp', 0.92))
+}
+
+/* ── Crop overlay interactivo ──────────────────────────────────────── */
+function CropOverlay({ imageUrl, onConfirm, onCancel }) {
+  const containerRef = useRef(null)
+  const [dragging, setDragging] = useState(null) // null | 'move' | 'nw' | 'ne' | 'sw' | 'se'
+  const [rect, setRect] = useState({ x: 0.1, y: 0.1, w: 0.8, h: 0.8 })
+  const startRef = useRef({ rect: null, px: 0, py: 0 })
+
+  const getRelPos = (e) => {
+    const box = containerRef.current?.getBoundingClientRect()
+    if (!box) return { rx: 0, ry: 0 }
+    const clientX = e.touches ? e.touches[0].clientX : e.clientX
+    const clientY = e.touches ? e.touches[0].clientY : e.clientY
+    return { rx: (clientX - box.left) / box.width, ry: (clientY - box.top) / box.height }
+  }
+
+  const handleDown = (e, type) => {
+    e.stopPropagation(); e.preventDefault()
+    const { rx, ry } = getRelPos(e)
+    startRef.current = { rect: { ...rect }, px: rx, py: ry }
+    setDragging(type)
+  }
+
+  useEffect(() => {
+    if (!dragging) return
+    const onMove = (e) => {
+      const { rx, ry } = getRelPos(e)
+      const { rect: sr, px, py } = startRef.current
+      const dx = rx - px, dy = ry - py
+      setRect(() => {
+        let { x, y, w, h } = { ...sr }
+        if (dragging === 'move') {
+          x = Math.max(0, Math.min(1 - w, x + dx))
+          y = Math.max(0, Math.min(1 - h, y + dy))
+        } else {
+          if (dragging.includes('w')) { x = Math.max(0, x + dx); w = Math.max(0.05, w - dx) }
+          if (dragging.includes('e')) { w = Math.max(0.05, Math.min(1 - x, w + dx)) }
+          if (dragging.includes('n')) { y = Math.max(0, y + dy); h = Math.max(0.05, h - dy) }
+          if (dragging.includes('s')) { h = Math.max(0.05, Math.min(1 - y, h + dy)) }
+        }
+        return { x, y, w, h }
+      })
+    }
+    const onUp = () => setDragging(null)
+    window.addEventListener('mousemove', onMove)
+    window.addEventListener('mouseup', onUp)
+    window.addEventListener('touchmove', onMove, { passive: false })
+    window.addEventListener('touchend', onUp)
+    return () => {
+      window.removeEventListener('mousemove', onMove)
+      window.removeEventListener('mouseup', onUp)
+      window.removeEventListener('touchmove', onMove)
+      window.removeEventListener('touchend', onUp)
+    }
+  }, [dragging])
+
+  const handleStyle = 'w-4 h-4 sm:w-3.5 sm:h-3.5 bg-white rounded-full border-2 border-saro-blue absolute z-10 touch-none'
+
+  return (
+    <div className="fixed inset-0 z-[110] bg-black/95 flex flex-col items-center justify-center p-4">
+      <p className="text-white text-sm mb-3 font-medium">Arrastrá las esquinas para recortar</p>
+      <div ref={containerRef} className="relative max-w-full max-h-[65vh] select-none" style={{ touchAction: 'none' }}>
+        <img src={imageUrl} alt="" className="max-w-full max-h-[65vh] object-contain rounded-lg" draggable={false} />
+        {/* Oscurecer fuera del recorte */}
+        <div className="absolute inset-0 pointer-events-none">
+          <div className="absolute inset-0 bg-black/60" />
+          <div
+            className="absolute bg-transparent"
+            style={{
+              left: `${rect.x * 100}%`, top: `${rect.y * 100}%`,
+              width: `${rect.w * 100}%`, height: `${rect.h * 100}%`,
+              boxShadow: '0 0 0 9999px rgba(0,0,0,0.6)',
+              border: '2px solid white',
+            }}
+          />
+        </div>
+        {/* Área draggable para mover */}
+        <div
+          className="absolute cursor-move touch-none"
+          style={{
+            left: `${rect.x * 100}%`, top: `${rect.y * 100}%`,
+            width: `${rect.w * 100}%`, height: `${rect.h * 100}%`,
+          }}
+          onMouseDown={e => handleDown(e, 'move')}
+          onTouchStart={e => handleDown(e, 'move')}
+        />
+        {/* Handles de esquinas */}
+        <div className={handleStyle} style={{ left: `calc(${rect.x * 100}% - 8px)`, top: `calc(${rect.y * 100}% - 8px)`, cursor: 'nw-resize' }}
+          onMouseDown={e => handleDown(e, 'nw')} onTouchStart={e => handleDown(e, 'nw')} />
+        <div className={handleStyle} style={{ left: `calc(${(rect.x + rect.w) * 100}% - 8px)`, top: `calc(${rect.y * 100}% - 8px)`, cursor: 'ne-resize' }}
+          onMouseDown={e => handleDown(e, 'ne')} onTouchStart={e => handleDown(e, 'ne')} />
+        <div className={handleStyle} style={{ left: `calc(${rect.x * 100}% - 8px)`, top: `calc(${(rect.y + rect.h) * 100}% - 8px)`, cursor: 'sw-resize' }}
+          onMouseDown={e => handleDown(e, 'sw')} onTouchStart={e => handleDown(e, 'sw')} />
+        <div className={handleStyle} style={{ left: `calc(${(rect.x + rect.w) * 100}% - 8px)`, top: `calc(${(rect.y + rect.h) * 100}% - 8px)`, cursor: 'se-resize' }}
+          onMouseDown={e => handleDown(e, 'se')} onTouchStart={e => handleDown(e, 'se')} />
+      </div>
+      <div className="flex gap-3 mt-4">
+        <button onClick={onCancel} className="px-5 py-2.5 rounded-xl bg-white/15 text-white text-sm font-medium hover:bg-white/25 transition-colors">
+          Cancelar
+        </button>
+        <button onClick={() => onConfirm(rect)} className="px-5 py-2.5 rounded-xl bg-saro-blue text-white text-sm font-bold hover:bg-saro-dark transition-colors">
+          Recortar
+        </button>
+      </div>
+    </div>
+  )
+}
+
 /* ── Lightbox para admin ──────────────────────────────────────────── */
-function AdminLightbox({ images, startIdx, onClose }) {
+function AdminLightbox({ images, startIdx, onClose, onUpdateImage }) {
   const [idx, setIdx] = useState(startIdx)
   const [touchX, setTouchX] = useState(null)
+  const [processing, setProcessing] = useState(false)
+  const [cropping, setCropping] = useState(false)
   const n = images.length
 
   const go = useCallback((dir) => {
     setIdx(i => (i + dir + n) % n)
   }, [n])
 
+  const handleRotate = async () => {
+    if (processing || !onUpdateImage) return
+    setProcessing(true)
+    try {
+      const blob = await rotateImage90(images[idx])
+      const file = new File([blob], 'rotated.webp', { type: 'image/webp' })
+      const url = await uploadFile(file, 'rotated')
+      if (url) onUpdateImage(idx, url)
+    } catch (e) {
+      console.error('Error rotando imagen:', e)
+    } finally {
+      setProcessing(false)
+    }
+  }
+
+  const handleCropConfirm = async (rect) => {
+    setCropping(false)
+    if (processing || !onUpdateImage) return
+    setProcessing(true)
+    try {
+      const blob = await cropImage(images[idx], rect)
+      const file = new File([blob], 'cropped.webp', { type: 'image/webp' })
+      const url = await uploadFile(file, 'cropped')
+      if (url) onUpdateImage(idx, url)
+    } catch (e) {
+      console.error('Error recortando imagen:', e)
+    } finally {
+      setProcessing(false)
+    }
+  }
+
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     const onKey = (e) => {
+      if (cropping) return
       if (e.key === 'Escape') onClose()
       if (e.key === 'ArrowLeft') go(-1)
       if (e.key === 'ArrowRight') go(1)
@@ -159,7 +329,7 @@ function AdminLightbox({ images, startIdx, onClose }) {
       document.body.style.overflow = ''
       window.removeEventListener('keydown', onKey)
     }
-  }, [onClose, go])
+  }, [onClose, go, cropping])
 
   return (
     <div
@@ -177,6 +347,34 @@ function AdminLightbox({ images, startIdx, onClose }) {
         <span className="absolute top-4 left-4 text-white/70 text-sm font-medium">
           {idx + 1} / {n}
         </span>
+      )}
+
+      {/* Botones de edición: rotar y recortar */}
+      {onUpdateImage && (
+        <div className="absolute top-4 left-1/2 -translate-x-1/2 z-10 flex gap-2">
+          <button
+            onClick={e => { e.stopPropagation(); handleRotate() }}
+            disabled={processing}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/15 hover:bg-white/30 text-white text-xs sm:text-sm font-medium transition-colors disabled:opacity-50"
+            title="Rotar 90°"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+              <path d="M21.5 2v6h-6"/><path d="M21.34 15.57a10 10 0 1 1-.57-8.38L21.5 8"/>
+            </svg>
+            <span>{processing ? '…' : 'Rotar'}</span>
+          </button>
+          <button
+            onClick={e => { e.stopPropagation(); setCropping(true) }}
+            disabled={processing}
+            className="flex items-center gap-1.5 px-3 py-2 rounded-xl bg-white/15 hover:bg-white/30 text-white text-xs sm:text-sm font-medium transition-colors disabled:opacity-50"
+            title="Recortar"
+          >
+            <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
+              <path d="M6.13 1L6 16a2 2 0 0 0 2 2h15"/><path d="M1 6.13L16 6a2 2 0 0 1 2 2v15"/>
+            </svg>
+            <span>Recortar</span>
+          </button>
+        </div>
       )}
 
       <div
@@ -231,6 +429,15 @@ function AdminLightbox({ images, startIdx, onClose }) {
             </button>
           ))}
         </div>
+      )}
+
+      {/* Overlay de recorte */}
+      {cropping && (
+        <CropOverlay
+          imageUrl={images[idx]}
+          onConfirm={handleCropConfirm}
+          onCancel={() => setCropping(false)}
+        />
       )}
     </div>
   )
@@ -456,6 +663,11 @@ function MultiImageUploader({ images, onChange, productName, applyLogo }) {
           images={images}
           startIdx={lightboxIdx}
           onClose={() => setLightboxIdx(null)}
+          onUpdateImage={(idx, newUrl) => {
+            const updated = [...images]
+            updated[idx] = newUrl
+            onChange(updated)
+          }}
         />
       )}
     </div>
