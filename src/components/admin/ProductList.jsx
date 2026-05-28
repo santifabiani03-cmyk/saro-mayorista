@@ -143,7 +143,13 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
 
   const handleSort = (key) => {
     if (sortKey === key) {
-      setSortDir(d => d === 'asc' ? 'desc' : 'asc')
+      if (sortDir === 'asc') {
+        setSortDir('desc')
+      } else {
+        // Tercer toque: volver al default
+        setSortKey('fecha')
+        setSortDir('desc')
+      }
     } else {
       setSortKey(key)
       setSortDir('asc')
@@ -262,15 +268,6 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
               </button>
             )
           })}
-          {sortKey && (
-            <button
-              onClick={() => { setSortKey(null); setSortDir('asc') }}
-              className="text-[10px] sm:text-xs text-gray-400 hover:text-red-400 flex-shrink-0 ml-1"
-              title="Quitar orden"
-            >
-              ✕
-            </button>
-          )}
         </div>
       </div>
 
