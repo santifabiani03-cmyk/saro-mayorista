@@ -67,6 +67,45 @@ function loadImage(url) {
   })
 }
 
+/**
+ * Genera un circulo partido en diagonal (135°) como dataURL PNG.
+ * Se usa para colores compuestos tipo "Negro/Azul" en el PDF.
+ */
+function makeSplitCircle(hexA, hexB, size = 64) {
+  const canvas = document.createElement('canvas')
+  canvas.width = size
+  canvas.height = size
+  const ctx = canvas.getContext('2d')
+  const r = size / 2
+
+  // Clip circular
+  ctx.beginPath()
+  ctx.arc(r, r, r, 0, Math.PI * 2)
+  ctx.clip()
+
+  // Color A — llena todo el circulo
+  ctx.fillStyle = hexA
+  ctx.fillRect(0, 0, size, size)
+
+  // Color B — triangulo inferior-derecho (diagonal de esquina sup-izq a inf-der)
+  ctx.beginPath()
+  ctx.moveTo(0, 0)
+  ctx.lineTo(size, 0)
+  ctx.lineTo(size, size)
+  ctx.lineTo(0, size)
+  ctx.closePath()
+  // Solo la mitad inferior-derecha
+  ctx.beginPath()
+  ctx.moveTo(size, 0)
+  ctx.lineTo(size, size)
+  ctx.lineTo(0, size)
+  ctx.closePath()
+  ctx.fillStyle = hexB
+  ctx.fill()
+
+  return canvas.toDataURL('image/png')
+}
+
 /** Convierte hex (#rrggbb) a [r, g, b] */
 function hexToRgb(hex) {
   const h = hex.replace('#', '')
@@ -330,13 +369,29 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
         const showing = product.colores.slice(0, maxShow)
         for (let ci = 0; ci < showing.length; ci++) {
           const colorName = showing[ci]
-          const hex = COLOR_MAP[colorName] ?? '#e5e7eb'
-          const [r, g, b] = hexToRgb(hex)
+          const cx = colorX + circleR
+          const cy = colorY
 
-          doc.setDrawColor(180, 180, 180)
-          doc.setLineWidth(0.2)
-          doc.setFillColor(r, g, b)
-          doc.circle(colorX + circleR, colorY, circleR, 'FD')
+          if (colorName.includes('/')) {
+            // Circulo dividido en diagonal para colores compuestos
+            const [partA, partB] = colorName.split('/')
+            const hexA = COLOR_MAP[partA.trim()] ?? '#e5e7eb'
+            const hexB = COLOR_MAP[partB.trim()] ?? '#e5e7eb'
+            const swatchImg = makeSplitCircle(hexA, hexB)
+            const diam = circleR * 2
+            doc.addImage(swatchImg, 'PNG', cx - circleR, cy - circleR, diam, diam)
+            // Borde
+            doc.setDrawColor(180, 180, 180)
+            doc.setLineWidth(0.2)
+            doc.circle(cx, cy, circleR, 'S')
+          } else {
+            const hex = COLOR_MAP[colorName] ?? '#e5e7eb'
+            const [r, g, b] = hexToRgb(hex)
+            doc.setDrawColor(180, 180, 180)
+            doc.setLineWidth(0.2)
+            doc.setFillColor(r, g, b)
+            doc.circle(cx, cy, circleR, 'FD')
+          }
 
           doc.setTextColor(90, 90, 90)
           doc.setFontSize(5)
