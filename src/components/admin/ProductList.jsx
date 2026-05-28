@@ -170,9 +170,16 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
           const vb = b.visible === false ? 0 : 1
           return mult * (va - vb)
         }
+        case 'stock': {
+          const sa = a.sinStock ? 0 : 1
+          const sb = b.sinStock ? 0 : 1
+          return mult * (sa - sb)
+        }
         case 'fecha': {
-          const da = a.fechaPublicacion ? new Date(a.fechaPublicacion).getTime() : 0
-          const db = b.fechaPublicacion ? new Date(b.fechaPublicacion).getTime() : 0
+          const da = a.fechaActualizacion || a.fechaPublicacion
+            ? new Date(a.fechaActualizacion || a.fechaPublicacion).getTime() : 0
+          const db = b.fechaActualizacion || b.fechaPublicacion
+            ? new Date(b.fechaActualizacion || b.fechaPublicacion).getTime() : 0
           return mult * (da - db)
         }
         default:
@@ -181,43 +188,90 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
     })
   }, [filtered, sortKey, sortDir])
 
+  const SORT_OPTIONS = [
+    { key: 'nombre', label: 'Nombre' },
+    { key: 'precio', label: 'Precio' },
+    { key: 'fecha',  label: 'Fecha' },
+    { key: 'visible', label: 'Visibilidad' },
+    { key: 'stock',  label: 'Stock' },
+  ]
+
   const thClass = 'text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide'
   const thButton = 'inline-flex items-center cursor-pointer hover:text-saro-blue transition-colors select-none'
 
   return (
     <div className="space-y-5">
       {/* Controles */}
-      <div className="flex flex-wrap gap-2 sm:gap-3 items-center justify-between">
-        <div className="flex gap-2 flex-wrap flex-1 min-w-0">
-          <input
-            type="text"
-            placeholder="Buscar producto…"
-            value={search}
-            onChange={e => setSearch(e.target.value)}
-            className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-saro-blue w-full sm:w-52"
-          />
-          <div className="flex gap-1.5">
-            {['', 'ropa', 'padel'].map(cat => (
+      <div className="space-y-2.5">
+        {/* Búsqueda + filtro categoría + contador */}
+        <div className="flex flex-wrap gap-2 sm:gap-3 items-center justify-between">
+          <div className="flex gap-2 flex-wrap flex-1 min-w-0">
+            <input
+              type="text"
+              placeholder="Buscar producto…"
+              value={search}
+              onChange={e => setSearch(e.target.value)}
+              className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-saro-blue w-full sm:w-52"
+            />
+            <div className="flex gap-1.5">
+              {['', 'ropa', 'padel'].map(cat => (
+                <button
+                  key={cat}
+                  onClick={() => setFilterCat(cat)}
+                  className={`px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium border transition-all ${
+                    filterCat === cat
+                      ? 'bg-saro-blue border-saro-blue text-white'
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue'
+                  }`}
+                >
+                  {cat === ''     ? 'Todos'    :
+                   cat === 'ropa' ? '👕 Ropa'  : '🏓 Pádel'}
+                </button>
+              ))}
+            </div>
+          </div>
+          <p className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
+            {filtered.length} producto{filtered.length !== 1 ? 's' : ''}
+            {' · '}
+            <span className="text-green-500 font-medium">{filtered.filter(p => p.visible !== false).length} visibles</span>
+          </p>
+        </div>
+
+        {/* Barra de ordenamiento */}
+        <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
+          <span className="text-[10px] sm:text-xs text-gray-400 flex-shrink-0 mr-0.5">Ordenar:</span>
+          {SORT_OPTIONS.map(opt => {
+            const active = sortKey === opt.key
+            return (
               <button
-                key={cat}
-                onClick={() => setFilterCat(cat)}
-                className={`px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium border transition-all ${
-                  filterCat === cat
-                    ? 'bg-saro-blue border-saro-blue text-white'
-                    : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue'
+                key={opt.key}
+                onClick={() => handleSort(opt.key)}
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-medium border transition-all flex-shrink-0 ${
+                  active
+                    ? 'border-saro-blue text-saro-blue bg-saro-light'
+                    : 'border-gray-200 text-gray-500 bg-white hover:border-gray-300'
                 }`}
               >
-                {cat === ''     ? 'Todos'    :
-                 cat === 'ropa' ? '👕 Ropa'  : '🏓 Pádel'}
+                {opt.label}
+                {active && (
+                  <svg viewBox="0 0 10 14" className="w-2.5 h-3" fill="currentColor">
+                    <path d="M5 0l4 5H1z" className={sortDir === 'asc' ? 'text-saro-blue' : 'text-gray-300'} />
+                    <path d="M5 14l-4-5h8z" className={sortDir === 'desc' ? 'text-saro-blue' : 'text-gray-300'} />
+                  </svg>
+                )}
               </button>
-            ))}
-          </div>
+            )
+          })}
+          {sortKey && (
+            <button
+              onClick={() => { setSortKey(null); setSortDir('asc') }}
+              className="text-[10px] sm:text-xs text-gray-400 hover:text-red-400 flex-shrink-0 ml-1"
+              title="Quitar orden"
+            >
+              ✕
+            </button>
+          )}
         </div>
-        <p className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
-          {filtered.length} producto{filtered.length !== 1 ? 's' : ''}
-          {' · '}
-          <span className="text-green-500 font-medium">{filtered.filter(p => p.visible !== false).length} visibles</span>
-        </p>
       </div>
 
       {/* Lista */}
