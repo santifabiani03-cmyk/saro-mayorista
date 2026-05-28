@@ -423,14 +423,13 @@ export default function AdminPage() {
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowQr(false)}>
           <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl" onClick={e => e.stopPropagation()}>
             <h3 className="font-extrabold text-lg text-gray-900 mb-1">QR del Catálogo</h3>
-            <p className="text-sm text-gray-400 mb-4">Escaneá para descargar el PDF actualizado</p>
+            <p className="text-sm text-gray-400 mb-4">Escaneá para ver el catálogo actualizado</p>
             <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://saro.com.ar/catalogo')}&color=2d3748&bgcolor=ffffff`}
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://santifabiani03-cmyk.github.io/saro-mayorista/')}&color=2d3748&bgcolor=ffffff`}
               alt="QR Catálogo SARO"
               className="w-48 h-48 sm:w-56 sm:h-56 mx-auto rounded-xl"
             />
-            <p className="text-xs text-gray-400 mt-3">saro.com.ar/catalogo</p>
-            <p className="text-[10px] text-gray-300 mt-1">Se actualiza cada vez que exportás el PDF</p>
+            <p className="text-[10px] text-gray-300 mt-3">Se actualiza cada vez que publicás cambios</p>
             <button
               onClick={() => setShowQr(false)}
               className="mt-4 px-6 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium transition-colors"

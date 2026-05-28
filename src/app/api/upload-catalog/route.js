@@ -46,7 +46,7 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Falta data (base64 del PDF)' }, { status: 400 })
   }
 
-  const filePath = 'public/catalogo.pdf'
+  const filePath = 'docs/catalogo.pdf'
 
   try {
     const sha = await getFileSha(owner, repo, filePath, token)
