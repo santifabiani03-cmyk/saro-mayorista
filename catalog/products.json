@@ -17,7 +17,7 @@
     "emoji": "🎾",
     "promos": [],
     "id": "p10",
-    "visible": true,
+    "visible": false,
     "sinStock": false,
     "fechaActualizacion": "2026-05-27T03:40:17.218Z",
     "_aiLoading": false,
@@ -53,7 +53,7 @@
     "imagenes": [
       "/assets/buzo-medio-cierre-micropolar-unisex.jpeg"
     ],
-    "visible": false
+    "visible": true
   },
   {
     "nombre": "MEDIAS ALGODON 3/4 ",
