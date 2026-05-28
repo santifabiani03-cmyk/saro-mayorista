@@ -27,8 +27,15 @@ function StandardCard({ product, onClick, tags, imgs, sinStock }) {
           </div>
         )}
 
+        {/* Logo SR */}
+        <img
+          src="/assets/logo-icon.png"
+          alt=""
+          className="absolute top-2.5 right-2.5 w-7 h-7 opacity-15 z-10 object-contain"
+        />
+
         {sinStock && (
-          <span className="absolute top-2 right-2 bg-gray-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm">
+          <span className="absolute top-2 right-2 bg-gray-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm z-20">
             Sin stock
           </span>
         )}

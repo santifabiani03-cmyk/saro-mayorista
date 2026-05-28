@@ -128,6 +128,27 @@ function loadPaletaImage(url, targetW, targetH, cornerPct = 3) {
   })
 }
 
+/** Genera una versión semitransparente de una imagen (para logo watermark en PDF). */
+function loadImageWithOpacity(url, opacity = 0.15) {
+  return new Promise(resolve => {
+    const img = new Image()
+    img.crossOrigin = 'anonymous'
+    img.onload = () => {
+      const canvas = document.createElement('canvas')
+      canvas.width = img.naturalWidth
+      canvas.height = img.naturalHeight
+      const ctx = canvas.getContext('2d')
+      ctx.globalAlpha = opacity
+      ctx.drawImage(img, 0, 0)
+      try {
+        resolve({ dataUrl: canvas.toDataURL('image/png'), width: img.naturalWidth, height: img.naturalHeight })
+      } catch { resolve(null) }
+    }
+    img.onerror = () => resolve(null)
+    img.src = url
+  })
+}
+
 /** Carga imagen sin modificar (para logos). */
 function loadImage(url) {
   return new Promise(resolve => {
@@ -283,6 +304,7 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
   // ── Precargar logos ──
   const logoMain = await loadImage('/assets/logo.png')
   const logoIcon = await loadImage('/assets/logo-icon.png')
+  const logoCardWm = await loadImageWithOpacity('/assets/logo-icon.png', 0.15)
 
   // ── Agrupar productos ──
   const ropaFem  = visible.filter(p => p.categoria === 'ropa' && p.genero === 'femenino')
@@ -559,6 +581,14 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
 
         // Colores
         drawColorCircles(doc, product, x + 3, y + iH + 12, cardW)
+      }
+
+      // Logo SR watermark en esquina superior derecha de la imagen
+      if (logoCardWm) {
+        const wmAspect = logoCardWm.width / logoCardWm.height
+        const wmH = 4.5
+        const wmW = wmH * wmAspect
+        doc.addImage(logoCardWm.dataUrl, 'PNG', x + cardW - wmW - 2, y + 2, wmW, wmH)
       }
 
       // Siguiente posicion

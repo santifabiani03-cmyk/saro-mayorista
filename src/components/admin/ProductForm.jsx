@@ -1274,7 +1274,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
   const [imagenes, setImagenes] = useState(
     () => initial?.imagenes?.length ? initial.imagenes : initial?.imagen ? [initial.imagen] : []
   )
-  const [applyLogo, setApplyLogo] = useState(true) // Logo SR al subir imágenes
+  const [applyLogo, setApplyLogo] = useState(false) // Logo SR en imagen (desactivado: se muestra en la card)
   const [errors, setErrors] = useState({})
 
   // Auto emoji cuando cambia categoría o parteCuerpo
@@ -1391,7 +1391,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               onChange={e => setApplyLogo(e.target.checked)}
               className="w-4 h-4 rounded border-gray-300 text-saro-blue focus:ring-saro-blue"
             />
-            <span className="text-xs text-gray-600">Aplicar logo <span className="font-bold text-saro-blue">SR</span> al subir imágenes</span>
+            <span className="text-xs text-gray-600">Grabar logo <span className="font-bold text-saro-blue">SR</span> en la imagen (el logo ya se muestra en la card automáticamente)</span>
           </label>
 
           {/* ── Herramienta de fondo IA ── */}
