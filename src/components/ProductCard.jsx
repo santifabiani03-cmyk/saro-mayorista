@@ -130,7 +130,7 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
       <img
         src="/assets/logo-icon.png"
         alt=""
-        className="absolute top-2.5 right-2.5 w-7 h-auto opacity-15 z-10 object-contain"
+        className="absolute top-2.5 right-2.5 w-7 h-7 opacity-15 z-10 object-contain"
       />
 
       {sinStock && (
