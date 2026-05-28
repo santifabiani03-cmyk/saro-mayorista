@@ -138,8 +138,8 @@ function MobileProductCard({ p, onEdit, onDelete, onToggleVisible, onToggleSinSt
 export default function ProductList({ products, onEdit, onDelete, onToggleVisible, onToggleSinStock, saving }) {
   const [search, setSearch]     = useState('')
   const [filterCat, setFilterCat] = useState('')
-  const [sortKey, setSortKey]   = useState(null)
-  const [sortDir, setSortDir]   = useState('asc')
+  const [sortKey, setSortKey]   = useState('fecha')
+  const [sortDir, setSortDir]   = useState('desc')
 
   const handleSort = (key) => {
     if (sortKey === key) {
