@@ -20,7 +20,6 @@ function EyeOffIcon() {
   )
 }
 
-/** Chevron arriba/abajo para indicar orden */
 function SortChevron({ active, dir }) {
   return (
     <span className={`inline-flex flex-col ml-1 leading-none ${active ? 'text-saro-blue' : 'text-gray-300'}`}>
@@ -34,18 +33,118 @@ function SortChevron({ active, dir }) {
   )
 }
 
+/* ── Card mobile para cada producto ── */
+function MobileProductCard({ p, onEdit, onDelete, onToggleVisible, onToggleSinStock, saving }) {
+  const ptags    = getProductTags(p).map(k => TAG_CONFIG[k]).filter(Boolean)
+  const visible  = p.visible !== false
+  const sinStock = p.sinStock === true
+  const thumb    = p.imagenes?.[0] ?? p.imagen
+
+  return (
+    <div className={`bg-white rounded-xl border border-gray-100 p-3 shadow-sm ${!visible ? 'opacity-50' : ''}`}>
+      <div className="flex gap-3">
+        {/* Thumb */}
+        <div className="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 relative">
+          {thumb ? (
+            <img src={thumb} alt={p.nombre} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
+          ) : (
+            <span className="text-2xl">{p.emoji}</span>
+          )}
+          {(p.imagenes?.length ?? 0) > 1 && (
+            <span className="absolute bottom-0 right-0 bg-black/60 text-white text-[9px] leading-none px-1 py-0.5 rounded-tl-lg">
+              {p.imagenes.length}
+            </span>
+          )}
+        </div>
+
+        {/* Info */}
+        <div className="flex-1 min-w-0">
+          <div className="flex items-start justify-between gap-2">
+            <p className="font-semibold text-gray-900 text-sm leading-tight truncate">{p.nombre}</p>
+            <span className="font-bold text-saro-blue text-sm whitespace-nowrap">
+              ${Number(p.precio).toLocaleString('es-AR')}
+            </span>
+          </div>
+
+          {/* Tags */}
+          <div className="flex items-center gap-1 flex-wrap mt-1">
+            {ptags.map((tag, i) => (
+              <span key={i} className={`text-[10px] px-1.5 py-0.5 rounded-full font-medium ${tag.cls}`}>
+                {tag.label}
+              </span>
+            ))}
+            {!visible && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">Oculto</span>
+            )}
+            {sinStock && (
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-gray-500 text-white">Sin stock</span>
+            )}
+            <span className="text-[10px] text-gray-400 capitalize">{p.categoria} · {p.genero}</span>
+          </div>
+
+          {/* Colores */}
+          {p.colores?.length > 0 && (
+            <div className="flex gap-1 flex-wrap mt-1.5">
+              {p.colores.slice(0, 6).map(c => (
+                <span key={c} title={c} className="w-3 h-3 rounded-full border border-white shadow-sm" style={getSwatchStyle(c)} />
+              ))}
+              {p.colores.length > 6 && <span className="text-[10px] text-gray-400">+{p.colores.length - 6}</span>}
+            </div>
+          )}
+        </div>
+      </div>
+
+      {/* Acciones — siempre visibles en mobile */}
+      <div className="flex items-center gap-2 mt-2.5 pt-2.5 border-t border-gray-50">
+        <button
+          onClick={() => onEdit(p)}
+          disabled={saving}
+          className="flex-1 py-2 rounded-lg bg-saro-light text-saro-blue text-xs font-semibold hover:bg-saro-blue hover:text-white transition-colors text-center"
+        >
+          ✏️ Editar
+        </button>
+        <button
+          onClick={() => onToggleSinStock(p.id)}
+          disabled={saving}
+          title={sinStock ? 'Marcar con stock' : 'Marcar sin stock'}
+          className={`p-2 rounded-lg transition-colors text-xs font-bold ${
+            sinStock ? 'bg-gray-500 text-white' : 'text-gray-300 hover:text-gray-600 bg-gray-50'
+          }`}
+        >
+          S
+        </button>
+        <button
+          onClick={() => onToggleVisible(p.id)}
+          disabled={saving}
+          title={visible ? 'Ocultar' : 'Mostrar'}
+          className={`p-2 rounded-lg transition-colors ${
+            visible ? 'text-gray-400 bg-gray-50 hover:text-saro-blue' : 'text-gray-400 bg-gray-50 hover:text-green-600'
+          }`}
+        >
+          {visible ? <EyeIcon /> : <EyeOffIcon />}
+        </button>
+        <button
+          onClick={() => onDelete(p.id)}
+          disabled={saving}
+          className="p-2 rounded-lg bg-red-50 text-red-400 text-xs hover:bg-red-500 hover:text-white transition-colors"
+        >
+          🗑️
+        </button>
+      </div>
+    </div>
+  )
+}
+
 export default function ProductList({ products, onEdit, onDelete, onToggleVisible, onToggleSinStock, saving }) {
   const [search, setSearch]     = useState('')
   const [filterCat, setFilterCat] = useState('')
-  const [sortKey, setSortKey]   = useState(null)   // 'nombre' | 'precio' | 'visible' | 'fecha'
-  const [sortDir, setSortDir]   = useState('asc')  // 'asc' | 'desc'
+  const [sortKey, setSortKey]   = useState(null)
+  const [sortDir, setSortDir]   = useState('asc')
 
   const handleSort = (key) => {
     if (sortKey === key) {
-      // Mismo campo: toggle dirección
       setSortDir(d => d === 'asc' ? 'desc' : 'asc')
     } else {
-      // Nuevo campo: activar ascendente
       setSortKey(key)
       setSortDir('asc')
     }
@@ -88,31 +187,33 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
   return (
     <div className="space-y-5">
       {/* Controles */}
-      <div className="flex flex-wrap gap-3 items-center justify-between">
-        <div className="flex gap-2 flex-wrap">
+      <div className="flex flex-wrap gap-2 sm:gap-3 items-center justify-between">
+        <div className="flex gap-2 flex-wrap flex-1 min-w-0">
           <input
             type="text"
             placeholder="Buscar producto…"
             value={search}
             onChange={e => setSearch(e.target.value)}
-            className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-saro-blue w-52"
+            className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-saro-blue w-full sm:w-52"
           />
-          {['', 'ropa', 'padel'].map(cat => (
-            <button
-              key={cat}
-              onClick={() => setFilterCat(cat)}
-              className={`px-3 py-2 rounded-xl text-sm font-medium border transition-all ${
-                filterCat === cat
-                  ? 'bg-saro-blue border-saro-blue text-white'
-                  : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue'
-              }`}
-            >
-              {cat === ''     ? 'Todos'    :
-               cat === 'ropa' ? '👕 Ropa'  : '🏓 Pádel'}
-            </button>
-          ))}
+          <div className="flex gap-1.5">
+            {['', 'ropa', 'padel'].map(cat => (
+              <button
+                key={cat}
+                onClick={() => setFilterCat(cat)}
+                className={`px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium border transition-all ${
+                  filterCat === cat
+                    ? 'bg-saro-blue border-saro-blue text-white'
+                    : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue'
+                }`}
+              >
+                {cat === ''     ? 'Todos'    :
+                 cat === 'ropa' ? '👕 Ropa'  : '🏓 Pádel'}
+              </button>
+            ))}
+          </div>
         </div>
-        <p className="text-sm text-gray-400">
+        <p className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
           {filtered.length} producto{filtered.length !== 1 ? 's' : ''}
           {' · '}
           <span className="text-green-500 font-medium">{filtered.filter(p => p.visible !== false).length} visibles</span>
@@ -126,220 +227,206 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
           <p>No hay productos que coincidan.</p>
         </div>
       ) : (
-        <div className="bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
-          <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
-              <tr>
-                <th className={thClass}>
-                  <button type="button" onClick={() => handleSort('nombre')} className={thButton}>
-                    Producto
-                    <SortChevron active={sortKey === 'nombre'} dir={sortDir} />
-                  </button>
-                </th>
-                <th className={`${thClass} hidden sm:table-cell`}>Filtros</th>
-                <th className={`${thClass} hidden md:table-cell`}>Variantes</th>
-                <th className={`text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide`}>
-                  <button type="button" onClick={() => handleSort('precio')} className={`${thButton} justify-end`}>
-                    Precio
-                    <SortChevron active={sortKey === 'precio'} dir={sortDir} />
-                  </button>
-                </th>
-                <th className={`${thClass} hidden lg:table-cell`}>
-                  <button type="button" onClick={() => handleSort('fecha')} className={thButton}>
-                    Fechas
-                    <SortChevron active={sortKey === 'fecha'} dir={sortDir} />
-                  </button>
-                </th>
-                <th className="px-4 py-3">
-                  <button type="button" onClick={() => handleSort('visible')} className={thButton} title="Ordenar por visibilidad">
-                    <EyeIcon />
-                    <SortChevron active={sortKey === 'visible'} dir={sortDir} />
-                  </button>
-                </th>
-              </tr>
-            </thead>
-            <tbody className="divide-y divide-gray-50">
-              {sorted.map(p => {
-                const ptags    = getProductTags(p).map(k => TAG_CONFIG[k]).filter(Boolean)
-                const visible  = p.visible !== false
-                const sinStock = p.sinStock === true
-                return (
-                  <tr key={p.id} className={`hover:bg-gray-50/60 transition-colors group ${!visible ? 'opacity-40' : ''}`}>
+        <>
+          {/* ── Mobile: Cards ── */}
+          <div className="sm:hidden space-y-2">
+            {sorted.map(p => (
+              <MobileProductCard
+                key={p.id}
+                p={p}
+                onEdit={onEdit}
+                onDelete={onDelete}
+                onToggleVisible={onToggleVisible}
+                onToggleSinStock={onToggleSinStock}
+                saving={saving}
+              />
+            ))}
+          </div>
 
-                    {/* Producto */}
-                    <td className="px-4 py-3">
-                      <div className="flex items-center gap-3">
-                        {/* Thumb */}
-                        {(() => {
-                          const thumb = p.imagenes?.[0] ?? p.imagen
-                          return (
-                            <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 relative">
-                              {thumb ? (
-                                <img
-                                  src={thumb}
-                                  alt={p.nombre}
-                                  className="w-full h-full object-cover"
-                                  onError={e => { e.target.style.display = 'none' }}
-                                />
-                              ) : (
-                                <span className="text-xl">{p.emoji}</span>
-                              )}
-                              {(p.imagenes?.length ?? 0) > 1 && (
-                                <span className="absolute bottom-0 right-0 bg-black/60 text-white text-[9px] leading-none px-1 py-0.5 rounded-tl-lg">
-                                  {p.imagenes.length}
+          {/* ── Desktop: Table ── */}
+          <div className="hidden sm:block bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+            <table className="w-full text-sm">
+              <thead className="bg-gray-50 border-b border-gray-100">
+                <tr>
+                  <th className={thClass}>
+                    <button type="button" onClick={() => handleSort('nombre')} className={thButton}>
+                      Producto
+                      <SortChevron active={sortKey === 'nombre'} dir={sortDir} />
+                    </button>
+                  </th>
+                  <th className={thClass}>Filtros</th>
+                  <th className={`${thClass} hidden md:table-cell`}>Variantes</th>
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                    <button type="button" onClick={() => handleSort('precio')} className={`${thButton} justify-end`}>
+                      Precio
+                      <SortChevron active={sortKey === 'precio'} dir={sortDir} />
+                    </button>
+                  </th>
+                  <th className={`${thClass} hidden lg:table-cell`}>
+                    <button type="button" onClick={() => handleSort('fecha')} className={thButton}>
+                      Fechas
+                      <SortChevron active={sortKey === 'fecha'} dir={sortDir} />
+                    </button>
+                  </th>
+                  <th className="px-4 py-3">
+                    <button type="button" onClick={() => handleSort('visible')} className={thButton} title="Ordenar por visibilidad">
+                      <EyeIcon />
+                      <SortChevron active={sortKey === 'visible'} dir={sortDir} />
+                    </button>
+                  </th>
+                </tr>
+              </thead>
+              <tbody className="divide-y divide-gray-50">
+                {sorted.map(p => {
+                  const ptags    = getProductTags(p).map(k => TAG_CONFIG[k]).filter(Boolean)
+                  const visible  = p.visible !== false
+                  const sinStock = p.sinStock === true
+                  return (
+                    <tr key={p.id} className={`hover:bg-gray-50/60 transition-colors group ${!visible ? 'opacity-40' : ''}`}>
+
+                      {/* Producto */}
+                      <td className="px-4 py-3">
+                        <div className="flex items-center gap-3">
+                          {(() => {
+                            const thumb = p.imagenes?.[0] ?? p.imagen
+                            return (
+                              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 relative">
+                                {thumb ? (
+                                  <img src={thumb} alt={p.nombre} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
+                                ) : (
+                                  <span className="text-xl">{p.emoji}</span>
+                                )}
+                                {(p.imagenes?.length ?? 0) > 1 && (
+                                  <span className="absolute bottom-0 right-0 bg-black/60 text-white text-[9px] leading-none px-1 py-0.5 rounded-tl-lg">
+                                    {p.imagenes.length}
+                                  </span>
+                                )}
+                              </div>
+                            )
+                          })()}
+                          <div>
+                            <p className="font-semibold text-gray-900 leading-tight">{p.nombre}</p>
+                            <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
+                              {ptags.map((tag, i) => (
+                                <span key={i} className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${tag.cls}`}>
+                                  {tag.label}
                                 </span>
+                              ))}
+                              {!visible && (
+                                <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">Oculto</span>
+                              )}
+                              {sinStock && (
+                                <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-gray-500 text-white">Sin stock</span>
                               )}
                             </div>
-                          )
-                        })()}
-                        <div>
-                          <p className="font-semibold text-gray-900 leading-tight">{p.nombre}</p>
-                          <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
-                            {ptags.map((tag, i) => (
-                              <span key={i} className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${tag.cls}`}>
-                                {tag.label}
-                              </span>
-                            ))}
-                            {!visible && (
-                              <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">
-                                Oculto
-                              </span>
-                            )}
-                            {sinStock && (
-                              <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-gray-500 text-white">
-                                Sin stock
-                              </span>
-                            )}
+                            <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{p.descripcion}</p>
                           </div>
-                          <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{p.descripcion}</p>
                         </div>
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* Filtros */}
-                    <td className="px-4 py-3 hidden sm:table-cell">
-                      <div className="space-y-0.5">
-                        <p className="text-xs text-gray-500 capitalize">{p.categoria}</p>
-                        <p className="text-xs text-gray-500 capitalize">{p.genero}</p>
-                        <p className="text-xs text-gray-500 capitalize">{p.parteCuerpo}</p>
-                      </div>
-                    </td>
+                      {/* Filtros */}
+                      <td className="px-4 py-3">
+                        <div className="space-y-0.5">
+                          <p className="text-xs text-gray-500 capitalize">{p.categoria}</p>
+                          <p className="text-xs text-gray-500 capitalize">{p.genero}</p>
+                          <p className="text-xs text-gray-500 capitalize">{p.parteCuerpo}</p>
+                        </div>
+                      </td>
 
-                    {/* Variantes */}
-                    <td className="px-4 py-3 hidden md:table-cell">
-                      <div className="space-y-1.5">
-                        {/* Swatches de colores */}
-                        <div className="flex gap-1 flex-wrap">
-                          {p.colores.slice(0, 8).map(c => (
-                            <span
-                              key={c}
-                              title={c}
-                              className="w-3.5 h-3.5 rounded-full border border-white shadow-sm"
-                              style={getSwatchStyle(c)}
-                            />
-                          ))}
-                          {p.colores.length > 8 && (
-                            <span className="text-xs text-gray-400">+{p.colores.length - 8}</span>
+                      {/* Variantes */}
+                      <td className="px-4 py-3 hidden md:table-cell">
+                        <div className="space-y-1.5">
+                          <div className="flex gap-1 flex-wrap">
+                            {p.colores.slice(0, 8).map(c => (
+                              <span key={c} title={c} className="w-3.5 h-3.5 rounded-full border border-white shadow-sm" style={getSwatchStyle(c)} />
+                            ))}
+                            {p.colores.length > 8 && <span className="text-xs text-gray-400">+{p.colores.length - 8}</span>}
+                          </div>
+                          <p className="text-xs text-gray-400">{p.talles.join(' · ')}</p>
+                          {p.noStock?.length > 0 && (
+                            <p className="text-xs text-red-400">{p.noStock.length} combo{p.noStock.length !== 1 ? 's' : ''} sin stock</p>
                           )}
                         </div>
-                        {/* Talles */}
-                        <p className="text-xs text-gray-400">{p.talles.join(' · ')}</p>
-                        {/* Sin stock */}
-                        {p.noStock?.length > 0 && (
-                          <p className="text-xs text-red-400">
-                            {p.noStock.length} combo{p.noStock.length !== 1 ? 's' : ''} sin stock
-                          </p>
-                        )}
-                      </div>
-                    </td>
+                      </td>
 
-                    {/* Precio */}
-                    <td className="px-4 py-3 text-right">
-                      <span className="font-bold text-saro-blue">
-                        ${Number(p.precio).toLocaleString('es-AR')}
-                      </span>
-                    </td>
+                      {/* Precio */}
+                      <td className="px-4 py-3 text-right">
+                        <span className="font-bold text-saro-blue">${Number(p.precio).toLocaleString('es-AR')}</span>
+                      </td>
 
-                    {/* Fechas */}
-                    <td className="px-4 py-3 hidden lg:table-cell">
-                      <div className="space-y-1">
-                        {p.fechaPublicacion ? (
-                          <div>
-                            <p className="text-xs text-gray-400">Publicado</p>
-                            <p className="text-xs font-medium text-gray-600">
-                              {new Date(p.fechaPublicacion).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' })}
-                            </p>
-                          </div>
-                        ) : (
-                          <p className="text-xs text-gray-300 italic">Sin fecha</p>
-                        )}
-                        {p.fechaActualizacion && (
-                          <div>
-                            <p className="text-xs text-gray-400">Editado</p>
-                            <p className="text-xs font-medium text-gray-500">
-                              {new Date(p.fechaActualizacion).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' })}
-                            </p>
-                          </div>
-                        )}
-                      </div>
-                    </td>
-
-                    {/* Acciones */}
-                    <td className="px-4 py-3">
-                      <div className="flex gap-2 justify-end items-center">
-                        {/* Toggle sin stock */}
-                        <button
-                          onClick={() => onToggleSinStock(p.id)}
-                          disabled={saving}
-                          title={sinStock ? 'Marcar con stock' : 'Marcar sin stock'}
-                          className={`p-1.5 rounded-lg transition-colors text-xs font-bold ${
-                            sinStock
-                              ? 'bg-gray-500 text-white hover:bg-gray-400'
-                              : 'text-gray-300 hover:text-gray-600 hover:bg-gray-100'
-                          }`}
-                        >
-                          S
-                        </button>
-
-                        {/* Ojo: siempre visible */}
-                        <button
-                          onClick={() => onToggleVisible(p.id)}
-                          disabled={saving}
-                          title={visible ? 'Ocultar en tienda' : 'Mostrar en tienda'}
-                          className={`p-1.5 rounded-lg transition-colors ${
-                            visible
-                              ? 'text-gray-400 hover:text-saro-blue hover:bg-saro-light'
-                              : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
-                          }`}
-                        >
-                          {visible ? <EyeIcon /> : <EyeOffIcon />}
-                        </button>
-
-                        {/* Editar y eliminar: solo al hover */}
-                        <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
-                          <button
-                            onClick={() => onEdit(p)}
-                            disabled={saving}
-                            className="px-3 py-1.5 rounded-lg bg-saro-light text-saro-blue text-xs font-semibold hover:bg-saro-blue hover:text-white transition-colors"
-                          >
-                            ✏️ Editar
-                          </button>
-                          <button
-                            onClick={() => onDelete(p.id)}
-                            disabled={saving}
-                            className="px-3 py-1.5 rounded-lg bg-red-50 text-red-500 text-xs font-semibold hover:bg-red-500 hover:text-white transition-colors"
-                          >
-                            🗑️
-                          </button>
+                      {/* Fechas */}
+                      <td className="px-4 py-3 hidden lg:table-cell">
+                        <div className="space-y-1">
+                          {p.fechaPublicacion ? (
+                            <div>
+                              <p className="text-xs text-gray-400">Publicado</p>
+                              <p className="text-xs font-medium text-gray-600">
+                                {new Date(p.fechaPublicacion).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' })}
+                              </p>
+                            </div>
+                          ) : (
+                            <p className="text-xs text-gray-300 italic">Sin fecha</p>
+                          )}
+                          {p.fechaActualizacion && (
+                            <div>
+                              <p className="text-xs text-gray-400">Editado</p>
+                              <p className="text-xs font-medium text-gray-500">
+                                {new Date(p.fechaActualizacion).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' })}
+                              </p>
+                            </div>
+                          )}
                         </div>
-                      </div>
-                    </td>
-                  </tr>
-                )
-              })}
-            </tbody>
-          </table>
-        </div>
+                      </td>
+
+                      {/* Acciones */}
+                      <td className="px-4 py-3">
+                        <div className="flex gap-2 justify-end items-center">
+                          <button
+                            onClick={() => onToggleSinStock(p.id)}
+                            disabled={saving}
+                            title={sinStock ? 'Marcar con stock' : 'Marcar sin stock'}
+                            className={`p-1.5 rounded-lg transition-colors text-xs font-bold ${
+                              sinStock ? 'bg-gray-500 text-white hover:bg-gray-400' : 'text-gray-300 hover:text-gray-600 hover:bg-gray-100'
+                            }`}
+                          >
+                            S
+                          </button>
+                          <button
+                            onClick={() => onToggleVisible(p.id)}
+                            disabled={saving}
+                            title={visible ? 'Ocultar en tienda' : 'Mostrar en tienda'}
+                            className={`p-1.5 rounded-lg transition-colors ${
+                              visible ? 'text-gray-400 hover:text-saro-blue hover:bg-saro-light' : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
+                            }`}
+                          >
+                            {visible ? <EyeIcon /> : <EyeOffIcon />}
+                          </button>
+                          {/* Editar y eliminar: hover en desktop */}
+                          <div className="flex gap-2 opacity-0 group-hover:opacity-100 transition-opacity">
+                            <button
+                              onClick={() => onEdit(p)}
+                              disabled={saving}
+                              className="px-3 py-1.5 rounded-lg bg-saro-light text-saro-blue text-xs font-semibold hover:bg-saro-blue hover:text-white transition-colors"
+                            >
+                              ✏️ Editar
+                            </button>
+                            <button
+                              onClick={() => onDelete(p.id)}
+                              disabled={saving}
+                              className="px-3 py-1.5 rounded-lg bg-red-50 text-red-500 text-xs font-semibold hover:bg-red-500 hover:text-white transition-colors"
+                            >
+                              🗑️
+                            </button>
+                          </div>
+                        </div>
+                      </td>
+                    </tr>
+                  )
+                })}
+              </tbody>
+            </table>
+          </div>
+        </>
       )}
     </div>
   )

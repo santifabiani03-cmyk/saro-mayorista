@@ -248,41 +248,41 @@ export default function AdminPage() {
 
       {/* Header */}
       <header className="bg-saro-dark text-white shadow-lg">
-        <div className="max-w-6xl mx-auto px-4 py-3 sm:py-4 relative">
+        <div className="max-w-6xl mx-auto px-3 sm:px-4 py-2.5 sm:py-4">
 
-          {/* Fila única: logo | acciones */}
-          <div className="flex items-center justify-between gap-3">
+          {/* Fila: logo | acciones */}
+          <div className="flex items-center justify-between gap-2 sm:gap-3">
 
-            {/* Izquierda: logo + título */}
-            <div className="flex items-center gap-2.5 min-w-0">
+            {/* Izquierda: logo + título + indicador sync */}
+            <div className="flex items-center gap-2 min-w-0">
               <img
                 src="/assets/logo.png"
                 alt="SARO"
-                className="h-9 w-auto brightness-0 invert flex-shrink-0"
+                className="h-7 sm:h-9 w-auto brightness-0 invert flex-shrink-0"
                 onError={e => { e.target.style.display = 'none' }}
               />
               <div className="min-w-0">
-                <p className="font-extrabold text-sm sm:text-lg leading-none">Panel Admin</p>
-                <p className="text-[11px] text-white/60 mt-0.5 hidden sm:block">SARO Mayorista</p>
+                <div className="flex items-center gap-2">
+                  <p className="font-extrabold text-sm sm:text-lg leading-none">Panel Admin</p>
+                  {publishedSnap !== null && (
+                    <span className={`flex items-center gap-1 text-[10px] sm:text-xs font-semibold ${isSynced ? 'text-green-400' : 'text-yellow-400'}`}>
+                      <span className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full flex-shrink-0 ${isSynced ? 'bg-green-400' : 'bg-yellow-400 animate-pulse'}`} />
+                      <span className="hidden sm:inline">{isSynced ? 'En vivo' : 'Sin publicar'}</span>
+                    </span>
+                  )}
+                </div>
+                <p className="text-[10px] text-white/60 mt-0.5 hidden sm:block">SARO Mayorista</p>
               </div>
             </div>
 
-            {/* Derecha: indicador + publicar + ver tienda */}
-            <div className="flex items-center gap-2 flex-shrink-0">
-
-              {/* Indicador de sincronización — solo punto en mobile, texto en desktop */}
-              {publishedSnap !== null && (
-                <span className={`flex items-center gap-1.5 text-xs font-semibold ${isSynced ? 'text-green-400' : 'text-yellow-400'}`}>
-                  <span className={`w-2 h-2 rounded-full flex-shrink-0 ${isSynced ? 'bg-green-400' : 'bg-yellow-400 animate-pulse'}`} />
-                  <span className="hidden sm:inline">{isSynced ? 'En vivo' : 'Sin publicar'}</span>
-                </span>
-              )}
+            {/* Derecha: publicar + PDF + ver tienda */}
+            <div className="flex items-center gap-1.5 sm:gap-2 flex-shrink-0">
 
               {/* Botón publicar */}
               <button
                 onClick={handleDeploy}
                 disabled={deploying || isSynced}
-                className={`flex items-center gap-1.5 px-3 py-2 text-white text-xs sm:text-sm font-bold rounded-xl transition-all ${
+                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 text-white text-[11px] sm:text-sm font-bold rounded-lg sm:rounded-xl transition-all ${
                   deploying
                     ? 'bg-gray-500 opacity-60 cursor-not-allowed'
                     : isSynced
@@ -290,33 +290,33 @@ export default function AdminPage() {
                     : 'bg-green-500 hover:bg-green-400 shadow-lg shadow-green-900/30'
                 }`}
               >
-                <span>{deploying ? '⏳' : '🚀'}</span>
+                <span className="text-xs sm:text-base">{deploying ? '⏳' : '🚀'}</span>
                 <span className="hidden sm:inline">{deploying ? 'Publicando…' : 'Publicar en sitio'}</span>
-                <span className="sm:hidden">{deploying ? 'Publicando…' : 'Publicar'}</span>
+                <span className="sm:hidden">{deploying ? '…' : 'Publicar'}</span>
               </button>
 
               {/* Exportar PDF */}
               <button
                 onClick={handleExportPdf}
                 disabled={exporting}
-                className={`flex items-center gap-1.5 px-3 py-2 text-xs sm:text-sm font-bold rounded-xl transition-all ${
+                className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold rounded-lg sm:rounded-xl transition-all ${
                   exporting
                     ? 'bg-gray-500 opacity-60 cursor-not-allowed text-white'
                     : 'bg-white/15 hover:bg-white/25 text-white'
                 }`}
                 title="Exportar catalogo de productos visibles a PDF"
               >
-                <span>{exporting ? '⏳' : '📄'}</span>
+                <span className="text-xs sm:text-base">{exporting ? '⏳' : '📄'}</span>
                 <span className="hidden sm:inline">{exporting ? exportProgress : 'Exportar PDF'}</span>
-                <span className="sm:hidden">{exporting ? '...' : 'PDF'}</span>
+                <span className="sm:hidden">{exporting ? '…' : 'PDF'}</span>
               </button>
 
               {/* Ver tienda */}
               <a
                 href="/"
-                className="text-xs sm:text-sm text-white/60 hover:text-white flex items-center gap-1 transition-colors whitespace-nowrap"
+                className="text-[11px] sm:text-sm text-white/60 hover:text-white flex items-center gap-0.5 transition-colors whitespace-nowrap"
               >
-                ← <span className="hidden sm:inline">Ver </span>tienda
+                ←<span className="hidden sm:inline"> Ver</span> tienda
               </a>
             </div>
           </div>
@@ -327,7 +327,7 @@ export default function AdminPage() {
 
       {/* Tabs */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
-        <div className="max-w-6xl mx-auto px-5 flex gap-1 overflow-x-auto scrollbar-hide">
+        <div className="max-w-6xl mx-auto px-3 sm:px-5 flex gap-0.5 sm:gap-1 overflow-x-auto scrollbar-hide">
           {[
             { key: 'editar', label: `📋 Publicados (${products.length})` },
             { key: 'nuevo',  label: editingProduct ? '✏️ Editando producto' : '＋ Nuevo producto' },
@@ -359,7 +359,7 @@ export default function AdminPage() {
       )}
 
       {/* Contenido */}
-      <div className="max-w-6xl mx-auto px-5 py-8">
+      <div className="max-w-6xl mx-auto px-3 sm:px-5 py-4 sm:py-8">
         {tab === 'nuevo' ? (
           <ProductForm
             key={editingProduct?.id ?? '__new__'}
