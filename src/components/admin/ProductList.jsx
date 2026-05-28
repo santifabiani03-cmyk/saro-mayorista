@@ -94,8 +94,18 @@ function MobileProductCard({ p, onEdit, onDelete, onToggleVisible, onToggleSinSt
         </div>
       </div>
 
+      {/* Fechas en mobile */}
+      <div className="flex items-center gap-3 mt-2 text-[10px] text-gray-400">
+        {p.fechaPublicacion && (
+          <span>📅 Pub: {new Date(p.fechaPublicacion).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'2-digit' })}</span>
+        )}
+        {p.fechaActualizacion && (
+          <span>✏️ Edit: {new Date(p.fechaActualizacion).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'2-digit' })}</span>
+        )}
+      </div>
+
       {/* Acciones — siempre visibles en mobile */}
-      <div className="flex items-center gap-2 mt-2.5 pt-2.5 border-t border-gray-50">
+      <div className="flex items-center gap-2 mt-2 pt-2.5 border-t border-gray-50">
         <button
           onClick={() => onEdit(p)}
           disabled={saving}
@@ -182,10 +192,12 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
           return mult * (sa - sb)
         }
         case 'fecha': {
-          const da = a.fechaActualizacion || a.fechaPublicacion
-            ? new Date(a.fechaActualizacion || a.fechaPublicacion).getTime() : 0
-          const db = b.fechaActualizacion || b.fechaPublicacion
-            ? new Date(b.fechaActualizacion || b.fechaPublicacion).getTime() : 0
+          const da = a.fechaActualizacion
+            ? new Date(a.fechaActualizacion).getTime()
+            : a.fechaPublicacion ? new Date(a.fechaPublicacion).getTime() : 0
+          const db = b.fechaActualizacion
+            ? new Date(b.fechaActualizacion).getTime()
+            : b.fechaPublicacion ? new Date(b.fechaPublicacion).getTime() : 0
           return mult * (da - db)
         }
         default:
@@ -313,7 +325,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                       <SortChevron active={sortKey === 'precio'} dir={sortDir} />
                     </button>
                   </th>
-                  <th className={`${thClass} hidden lg:table-cell`}>
+                  <th className={thClass}>
                     <button type="button" onClick={() => handleSort('fecha')} className={thButton}>
                       Fechas
                       <SortChevron active={sortKey === 'fecha'} dir={sortDir} />
@@ -406,7 +418,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                       </td>
 
                       {/* Fechas */}
-                      <td className="px-4 py-3 hidden lg:table-cell">
+                      <td className="px-4 py-3">
                         <div className="space-y-1">
                           {p.fechaPublicacion ? (
                             <div>
