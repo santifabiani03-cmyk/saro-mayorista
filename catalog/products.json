@@ -17,7 +17,7 @@
     "emoji": "🎾",
     "promos": [],
     "id": "p10",
-    "visible": false,
+    "visible": true,
     "sinStock": false,
     "fechaActualizacion": "2026-05-27T03:40:17.218Z",
     "_aiLoading": false,
@@ -130,7 +130,7 @@
     "imagenes": [
       "/assets/imagen-1779452087536.webp"
     ],
-    "visible": false
+    "visible": true
   },
   {
     "nombre": "CANASTO PLEGABLE ALUMINIO NOAC ",
