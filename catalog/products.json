@@ -2124,8 +2124,7 @@
     "genero": "",
     "parteCuerpo": "",
     "colores": [
-      "Celeste",
-      "Blanco"
+      "Blanco/Celeste"
     ],
     "talles": [
       "Única"
@@ -2134,9 +2133,16 @@
     "emoji": "📦",
     "promos": [],
     "id": "p1779922130410",
+    "fechaPublicacion": "2026-05-27T22:48:50.410Z",
+    "colorDefs": {
+      "Blanco/Celeste": [
+        "Blanco",
+        "Celeste"
+      ]
+    },
+    "fechaActualizacion": "2026-05-28T04:31:29.367Z",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1779921966660.webp"
-    ],
-    "fechaPublicacion": "2026-05-27T22:48:50.410Z"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/rotated-1779942678417.webp"
+    ]
   }
 ]
