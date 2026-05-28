@@ -2097,7 +2097,7 @@
     "genero": "",
     "parteCuerpo": "",
     "colores": [
-      "Rojo"
+      "Negro/Rojo"
     ],
     "talles": [
       "Única"
@@ -2109,11 +2109,11 @@
     "_aiCount": 1,
     "id": "p1779916282248",
     "fechaPublicacion": "2026-05-27T21:11:22.249Z",
+    "fechaActualizacion": "2026-05-28T05:41:17.327Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779946766099.jpg",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779946778628.jpg"
-    ],
-    "fechaActualizacion": "2026-05-28T05:39:59.552Z"
+    ]
   },
   {
     "nombre": "Saro SR Junior ",
