@@ -6,5 +6,5 @@ export const metadata = {
 }
 
 export default function CatalogoPage() {
-  redirect('https://santifabiani03-cmyk.github.io/saro-mayorista/')
+  redirect('https://catalogo.saro.com.ar')
 }

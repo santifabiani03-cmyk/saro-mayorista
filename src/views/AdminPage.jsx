@@ -425,7 +425,7 @@ export default function AdminPage() {
             <h3 className="font-extrabold text-lg text-gray-900 mb-1">QR del Catálogo</h3>
             <p className="text-sm text-gray-400 mb-4">Escaneá para ver el catálogo actualizado</p>
             <img
-              src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://santifabiani03-cmyk.github.io/saro-mayorista/')}&color=2d3748&bgcolor=ffffff`}
+              src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://catalogo.saro.com.ar')}&color=2d3748&bgcolor=ffffff`}
               alt="QR Catálogo SARO"
               className="w-48 h-48 sm:w-56 sm:h-56 mx-auto rounded-xl"
             />
