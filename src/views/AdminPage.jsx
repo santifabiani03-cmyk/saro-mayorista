@@ -389,7 +389,7 @@ export default function AdminPage() {
         href="https://vercel.com/santifabiani03-9326s-projects/saro-mayorista/analytics"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-3 right-4 text-[10px] text-gray-300 hover:text-gray-500 transition-colors"
+        className="fixed bottom-3 right-4 text-[10px] text-gray-300 hover:text-gray-500 transition-colors hidden sm:inline"
         title="Vercel Analytics"
       >
         analytics ↗
