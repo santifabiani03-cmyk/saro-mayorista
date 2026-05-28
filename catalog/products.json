@@ -1650,26 +1650,6 @@
     "fechaPublicacion": "2026-05-22T21:17:44.000Z"
   },
   {
-    "nombre": "Munequeras",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495465075",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/munequeras-p64.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:17:55.000Z"
-  },
-  {
     "nombre": "Grip Tape Over Grip",
     "precio": 0,
     "descripcion": "",
@@ -1887,24 +1867,36 @@
     "fechaPublicacion": "2026-05-22T21:20:45.000Z"
   },
   {
-    "nombre": "Protectores Elastizados",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
+    "nombre": "NECESER OBJ. PERSONALES ",
+    "precio": 13000,
+    "descripcion": "Neceser deportivo para objetos personales mas pequeños (celular, llaves, billetera, pelotas, etc.)\nMedidas Largo 28cm / Alto 13cm / Profundidad 13cm\n",
+    "tags": [
+      "nuevo"
+    ],
     "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Rojo",
+      "Azul",
+      "Rosa",
+      "Gris"
+    ],
+    "talles": [
+      "Única"
+    ],
     "noStock": [],
     "emoji": "🎾",
+    "promos": [],
     "id": "p1779495645178",
-    "visible": false,
+    "visible": true,
     "sinStock": false,
+    "fechaPublicacion": "2026-05-22T21:20:53.000Z",
     "imagenes": [
-      "/assets/protectores-elastizados-p76.png"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/protectores-elastizados-1779973541116.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/protectores-elastizados-1779973546168.webp"
     ],
-    "fechaPublicacion": "2026-05-22T21:20:53.000Z"
+    "fechaActualizacion": "2026-05-28T13:08:40.544Z"
   },
   {
     "nombre": "Pelotas Nova Padel Pro",
