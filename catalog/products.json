@@ -27,35 +27,6 @@
     ]
   },
   {
-    "nombre": "Buzo medio cierre micropolar unisex",
-    "precio": 20999,
-    "descripcion": "Buzo medio cierre micropolar unisex calidad super premium usado por maradona",
-    "tags": [],
-    "categoria": "ropa",
-    "genero": "unisex",
-    "parteCuerpo": "torso",
-    "colores": [
-      "Negro",
-      "Gris"
-    ],
-    "talles": [
-      "M",
-      "XL",
-      "L",
-      "S",
-      "XXL"
-    ],
-    "noStock": [],
-    "emoji": "👕",
-    "id": "p1779317305009",
-    "sinStock": false,
-    "fechaActualizacion": "2026-05-22T05:49:21.413Z",
-    "imagenes": [
-      "/assets/buzo-medio-cierre-micropolar-unisex.jpeg"
-    ],
-    "visible": true
-  },
-  {
     "nombre": "MEDIAS ALGODON 3/4 ",
     "precio": 3500,
     "descripcion": "Medias algodon 3/4 \nPACK X DOCENA $35.000 ",
@@ -113,7 +84,7 @@
       },
       {
         "cantidad": 40,
-        "precioTotal": 60000
+        "precioTotal": 64000
       },
       {
         "cantidad": 60,
@@ -126,11 +97,11 @@
     ],
     "id": "p1779452132920",
     "fechaPublicacion": "2026-05-22T12:15:32.920Z",
-    "fechaActualizacion": "2026-05-24T20:22:32.324Z",
+    "fechaActualizacion": "2026-05-28T11:37:22.084Z",
+    "visible": true,
     "imagenes": [
-      "/assets/imagen-1779452087536.webp"
-    ],
-    "visible": true
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/cubre-grip-perforado-c-relieve-1779968166734.webp"
+    ]
   },
   {
     "nombre": "CANASTO PLEGABLE ALUMINIO NOAC ",
@@ -1619,26 +1590,6 @@
     "fechaPublicacion": "2026-05-22T21:17:09.000Z"
   },
   {
-    "nombre": "Medias 3/4 Unisex Algodon",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "ropa",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "👕",
-    "id": "p1779495430011",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/medias-3-4-unisex-algodon-p62.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:17:18.000Z"
-  },
-  {
     "nombre": "Medias Soquete",
     "precio": 0,
     "descripcion": "",
@@ -1719,26 +1670,6 @@
     "fechaPublicacion": "2026-05-22T21:17:55.000Z"
   },
   {
-    "nombre": "Toalla Secado Rapido",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495475934",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/toalla-secado-rapido-p64.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:18:04.000Z"
-  },
-  {
     "nombre": "Grip Tape Over Grip",
     "precio": 0,
     "descripcion": "",
@@ -1757,26 +1688,6 @@
       "/assets/grip-tape-over-grip-p65.png"
     ],
     "fechaPublicacion": "2026-05-22T21:18:14.000Z"
-  },
-  {
-    "nombre": "Kunka Grips",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495494409",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/kunka-grips-p65.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:18:23.000Z"
   },
   {
     "nombre": "Madma Over Grips",
@@ -1819,26 +1730,6 @@
     "fechaPublicacion": "2026-05-22T21:18:40.000Z"
   },
   {
-    "nombre": "Over Grips Bulk",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495520645",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/over-grips-bulk-p67.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:18:51.000Z"
-  },
-  {
     "nombre": "Bolso Mochila Mediano",
     "precio": 0,
     "descripcion": "",
@@ -1861,24 +1752,31 @@
   },
   {
     "nombre": "Mochila Paletera",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
+    "precio": 26000,
+    "descripcion": "Práctica, cómoda y funcional, la mochila paletera fue diseñada para acompañarte en cada entrenamiento o partido, ofreciendo el espacio justo con una estructura compacta pero amplia al mismo tiempo. \n\nCuenta con un compartimento delantero especial para transportar tu paleta de forma segura y accesible. Su interior amplio permite llevar indumentaria, accesorios y objetos personales sin perder comodidad al trasladarla.",
+    "tags": [
+      "nuevo"
+    ],
     "categoria": "padel",
     "genero": "",
     "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495548570",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/mochila-paletera-p68.png",
-      "/assets/mochila-paletera-p69.png"
+    "colores": [
+      "Rojo"
     ],
-    "fechaPublicacion": "2026-05-22T21:19:26.000Z"
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1779495548570",
+    "visible": true,
+    "sinStock": false,
+    "fechaPublicacion": "2026-05-22T21:19:26.000Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-paletera-1779969247304.webp"
+    ],
+    "fechaActualizacion": "2026-05-28T11:57:24.236Z"
   },
   {
     "nombre": "Funda Paletera",
@@ -1902,46 +1800,69 @@
   },
   {
     "nombre": "Mochila Multi Compartimentos",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
+    "precio": 30000,
+    "descripcion": "Diseñada para quienes buscan máxima organización y comodidad, la mochila multi compartimentos SARO combina gran capacidad, practicidad y un diseño moderno ideal para entrenamiento, viajes o uso diario deportivo.\n\nCuenta con un depósito delantero independiente para zapatillas, permitiendo transportar el calzado separado del resto de tus pertenencias. Además, incorpora doble depósito lateral con cierre para accesorios y objetos de acceso rápido.\n\nSu compartimento principal amplio es ideal para llevar indumentaria, toallas, accesorios deportivos y objetos de mayor tamaño. También incluye un bolsillo delantero de mayor capacidad y un bolsillo interior pequeño para guardar elementos personales de forma más segura y organizada.\n\nLos tiradores acolchonados brindan mayor confort durante el uso, incluso en traslados prolongados.",
+    "tags": [
+      "oferta"
+    ],
     "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Azul",
+      "Verde",
+      "Gris"
+    ],
+    "talles": [
+      "Única"
+    ],
     "noStock": [],
     "emoji": "🎾",
+    "promos": [],
     "id": "p1779495576234",
-    "visible": false,
+    "visible": true,
     "sinStock": false,
+    "fechaPublicacion": "2026-05-22T21:19:52.000Z",
     "imagenes": [
-      "/assets/mochila-multi-compartimentos-p70.png",
-      "/assets/mochila-multi-compartimentos-p71.png"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-multi-compartimentos-1779969565360.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-multi-compartimentos-1779969570292.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-multi-compartimentos-1779969575774.webp"
     ],
-    "fechaPublicacion": "2026-05-22T21:19:52.000Z"
+    "fechaActualizacion": "2026-05-28T12:00:57.226Z"
   },
   {
     "nombre": "Bolso Mochila Ecocuero",
-    "precio": 0,
-    "descripcion": "",
+    "precio": 45000,
+    "descripcion": "Cuenta con amplio espacio de guardado gracias a sus depósitos principales ideales para paletas y/o indumentaria deportiva. Además, incorpora un compartimento exclusivo para zapatillas, bolsillo delantero para objetos pequeños y un compartimento inferior a lo largo de toda la base del bolso, perfecto para organizar accesorios o prendas adicionales.\nFabricado en ecocuero resistente y lona reforzada, ofrece gran durabilidad y fácil limpieza. Su interior se encuentra completamente forrado para mayor protección y terminaciones de calidad.\nCaracterísticas:\n• Interior forrado\n• Tiradores tipo mochila acolchados\n• Agarre superior reforzado\n• Correa regulable\n• Compartimentos principales amplios\n• Depósito independiente para zapatillas\n• Bolsillo delantero para objetos pequeños\n• Compartimento inferior de largo completo\n• Materiales resistentes: ecocuero y lona reforzada\n\nIdeal para entrenamiento, competencia o uso diario deportivo.",
     "tags": [],
     "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Azul",
+      "Rosa",
+      "Gris",
+      "Negro"
+    ],
+    "talles": [
+      "Única"
+    ],
     "noStock": [],
     "emoji": "🎾",
+    "promos": [],
     "id": "p1779495592907",
-    "visible": false,
+    "visible": true,
     "sinStock": false,
+    "fechaPublicacion": "2026-05-22T21:20:20.000Z",
+    "_aiLoading": false,
+    "_aiCount": 1,
     "imagenes": [
-      "/assets/bolso-mochila-ecocuero-p71.png",
-      "/assets/bolso-mochila-ecocuero-p72.png",
-      "/assets/bolso-mochila-ecocuero-p73.png"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968378771.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968383284.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968388897.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968393193.webp"
     ],
-    "fechaPublicacion": "2026-05-22T21:20:20.000Z"
+    "fechaActualizacion": "2026-05-28T11:48:37.638Z"
   },
   {
     "nombre": "Bolso Mochila Elite",
@@ -1986,104 +1907,32 @@
     "fechaPublicacion": "2026-05-22T21:20:53.000Z"
   },
   {
-    "nombre": "Protectores Carbono",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495653433",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/protectores-carbono-p77.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:21:01.000Z"
-  },
-  {
     "nombre": "Pelotas Nova Padel Pro",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
+    "precio": 5800,
+    "descripcion": "- NOVA PRO - Tubo x2u. \nExcelente paño, compresion y duravilidad. \nImportadas.\n\nTambien disponible CAJA X 24u. ",
+    "tags": [
+      "nuevo"
+    ],
     "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Amarillo"
+    ],
+    "talles": [
+      "Única"
+    ],
     "noStock": [],
     "emoji": "🎾",
+    "promos": [],
     "id": "p1779495661303",
-    "visible": false,
+    "visible": true,
     "sinStock": false,
+    "fechaPublicacion": "2026-05-22T21:21:10.000Z",
     "imagenes": [
-      "/assets/pelotas-nova-padel-pro-p77.png"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pelotas-nova-padel-pro-1779969106167.webp"
     ],
-    "fechaPublicacion": "2026-05-22T21:21:10.000Z"
-  },
-  {
-    "nombre": "Pelotas WinAr",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495670265",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/pelotas-winar-p78.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:21:19.000Z"
-  },
-  {
-    "nombre": "Pelotas Noac Pro",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495679219",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/pelotas-noac-pro-p78.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:21:27.000Z"
-  },
-  {
-    "nombre": "Carro Recogepelotas Noac",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495687778",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/carro-recogepelotas-noac-p78.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:21:36.000Z"
+    "fechaActualizacion": "2026-05-28T11:53:21.649Z"
   },
   {
     "nombre": "Paleta MAX Carbono Pro",
@@ -2146,5 +1995,34 @@
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/rotated-1779942678417.webp"
     ]
+  },
+  {
+    "nombre": "Muñequera x par ",
+    "precio": 5000,
+    "descripcion": "Muñequeras x par - Algodon \nSuper elastizadas ",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Rosa",
+      "Blanco",
+      "Negro",
+      "Azul",
+      "Naranja"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1779968140080",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1779968065148.webp"
+    ],
+    "fechaPublicacion": "2026-05-28T11:35:40.080Z"
   }
 ]
