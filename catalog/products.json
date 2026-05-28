@@ -2093,7 +2093,7 @@
       "stock_limitado",
       "carbono"
     ],
-    "categoria": "padel",
+    "categoria": "paleta",
     "genero": "",
     "parteCuerpo": "",
     "colores": [
@@ -2103,15 +2103,17 @@
       "Única"
     ],
     "noStock": [],
-    "emoji": "📦",
+    "emoji": "🏓",
     "promos": [],
     "_aiLoading": false,
     "_aiCount": 1,
     "id": "p1779916282248",
+    "fechaPublicacion": "2026-05-27T21:11:22.249Z",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1779915794067.jpg"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779946766099.jpg",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779946778628.jpg"
     ],
-    "fechaPublicacion": "2026-05-27T21:11:22.249Z"
+    "fechaActualizacion": "2026-05-28T05:39:59.552Z"
   },
   {
     "nombre": "Saro SR Junior ",
