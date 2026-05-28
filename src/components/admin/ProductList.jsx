@@ -232,18 +232,23 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
               className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-saro-blue w-full sm:w-52"
             />
             <div className="flex gap-1.5">
-              {['', 'ropa', 'padel'].map(cat => (
+              {[
+                { val: '',       label: 'Todos',  icon: null },
+                { val: 'ropa',   label: 'Ropa',   icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-3.5 h-3.5 flex-shrink-0"><path d="M20.38 3.46L16 2a4 4 0 01-8 0L3.62 3.46a2 2 0 00-1.34 2.23l.58 3.47a1 1 0 00.99.84H6v10c0 1.1.9 2 2 2h8a2 2 0 002-2V10h2.15a1 1 0 00.99-.84l.58-3.47a2 2 0 00-1.34-2.23z"/></svg> },
+                { val: 'padel',  label: 'Pádel',  icon: <svg viewBox="0 0 24 24" fill="currentColor" className="w-3.5 h-3.5 flex-shrink-0"><circle cx="12" cy="12" r="4.5"/></svg> },
+                { val: 'paleta', label: 'Paleta', icon: <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" className="w-3.5 h-3.5 flex-shrink-0"><ellipse cx="12" cy="9" rx="6" ry="8"/><line x1="12" y1="17" x2="12" y2="23" strokeLinecap="round"/><circle cx="10" cy="7" r="0.8" fill="currentColor" stroke="none"/><circle cx="14" cy="7" r="0.8" fill="currentColor" stroke="none"/><circle cx="12" cy="10" r="0.8" fill="currentColor" stroke="none"/></svg> },
+              ].map(cat => (
                 <button
-                  key={cat}
-                  onClick={() => setFilterCat(cat)}
-                  className={`px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium border transition-all ${
-                    filterCat === cat
+                  key={cat.val}
+                  onClick={() => setFilterCat(cat.val)}
+                  className={`flex items-center gap-1 px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium border transition-all ${
+                    filterCat === cat.val
                       ? 'bg-saro-blue border-saro-blue text-white'
                       : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue'
                   }`}
                 >
-                  {cat === ''     ? 'Todos'    :
-                   cat === 'ropa' ? '👕 Ropa'  : '🏓 Pádel'}
+                  {cat.icon}
+                  {cat.label}
                 </button>
               ))}
             </div>
