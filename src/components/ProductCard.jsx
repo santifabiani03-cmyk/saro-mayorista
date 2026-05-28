@@ -81,8 +81,8 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
       onClick={onClick}
       className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer group hover:shadow-md hover:-translate-y-0.5 transition-all duration-200 h-full"
     >
-      {/* h-full para llenar toda la celda de la grilla — sin espacio blanco abajo */}
-      <div className="relative h-full min-h-[250px] bg-gradient-to-b from-gray-50 via-white to-gray-100 overflow-hidden">
+      {/* aspect-square = tamaño base cuando está sola; h-full = se estira si la fila es más alta */}
+      <div className="relative aspect-square h-full bg-gradient-to-b from-gray-50 via-white to-gray-100 overflow-hidden">
 
         {/* Imagen de la paleta — cover anclada abajo, mango al fondo, recorta arriba si hace falta */}
         {imgs.length > 0 ? (
@@ -115,7 +115,7 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
         <img
           src="/assets/logo-icon.png"
           alt=""
-          className="absolute top-2.5 right-2.5 w-7 h-7 opacity-15 z-10"
+          className="absolute top-2.5 right-2.5 w-7 h-auto opacity-15 z-10 object-contain"
         />
 
         {sinStock && (
