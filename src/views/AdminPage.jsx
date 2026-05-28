@@ -327,7 +327,7 @@ export default function AdminPage() {
 
       {/* Tabs */}
       <div className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
-        <div className="max-w-6xl mx-auto px-5 flex gap-1">
+        <div className="max-w-6xl mx-auto px-5 flex gap-1 overflow-x-auto scrollbar-hide">
           {[
             { key: 'editar', label: `📋 Publicados (${products.length})` },
             { key: 'nuevo',  label: editingProduct ? '✏️ Editando producto' : '＋ Nuevo producto' },
@@ -337,7 +337,7 @@ export default function AdminPage() {
             <button
               key={t.key}
               onClick={() => { changeTab(t.key); if (t.key === 'editar') setEditing(null) }}
-              className={`px-5 py-3.5 text-sm font-semibold border-b-2 transition-colors ${
+              className={`px-4 sm:px-5 py-3.5 text-xs sm:text-sm font-semibold border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
                 tab === t.key
                   ? 'border-saro-blue text-saro-blue'
                   : 'border-transparent text-gray-500 hover:text-gray-800'

@@ -24,7 +24,33 @@ function loadImg(url) {
 }
 
 /**
+ * Encuentra el bounding box del contenido visible (no-transparente) de una imagen.
+ * Devuelve { x, y, w, h } del rectángulo que contiene el producto.
+ */
+function getTrimBounds(img) {
+  const c = document.createElement('canvas')
+  c.width = img.width; c.height = img.height
+  const ctx = c.getContext('2d')
+  ctx.drawImage(img, 0, 0)
+  const data = ctx.getImageData(0, 0, c.width, c.height).data
+  let top = c.height, left = c.width, bottom = 0, right = 0
+  for (let y = 0; y < c.height; y++) {
+    for (let x = 0; x < c.width; x++) {
+      if (data[(y * c.width + x) * 4 + 3] > 10) { // alpha > 10
+        if (y < top) top = y
+        if (y > bottom) bottom = y
+        if (x < left) left = x
+        if (x > right) right = x
+      }
+    }
+  }
+  if (bottom < top) return { x: 0, y: 0, w: img.width, h: img.height } // sin contenido
+  return { x: left, y: top, w: right - left + 1, h: bottom - top + 1 }
+}
+
+/**
  * Remueve el fondo de una imagen y la coloca sobre un fondo estandarizado.
+ * Recorta automáticamente el espacio transparente y centra el producto.
  * bgType: 'gradient' | 'white'
  */
 async function removeAndStandardize(imageUrl, onProgress, bgType = 'gradient') {
@@ -38,7 +64,6 @@ async function removeAndStandardize(imageUrl, onProgress, bgType = 'gradient') {
 
   onProgress?.('Removiendo fondo…')
   const blob = await removeBackground(srcBlob, {
-    proxyToWorker: false,
     progress: (key, current, total) => {
       if (key === 'compute:inference') {
         const pct = total > 0 ? Math.round((current / total) * 100) : 0
@@ -47,14 +72,18 @@ async function removeAndStandardize(imageUrl, onProgress, bgType = 'gradient') {
     },
   })
 
-  onProgress?.('Aplicando fondo…')
+  onProgress?.('Ajustando producto…')
   const img = new Image()
   img.src = URL.createObjectURL(blob)
   await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject })
 
-  const size = Math.max(img.width, img.height)
-  const padding = Math.round(size * 0.08)
-  const canvasSize = size + padding * 2
+  // Detectar bounding box real del producto (sin transparencia)
+  const bounds = getTrimBounds(img)
+
+  // Canvas cuadrado basado en el lado mayor del producto recortado
+  const productSize = Math.max(bounds.w, bounds.h)
+  const padding = Math.round(productSize * 0.10)
+  const canvasSize = productSize + padding * 2
   const canvas = document.createElement('canvas')
   canvas.width = canvasSize; canvas.height = canvasSize
   const ctx = canvas.getContext('2d')
@@ -66,8 +95,10 @@ async function removeAndStandardize(imageUrl, onProgress, bgType = 'gradient') {
   ctx.fillStyle = grad
   ctx.fillRect(0, 0, canvasSize, canvasSize)
 
-  // Centrar producto
-  ctx.drawImage(img, padding + (size - img.width) / 2, padding + (size - img.height) / 2)
+  // Centrar producto recortado
+  const drawX = padding + (productSize - bounds.w) / 2
+  const drawY = padding + (productSize - bounds.h) / 2
+  ctx.drawImage(img, bounds.x, bounds.y, bounds.w, bounds.h, drawX, drawY, bounds.w, bounds.h)
   URL.revokeObjectURL(img.src)
 
   return new Promise(resolve => { canvas.toBlob(b => resolve(b), 'image/webp', 0.9) })

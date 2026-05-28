@@ -56,14 +56,41 @@ function FaqItem({ faq }) {
 }
 
 export default function FaqSection() {
+  const [expanded, setExpanded] = useState(false)
+
   return (
-    <section className="bg-white rounded-2xl shadow-sm border border-gray-100 p-5 sm:p-6">
-      <h2 className="text-lg font-bold text-gray-900 mb-1">Preguntas frecuentes</h2>
-      <p className="text-sm text-gray-400 mb-4">Todo lo que necesitás saber para comprar en SARO Mayorista</p>
-      <div>
-        {faqs.map((faq, i) => (
-          <FaqItem key={i} faq={faq} />
-        ))}
+    <section className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+      {/* Header colapsable */}
+      <button
+        onClick={() => setExpanded(e => !e)}
+        className="w-full flex items-center justify-between p-5 sm:p-6 text-left hover:bg-gray-50 transition-colors"
+      >
+        <div>
+          <h2 className="text-lg font-bold text-gray-900">Preguntas frecuentes</h2>
+          <p className="text-sm text-gray-400 mt-0.5">Todo lo que necesitás saber para comprar en SARO Mayorista</p>
+        </div>
+        <svg
+          className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+          strokeLinecap="round" strokeLinejoin="round"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
+      {/* Contenido desplegable */}
+      <div
+        className={`grid transition-all duration-300 ease-in-out ${
+          expanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
+        }`}
+      >
+        <div className="overflow-hidden">
+          <div className="px-5 sm:px-6 pb-5 sm:pb-6 border-t border-gray-100">
+            {faqs.map((faq, i) => (
+              <FaqItem key={i} faq={faq} />
+            ))}
+          </div>
+        </div>
       </div>
 
       {/* JSON-LD FAQPage para Google Rich Results */}
