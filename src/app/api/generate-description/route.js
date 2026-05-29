@@ -19,6 +19,22 @@ Nombre del producto: ${nombre}${hasKw ? `\nPalabras clave a desarrollar: ${keywo
 }
 
 export async function POST(request) {
+  const clean = val => (val ?? '').replace(/^﻿/, '').trim()
+  const correctPin = clean(process.env.ADMIN_PIN)
+  if (!correctPin) {
+    return NextResponse.json(
+      { error: 'ADMIN_PIN no configurado en el servidor' },
+      { status: 500 }
+    )
+  }
+
+  const body = await request.json().catch(() => ({}))
+  const { nombre, keywords, precio, pin } = body
+
+  if (!pin || pin !== correctPin) {
+    return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
+  }
+
   const apiKey = process.env.GEMINI_API_KEY
   if (!apiKey) {
     return NextResponse.json(
@@ -26,9 +42,6 @@ export async function POST(request) {
       { status: 500 }
     )
   }
-
-  const body = await request.json().catch(() => ({}))
-  const { nombre, keywords, precio } = body
 
   if (!nombre && !keywords) {
     return NextResponse.json(

@@ -1479,6 +1479,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                         nombre: form.nombre,
                         keywords: form.descripcion,
                         precio: form.precio,
+                        pin: sessionStorage.getItem('saro_admin_pin') ?? '',
                       }),
                     })
                     const json = await res.json()
