@@ -565,9 +565,13 @@ function RadioGroup({ options, value, onChange }) {
 
 function MultiImageUploader({ images, onChange, productName, applyLogo }) {
   const inputRef    = useRef()
-  const [pending, setPending] = useState(0)   // cuántas imágenes se están subiendo
+  const [pending, setPending] = useState(0)
   const [dragging, setDragging] = useState(false)
   const [lightboxIdx, setLightboxIdx] = useState(null)
+
+  // ── Drag & drop para reordenar ──
+  const [dragIdx, setDragIdx]     = useState(null)
+  const [overIdx, setOverIdx]     = useState(null)
 
   const handleFiles = async (files) => {
     const list = Array.from(files).filter(f => f.type.startsWith('image/'))
@@ -577,7 +581,6 @@ function MultiImageUploader({ images, onChange, productName, applyLogo }) {
     const urls = []
     for (const f of list) {
       let url = await uploadFile(f, productName)
-      // Aplicar logo SR si está activado
       if (url && applyLogo) {
         try {
           const logoBlob = await applyLogoWatermark(url, () => {})
@@ -598,35 +601,113 @@ function MultiImageUploader({ images, onChange, productName, applyLogo }) {
 
   const remove = (i) => onChange(images.filter((_, j) => j !== i))
 
+  const moveImage = (from, to) => {
+    if (from === to || to < 0 || to >= images.length) return
+    const next = [...images]
+    const [moved] = next.splice(from, 1)
+    next.splice(to, 0, moved)
+    onChange(next)
+  }
+
+  // Drag handlers para reordenar entre thumbnails
+  const onThumbDragStart = (e, i) => {
+    setDragIdx(i)
+    e.dataTransfer.effectAllowed = 'move'
+    // Usar un thumbnail transparente para no confundir con drop de archivos
+    e.dataTransfer.setData('text/plain', `reorder:${i}`)
+  }
+  const onThumbDragOver = (e, i) => {
+    e.preventDefault()
+    e.dataTransfer.dropEffect = 'move'
+    setOverIdx(i)
+  }
+  const onThumbDrop = (e, i) => {
+    e.preventDefault()
+    e.stopPropagation()
+    const data = e.dataTransfer.getData('text/plain')
+    if (data.startsWith('reorder:')) {
+      const from = parseInt(data.split(':')[1], 10)
+      moveImage(from, i)
+    }
+    setDragIdx(null)
+    setOverIdx(null)
+  }
+  const onThumbDragEnd = () => { setDragIdx(null); setOverIdx(null) }
+
+  // Detectar si el drag externo es de archivos (no reorden interno)
+  const isFileDrag = (e) => e.dataTransfer?.types?.includes('Files')
+
   return (
     <div
-      onDragOver={e => { e.preventDefault(); setDragging(true) }}
-      onDragLeave={() => setDragging(false)}
-      onDrop={e => { e.preventDefault(); setDragging(false); handleFiles(e.dataTransfer.files) }}
+      onDragOver={e => { if (isFileDrag(e)) { e.preventDefault(); setDragging(true) } }}
+      onDragLeave={e => { if (isFileDrag(e)) setDragging(false) }}
+      onDrop={e => {
+        if (isFileDrag(e) && !e.dataTransfer.getData('text/plain').startsWith('reorder:')) {
+          e.preventDefault(); setDragging(false); handleFiles(e.dataTransfer.files)
+        }
+      }}
     >
       {/* Grid de imágenes */}
       <div className={`grid grid-cols-3 gap-2 p-2 rounded-2xl transition-colors ${dragging ? 'bg-saro-light border-2 border-saro-blue border-dashed' : ''}`}>
 
         {/* Imágenes existentes */}
         {images.map((url, i) => (
-          <div key={url + i} className="relative aspect-square rounded-xl overflow-hidden bg-gray-100 group cursor-zoom-in"
-            onClick={() => setLightboxIdx(i)}
+          <div
+            key={url + i}
+            draggable
+            onDragStart={e => onThumbDragStart(e, i)}
+            onDragOver={e => onThumbDragOver(e, i)}
+            onDrop={e => onThumbDrop(e, i)}
+            onDragEnd={onThumbDragEnd}
+            className={`relative aspect-square rounded-xl overflow-hidden bg-gray-100 group transition-all
+              ${dragIdx === i ? 'opacity-40 scale-95' : ''}
+              ${overIdx === i && dragIdx !== null && dragIdx !== i ? 'ring-2 ring-saro-blue ring-offset-1' : ''}
+              ${dragIdx !== null ? 'cursor-grabbing' : 'cursor-grab'}`}
+            onClick={() => { if (dragIdx === null) setLightboxIdx(i) }}
           >
-            <img src={url} alt="" className="w-full h-full object-cover" />
-            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors" />
+            <img src={url} alt="" className="w-full h-full object-cover pointer-events-none" />
+            <div className="absolute inset-0 bg-black/0 group-hover:bg-black/25 transition-colors pointer-events-none" />
 
             {/* Badge "Principal" en la primera */}
             {i === 0 && (
-              <span className="absolute bottom-1 left-1 text-[10px] bg-saro-blue text-white px-1.5 py-0.5 rounded-full font-semibold">
+              <span className="absolute bottom-1 left-1 text-[10px] bg-saro-blue text-white px-1.5 py-0.5 rounded-full font-semibold pointer-events-none">
                 Principal
               </span>
             )}
+
+            {/* Botones de reorden: ← → */}
+            <div className="absolute bottom-1 right-1 flex gap-0.5 opacity-0 group-hover:opacity-100 transition-opacity">
+              {i > 0 && (
+                <button
+                  type="button"
+                  onClick={e => { e.stopPropagation(); moveImage(i, i - 1) }}
+                  className="w-5 h-5 bg-black/60 hover:bg-black/80 text-white rounded-full text-[10px] flex items-center justify-center shadow"
+                  title="Mover antes"
+                >◀</button>
+              )}
+              {i < images.length - 1 && (
+                <button
+                  type="button"
+                  onClick={e => { e.stopPropagation(); moveImage(i, i + 1) }}
+                  className="w-5 h-5 bg-black/60 hover:bg-black/80 text-white rounded-full text-[10px] flex items-center justify-center shadow"
+                  title="Mover después"
+                >▶</button>
+              )}
+            </div>
+
             {/* Botón eliminar */}
             <button
               type="button"
               onClick={e => { e.stopPropagation(); remove(i) }}
               className="absolute top-1 right-1 w-5 h-5 bg-red-500 hover:bg-red-600 text-white rounded-full text-xs flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity shadow"
             >✕</button>
+
+            {/* Indicador de posición */}
+            {images.length > 1 && (
+              <span className="absolute top-1 left-1 text-[9px] bg-black/50 text-white/80 w-4 h-4 rounded-full flex items-center justify-center font-semibold pointer-events-none">
+                {i + 1}
+              </span>
+            )}
           </div>
         ))}
 
@@ -651,6 +732,11 @@ function MultiImageUploader({ images, onChange, productName, applyLogo }) {
       {images.length === 0 && pending === 0 && (
         <p className="text-xs text-gray-400 text-center mt-2">
           Clic en + o arrastrá imágenes aquí · JPG, PNG, WEBP
+        </p>
+      )}
+      {images.length > 1 && (
+        <p className="text-[10px] text-gray-400 text-center mt-1">
+          Arrastrá para reordenar · La primera imagen es la principal del catálogo
         </p>
       )}
 
