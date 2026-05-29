@@ -1927,7 +1927,7 @@
     "fechaActualizacion": "2026-05-28T11:53:21.649Z"
   },
   {
-    "nombre": "Paleta MAX Carbono 12 k",
+    "nombre": "Saro MAX Carbono 12 k",
     "precio": 180000,
     "descripcion": "La Paleta MAX Carbono Pro es una paleta de pádel con formato redondo, diseñada para un equilibrio óptimo entre control y potencia en cada golpe. Su composición íntegra de carbono garantiza una alta durabilidad y resistencia, ideal para jugadores que buscan rendimiento constante. Ofrece una experiencia de juego superior, adaptándose a diversas situaciones en la cancha.",
     "tags": [
@@ -1938,8 +1938,7 @@
     "genero": "",
     "parteCuerpo": "",
     "colores": [
-      "Negro/Rojo",
-      "Negro"
+      "Negro/Rojo"
     ],
     "talles": [
       "Única"
@@ -1951,7 +1950,7 @@
     "_aiCount": 1,
     "id": "p1779916282248",
     "fechaPublicacion": "2026-05-27T21:11:22.249Z",
-    "fechaActualizacion": "2026-05-28T17:50:41.668Z",
+    "fechaActualizacion": "2026-05-29T20:07:09.233Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779989234833.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779986492622.webp"
