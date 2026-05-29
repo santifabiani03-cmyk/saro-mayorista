@@ -2046,5 +2046,34 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-nexus-woman-1779992751622.webp"
     ],
     "fechaActualizacion": "2026-05-28T18:26:09.708Z"
+  },
+  {
+    "nombre": "Saro Radian Pro Carbono",
+    "precio": 140000,
+    "descripcion": "La paleta Saro Radian Pro Carbono presenta un formato diamante con peso en la punta, ideal para golpes de potencia. Su construcción con carbono 12k en las caras ofrece una alta durabilidad y resistencia al impacto. Este diseño asegura un rendimiento superior y una vida útil prolongada en la cancha.",
+    "tags": [
+      "stock_limitado",
+      "carbono"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 1,
+    "id": "p1780084771974",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780084512601.jpg",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780084526132.jpg"
+    ],
+    "fechaPublicacion": "2026-05-29T19:59:31.974Z"
   }
 ]
