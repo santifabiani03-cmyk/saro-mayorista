@@ -17,24 +17,38 @@ export default function ShopShell({ config, children }) {
 
         {/* Footer SEO */}
         <footer className="bg-white border-t border-gray-100 mt-12 py-8 px-4">
-          <div className="max-w-7xl mx-auto text-center space-y-3">
+          <div className="max-w-7xl mx-auto text-center space-y-4">
             <Image
               src="/assets/logo-icon.png"
-              alt="SARO"
+              alt="SARO — Paletas de padel y ropa deportiva mayorista"
               width={40}
               height={40}
               className="h-10 w-auto mx-auto opacity-40"
               loading="lazy"
             />
-            <p className="text-xs text-gray-400 max-w-xl mx-auto leading-relaxed">
-              SARO Mayorista — Indumentaria deportiva, ropa de entrenamiento,
-              paletas de padel, bolsos, mochilas y accesorios deportivos. Venta
-              mayorista en Argentina con precios exclusivos por cantidad.
+            <p className="text-xs text-gray-400 max-w-2xl mx-auto leading-relaxed">
+              SARO Mayorista — Tu proveedor de paletas de padel, palas de padel,
+              accesorios de padel (grips, cubre grips, pelotas, bolsos, mochilas)
+              y ropa deportiva al por mayor en Argentina. Catalogo mayorista con
+              precios exclusivos por cantidad y envios a todo el pais.
             </p>
-            <p className="text-[10px] text-gray-300">
-              Ropa deportiva mayorista &middot; Padel &middot; Accesorios
-              &middot; Entrenamiento &middot; Argentina
-            </p>
+            <nav className="flex flex-wrap justify-center gap-x-3 gap-y-1 text-[10px] text-gray-300">
+              <span>Paletas de padel</span>
+              <span>&middot;</span>
+              <span>Palas de padel</span>
+              <span>&middot;</span>
+              <span>Accesorios de padel</span>
+              <span>&middot;</span>
+              <span>Grips y cubre grips</span>
+              <span>&middot;</span>
+              <span>Bolsos de padel</span>
+              <span>&middot;</span>
+              <span>Ropa deportiva mayorista</span>
+              <span>&middot;</span>
+              <span>Indumentaria deportiva</span>
+              <span>&middot;</span>
+              <span>Mayorista Argentina</span>
+            </nav>
           </div>
         </footer>
       </div>

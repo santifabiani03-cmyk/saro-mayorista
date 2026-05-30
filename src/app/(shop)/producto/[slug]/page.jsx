@@ -27,24 +27,32 @@ export async function generateMetadata({ params }) {
   }
 
   const imgs = getImages(product)
+  const catLabel = product.categoria === 'paleta' ? 'Paleta de padel'
+    : product.categoria === 'padel' ? 'Accesorio de padel'
+    : 'Ropa deportiva'
+
   const description = product.descripcion
-    ? `${product.nombre} - ${product.descripcion.slice(0, 140)}`
-    : `${product.nombre} - Compra al por mayor en SARO Mayorista. ${product.categoria}, ${product.genero}. Precio: $${product.precio}`
+    ? `${product.nombre} — ${catLabel} al por mayor. ${product.descripcion.slice(0, 120)}`
+    : `${product.nombre} — ${catLabel} al por mayor en SARO Mayorista. Precio mayorista: $${product.precio.toLocaleString('es-AR')}. Envios a toda Argentina.`
+
+  const imgUrl = imgs[0]
+    ? (imgs[0].startsWith('http') ? imgs[0] : `https://saro.com.ar${imgs[0]}`)
+    : undefined
 
   return {
-    title: `${product.nombre} | SARO Mayorista`,
+    title: `${product.nombre} | ${catLabel} Mayorista | SARO`,
     description,
     openGraph: {
-      title: `${product.nombre} | SARO Mayorista`,
+      title: `${product.nombre} | ${catLabel} al por Mayor`,
       description,
-      images: imgs[0] ? [`https://saro.com.ar${imgs[0]}`] : [],
-      type: 'website',
+      images: imgUrl ? [imgUrl] : [],
+      type: 'product',
     },
     twitter: {
       card: 'summary_large_image',
-      title: `${product.nombre} | SARO Mayorista`,
+      title: `${product.nombre} | ${catLabel} Mayorista`,
       description,
-      images: imgs[0] ? [`https://saro.com.ar${imgs[0]}`] : [],
+      images: imgUrl ? [imgUrl] : [],
     },
   }
 }
@@ -59,15 +67,24 @@ export default async function ProductoPage({ params }) {
 
   const imgs = getImages(product)
 
+  const catLabel = product.categoria === 'paleta' ? 'Paleta de padel'
+    : product.categoria === 'padel' ? 'Accesorio de padel'
+    : 'Ropa deportiva'
+
+  const prodImgUrl = imgs[0]
+    ? (imgs[0].startsWith('http') ? imgs[0] : `https://saro.com.ar${imgs[0]}`)
+    : undefined
+
   // JSON-LD del producto (renderizado server-side para SEO)
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
     name: product.nombre,
     description:
-      product.descripcion || `${product.nombre} - ${product.categoria}`,
-    image: imgs[0] ? `https://saro.com.ar${imgs[0]}` : undefined,
+      product.descripcion || `${product.nombre} — ${catLabel} al por mayor en SARO Mayorista`,
+    image: prodImgUrl,
     brand: { '@type': 'Brand', name: 'SARO' },
+    category: catLabel,
     offers: {
       '@type': 'Offer',
       price: product.precio,
@@ -75,6 +92,7 @@ export default async function ProductoPage({ params }) {
       availability: product.sinStock
         ? 'https://schema.org/OutOfStock'
         : 'https://schema.org/InStock',
+      seller: { '@type': 'Organization', name: 'SARO Mayorista' },
     },
   }
 

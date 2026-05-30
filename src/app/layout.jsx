@@ -3,11 +3,11 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
 export const metadata = {
-  title: 'SARO Mayorista | Ropa Deportiva y Accesorios de Padel al por Mayor',
+  title: 'SARO Mayorista | Paletas de Padel, Ropa Deportiva y Accesorios al por Mayor',
   description:
-    'SARO Mayorista: catalogo completo de ropa deportiva, indumentaria de entrenamiento, paletas de padel, bolsos y accesorios. Venta mayorista en Argentina con precios exclusivos por cantidad.',
+    'SARO Mayorista: paletas de padel, palas de padel, accesorios de padel, grips, bolsos y ropa deportiva al por mayor en Argentina. Catalogo mayorista con precios exclusivos por cantidad. Envios a todo el pais.',
   keywords:
-    'ropa deportiva mayorista, SARO, padel, paletas de padel, accesorios de padel, indumentaria deportiva, ropa de entrenamiento, mayorista Argentina, buzos deportivos, remeras deportivas, shorts deportivos, bolsos deportivos',
+    'paletas de padel, palas de padel, paletas padel mayorista, accesorios de padel, grip padel, cubre grip, bolso padel, mochila padel, pelotas padel, ropa deportiva mayorista, indumentaria deportiva, ropa de entrenamiento, mayorista Argentina, SARO, buzos deportivos, remeras deportivas, shorts deportivos, calzas deportivas, camperas deportivas, medias deportivas',
   authors: [{ name: 'SARO' }],
   icons: {
     icon: [
@@ -26,9 +26,9 @@ export const metadata = {
   alternates: { canonical: 'https://saro.com.ar/' },
   openGraph: {
     type: 'website',
-    title: 'SARO Mayorista | Ropa Deportiva y Padel',
+    title: 'SARO Mayorista | Paletas de Padel y Ropa Deportiva al por Mayor',
     description:
-      'Catalogo mayorista de ropa deportiva, indumentaria de entrenamiento, paletas y accesorios de padel. Precios exclusivos por cantidad.',
+      'Paletas de padel, accesorios de padel y ropa deportiva al por mayor. Catalogo mayorista con precios exclusivos. Envios a toda Argentina.',
     images: ['https://saro.com.ar/assets/logo-horizontal.png'],
     url: 'https://saro.com.ar/',
     siteName: 'SARO Mayorista',
@@ -36,9 +36,9 @@ export const metadata = {
   },
   twitter: {
     card: 'summary_large_image',
-    title: 'SARO Mayorista | Ropa Deportiva y Padel',
+    title: 'SARO Mayorista | Paletas de Padel y Ropa Deportiva',
     description:
-      'Catalogo mayorista de ropa deportiva, paletas y accesorios de padel. Venta al por mayor en Argentina.',
+      'Paletas de padel, palas de padel, accesorios y ropa deportiva al por mayor en Argentina. Precios mayoristas exclusivos.',
     images: ['https://saro.com.ar/assets/logo-horizontal.png'],
   },
 }
@@ -58,7 +58,7 @@ export default function RootLayout({ children }) {
               url: 'https://saro.com.ar',
               logo: 'https://saro.com.ar/assets/logo-horizontal.png',
               description:
-                'Marca de indumentaria deportiva y accesorios de padel. Venta mayorista en Argentina.',
+                'SARO: marca de paletas de padel, accesorios de padel y ropa deportiva. Venta mayorista en Argentina con envios a todo el pais.',
               contactPoint: {
                 '@type': 'ContactPoint',
                 contactType: 'sales',
@@ -77,7 +77,7 @@ export default function RootLayout({ children }) {
               name: 'SARO Mayorista',
               url: 'https://saro.com.ar',
               description:
-                'Catalogo mayorista de ropa deportiva y accesorios de padel',
+                'Catalogo mayorista de paletas de padel, accesorios de padel y ropa deportiva en Argentina',
               inLanguage: 'es-AR',
             }),
           }}
@@ -112,10 +112,11 @@ export default function RootLayout({ children }) {
       <body>
         {/* Contenido para crawlers (visible antes de que cargue React) */}
         <noscript>
-          <h1>SARO Mayorista</h1>
+          <h1>SARO Mayorista — Paletas de Padel y Ropa Deportiva al por Mayor</h1>
           <p>
-            Ropa deportiva, indumentaria de entrenamiento, paletas de padel y
-            accesorios. Venta mayorista en Argentina.
+            Paletas de padel, palas de padel, accesorios de padel, grips, bolsos,
+            mochilas y ropa deportiva al por mayor en Argentina. Catalogo mayorista
+            con precios exclusivos por cantidad y envios a todo el pais.
           </p>
         </noscript>
         {children}

@@ -5,27 +5,27 @@ import { useState } from 'react'
 const faqs = [
   {
     q: '¿Cuál es la compra mínima?',
-    a: 'Sugerimos una compra mínima que se indica en la parte superior de la página. Esto nos permite ofrecerte los mejores precios mayoristas del mercado.',
+    a: 'Sugerimos una compra mínima que se indica en la parte superior de la página. Esto nos permite ofrecerte los mejores precios mayoristas en paletas de padel, accesorios y ropa deportiva.',
   },
   {
     q: '¿Hacen envíos a todo el país?',
-    a: 'Sí, realizamos envíos a toda la Argentina a través de las principales empresas de logística. El costo de envío se coordina al momento de confirmar tu pedido.',
+    a: 'Sí, realizamos envíos de paletas de padel, accesorios de padel y ropa deportiva a toda la Argentina a través de las principales empresas de logística. El costo de envío se coordina al momento de confirmar tu pedido.',
   },
   {
-    q: '¿Cómo hago un pedido?',
-    a: 'Es muy fácil: elegí los productos que necesitás, seleccioná colores, talles y cantidades, y enviá tu pedido por WhatsApp directamente desde el carrito. Nosotros te confirmamos stock y te indicamos cómo pagar.',
+    q: '¿Cómo hago un pedido de paletas de padel o ropa deportiva?',
+    a: 'Es muy fácil: elegí los productos que necesitás (paletas, grips, bolsos, ropa), seleccioná colores, talles y cantidades, y enviá tu pedido por WhatsApp directamente desde el carrito. Nosotros te confirmamos stock y te indicamos cómo pagar.',
   },
   {
     q: '¿Qué medios de pago aceptan?',
     a: 'Aceptamos transferencia bancaria y otros medios que se coordinan de forma directa. Una vez confirmado tu pedido, te compartimos los datos necesarios.',
   },
   {
-    q: '¿Qué productos ofrecen?',
-    a: 'Tenemos un catálogo completo de indumentaria deportiva (remeras, buzos, shorts, calzas, camperas), accesorios de pádel (paletas, bolsos, mochilas) y accesorios deportivos en general. Todo con la calidad SARO.',
+    q: '¿Qué paletas de padel y productos ofrecen?',
+    a: 'Tenemos un catalogo completo de paletas de padel y palas de padel para todos los niveles, accesorios de padel (grips, cubre grips, pelotas, bolsos, mochilas), indumentaria deportiva (remeras, buzos, shorts, calzas, camperas) y accesorios deportivos en general. Todo con la calidad SARO.',
   },
   {
-    q: '¿Puedo revender los productos?',
-    a: 'Por supuesto, nuestros precios están pensados para comerciantes y revendedores. Cuanto mayor sea tu pedido, mejores precios podemos ofrecerte a través de nuestras promos por cantidad.',
+    q: '¿Puedo revender paletas de padel y ropa deportiva SARO?',
+    a: 'Por supuesto, nuestros precios mayoristas en paletas de padel y ropa deportiva están pensados para comerciantes y revendedores. Cuanto mayor sea tu pedido, mejores precios podemos ofrecerte a través de nuestras promos por cantidad.',
   },
 ]
 

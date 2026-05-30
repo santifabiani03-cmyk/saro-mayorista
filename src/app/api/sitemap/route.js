@@ -28,11 +28,14 @@ export async function GET() {
     <priority>1.0</priority>
   </url>`,
       ...visibleProducts.map(
-        p => `  <url>
-    <loc>${BASE_URL}/producto/${toSlug(p.nombre, p.id)}</loc>
+        p => {
+          const lastmod = p.fechaActualizacion || p.fechaPublicacion
+          return `  <url>
+    <loc>${BASE_URL}/producto/${toSlug(p.nombre, p.id)}</loc>${lastmod ? `\n    <lastmod>${new Date(lastmod).toISOString().split('T')[0]}</lastmod>` : ''}
     <changefreq>weekly</changefreq>
     <priority>0.8</priority>
   </url>`
+        }
       ),
     ]
 

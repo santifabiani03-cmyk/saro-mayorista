@@ -42,6 +42,11 @@ export default function CatalogClient({ products }) {
   return (
     <>
       <main className="max-w-7xl mx-auto px-4 py-6 space-y-6">
+        {/* H1 SEO — visible, compacto, no molesta al usuario */}
+        <h1 className="text-lg sm:text-xl font-bold text-gray-800 leading-tight">
+          Catalogo mayorista de paletas de padel, accesorios y ropa deportiva
+        </h1>
+
         <Filters products={products} filters={filters} setFilters={setFilters} />
 
         <div className="flex items-center justify-between gap-3">
