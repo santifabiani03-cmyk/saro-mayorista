@@ -16,6 +16,19 @@ const getImages = p =>
 // Revalidar cada 60 segundos (ISR)
 export const revalidate = 60
 
+// --- Pre-generar páginas de producto para indexación rápida ---
+export async function generateStaticParams() {
+  try {
+    const products = getProducts()
+    const { toSlug } = await import('../../../../utils/slug')
+    return products
+      .filter(p => p.visible !== false)
+      .map(p => ({ slug: toSlug(p.nombre, p.id) }))
+  } catch {
+    return []
+  }
+}
+
 // --- Metadata dinámica para SEO (se renderiza en el server) ---
 export async function generateMetadata({ params }) {
   const { slug } = await params
@@ -53,6 +66,9 @@ export async function generateMetadata({ params }) {
       title: `${product.nombre} | ${catLabel} Mayorista`,
       description,
       images: imgUrl ? [imgUrl] : [],
+    },
+    alternates: {
+      canonical: `https://saro.com.ar/producto/${slug}`,
     },
   }
 }

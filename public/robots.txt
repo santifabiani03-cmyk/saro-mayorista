@@ -1,6 +1,7 @@
 User-agent: *
-Allow: /api/sitemap
 Allow: /
+Allow: /producto/
+Allow: /api/sitemap
 Disallow: /admin
 Disallow: /api/
 

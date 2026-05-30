@@ -21,9 +21,17 @@ export async function GET() {
     const data = JSON.parse(fs.readFileSync(CATALOG_FILE, 'utf-8'))
     const visibleProducts = data.filter(p => p.visible !== false)
 
+    // Fecha más reciente de actualización de cualquier producto
+    const latestDate = visibleProducts.reduce((max, p) => {
+      const d = p.fechaActualizacion || p.fechaPublicacion
+      return d && d > max ? d : max
+    }, '')
+    const homeLastmod = latestDate ? new Date(latestDate).toISOString().split('T')[0] : new Date().toISOString().split('T')[0]
+
     const urls = [
       `  <url>
     <loc>${BASE_URL}/</loc>
+    <lastmod>${homeLastmod}</lastmod>
     <changefreq>daily</changefreq>
     <priority>1.0</priority>
   </url>`,
