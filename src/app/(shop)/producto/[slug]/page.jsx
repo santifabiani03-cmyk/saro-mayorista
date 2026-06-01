@@ -16,18 +16,10 @@ const getImages = p =>
 // Revalidar cada 60 segundos (ISR)
 export const revalidate = 60
 
-// --- Pre-generar páginas de producto para indexación rápida ---
-export async function generateStaticParams() {
-  try {
-    const products = getProducts()
-    const { toSlug } = await import('../../../../utils/slug')
-    return products
-      .filter(p => p.visible !== false)
-      .map(p => ({ slug: toSlug(p.nombre, p.id) }))
-  } catch {
-    return []
-  }
-}
+// Las páginas de producto se generan on-demand via ISR (revalidate=60).
+// generateStaticParams fue removido porque algunos productos causan errores
+// de pre-render que bloquean todo el build de Vercel.
+// El sitemap dinámico (/api/sitemap) ya lista todas las URLs para Google.
 
 // --- Metadata dinámica para SEO (se renderiza en el server) ---
 export async function generateMetadata({ params }) {
