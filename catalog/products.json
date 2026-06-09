@@ -2077,7 +2077,7 @@
   },
   {
     "nombre": "Saro MAX 3.0 Carbono",
-    "precio": 130000,
+    "precio": 180000,
     "descripcion": "La paleta Saro MAX 3.0 Carbono presenta un formato redondo con el centro construido en carbono. Esta composición mejora significativamente el control en cada golpe, ofreciendo precisión en el juego. Es una opción ideal para jugadores que buscan maximizar la dirección y estabilidad en la cancha.",
     "tags": [
       "carbono"
@@ -2097,10 +2097,11 @@
     "_aiLoading": false,
     "_aiCount": 1,
     "id": "p1780099106807",
+    "fechaPublicacion": "2026-05-29T23:58:26.807Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780098751394.jpg",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780098762369.jpg"
     ],
-    "fechaPublicacion": "2026-05-29T23:58:26.807Z"
+    "fechaActualizacion": "2026-06-09T12:41:46.474Z"
   }
 ]
