@@ -38,5 +38,61 @@
     ],
     "total": 180000,
     "totalItems": 1
+  },
+  {
+    "id": "o1782307612755",
+    "fecha": "2026-06-24T13:26:52.755Z",
+    "items": [
+      {
+        "productId": "p1779495548570",
+        "nombre": "Mochila Paletera",
+        "precio": 26000,
+        "color": "Rojo",
+        "talle": "Única",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1779495645178",
+        "nombre": "NECESER OBJ. PERSONALES ",
+        "precio": 13000,
+        "color": "Rojo",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779495645178",
+        "nombre": "NECESER OBJ. PERSONALES ",
+        "precio": 13000,
+        "color": "Rosa",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779495645178",
+        "nombre": "NECESER OBJ. PERSONALES ",
+        "precio": 13000,
+        "color": "Gris",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779452463276",
+        "nombre": "CARAMELERA NOAC PERFORADOS X60u. ",
+        "precio": 58000,
+        "color": "Multicolor",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 152500,
+    "totalItems": 7
   }
 ]
