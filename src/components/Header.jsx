@@ -40,7 +40,7 @@ export default function Header({ config }) {
             <div className="hidden sm:flex items-center gap-1.5 bg-saro-light text-saro-dark px-3 py-1.5 rounded-full text-sm font-medium">
               <span className="text-saro-blue font-bold">Compra mín. sugerida:</span>
               <span className="font-bold">
-                ${config.minPurchase.toLocaleString('es-AR')}
+                ${(config.suggestedMinPurchase ?? config.minPurchase).toLocaleString('es-AR')}
               </span>
             </div>
 
@@ -85,7 +85,7 @@ export default function Header({ config }) {
 
         {/* Badge móvil mínimo */}
         <div className="sm:hidden bg-saro-light px-4 py-1.5 text-center text-xs text-saro-dark font-medium border-t border-saro-light">
-          Compra mín. sugerida: <strong>${config.minPurchase.toLocaleString('es-AR')}</strong>
+          Compra mín. sugerida: <strong>${(config.suggestedMinPurchase ?? config.minPurchase).toLocaleString('es-AR')}</strong>
         </div>
       </header>
 

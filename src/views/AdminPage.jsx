@@ -4,6 +4,7 @@ import ProductForm from '../components/admin/ProductForm'
 import ProductList from '../components/admin/ProductList'
 import DemandDashboard from '../components/admin/DemandDashboard'
 import LabelCompiler from '../components/admin/LabelCompiler'
+import SettingsPanel from '../components/admin/SettingsPanel'
 import { exportCatalogPdf, uploadCatalogPdf } from '../utils/exportCatalogPdf'
 
 
@@ -392,6 +393,7 @@ export default function AdminPage() {
             { key: 'nuevo',  label: editingProduct ? '✏️ Editando producto' : '＋ Nuevo producto' },
             { key: 'etiquetas', label: '🏷️ Etiquetas' },
             { key: 'demanda', label: '📊 Demanda' },
+            { key: 'ajustes', label: '⚙️ Ajustes' },
           ].map(t => (
             <button
               key={t.key}
@@ -431,6 +433,8 @@ export default function AdminPage() {
           <LabelCompiler />
         ) : tab === 'demanda' ? (
           <DemandDashboard />
+        ) : tab === 'ajustes' ? (
+          <SettingsPanel onToast={showToast} />
         ) : (
           <ProductList
             products={products}

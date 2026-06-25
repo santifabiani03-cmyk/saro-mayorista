@@ -1,0 +1,171 @@
+'use client'
+import { useState, useEffect } from 'react'
+
+export default function SettingsPanel({ onToast }) {
+  const [loading, setLoading] = useState(true)
+  const [saving, setSaving] = useState(false)
+  const [config, setConfig] = useState(null)
+
+  const [minPurchase, setMinPurchase] = useState('')
+  const [suggestedMinPurchase, setSuggestedMinPurchase] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
+
+  useEffect(() => {
+    fetch('/config.json')
+      .then(r => r.json())
+      .then(data => {
+        setConfig(data)
+        setMinPurchase(data.minPurchase ?? '')
+        setSuggestedMinPurchase(data.suggestedMinPurchase ?? data.minPurchase ?? '')
+        const num = data.whatsappNumber ?? ''
+        setPhoneNumber(num.startsWith('54') ? num.slice(2) : num)
+      })
+      .catch(() => onToast?.('No se pudo cargar la configuración', 'error'))
+      .finally(() => setLoading(false))
+  }, [])
+
+  const handleSave = async () => {
+    const min = Number(minPurchase)
+    const sug = Number(suggestedMinPurchase)
+    const phone = phoneNumber.replace(/\D/g, '')
+
+    if (!min || min < 0) return onToast?.('La compra mínima debe ser un número positivo', 'error')
+    if (!sug || sug < 0) return onToast?.('La compra mínima sugerida debe ser un número positivo', 'error')
+    if (!phone || phone.length < 8 || phone.length > 13) return onToast?.('El número de teléfono no es válido', 'error')
+
+    const fullNumber = '54' + phone
+
+    setSaving(true)
+    try {
+      const res = await fetch('/api/update-config', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pin: sessionStorage.getItem('saro_admin_pin') ?? '',
+          config: {
+            minPurchase: min,
+            suggestedMinPurchase: sug,
+            whatsappNumber: fullNumber,
+          },
+        }),
+      })
+      const json = await res.json()
+      if (!json.ok) throw new Error(json.error ?? 'Error desconocido')
+      setConfig(json.config)
+      onToast?.('✅ Configuración guardada. Se aplicará en el próximo deploy.')
+    } catch (e) {
+      onToast?.('❌ Error al guardar: ' + (e?.message ?? ''), 'error')
+    } finally {
+      setSaving(false)
+    }
+  }
+
+  if (loading) {
+    return (
+      <div className="flex items-center justify-center py-20 text-gray-400 text-sm">
+        Cargando configuración…
+      </div>
+    )
+  }
+
+  return (
+    <div className="max-w-lg mx-auto">
+      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
+        <div className="px-6 py-5 border-b border-gray-100">
+          <h2 className="font-extrabold text-lg text-gray-900">Ajustes de la tienda</h2>
+          <p className="text-sm text-gray-400 mt-0.5">Los cambios se aplican en el próximo deploy</p>
+        </div>
+
+        <div className="px-6 py-5 space-y-6">
+
+          {/* Compra mínima */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Compra mínima
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Monto mínimo requerido para enviar un pedido
+            </p>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">$</span>
+              <input
+                type="number"
+                min="0"
+                step="1000"
+                value={minPurchase}
+                onChange={e => setMinPurchase(e.target.value)}
+                className="w-full border-2 border-gray-200 rounded-xl pl-8 pr-4 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
+                placeholder="150000"
+              />
+            </div>
+          </div>
+
+          {/* Compra mínima sugerida */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Compra mínima sugerida
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Se muestra como referencia en el header de la tienda
+            </p>
+            <div className="relative">
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">$</span>
+              <input
+                type="number"
+                min="0"
+                step="1000"
+                value={suggestedMinPurchase}
+                onChange={e => setSuggestedMinPurchase(e.target.value)}
+                className="w-full border-2 border-gray-200 rounded-xl pl-8 pr-4 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
+                placeholder="150000"
+              />
+            </div>
+          </div>
+
+          {/* Teléfono WhatsApp */}
+          <div>
+            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+              Teléfono WhatsApp
+            </label>
+            <p className="text-xs text-gray-400 mb-2">
+              Número al que llegan los pedidos por WhatsApp
+            </p>
+            <div className="flex items-stretch">
+              <span className="flex items-center px-3 bg-gray-100 border-2 border-r-0 border-gray-200 rounded-l-xl text-sm font-bold text-gray-500 select-none">
+                +54
+              </span>
+              <input
+                type="tel"
+                value={phoneNumber}
+                onChange={e => setPhoneNumber(e.target.value.replace(/[^\d]/g, ''))}
+                className="flex-1 border-2 border-gray-200 rounded-r-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
+                placeholder="9 11 2320 8058"
+                maxLength={13}
+              />
+            </div>
+            <p className="text-xs text-gray-300 mt-1.5">
+              Número completo: +54{phoneNumber || '…'}
+            </p>
+          </div>
+
+        </div>
+
+        {/* Footer */}
+        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
+          <p className="text-xs text-gray-400">
+            {config?.whatsappNumber && (
+              <>Actual: +{config.whatsappNumber}</>
+            )}
+          </p>
+          <button
+            onClick={handleSave}
+            disabled={saving}
+            className="px-5 py-2.5 bg-saro-blue hover:bg-saro-dark text-white text-sm font-bold rounded-xl transition-colors disabled:opacity-60"
+          >
+            {saving ? 'Guardando…' : 'Guardar cambios'}
+          </button>
+        </div>
+      </div>
+    </div>
+  )
+}
