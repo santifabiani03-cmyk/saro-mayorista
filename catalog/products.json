@@ -105,7 +105,7 @@
   },
   {
     "nombre": "CANASTO PLEGABLE ALUMINIO NOAC ",
-    "precio": 160000,
+    "precio": 170000,
     "descripcion": "-CAPACIDAD 150 🎾\n-RED DE CONTENCIÓN \n-FUNDA \n-BOLSILLO LATERAL OBJ PEQUEÑOS\n-RUEDAS SÚPER DESLIZANTES CON TRABA\n\n*No incluye pelotas*",
     "tags": [
       "destacado"
@@ -121,12 +121,14 @@
     ],
     "noStock": [],
     "emoji": "🎾",
+    "promos": [],
     "id": "p1779452295652",
+    "fechaPublicacion": "2026-05-22T12:18:15.652Z",
+    "visible": true,
     "imagenes": [
       "/assets/imagen-1779452173589.webp"
     ],
-    "fechaPublicacion": "2026-05-22T12:18:15.652Z",
-    "visible": true
+    "fechaActualizacion": "2026-06-25T12:01:06.350Z"
   },
   {
     "nombre": "CARAMELERA NOAC PERFORADOS X60u. ",
@@ -1650,87 +1652,6 @@
     "fechaPublicacion": "2026-05-22T21:17:44.000Z"
   },
   {
-    "nombre": "Grip Tape Over Grip",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495484653",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/grip-tape-over-grip-p65.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:18:14.000Z"
-  },
-  {
-    "nombre": "Madma Over Grips",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495503717",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/madma-over-grips-p66.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:18:32.000Z"
-  },
-  {
-    "nombre": "Fundita Porta Paleta SARO",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495512529",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/fundita-porta-paleta-saro-p66.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:18:40.000Z"
-  },
-  {
-    "nombre": "Bolso Mochila Mediano",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495531594",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/bolso-mochila-mediano-p67.png",
-      "/assets/bolso-mochila-mediano-p68.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:19:08.000Z"
-  },
-  {
     "nombre": "Mochila Paletera",
     "precio": 26000,
     "descripcion": "Práctica, cómoda y funcional, la mochila paletera fue diseñada para acompañarte en cada entrenamiento o partido, ofreciendo el espacio justo con una estructura compacta pero amplia al mismo tiempo. \n\nCuenta con un compartimento delantero especial para transportar tu paleta de forma segura y accesible. Su interior amplio permite llevar indumentaria, accesorios y objetos personales sin perder comodidad al trasladarla.",
@@ -1757,26 +1678,6 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-paletera-1779969247304.webp"
     ],
     "fechaActualizacion": "2026-05-28T11:57:24.236Z"
-  },
-  {
-    "nombre": "Funda Paletera",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495566318",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/funda-paletera-p69.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:19:36.000Z"
   },
   {
     "nombre": "Mochila Multi Compartimentos",
@@ -1843,28 +1744,6 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968393193.webp"
     ],
     "fechaActualizacion": "2026-05-28T11:48:37.638Z"
-  },
-  {
-    "nombre": "Bolso Mochila Elite",
-    "precio": 0,
-    "descripcion": "",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [],
-    "talles": [],
-    "noStock": [],
-    "emoji": "🎾",
-    "id": "p1779495620729",
-    "visible": false,
-    "sinStock": false,
-    "imagenes": [
-      "/assets/bolso-mochila-elite-p73.png",
-      "/assets/bolso-mochila-elite-p74.png",
-      "/assets/bolso-mochila-elite-p75.png"
-    ],
-    "fechaPublicacion": "2026-05-22T21:20:45.000Z"
   },
   {
     "nombre": "NECESER OBJ. PERSONALES ",
@@ -2103,5 +1982,116 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780098762369.jpg"
     ],
     "fechaActualizacion": "2026-06-09T12:41:46.474Z"
+  },
+  {
+    "nombre": "Bolso mochila ELITE ",
+    "precio": 52000,
+    "descripcion": "El bolso mochila paletero ELITE es un accesorio versátil para el equipamiento deportivo. Cuenta con dos compartimentos laterales diseñados para paletas, junto con depósitos independientes para zapatillas y ropa. Incorpora tiradores de mochila regulables, una manija superior y un bolsillo específico para objetos personales pequeños.\nCompuesto por ecocuero resistente y facil de limpiar, lona reforzada e interior forrado. ",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "",
+    "colores": [
+      "Azul",
+      "Celeste",
+      "Negro",
+      "Gris",
+      "Rosa"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [
+      {
+        "cantidad": 4,
+        "precioTotal": 200000
+      },
+      {
+        "cantidad": 8,
+        "precioTotal": 384000
+      }
+    ],
+    "_aiLoading": false,
+    "_aiCount": 1,
+    "id": "p1782388768791",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388169727.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388108644.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388114714.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388111268.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388112957.webp"
+    ],
+    "fechaPublicacion": "2026-06-25T11:59:28.791Z"
+  },
+  {
+    "nombre": "TUBO PELOTAS x2 NOVA ",
+    "precio": 5800,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "",
+    "colores": [
+      "Amarillo Fluo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1782389218836",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782389121983.webp"
+    ],
+    "fechaPublicacion": "2026-06-25T12:06:58.836Z"
+  },
+  {
+    "nombre": "Bolso mochila PREMIUM ",
+    "precio": 56000,
+    "descripcion": "Este bolso mochila PREMIUM combina ecocuero y lona reforzada para máxima durabilidad. Presenta doble asa de agarre acolchonada, un bolsillo lateral para objetos personales y compartimentos independientes para ropa y zapatillas. Incluye dos compartimentos laterales acolchados y reforzados, diseñados para transportar paletas de forma segura.",
+    "tags": [
+      "nuevo",
+      "destacado"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "",
+    "colores": [
+      "Naranja",
+      "Gris",
+      "Azul"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [
+      {
+        "cantidad": 4,
+        "precioTotal": 216000
+      },
+      {
+        "cantidad": 6,
+        "precioTotal": 312000
+      }
+    ],
+    "_aiLoading": false,
+    "_aiCount": 2,
+    "id": "p1782391159367",
+    "fechaPublicacion": "2026-06-25T12:39:19.367Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782390069890.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782390066839.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782390096005.webp"
+    ],
+    "fechaActualizacion": "2026-06-25T12:40:22.616Z"
   }
 ]
