@@ -2093,5 +2093,35 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782390096005.webp"
     ],
     "fechaActualizacion": "2026-06-25T12:40:22.616Z"
+  },
+  {
+    "nombre": "COMBO TORNEO BOLSO GRANDE ",
+    "precio": 150000,
+    "descripcion": "COMBO PREMIOS BOLSO GRANDE 🎾🏆\n\nIncluye: 2u. BOLSO GRANDE LONA // 2u. REMERA DRY ELAST el mejor material del mercado // 4u. MEDIAS 3/4 // 4u. CUBRE GRIP RELIEVE // 4u. BOTELLAS ",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "promos": [
+      {
+        "cantidad": 2,
+        "precioTotal": 280000
+      }
+    ],
+    "id": "p1782405898282",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782405816945.webp"
+    ],
+    "fechaPublicacion": "2026-06-25T16:44:58.283Z"
   }
 ]
