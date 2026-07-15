@@ -192,9 +192,11 @@ export default function Paleta3D({ progressRef }) {
         if (Math.abs(ox) < 2.5) ox = (mouse.x < 0 ? -1 : 1) * 2.5  // asegurar que venga de un costado
         b.e = ox <= 0 ? 1 : -1
         b.sx = ox; b.sy = mouse.y * halfH * 1.05; b.sz = 1.0
-        // Destino aleatorio: la paleta la manda a un lado y altura al azar (fuera de cuadro)
-        b.ex = (Math.random() * 2 - 1) * halfW * 1.7
-        b.ey = (0.5 + Math.random() * 1.0) * halfH
+        // Destino aleatorio en cualquier dirección (arriba, abajo, diagonales), fuera de cuadro
+        const ang = Math.random() * Math.PI * 2
+        const rad = 1.3 + Math.random() * 0.5
+        b.ex = Math.cos(ang) * halfW * rad
+        b.ey = Math.sin(ang) * halfH * rad
         b.ez = -1.5 - Math.random() * 2.5
         b.active = true; b.t = 0; b.dur = dur
         clickActive = true; clickT = 0; clickDur = dur; clickDir = b.e
