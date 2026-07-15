@@ -4,7 +4,6 @@ import { useCart } from '../context/CartContext'
 import { COLOR_MAP, TAG_CONFIG, SIZE_ORDER, getProductTags, getSwatchStyle } from '../utils/colors'
 import ImageCarousel from './ImageCarousel'
 
-// Compatibilidad: soporta campo legacy `imagen` (string) y nuevo `imagenes` (array)
 const getImages = p => p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : []
 
 function buildMatrix(colores, talles) {
@@ -16,7 +15,6 @@ function buildMatrix(colores, talles) {
 export default function ProductModal({ product, onClose }) {
   const { addItems } = useCart()
 
-  // Talles ordenados canónicamente (XS → S → M → L → XL → XXL …)
   const sortedTalles = [...product.talles].sort((a, b) => {
     const ia = SIZE_ORDER.indexOf(a)
     const ib = SIZE_ORDER.indexOf(b)
@@ -29,7 +27,6 @@ export default function ProductModal({ product, onClose }) {
   const [matrix, setMatrix] = useState(() => buildMatrix(product.colores, sortedTalles))
   const imgs = getImages(product)
 
-  // Bloquear scroll del body mientras el modal esté abierto
   useEffect(() => {
     document.body.style.overflow = 'hidden'
     return () => { document.body.style.overflow = '' }
@@ -66,58 +63,58 @@ export default function ProductModal({ product, onClose }) {
 
   return (
     <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/50 backdrop-blur-sm"
+      className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-6 bg-black/50 backdrop-blur-sm animate-fade-in"
       onClick={onClose}
     >
       <div
-        className="bg-white rounded-2xl w-full max-w-3xl max-h-[92vh] flex flex-col shadow-2xl overflow-hidden"
+        className="bg-white rounded-2xl w-full max-w-3xl max-h-[92vh] flex flex-col shadow-float overflow-hidden animate-slide-up"
         onClick={e => e.stopPropagation()}
       >
-        {/* ── Header ── */}
-        <div className="flex items-start justify-between p-4 sm:p-5 border-b border-gray-100 flex-shrink-0">
+        {/* Header */}
+        <div className="flex items-start justify-between p-4 sm:p-5 border-b border-gray-100/80 flex-shrink-0">
           <div>
             <div className="flex items-center gap-2 flex-wrap">
-              <h2 className="text-lg sm:text-xl font-bold text-gray-900">{product.nombre}</h2>
+              <h2 className="text-lg sm:text-xl font-bold text-gray-900 tracking-tight">{product.nombre}</h2>
               {tags.map((tag, i) => (
-                <span key={i} className={`px-2 py-0.5 rounded-full text-xs font-semibold ${tag.cls}`}>
+                <span key={i} className={`px-2 py-0.5 rounded-md text-[11px] font-semibold ${tag.cls}`}>
                   {tag.label}
                 </span>
               ))}
             </div>
-            <p className="text-2xl font-extrabold text-saro-blue mt-0.5">
+            <p className="text-2xl font-extrabold text-saro-blue mt-1 tracking-tight">
               ${product.precio.toLocaleString('es-AR')}
               <span className="text-sm font-normal text-gray-400 ml-1">c/u</span>
             </p>
           </div>
           <button
             onClick={onClose}
-            className="text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl p-1.5 text-xl leading-none transition-colors flex-shrink-0"
+            className="text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl p-2 text-lg leading-none transition-colors flex-shrink-0"
           >
             ✕
           </button>
         </div>
 
-        {/* ── Cuerpo ── */}
+        {/* Cuerpo */}
         <div className="overflow-y-auto flex-1">
           <div className="p-4 sm:p-5 grid grid-cols-1 md:grid-cols-2 gap-6">
 
-            {/* ── Galería con carrusel ── */}
+            {/* Galería */}
             <div className="space-y-3">
               <ImageCarousel images={imgs} emoji={product.emoji} thumbs altText={product.nombre} />
               <p className="text-sm text-gray-600 leading-relaxed">{product.descripcion}</p>
             </div>
 
-            {/* ── Matriz color × talle ── */}
+            {/* Matriz color × talle */}
             <div className="space-y-3">
-              <h3 className="font-semibold text-gray-800">Seleccioná cantidades</h3>
+              <h3 className="font-semibold text-gray-800 text-sm">Seleccioná cantidades</h3>
 
-              <div className="overflow-x-auto rounded-xl border border-gray-100">
+              <div className="overflow-x-auto rounded-xl border border-gray-100/80">
                 <table className="w-full text-sm min-w-max">
-                  <thead className="bg-gray-50">
+                  <thead className="bg-gray-50/80">
                     <tr>
-                      <th className="text-left py-2 px-3 text-gray-500 font-medium text-xs">Color</th>
+                      <th className="text-left py-2.5 px-3 text-gray-500 font-medium text-xs">Color</th>
                       {sortedTalles.map(t => (
-                        <th key={t} className="py-2 px-2 text-center text-gray-500 font-medium text-xs min-w-[68px]">
+                        <th key={t} className="py-2.5 px-2 text-center text-gray-500 font-medium text-xs min-w-[68px]">
                           {t}
                         </th>
                       ))}
@@ -125,7 +122,7 @@ export default function ProductModal({ product, onClose }) {
                   </thead>
                   <tbody>
                     {product.colores.map((color, ci) => (
-                      <tr key={color} className={ci % 2 === 0 ? 'bg-white' : 'bg-gray-50/50'}>
+                      <tr key={color} className={ci % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'}>
                         <td className="py-2 px-3">
                           <div className="flex items-center gap-1.5">
                             <span
@@ -146,14 +143,14 @@ export default function ProductModal({ product, onClose }) {
                                 <div className="flex items-center justify-center gap-0.5">
                                   <button
                                     onClick={() => updateQty(color, talle, -1)}
-                                    className="w-6 h-6 rounded-md bg-gray-100 hover:bg-red-100 hover:text-red-600 text-gray-600 text-xs font-bold transition-colors flex items-center justify-center"
+                                    className="w-6 h-6 rounded-lg bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-600 text-xs font-bold transition-colors flex items-center justify-center"
                                   >−</button>
                                   <span className={`w-6 text-center text-xs font-bold tabular-nums ${qty > 0 ? 'text-saro-blue' : 'text-gray-300'}`}>
                                     {qty}
                                   </span>
                                   <button
                                     onClick={() => updateQty(color, talle, 1)}
-                                    className="w-6 h-6 rounded-md bg-gray-100 hover:bg-green-100 hover:text-green-700 text-gray-600 text-xs font-bold transition-colors flex items-center justify-center"
+                                    className="w-6 h-6 rounded-lg bg-gray-100 hover:bg-green-50 hover:text-green-700 text-gray-600 text-xs font-bold transition-colors flex items-center justify-center"
                                   >+</button>
                                 </div>
                               )}
@@ -167,7 +164,7 @@ export default function ProductModal({ product, onClose }) {
               </div>
 
               {product.sinStock && (
-                <div className="flex items-start gap-2.5 bg-red-50 border border-red-200 rounded-xl px-4 py-3">
+                <div className="flex items-start gap-2.5 bg-red-50 border border-red-200/80 rounded-xl px-4 py-3">
                   <span className="text-red-500 text-base flex-shrink-0 mt-0.5">⚠️</span>
                   <p className="text-xs text-red-700 leading-relaxed">
                     <span className="font-bold">Es muy probable que ya no contemos con stock de este producto.</span>
@@ -184,9 +181,9 @@ export default function ProductModal({ product, onClose }) {
                     {product.promos.map((p, i) => {
                       const active = totalUnidades >= p.cantidad
                       return (
-                        <span key={i} className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all ${
+                        <span key={i} className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all duration-200 ${
                           active
-                            ? 'bg-green-50 border-green-300 text-green-700'
+                            ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
                             : 'bg-gray-50 border-gray-200 text-gray-500'
                         }`}>
                           {p.cantidad}u → ${p.precioTotal.toLocaleString('es-AR')}
@@ -211,7 +208,7 @@ export default function ProductModal({ product, onClose }) {
 
                 return (
                   <div className="space-y-1.5">
-                    <div className="flex items-center justify-between bg-saro-light rounded-xl px-4 py-3">
+                    <div className="flex items-center justify-between bg-saro-light rounded-xl px-4 py-3 border border-blue-100/40">
                       <span className="text-sm font-medium text-saro-dark">
                         {totalUnidades} unidad{totalUnidades !== 1 ? 'es' : ''} seleccionada{totalUnidades !== 1 ? 's' : ''}
                       </span>
@@ -227,8 +224,8 @@ export default function ProductModal({ product, onClose }) {
                       </div>
                     </div>
                     {ahorro > 0 && (
-                      <div className="bg-green-50 border border-green-200 rounded-xl px-4 py-2">
-                        <span className="text-xs text-green-700 font-medium">
+                      <div className="bg-emerald-50 border border-emerald-200/80 rounded-xl px-4 py-2">
+                        <span className="text-xs text-emerald-700 font-medium">
                           💰 Ahorrás ${ahorro.toLocaleString('es-AR')} con la promo de {applicable.cantidad}u
                         </span>
                       </div>
@@ -240,20 +237,20 @@ export default function ProductModal({ product, onClose }) {
           </div>
         </div>
 
-        {/* ── Footer ── */}
-        <div className="flex gap-3 p-4 sm:p-5 border-t border-gray-100 flex-shrink-0">
+        {/* Footer */}
+        <div className="flex gap-3 p-4 sm:p-5 border-t border-gray-100/80 flex-shrink-0">
           <button
             onClick={onClose}
-            className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium text-sm transition-colors"
+            className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium text-sm transition-colors active:scale-[.98]"
           >
             Cancelar
           </button>
           <button
             onClick={handleAgregar}
             disabled={totalUnidades === 0}
-            className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-colors ${
+            className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 active:scale-[.98] ${
               totalUnidades > 0
-                ? 'bg-saro-blue hover:bg-saro-dark text-white shadow-sm'
+                ? 'bg-saro-blue hover:bg-saro-mid text-white shadow-md shadow-saro-blue/20'
                 : 'bg-gray-100 text-gray-400 cursor-not-allowed'
             }`}
           >

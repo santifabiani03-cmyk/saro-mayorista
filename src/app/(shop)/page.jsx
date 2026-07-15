@@ -54,9 +54,9 @@ export default function HomePage() {
       <CatalogClient products={products} />
 
       {/* Sección SEO server-rendered — Google la ve, el usuario la ve como info útil al final */}
-      <section className="max-w-7xl mx-auto px-4 pb-8">
-        <div className="bg-white rounded-2xl border border-gray-100 p-6 space-y-4">
-          <h2 className="text-base font-bold text-gray-800">
+      <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-8">
+        <div className="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6 space-y-4">
+          <h2 className="text-base font-bold text-gray-900 tracking-tight">
             Catalogo mayorista de padel y ropa deportiva
           </h2>
           <div className="grid sm:grid-cols-3 gap-4 text-sm text-gray-500 leading-relaxed">

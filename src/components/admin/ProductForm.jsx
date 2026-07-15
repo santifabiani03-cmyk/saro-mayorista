@@ -766,6 +766,190 @@ function MultiImageUploader({ images, onChange, productName, applyLogo }) {
   )
 }
 
+// ── Generador de escenas con IA (Gemini) ─────────────────────────────────────
+// Toma una imagen del producto y genera una foto lifestyle: producto en uso,
+// en cancha, en tienda, etc. La imagen generada se puede sumar a la galería.
+
+const AI_SCENES = [
+  { key: 'accion',    icon: '🎾', label: 'En acción',  desc: 'Jugador usándolo en cancha' },
+  { key: 'lifestyle', icon: '🏙️', label: 'Lifestyle',  desc: 'Escena urbana deportiva' },
+  { key: 'estudio',   icon: '💡', label: 'Estudio',    desc: 'Fondo premium con luces' },
+  { key: 'tienda',    icon: '🏬', label: 'En tienda',  desc: 'Exhibido en local deportivo' },
+]
+
+function base64ToFile(b64, mime) {
+  const bin = atob(b64)
+  const arr = new Uint8Array(bin.length)
+  for (let i = 0; i < bin.length; i++) arr[i] = bin.charCodeAt(i)
+  const ext = mime.includes('png') ? 'png' : mime.includes('jpeg') ? 'jpg' : 'webp'
+  return new File([arr], `ia-escena.${ext}`, { type: mime })
+}
+
+function AiSceneSection({ images, onChange, productName }) {
+  const [srcIdx, setSrcIdx]       = useState(0)
+  const [scene, setScene]         = useState('accion')
+  const [generating, setGenerating] = useState(false)
+  const [results, setResults]     = useState([]) // { dataUrl, b64, mime, adding, added }
+  const [error, setError]         = useState(null)
+  const [open, setOpen]           = useState(false)
+
+  const generate = async () => {
+    setGenerating(true)
+    setError(null)
+    try {
+      const res = await fetch('/api/generate-image', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({
+          pin: sessionStorage.getItem('saro_admin_pin') ?? '',
+          imageUrl: images[srcIdx],
+          scene,
+          productName,
+        }),
+      })
+      const json = await res.json()
+      if (!json.ok) throw new Error(json.error ?? 'Error desconocido')
+      setResults(prev => [{
+        dataUrl: `data:${json.mimeType};base64,${json.image}`,
+        b64: json.image,
+        mime: json.mimeType,
+        adding: false,
+        added: false,
+      }, ...prev])
+    } catch (e) {
+      setError(e.message ?? 'Error al generar')
+    } finally {
+      setGenerating(false)
+    }
+  }
+
+  const addToGallery = async (idx) => {
+    setResults(prev => prev.map((r, i) => i === idx ? { ...r, adding: true } : r))
+    try {
+      const file = base64ToFile(results[idx].b64, results[idx].mime)
+      const url = await uploadFile(file, productName)
+      if (!url) throw new Error('No se pudo subir')
+      onChange([...images, url])
+      setResults(prev => prev.map((r, i) => i === idx ? { ...r, adding: false, added: true } : r))
+    } catch {
+      setResults(prev => prev.map((r, i) => i === idx ? { ...r, adding: false } : r))
+      setError('No se pudo subir la imagen generada. Probá de nuevo.')
+    }
+  }
+
+  return (
+    <div className="border border-violet-200 bg-violet-50/50 rounded-2xl overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen(o => !o)}
+        className="w-full flex items-center justify-between px-4 py-3 text-left"
+      >
+        <div className="flex items-center gap-2">
+          <span className="text-base">✨</span>
+          <div>
+            <p className="text-sm font-bold text-violet-800">Generar escena con IA</p>
+            <p className="text-[11px] text-violet-500">Foto del producto en uso, en cancha o en tienda</p>
+          </div>
+        </div>
+        <svg
+          className={`w-4 h-4 text-violet-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
+          strokeLinecap="round" strokeLinejoin="round"
+        >
+          <polyline points="6 9 12 15 18 9" />
+        </svg>
+      </button>
+
+      {open && (
+        <div className="px-4 pb-4 space-y-3">
+          {/* Imagen de origen */}
+          {images.length > 1 && (
+            <div>
+              <p className="text-[11px] font-semibold text-violet-600 mb-1.5">Imagen base:</p>
+              <div className="flex gap-1.5 flex-wrap">
+                {images.map((url, i) => (
+                  <button
+                    key={url + i}
+                    type="button"
+                    onClick={() => setSrcIdx(i)}
+                    className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${
+                      srcIdx === i ? 'border-violet-500 scale-105' : 'border-transparent opacity-60 hover:opacity-100'
+                    }`}
+                  >
+                    <img src={url} alt="" className="w-full h-full object-cover" />
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          {/* Escenas */}
+          <div className="grid grid-cols-2 sm:grid-cols-4 gap-1.5">
+            {AI_SCENES.map(s => (
+              <button
+                key={s.key}
+                type="button"
+                onClick={() => setScene(s.key)}
+                className={`flex flex-col items-start gap-0.5 rounded-xl border px-3 py-2 text-left transition-all ${
+                  scene === s.key
+                    ? 'border-violet-500 bg-white shadow-sm'
+                    : 'border-violet-100 bg-white/60 hover:border-violet-300'
+                }`}
+              >
+                <span className="text-sm">{s.icon} <span className="font-semibold text-xs text-gray-800">{s.label}</span></span>
+                <span className="text-[10px] text-gray-400 leading-tight">{s.desc}</span>
+              </button>
+            ))}
+          </div>
+
+          <button
+            type="button"
+            onClick={generate}
+            disabled={generating || images.length === 0}
+            className="w-full py-2.5 rounded-xl bg-violet-600 hover:bg-violet-700 text-white text-sm font-bold transition-colors disabled:opacity-50"
+          >
+            {generating ? '✨ Generando… (puede tardar ~15s)' : '✨ Generar imagen'}
+          </button>
+
+          {error && (
+            <p className="text-xs text-red-500 bg-red-50 border border-red-200 rounded-lg px-3 py-2">{error}</p>
+          )}
+
+          {/* Resultados */}
+          {results.length > 0 && (
+            <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
+              {results.map((r, i) => (
+                <div key={i} className="relative rounded-xl overflow-hidden border border-violet-100 bg-white">
+                  <img src={r.dataUrl} alt="Imagen generada por IA" className="w-full aspect-square object-cover" />
+                  <div className="p-1.5">
+                    {r.added ? (
+                      <p className="text-center text-[11px] font-semibold text-green-600 py-1">✅ Agregada</p>
+                    ) : (
+                      <button
+                        type="button"
+                        onClick={() => addToGallery(i)}
+                        disabled={r.adding}
+                        className="w-full py-1.5 rounded-lg bg-violet-100 hover:bg-violet-200 text-violet-700 text-[11px] font-bold transition-colors disabled:opacity-50"
+                      >
+                        {r.adding ? 'Subiendo…' : '+ Agregar a la galería'}
+                      </button>
+                    )}
+                  </div>
+                </div>
+              ))}
+            </div>
+          )}
+
+          <p className="text-[10px] text-violet-400 leading-relaxed">
+            La IA mantiene el diseño del producto pero puede tener variaciones — revisá el resultado antes de agregarlo.
+            Usa tu API de Gemini (misma que las descripciones).
+          </p>
+        </div>
+      )}
+    </div>
+  )
+}
+
 // ── Selector de colores ───────────────────────────────────────────────────────
 
 // ── Contador de usos diarios de IA (para generador de descripciones con Gemini) ─
@@ -1485,6 +1669,15 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               productName={form.nombre}
               applyLogo={applyLogo}
               isPaleta={form.categoria === 'paleta'}
+            />
+          )}
+
+          {/* ── Generador de escenas con IA ── */}
+          {imagenes.length > 0 && (
+            <AiSceneSection
+              images={imagenes}
+              onChange={setImagenes}
+              productName={form.nombre}
             />
           )}
 

@@ -3,7 +3,6 @@
 import { COLOR_MAP, TAG_CONFIG, getProductTags, getSwatchStyle } from '../utils/colors'
 import ImageCarousel from './ImageCarousel'
 
-// Compatibilidad: soporta campo legacy `imagen` (string) y nuevo `imagenes` (array)
 const getImages = p => p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : []
 
 /* ── Card estándar (ropa / padel) ───────────────────────────────── */
@@ -11,16 +10,16 @@ function StandardCard({ product, onClick, tags, imgs, sinStock }) {
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer group hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+      className="bg-white rounded-2xl shadow-card border border-gray-100/80 overflow-hidden cursor-pointer group hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 ease-out"
     >
       {/* Imagen / carrusel */}
-      <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100 overflow-hidden">
+      <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100/50 overflow-hidden">
         <ImageCarousel images={imgs} emoji={product.emoji} compact altText={product.nombre} />
 
         {tags.length > 0 && (
-          <div className="absolute top-2 left-2 flex flex-col gap-1 items-start">
+          <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 items-start">
             {tags.map((tag, i) => (
-              <span key={i} className={`px-2 py-0.5 rounded-full text-xs font-semibold shadow-sm ${tag.cls}`}>
+              <span key={i} className={`px-2 py-0.5 rounded-full text-[11px] font-semibold shadow-sm ${tag.cls}`}>
                 {tag.label}
               </span>
             ))}
@@ -35,18 +34,18 @@ function StandardCard({ product, onClick, tags, imgs, sinStock }) {
         />
 
         {sinStock && (
-          <span className="absolute top-2 right-2 bg-gray-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm z-20">
+          <span className="absolute top-2 right-2 bg-gray-800/80 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded-full z-20">
             Sin stock
           </span>
         )}
       </div>
 
       {/* Info */}
-      <div className="p-3 space-y-2">
-        <p className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2">
+      <div className="p-3.5 space-y-2">
+        <p className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 tracking-tight">
           {product.nombre}
         </p>
-        <p className="text-xs text-gray-400 capitalize">
+        <p className="text-[11px] text-gray-400 capitalize font-medium">
           {product.categoria} · {product.genero}
         </p>
 
@@ -56,20 +55,20 @@ function StandardCard({ product, onClick, tags, imgs, sinStock }) {
             <span
               key={c}
               title={c}
-              className="w-3.5 h-3.5 rounded-full border border-white shadow-sm flex-shrink-0"
+              className="w-3.5 h-3.5 rounded-full border border-white shadow-sm flex-shrink-0 ring-1 ring-gray-200/60"
               style={getSwatchStyle(c, product.colorDefs)}
             />
           ))}
           {product.colores.length > 6 && (
-            <span className="text-xs text-gray-400">+{product.colores.length - 6}</span>
+            <span className="text-[10px] text-gray-400 font-medium">+{product.colores.length - 6}</span>
           )}
         </div>
 
-        <div className="flex items-center justify-between pt-1">
-          <span className="font-bold text-saro-blue text-base">
+        <div className="flex items-center justify-between pt-1.5">
+          <span className="font-extrabold text-saro-blue text-base tracking-tight">
             ${product.precio.toLocaleString('es-AR')}
           </span>
-          <span className="text-xs bg-saro-light text-saro-blue px-2.5 py-1 rounded-full font-semibold">
+          <span className="text-[11px] bg-saro-dark text-white px-2.5 py-1 rounded-lg font-semibold group-hover:bg-saro-blue transition-colors duration-300">
             Ver →
           </span>
         </div>
@@ -79,36 +78,34 @@ function StandardCard({ product, onClick, tags, imgs, sinStock }) {
 }
 
 /* ── Card especial para paletas ─────────────────────────────────── */
-/* Misma altura total que StandardCard (aspect-square + info).       */
-/* La imagen cubre TODA la card y la info va superpuesta abajo.      */
 function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
   return (
     <div
       onClick={onClick}
-      className="relative bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden cursor-pointer group hover:shadow-md hover:-translate-y-0.5 transition-all duration-200"
+      className="relative bg-white rounded-2xl shadow-card border border-gray-100/80 overflow-hidden cursor-pointer group hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 ease-out"
     >
-      {/* ── Estructura invisible: replica la altura de StandardCard ── */}
+      {/* Estructura invisible: replica la altura de StandardCard */}
       <div className="invisible" aria-hidden="true">
         <div className="aspect-square" />
-        <div className="p-3 space-y-2">
+        <div className="p-3.5 space-y-2">
           <p className="font-semibold text-sm leading-tight line-clamp-2">&nbsp;<br />&nbsp;</p>
-          <p className="text-xs">&nbsp;</p>
+          <p className="text-[11px]">&nbsp;</p>
           <div className="flex items-center gap-1">
             <span className="w-3.5 h-3.5" />
           </div>
-          <div className="flex items-center justify-between pt-1">
-            <span className="font-bold text-base">&nbsp;</span>
-            <span className="text-xs px-2.5 py-1 rounded-full font-semibold">&nbsp;</span>
+          <div className="flex items-center justify-between pt-1.5">
+            <span className="font-extrabold text-base">&nbsp;</span>
+            <span className="text-[11px] px-2.5 py-1 rounded-lg font-semibold">&nbsp;</span>
           </div>
         </div>
       </div>
 
-      {/* ── Imagen: cubre toda la card ── */}
+      {/* Imagen: cubre toda la card */}
       {imgs.length > 0 ? (
         <img
           src={imgs[0]}
           alt={product.nombre}
-          className="absolute inset-0 w-full h-full object-cover object-bottom transition-transform duration-300 group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover object-bottom transition-transform duration-500 ease-out group-hover:scale-105"
           loading="lazy"
           decoding="async"
           onError={e => { e.currentTarget.style.opacity = '0.3' }}
@@ -124,9 +121,9 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
 
       {/* Tags arriba izquierda */}
       {tags.length > 0 && (
-        <div className="absolute top-2 left-2 flex flex-col gap-1 items-start z-10">
+        <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 items-start z-10">
           {tags.map((tag, i) => (
-            <span key={i} className={`px-2 py-0.5 rounded-full text-xs font-semibold shadow-sm ${tag.cls}`}>
+            <span key={i} className={`px-2 py-0.5 rounded-full text-[11px] font-semibold shadow-sm ${tag.cls}`}>
               {tag.label}
             </span>
           ))}
@@ -141,16 +138,15 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
       />
 
       {sinStock && (
-        <span className="absolute top-2 right-2 bg-gray-500 text-white text-xs font-semibold px-2 py-0.5 rounded-full shadow-sm z-10">
+        <span className="absolute top-2 right-2 bg-gray-800/80 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded-full z-10">
           Sin stock
         </span>
       )}
 
-      {/* ── Info superpuesta abajo con gradiente oscuro ── */}
-      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/75 via-black/50 to-transparent pt-12 pb-3 px-3 z-10">
-        {/* Fila: Nombre a la izq, Colores a la der */}
+      {/* Info superpuesta abajo con gradiente oscuro */}
+      <div className="absolute bottom-0 inset-x-0 bg-gradient-to-t from-black/80 via-black/50 to-transparent pt-14 pb-3.5 px-3.5 z-10">
         <div className="flex items-start justify-between gap-2">
-          <p className="font-bold text-white text-sm leading-tight line-clamp-2 drop-shadow-sm flex-1">
+          <p className="font-bold text-white text-sm leading-tight line-clamp-2 drop-shadow-sm flex-1 tracking-tight">
             {product.nombre}
           </p>
           <div className="flex items-center gap-1 flex-shrink-0 mt-0.5">
@@ -168,12 +164,11 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
           </div>
         </div>
 
-        {/* Fila: Precio a la izq, Ver → a la der */}
-        <div className="flex items-center justify-between mt-1.5">
-          <span className="font-bold text-white text-base drop-shadow-sm">
+        <div className="flex items-center justify-between mt-2">
+          <span className="font-extrabold text-white text-base drop-shadow-sm tracking-tight">
             ${product.precio.toLocaleString('es-AR')}
           </span>
-          <span className="text-xs bg-white/20 backdrop-blur-sm text-white px-2.5 py-1 rounded-full font-semibold border border-white/30">
+          <span className="text-[11px] bg-white/20 backdrop-blur-sm text-white px-2.5 py-1 rounded-lg font-semibold border border-white/20 group-hover:bg-white/30 transition-colors duration-300">
             Ver →
           </span>
         </div>
@@ -189,7 +184,6 @@ export default function ProductCard({ product, onClick, onNavigate }) {
     .sort((a, b) => b.label.length - a.label.length)
   const imgs = getImages(product)
 
-  // sinStock: campo explícito del admin, o calculado si todos los combos están sin stock
   const totalCombos = product.colores.length * product.talles.length
   const sinStock    = product.sinStock === true ||
                       (totalCombos > 0 && product.noStock?.length === totalCombos)

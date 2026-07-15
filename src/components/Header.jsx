@@ -11,10 +11,10 @@ export default function Header({ config }) {
 
   return (
     <>
-      <header className="bg-white border-b border-gray-100 sticky top-0 z-30 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex items-center justify-between gap-4">
+      <header className="bg-white/80 backdrop-blur-xl border-b border-gray-100/60 sticky top-0 z-30 shadow-sm">
+        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
 
-          {/* Logo — ícono SR en mobile, horizontal completo en desktop */}
+          {/* Logo */}
           <a href="/" className="flex-shrink-0" aria-label="SARO Mayorista - Inicio">
             <Image
               src="/assets/logo-icon.png"
@@ -34,12 +34,12 @@ export default function Header({ config }) {
             />
           </a>
 
-          <div className="flex items-center gap-3">
+          <div className="flex items-center gap-2.5 sm:gap-3">
 
             {/* Badge mínimo de compra */}
-            <div className="hidden sm:flex items-center gap-1.5 bg-saro-light text-saro-dark px-3 py-1.5 rounded-full text-sm font-medium">
-              <span className="text-saro-blue font-bold">Compra mín. sugerida:</span>
-              <span className="font-bold">
+            <div className="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-saro-light to-blue-50 text-saro-dark px-3.5 py-2 rounded-full text-sm font-medium border border-blue-100/60">
+              <span className="text-saro-blue font-bold text-xs tracking-tight">Compra mín. sugerida:</span>
+              <span className="font-extrabold text-saro-dark">
                 ${(config.suggestedMinPurchase ?? config.minPurchase).toLocaleString('es-AR')}
               </span>
             </div>
@@ -47,7 +47,7 @@ export default function Header({ config }) {
             {/* Botón ¿Cómo comprar? */}
             <button
               onClick={() => setShowHowTo(true)}
-              className="flex items-center gap-1.5 px-3 py-2 rounded-xl border-2 border-saro-blue text-saro-blue hover:bg-saro-blue hover:text-white transition-colors text-sm font-semibold"
+              className="hidden sm:flex items-center gap-1.5 px-3.5 py-2.5 rounded-xl border-2 border-saro-blue/20 text-saro-blue hover:bg-saro-blue hover:text-white hover:border-saro-blue transition-all duration-200 text-sm font-semibold btn-press"
               title="¿Cómo comprar?"
             >
               ¿Cómo comprar?
@@ -58,7 +58,7 @@ export default function Header({ config }) {
               href={`https://wa.me/${config.whatsappNumber}`}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center w-10 h-10 rounded-xl bg-green-500 hover:bg-green-600 transition-colors shadow-sm shadow-green-200"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition-all duration-200 shadow-md shadow-emerald-500/20 btn-press"
               title="Contactar por WhatsApp"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-white">
@@ -70,12 +70,14 @@ export default function Header({ config }) {
             {/* Botón carrito */}
             <button
               onClick={() => setIsOpen(!isOpen)}
-              className="relative flex items-center gap-2 bg-saro-blue hover:bg-saro-dark text-white px-4 py-2 rounded-xl font-semibold text-sm transition-colors"
+              className="relative flex items-center gap-2 bg-saro-dark hover:bg-saro-blue text-white px-4 py-2.5 rounded-xl font-semibold text-sm transition-all duration-200 shadow-md shadow-saro-dark/20 btn-press"
             >
-              <span className="text-base">🛒</span>
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5">
+                <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
+              </svg>
               <span className="hidden sm:inline">Carrito</span>
               {totalItems > 0 && (
-                <span className="absolute -top-2 -right-2 bg-red-500 text-white text-xs w-5 h-5 rounded-full flex items-center justify-center font-bold leading-none">
+                <span className="absolute -top-1.5 -right-1.5 bg-saro-accent text-white text-[10px] w-5 h-5 rounded-full flex items-center justify-center font-bold leading-none shadow-sm">
                   {totalItems > 99 ? '99+' : totalItems}
                 </span>
               )}
@@ -84,8 +86,8 @@ export default function Header({ config }) {
         </div>
 
         {/* Badge móvil mínimo */}
-        <div className="sm:hidden bg-saro-light px-4 py-1.5 text-center text-xs text-saro-dark font-medium border-t border-saro-light">
-          Compra mín. sugerida: <strong>${(config.suggestedMinPurchase ?? config.minPurchase).toLocaleString('es-AR')}</strong>
+        <div className="sm:hidden bg-gradient-to-r from-saro-light to-blue-50 px-4 py-2 text-center text-xs text-saro-dark font-medium border-t border-blue-100/40">
+          Compra mín. sugerida: <strong className="text-saro-blue">${(config.suggestedMinPurchase ?? config.minPurchase).toLocaleString('es-AR')}</strong>
         </div>
       </header>
 

@@ -35,7 +35,6 @@ const steps = [
 ]
 
 export default function HowToBuyModal({ onClose }) {
-  // Cerrar con Escape
   useEffect(() => {
     const handler = (e) => { if (e.key === 'Escape') onClose() }
     window.addEventListener('keydown', handler)
@@ -46,20 +45,20 @@ export default function HowToBuyModal({ onClose }) {
     <>
       {/* Overlay */}
       <div
-        className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm"
+        className="fixed inset-0 bg-black/50 z-40 backdrop-blur-sm animate-fade-in"
         onClick={onClose}
       />
 
       {/* Modal */}
-      <div className="fixed inset-0 z-50 flex items-center justify-center p-4">
-        <div className="bg-white rounded-2xl shadow-2xl w-full max-w-md max-h-[90vh] overflow-y-auto">
+      <div className="fixed inset-0 z-50 flex items-center justify-center p-4 animate-slide-up">
+        <div className="bg-white rounded-2xl shadow-float w-full max-w-md max-h-[90vh] overflow-y-auto">
 
           {/* Header del modal */}
-          <div className="sticky top-0 bg-white rounded-t-2xl px-6 pt-6 pb-4 border-b border-gray-100">
+          <div className="sticky top-0 bg-white rounded-t-2xl px-6 pt-6 pb-4 border-b border-gray-100/80">
             <div className="flex items-center justify-between">
               <div>
-                <h2 className="text-xl font-extrabold text-saro-dark">¿Cómo comprar?</h2>
-                <p className="text-sm text-gray-400 mt-0.5">Seguí estos pasos y tu pedido llega rápido 🚀</p>
+                <h2 className="text-xl font-extrabold text-saro-dark tracking-tight">¿Cómo comprar?</h2>
+                <p className="text-sm text-gray-400 mt-0.5">Seguí estos pasos y tu pedido llega rápido</p>
               </div>
               <button
                 onClick={onClose}
@@ -71,22 +70,19 @@ export default function HowToBuyModal({ onClose }) {
           </div>
 
           {/* Pasos */}
-          <div className="px-6 py-5 space-y-4">
+          <div className="px-6 py-5 space-y-1">
             {steps.map((step, idx) => (
               <div key={idx} className="flex gap-4">
-
-                {/* Línea conectora + número */}
                 <div className="flex flex-col items-center flex-shrink-0">
-                  <div className="w-10 h-10 rounded-full bg-saro-blue flex items-center justify-center text-white font-extrabold text-sm shadow-md shadow-saro-blue/30">
+                  <div className="w-10 h-10 rounded-xl bg-saro-blue flex items-center justify-center text-white font-extrabold text-sm shadow-md shadow-saro-blue/20">
                     {step.number}
                   </div>
                   {idx < steps.length - 1 && (
-                    <div className="w-0.5 h-full min-h-[20px] bg-gray-100 mt-1" />
+                    <div className="w-0.5 h-full min-h-[20px] bg-gradient-to-b from-saro-blue/20 to-transparent mt-1" />
                   )}
                 </div>
 
-                {/* Contenido */}
-                <div className="pb-4 min-w-0">
+                <div className="pb-5 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-lg">{step.icon}</span>
                     <p className="font-bold text-gray-900 text-sm">{step.title}</p>
@@ -99,14 +95,14 @@ export default function HowToBuyModal({ onClose }) {
 
           {/* Footer */}
           <div className="px-6 pb-6">
-            <div className="bg-saro-light rounded-xl px-4 py-3 text-center">
+            <div className="bg-saro-light rounded-xl px-4 py-3 text-center border border-blue-100/40">
               <p className="text-sm text-saro-dark font-medium">
-                ¿Tenés alguna duda? Escribinos directo por WhatsApp 💬
+                ¿Tenés alguna duda? Escribinos directo por WhatsApp
               </p>
             </div>
             <button
               onClick={onClose}
-              className="w-full mt-3 py-3 bg-saro-blue hover:bg-saro-dark text-white font-bold rounded-xl transition-colors text-sm"
+              className="w-full mt-3 py-3 bg-saro-blue hover:bg-saro-mid text-white font-bold rounded-xl transition-all duration-200 text-sm shadow-md shadow-saro-blue/20 active:scale-[.98]"
             >
               ¡Entendido, voy a comprar!
             </button>
