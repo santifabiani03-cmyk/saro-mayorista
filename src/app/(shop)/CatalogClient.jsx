@@ -5,11 +5,9 @@ import { useRouter } from 'next/navigation'
 import Filters from '../../components/Filters'
 import ProductCard from '../../components/ProductCard'
 import ProductModal from '../../components/ProductModal'
-import FaqSection from '../../components/FaqSection'
-import IntroHero from '../../components/IntroHero'
 import { toSlug } from '../../utils/slug'
 
-export default function CatalogClient({ products }) {
+export default function CatalogClient({ products, heading, showFilters = true }) {
   const router = useRouter()
   const [filters, setFilters] = useState({
     categoria: '',
@@ -40,21 +38,24 @@ export default function CatalogClient({ products }) {
     return true
   })
 
-  const totalVisible = products.filter(p => p.visible !== false).length
-
-  const goToCatalog = () => {
-    document.getElementById('catalogo')?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-  }
+  const visibleProducts = products.filter(p => p.visible !== false)
+  const totalVisible = visibleProducts.length
 
   return (
     <>
-      <IntroHero productCount={totalVisible} onExplore={goToCatalog} />
-
-      <main id="catalogo" className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6 scroll-mt-20">
-        <h1 className="sr-only">
-          Catalogo mayorista de paletas de padel, accesorios de padel y ropa deportiva en Argentina
-        </h1>
-        <Filters products={products} filters={filters} setFilters={setFilters} />
+      <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
+        {heading ? (
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-saro-dark tracking-tight">
+            {heading}
+          </h1>
+        ) : (
+          <h1 className="sr-only">
+            Catalogo mayorista de paletas de padel, accesorios de padel y ropa deportiva en Argentina
+          </h1>
+        )}
+        {showFilters && (
+          <Filters products={visibleProducts} filters={filters} setFilters={setFilters} />
+        )}
 
         <div className="flex items-center justify-between gap-3">
           <p className="text-sm text-gray-500 flex-shrink-0 font-medium">
@@ -155,8 +156,6 @@ export default function CatalogClient({ products }) {
             </button>
           </div>
         )}
-
-        <FaqSection />
       </main>
 
       {selectedProduct && (

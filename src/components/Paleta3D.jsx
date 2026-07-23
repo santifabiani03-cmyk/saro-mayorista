@@ -17,7 +17,7 @@ const ROT_X = 0             // corrección de inclinación inicial
 const ROT_Y = 0             // corrección de giro inicial
 const ROT_Z = 0
 
-export default function Paleta3D({ progressRef }) {
+export default function Paleta3D({ progressRef, onReady }) {
   const mountRef = useRef(null)
 
   useEffect(() => {
@@ -130,6 +130,7 @@ export default function Paleta3D({ progressRef }) {
         swing.position.y = -(HALF + ELBOW)      // recoloca el conjunto centrado
         swing.add(holder)
         paleta.add(swing)
+        if (!disposed && onReady) onReady()   // avisa al hero que ya se puede sacar el placeholder
       }, undefined, (err) => console.error('Error cargando glb:', err))
 
       const onResize = () => {

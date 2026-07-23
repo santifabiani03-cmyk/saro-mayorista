@@ -75,19 +75,24 @@ export default function Filters({ products, filters, setFilters }) {
     .filter(k => TAG_CONFIG[k])
     .sort((a, b) => TAG_CONFIG[b].label.length - TAG_CONFIG[a].label.length)
 
-  const Group = ({ label, values, filterKey, labelMap, iconMap }) => (
-    <div className="flex flex-col gap-2">
-      <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">{label}</span>
-      <div className="flex flex-wrap gap-1.5">
-        {values.map(v => (
-          <Chip key={v} active={filters[filterKey] === v} onClick={() => toggle(filterKey, v)}>
-            {iconMap?.[v] || null}
-            {labelMap[v] ?? v}
-          </Chip>
-        ))}
+  // Un grupo con una sola opción no aporta nada (ej. "Paletas" en el catálogo
+  // de paletas), así que no se muestra.
+  const Group = ({ label, values, filterKey, labelMap, iconMap }) => {
+    if (values.length < 2) return null
+    return (
+      <div className="flex flex-col gap-2">
+        <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">{label}</span>
+        <div className="flex flex-wrap gap-1.5">
+          {values.map(v => (
+            <Chip key={v} active={filters[filterKey] === v} onClick={() => toggle(filterKey, v)}>
+              {iconMap?.[v] || null}
+              {labelMap[v] ?? v}
+            </Chip>
+          ))}
+        </div>
       </div>
-    </div>
-  )
+    )
+  }
 
   return (
     <div className="bg-white rounded-2xl shadow-card border border-gray-100/80 p-4 sm:p-5">

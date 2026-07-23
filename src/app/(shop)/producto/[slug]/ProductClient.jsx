@@ -31,6 +31,9 @@ export default function ProductClient({ product }) {
   const router = useRouter()
   const { addItems } = useCart()
 
+  // Volver al catálogo que corresponde según la categoría del producto.
+  const backHref = product.categoria === 'paleta' ? '/paletas' : '/ropa-y-accesorios'
+
   const sortedTalles = [...product.talles].sort((a, b) => {
     const ia = SIZE_ORDER.indexOf(a)
     const ib = SIZE_ORDER.indexOf(b)
@@ -74,7 +77,7 @@ export default function ProductClient({ product }) {
       })
     )
     if (selections.length > 0) addItems(product, selections)
-    router.push('/')
+    router.push(backHref)
   }
 
   const tags = getProductTags(product)
@@ -97,7 +100,7 @@ export default function ProductClient({ product }) {
       {/* Breadcrumb */}
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
         <Link
-          href="/"
+          href={backHref}
           className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-saro-blue transition-colors font-medium"
         >
           <svg
@@ -333,7 +336,7 @@ export default function ProductClient({ product }) {
               {/* Botones */}
               <div className="flex gap-3 pt-2">
                 <Link
-                  href="/"
+                  href={backHref}
                   className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium text-sm transition-colors text-center active:scale-[.98]"
                 >
                   ← Catalogo

@@ -74,9 +74,17 @@ directos tipo `https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayori
 
 ### 2.3 Cómo se lee y se publica (el flujo de datos)
 
-- **Lectura (tienda pública):** la home lee `catalog/products.json` del disco al construir la
-  página y se refresca sola cada 60 segundos (esto se llama ISR: `export const revalidate = 60`
-  en `src/app/(shop)/page.jsx`). También existe la API `/api/catalog` que devuelve el JSON.
+- **Lectura (tienda pública):** las páginas de catálogo (`/paletas` y `/ropa-y-accesorios`) leen
+  `catalog/products.json` del disco al construir la página y se refrescan solas cada 60 segundos
+  (ISR: `export const revalidate = 60`). La home (`/`) es la **landing** y lee el mismo JSON solo
+  para los contadores. También existe la API `/api/catalog` que devuelve el JSON.
+
+**Rutas públicas (actualizado):** `/` = landing de entrada (hero 3D + secciones de scroll +
+FAQ). Desde ahí se entra a **dos catálogos separados**: `/paletas` (solo paletas) y
+`/ropa-y-accesorios` (todo lo que no es paleta: accesorios de pádel + ropa). `/producto/[slug]`
+= ficha (su botón "volver" apunta al catálogo según la categoría). ⚠️ `/catalogo` **ya existía**
+antes y redirige a un catálogo externo (`catalogo.saro.com.ar`) — NO es la grilla interna, no
+tocar. El sitemap lista `/`, `/paletas`, `/ropa-y-accesorios` y los productos.
 - **Escritura (admin):** cuando en el panel `/admin` editás productos y tocás **"Publicar en
   sitio"**, la web llama a `/api/publish`, que **escribe el `products.json` actualizado
   directamente en GitHub** usando un token de acceso (`GITHUB_TOKEN`). Vercel detecta el cambio
@@ -116,9 +124,13 @@ Pagina saro/
 │   │   ├── globals.css       ← estilos globales + animaciones del hero
 │   │   ├── (shop)/           ← LA TIENDA PÚBLICA (grupo de rutas)
 │   │   │   ├── layout.jsx    ← lee public/config.json y envuelve la tienda
-│   │   │   ├── page.jsx      ← home / catálogo (Server Component)
+│   │   │   ├── page.jsx      ← LANDING de entrada (/) — Server Component + preload del .glb
+│   │   │   ├── Landing.jsx   ← la landing en sí: HERO 3D + secciones de scroll + FAQ
+│   │   │   ├── paletas/page.jsx           ← catálogo SOLO paletas (/paletas)
+│   │   │   ├── ropa-y-accesorios/page.jsx ← catálogo ropa + accesorios (/ropa-y-accesorios)
+│   │   │   ├── CatalogView.jsx    ← arma schema + catálogo + bloque SEO por catálogo
 │   │   │   ├── ShopShell.jsx ← header + carrito + footer
-│   │   │   ├── CatalogClient.jsx  ← grilla de productos, filtros, buscador, HERO 3D
+│   │   │   ├── CatalogClient.jsx  ← grilla de productos, filtros, buscador (prop showFilters)
 │   │   │   └── producto/[slug]/   ← página individual de cada producto
 │   │   ├── admin/            ← entrada al panel admin (carga AdminPage)
 │   │   └── api/              ← LA "COCINA" (endpoints, ver tabla abajo)

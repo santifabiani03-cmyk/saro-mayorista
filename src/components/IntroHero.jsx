@@ -1,6 +1,6 @@
 'use client'
 
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
 
 const Paleta3D = dynamic(() => import('./Paleta3D'), { ssr: false })
@@ -36,6 +36,7 @@ function riseStage(p, start, peak) {
 }
 
 export default function IntroHero({ productCount = 0, onExplore }) {
+  const [paletaReady, setPaletaReady] = useState(false)
   const sectionRef = useRef(null)
   const stageRef   = useRef(null)
   const progressRef = useRef(0)
@@ -172,8 +173,21 @@ export default function IntroHero({ productCount = 0, onExplore }) {
 
         {/* Paleta 3D real (Three.js) */}
         <div className="absolute inset-0 flex items-center justify-center z-10">
-          <div className="intro-floaty w-[94vw] max-w-[560px] h-[80vh] max-h-[720px]">
-            <Paleta3D progressRef={progressRef} />
+          <div className="intro-floaty relative w-[94vw] max-w-[560px] h-[80vh] max-h-[720px]">
+            {/* Placeholder mientras baja/decodifica el modelo 3D */}
+            <div
+              className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-700 ${
+                paletaReady ? 'opacity-0' : 'opacity-100'
+              }`}
+              aria-hidden="true"
+            >
+              <img
+                src="/assets/logo-icon.png"
+                alt=""
+                className="w-16 h-16 sm:w-20 sm:h-20 opacity-40 animate-pulse"
+              />
+            </div>
+            <Paleta3D progressRef={progressRef} onReady={() => setPaletaReady(true)} />
           </div>
         </div>
 

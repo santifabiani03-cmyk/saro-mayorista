@@ -66,8 +66,8 @@ export const getProductTags = (p) => {
   return tags
 }
 
-export const CATEGORIA_LABELS  = { ropa: 'Ropa', padel: 'Pádel', paleta: 'Paletas' }
-export const GENERO_LABELS     = { masculino: 'Masculino', femenino: 'Femenino', unisex: 'Unisex' }
+export const CATEGORIA_LABELS  = { ropa: 'Ropa', padel: 'Accesorios', paleta: 'Paletas' }
+export const GENERO_LABELS     = { masculino: 'Hombre', femenino: 'Mujer', unisex: 'Unisex' }
 export const PARTE_LABELS      = {
   torso:     'Torso',
   piernas:   'Piernas',
