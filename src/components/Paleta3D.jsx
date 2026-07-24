@@ -63,7 +63,7 @@ export default function Paleta3D({ progressRef, onReady }) {
       key.shadow.camera.far = 30
       Object.assign(key.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12 })
       key.shadow.bias = -0.0004
-      key.shadow.radius = 4
+      key.shadow.radius = 9
       scene.add(key)
       const fill = new THREE.DirectionalLight(0xdfeaff, 0.5)
       fill.position.set(-6, 2, 4)
@@ -75,7 +75,7 @@ export default function Paleta3D({ progressRef, onReady }) {
 
       const shadowPlane = new THREE.Mesh(
         new THREE.PlaneGeometry(18, 18),
-        new THREE.ShadowMaterial({ opacity: 0.22 })
+        new THREE.ShadowMaterial({ opacity: 0.16 })
       )
       shadowPlane.rotation.x = -Math.PI / 2
       shadowPlane.position.y = -3.8   // más abajo: acompaña la bajada del modelo, evita que la paleta flotando la toque
@@ -189,8 +189,8 @@ export default function Paleta3D({ progressRef, onReady }) {
         swing.rotation.y = shot.yAmp * e * smoothstep(0, 0.3, prog) * (1 - smoothstep(0.62, 1, prog))
         // Profundidad: carga hacia atrás en el windup y empuja hacia adelante en el impacto
         swing.position.z = (shot.thrust || 0) * (-0.4 * w * (1 - s) + hitEnv)
-        // Golpe al revés: giro rápido de 360° (se ve la otra cara y vuelve al frente)
-        if (shot.flip) swing.rotation.y += Math.PI * 2 * e * smoothstep(0.12, 0.85, prog)
+        // Golpe al revés: giro de 360° (se ve la otra cara y vuelve al frente)
+        if (shot.flip) swing.rotation.y += Math.PI * 2 * e * smoothstep(0.1, 0.9, prog)
       }
       const MIN_GAP = 0.45  // tiempo mínimo entre pelota y pelota (seg)
       const launch = () => {
@@ -201,7 +201,7 @@ export default function Paleta3D({ progressRef, onReady }) {
         if (!b) return
         const interval = Math.min(2.5, nowS - lastLaunch)
         const speedK = smoothstep(MIN_GAP, 2.0, interval) // 0 rápido → 1 lento
-        const dur = 0.34 + speedK * 0.66               // 0.34s (rápido) .. 1.0s (lento)
+        let dur = 0.34 + speedK * 0.66                 // 0.34s (rápido) .. 1.0s (lento)
         lastLaunch = nowS
         // Origen desde donde está el mouse (el usuario elige de dónde sale la pelota)
         const aspect = camera.aspect || 1
@@ -213,10 +213,10 @@ export default function Paleta3D({ progressRef, onReady }) {
         b.sx = ox; b.sy = mouse.y * halfH * 1.05; b.sz = 1.0
         // Destino aleatorio en cualquier dirección (arriba, abajo, diagonales), fuera de cuadro
         const ang = Math.random() * Math.PI * 2
-        const rad = 1.3 + Math.random() * 0.5
+        const rad = 2.4 + Math.random() * 1.2           // lejos: la pelota sale de la pantalla antes de desaparecer
         b.ex = Math.cos(ang) * halfW * rad
         b.ey = Math.sin(ang) * halfH * rad
-        b.ez = -1.5 - Math.random() * 2.5
+        b.ez = 1.2 + Math.random() * 2.5                // rebota hacia adelante (no atraviesa la paleta)
         // Punto de impacto: aleatorio dentro de la zona central de la cara de la paleta
         b.cx = (Math.random() - 0.5) * 1.4
         b.cy = HIT_Y + (Math.random() - 0.5) * 1.1
@@ -230,6 +230,7 @@ export default function Paleta3D({ progressRef, onReady }) {
           shotName = 'reves'
           hitsSinceFlip = 0
           nextFlip = 4 + Math.floor(Math.random() * 3)
+          dur = Math.max(dur, 1.15)   // el golpe al revés va más lento, para apreciar la vuelta
         } else {
           shotName = downOut ? 'remate' : upOut ? 'globo'
             : (speedK < 0.3 ? 'volea' : ['drive', 'volea', 'globo'][Math.floor(Math.random() * 3)])
@@ -295,7 +296,7 @@ export default function Paleta3D({ progressRef, onReady }) {
         }
         // La sombra se atenúa durante el golpe (cuando la cámara se aleja) para que no se note
         // su recorte contra el borde del piso.
-        shadowPlane.material.opacity = 0.22 * (1 - Math.min(1, camPull) * 0.6)
+        shadowPlane.material.opacity = 0.16 * (1 - Math.min(1, camPull) * 0.6)
 
         // Pelota del remate por scroll: entra desde izq-arriba → contacto → sale a la derecha
         if (hitT > 0.001 && hitT < 0.999) {
@@ -327,7 +328,8 @@ export default function Paleta3D({ progressRef, onReady }) {
             b.mesh.position.set(b.sx + (b.cx - b.sx) * k, b.sy + (b.cy - b.sy) * k, b.sz + (b.cz - b.sz) * k)
           } else {
             const k = (b.t - cT) / (1 - cT)
-            b.mesh.position.set(b.cx + (b.ex - b.cx) * k, b.cy + (b.ey - b.cy) * k, b.cz + (b.ez - b.cz) * k)
+            const ko = 1 - (1 - k) * (1 - k)   // ease-out: sale rápido del impacto y sigue hasta salir de pantalla
+            b.mesh.position.set(b.cx + (b.ex - b.cx) * ko, b.cy + (b.ey - b.cy) * ko, b.cz + (b.ez - b.cz) * ko)
           }
           const pop = 1 + 0.4 * smoothstep(cT - 0.05, cT, b.t) * (1 - smoothstep(cT, cT + 0.06, b.t))
           b.mesh.scale.set(pop, 2 - pop, pop)
