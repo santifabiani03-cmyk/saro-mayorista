@@ -123,9 +123,18 @@ export default function IntroHero({ productCount = 0, onExplore }) {
             priority
             quality={90}
             sizes="100vw"
-            className="object-cover scale-105 blur-[2px]"
+            className="object-cover scale-105"
           />
-          <div className="absolute inset-0 bg-gradient-to-b from-white/85 via-white/45 to-white/80" />
+          {/* Velo solo en esquinas/bordes (viñeta): el centro queda nítido */}
+          <div
+            className="absolute inset-0"
+            style={{ background: 'radial-gradient(120% 115% at 50% 42%, transparent 42%, rgba(255,255,255,.5) 76%, rgba(255,255,255,.92) 100%)' }}
+          />
+          {/* Fade del borde inferior para que se lea el texto/CTA */}
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(to top, rgba(255,255,255,.92) 0%, rgba(255,255,255,.45) 20%, transparent 46%)' }}
+          />
         </div>
 
         {/* Glows ambientales */}
@@ -199,7 +208,7 @@ export default function IntroHero({ productCount = 0, onExplore }) {
               <img
                 src="/assets/logo-icon.png"
                 alt=""
-                className="w-16 h-16 sm:w-20 sm:h-20 opacity-40 animate-pulse"
+                className="h-14 sm:h-16 w-auto opacity-40 animate-pulse"
               />
             </div>
             <Paleta3D progressRef={progressRef} onReady={() => setPaletaReady(true)} />
