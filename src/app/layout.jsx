@@ -11,9 +11,9 @@ export const metadata = {
   authors: [{ name: 'SARO' }],
   icons: {
     icon: [
-      { url: '/assets/logo-icon.png', type: 'image/png' },
+      { url: '/favicon.png', type: 'image/png' },
     ],
-    apple: '/assets/logo-icon.png',
+    apple: '/favicon.png',
   },
   manifest: '/manifest.json',
   verification: {
