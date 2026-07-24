@@ -1,6 +1,7 @@
 'use client'
 
 import { useEffect, useRef, useState } from 'react'
+import Image from 'next/image'
 import dynamic from 'next/dynamic'
 
 const Paleta3D = dynamic(() => import('./Paleta3D'), { ssr: false })
@@ -113,6 +114,19 @@ export default function IntroHero({ productCount = 0, onExplore }) {
         className="sticky top-0 h-screen w-full overflow-hidden"
         style={{ perspective: '1400px' }}
       >
+        {/* Fondo: cancha de pádel + velo blanco (legibilidad del texto y que la paleta siga siendo protagonista) */}
+        <div className="absolute inset-0 overflow-hidden pointer-events-none">
+          <Image
+            src="/assets/fondo-cancha.png"
+            alt=""
+            fill
+            priority
+            sizes="100vw"
+            className="object-cover scale-105 blur-[2px]"
+          />
+          <div className="absolute inset-0 bg-gradient-to-b from-white/85 via-white/45 to-white/80" />
+        </div>
+
         {/* Glows ambientales */}
         <div ref={glowRef} className="absolute inset-0 pointer-events-none">
           <div className="intro-glow absolute top-[8%] left-1/2 -translate-x-1/2 w-[70vw] h-[70vw] max-w-[720px] max-h-[720px] rounded-full bg-saro-blue/20 blur-[120px]" />

@@ -155,7 +155,7 @@ export default function Paleta3D({ progressRef, onReady }) {
       const RESET = 0.5     // p por debajo del cual se re-arma
       const HIT_DUR = 1.4   // duración del remate (seg)
       let raf = 0
-      let baseY = 0, baseX = 0
+      let baseY = 0, baseX = 0, camPull = 0
       let hitState = 'idle' // idle | playing | done
       let hitT = 0
       const t0 = performance.now()
@@ -246,6 +246,15 @@ export default function Paleta3D({ progressRef, onReady }) {
         if (hitT > 0.001) setSwing(hitT, 1, sc)                 // remate por scroll (desde la izq)
         else if (clickActive) setSwing(clickT, clickDir, sc)    // golpe por click interactivo
         else setSwing(0, 1, sc)                                 // reposo
+
+        // Al golpear, la cabeza de la paleta se sale del cuadro de la cámara. Alejamos la
+        // cámara SOLO durante el swing (no toca la animación) para que el golpe entre entero;
+        // en reposo la cámara vuelve sola a su lugar, así el encuadre normal no cambia.
+        if (swing) {
+          const swingExt = Math.min(1, Math.abs(swing.rotation.z) / 1.5)
+          camPull += (swingExt - camPull) * 0.15
+          camera.position.z += camPull * 2.6
+        }
 
         // Pelota del remate por scroll: entra desde izq-arriba → contacto → sale a la derecha
         if (hitT > 0.001 && hitT < 0.999) {
