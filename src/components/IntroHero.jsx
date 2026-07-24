@@ -175,7 +175,7 @@ export default function IntroHero({ productCount = 0, onExplore }) {
         </div>
 
         {/* Texto superior */}
-        <div className="absolute inset-x-0 top-[13%] sm:top-[15%] px-6 text-center z-20">
+        <div className="absolute inset-x-0 top-[8%] sm:top-[9%] px-6 text-center z-20">
           <div ref={t1Ref} className="will-change-[opacity,transform]">
             <p className="intro-rise intro-rise-1 text-[11px] sm:text-xs font-bold uppercase tracking-[.32em] text-saro-blue mb-3">
               Venta mayorista · Argentina
@@ -185,7 +185,7 @@ export default function IntroHero({ productCount = 0, onExplore }) {
               <img
                 src="/assets/saro-wordmark.png"
                 alt="SARO"
-                className="inline-block h-[0.72em] w-auto align-baseline"
+                className="inline-block h-[0.6em] w-auto align-baseline"
               />
             </p>
           </div>
