@@ -283,10 +283,12 @@ export default function Paleta3D({ progressRef, onReady }) {
         paleta.position.y = float - MODEL_DROP
         // Factor para pantallas angostas (mobile portrait): cámara/arco/pelota más contenidos
         const sc = Math.min(1, (camera.aspect || 1) / 0.78)
-        // El canvas ahora ocupa toda la pantalla; escalamos la distancia de cámara con el alto
-        // del canvas para que la paleta conserve exactamente el mismo tamaño y posición.
-        const hRatio = (mount.clientHeight || 720) / 720
-        camera.position.z = CAM_Z * hRatio * Math.max(1, 0.78 / (camera.aspect || 1)) - p * 2.0 * hRatio
+        // El canvas ahora ocupa toda la pantalla. Escalamos la cámara con el alto para que la
+        // paleta conserve EL MISMO tamaño que tenía antes: la referencia es el alto que tenía el
+        // canvas viejo (80vh con tope de 720px), no un valor fijo.
+        const chNow = mount.clientHeight || 720
+        const hRatio = chNow / Math.min(0.8 * chNow, 720)
+        camera.position.z = CAM_Z * hRatio * Math.max(1, 0.58 / (camera.aspect || 1)) - p * 2.0 * hRatio
 
         // Swing tipo raqueta (pivote en el codo). Prioridad: remate por scroll; si no, click.
         if (clickActive) { clickT += dt / clickDur; if (clickT >= 1) clickActive = false }
