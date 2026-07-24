@@ -202,7 +202,7 @@ export default function IntroHero({ productCount = 0, onExplore }) {
 
         {/* Paleta 3D real (Three.js) */}
         <div className="absolute inset-0 flex items-center justify-center z-10">
-          <div className="intro-floaty relative w-full h-[80vh] max-h-[720px]">
+          <div className="intro-floaty relative w-full h-full">
             {/* Placeholder mientras baja/decodifica el modelo 3D */}
             <div
               className={`absolute inset-0 flex items-center justify-center pointer-events-none transition-opacity duration-700 ${

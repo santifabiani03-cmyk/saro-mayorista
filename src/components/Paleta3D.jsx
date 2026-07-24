@@ -283,7 +283,10 @@ export default function Paleta3D({ progressRef, onReady }) {
         paleta.position.y = float - MODEL_DROP
         // Factor para pantallas angostas (mobile portrait): cámara/arco/pelota más contenidos
         const sc = Math.min(1, (camera.aspect || 1) / 0.78)
-        camera.position.z = CAM_Z * Math.max(1, 0.78 / (camera.aspect || 1)) - p * 2.0
+        // El canvas ahora ocupa toda la pantalla; escalamos la distancia de cámara con el alto
+        // del canvas para que la paleta conserve exactamente el mismo tamaño y posición.
+        const hRatio = (mount.clientHeight || 720) / 720
+        camera.position.z = CAM_Z * hRatio * Math.max(1, 0.78 / (camera.aspect || 1)) - p * 2.0 * hRatio
 
         // Swing tipo raqueta (pivote en el codo). Prioridad: remate por scroll; si no, click.
         if (clickActive) { clickT += dt / clickDur; if (clickT >= 1) clickActive = false }
@@ -297,7 +300,7 @@ export default function Paleta3D({ progressRef, onReady }) {
         if (swing) {
           const swingExt = Math.min(1, Math.abs(swing.rotation.z) / 1.5)
           camPull += (swingExt - camPull) * 0.15
-          camera.position.z += camPull * 3.6
+          camera.position.z += camPull * 3.6 * hRatio
         }
         // La sombra se atenúa durante el golpe (cuando la cámara se aleja) para que no se note
         // su recorte contra el borde del piso.
