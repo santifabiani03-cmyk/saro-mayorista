@@ -17,6 +17,7 @@ const ROT_X = 0             // corrección de inclinación inicial
 const ROT_Y = 0             // corrección de giro inicial
 const ROT_Z = 0
 const MODEL_DROP = 0.7      // baja la paleta un poco para que no tape el título
+const HIT_Y = 0.6          // altura de impacto de la pelota: centro de la cara (bajó al bajar el modelo)
 
 export default function Paleta3D({ progressRef, onReady }) {
   const mountRef = useRef(null)
@@ -200,6 +201,10 @@ export default function Paleta3D({ progressRef, onReady }) {
         b.ex = Math.cos(ang) * halfW * rad
         b.ey = Math.sin(ang) * halfH * rad
         b.ez = -1.5 - Math.random() * 2.5
+        // Punto de impacto: aleatorio dentro de la zona central de la cara de la paleta
+        b.cx = (Math.random() - 0.5) * 1.4
+        b.cy = HIT_Y + (Math.random() - 0.5) * 1.1
+        b.cz = 0.8
         b.active = true; b.t = 0; b.dur = dur
         clickActive = true; clickT = 0; clickDur = dur; clickDir = b.e
       }
@@ -266,10 +271,10 @@ export default function Paleta3D({ progressRef, onReady }) {
           const cT = 0.47
           if (hitT < cT) {
             const k = hitT / cT
-            ball.position.set(-9 * sc * (1 - k), 4.2 - 2.6 * k, -2.5 + 3.3 * k)  // → (0, 1.6, 0.8)
+            ball.position.set(-9 * sc * (1 - k), 4.2 - (4.2 - HIT_Y) * k, -2.5 + 3.3 * k)  // → (0, HIT_Y, 0.8)
           } else {
             const k = (hitT - cT) / (1 - cT)
-            ball.position.set(10.5 * sc * k, 1.6 + 1.4 * k, 0.8 - 3.3 * k)        // sale a la derecha
+            ball.position.set(10.5 * sc * k, HIT_Y + 1.4 * k, 0.8 - 3.3 * k)        // sale a la derecha
           }
           const pop = 1 + 0.4 * smoothstep(cT - 0.05, cT, hitT) * (1 - smoothstep(cT, cT + 0.06, hitT))
           ball.scale.set(pop, 2 - pop, pop)
@@ -287,10 +292,10 @@ export default function Paleta3D({ progressRef, onReady }) {
           const cT = 0.47
           if (b.t < cT) {
             const k = b.t / cT
-            b.mesh.position.set(b.sx + (0 - b.sx) * k, b.sy + (1.6 - b.sy) * k, b.sz + (0.8 - b.sz) * k)
+            b.mesh.position.set(b.sx + (b.cx - b.sx) * k, b.sy + (b.cy - b.sy) * k, b.sz + (b.cz - b.sz) * k)
           } else {
             const k = (b.t - cT) / (1 - cT)
-            b.mesh.position.set(0 + b.ex * k, 1.6 + (b.ey - 1.6) * k, 0.8 + (b.ez - 0.8) * k)
+            b.mesh.position.set(b.cx + (b.ex - b.cx) * k, b.cy + (b.ey - b.cy) * k, b.cz + (b.ez - b.cz) * k)
           }
           const pop = 1 + 0.4 * smoothstep(cT - 0.05, cT, b.t) * (1 - smoothstep(cT, cT + 0.06, b.t))
           b.mesh.scale.set(pop, 2 - pop, pop)
