@@ -47,7 +47,7 @@ body { margin: 0; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: 
 /* Flotación idle de la paleta (independiente del scroll) */
 @keyframes floaty {
   0%, 100% { transform: translateY(0) rotate(0deg); }
-  50%      { transform: translateY(-14px) rotate(1.2deg); }
+  50%      { transform: translateY(-8px) rotate(1.2deg); }
 }
 .intro-floaty { animation: floaty 6s ease-in-out infinite; }
 

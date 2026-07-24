@@ -269,7 +269,7 @@ export default function Paleta3D({ progressRef, onReady }) {
         const targetX = -mouse.y * 0.33 * mInf + (reduce ? 0 : Math.sin(t * 0.6) * 0.02)
         baseY += (targetY - baseY) * 0.08
         baseX += (targetX - baseX) * 0.08
-        const float = reduce ? 0 : Math.sin(t * 1.1) * 0.22 * (0.4 + 0.6 * mInf)
+        const float = reduce ? 0 : Math.sin(t * 1.1) * 0.14 * (0.4 + 0.6 * mInf)
 
         // Remate one-shot: una vez que arranca, se completa solo (no queda a medias)
         if (hitState === 'idle' && !reduce && p >= TRIGGER) hitState = 'playing'

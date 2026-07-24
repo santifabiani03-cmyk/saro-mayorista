@@ -182,7 +182,11 @@ export default function IntroHero({ productCount = 0, onExplore }) {
             </p>
             <p className="intro-rise intro-rise-2 text-4xl sm:text-6xl font-extrabold text-saro-dark leading-[1.05] tracking-tight max-w-4xl mx-auto">
               El padel arranca<br className="hidden sm:block" /> en{' '}
-              <span className="text-transparent bg-clip-text bg-gradient-to-r from-saro-blue to-saro-mid">SARO</span>
+              <img
+                src="/assets/saro-wordmark.png"
+                alt="SARO"
+                className="inline-block h-[0.72em] w-auto align-baseline"
+              />
             </p>
           </div>
 
