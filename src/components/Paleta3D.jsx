@@ -213,10 +213,14 @@ export default function Paleta3D({ progressRef, onReady }) {
         b.sx = ox; b.sy = mouse.y * halfH * 1.05; b.sz = 1.0
         // Destino aleatorio en cualquier dirección (arriba, abajo, diagonales), fuera de cuadro
         const ang = Math.random() * Math.PI * 2
-        const rad = 2.4 + Math.random() * 1.2           // lejos: la pelota sale de la pantalla antes de desaparecer
-        b.ex = Math.cos(ang) * halfW * rad
-        b.ey = Math.sin(ang) * halfH * rad
-        b.ez = 1.2 + Math.random() * 2.5                // rebota hacia adelante (no atraviesa la paleta)
+        // Velocidad de salida constante: rebota hacia adelante (no atraviesa la paleta) y vuela
+        // en línea recta hasta salir de la pantalla. Algo más rápida si el golpe fue rápido.
+        const dz = 0.35, dlen = Math.sqrt(1 + dz * dz)
+        const spd = 6 + (1 - speedK) * 4
+        b.vx = (Math.cos(ang) / dlen) * spd
+        b.vy = (Math.sin(ang) / dlen) * spd
+        b.vz = (dz / dlen) * spd
+        b.halfW = halfW; b.halfH = halfH
         // Punto de impacto: aleatorio dentro de la zona central de la cara de la paleta
         b.cx = (Math.random() - 0.5) * 1.4
         b.cy = HIT_Y + (Math.random() - 0.5) * 1.1
@@ -224,7 +228,7 @@ export default function Paleta3D({ progressRef, onReady }) {
         // Cada 4–6 golpes, uno es "al revés" (giro). Si no, según hacia dónde sale la pelota
         // (sube→globo, baja→remate, clicks rápidos→volea) con algo de azar.
         hitsSinceFlip++
-        const upOut = b.ey > halfH * 0.55, downOut = b.ey < -halfH * 0.4
+        const upOut = Math.sin(ang) > 0.45, downOut = Math.sin(ang) < -0.4
         let shotName
         if (hitsSinceFlip >= nextFlip) {
           shotName = 'reves'
@@ -237,7 +241,8 @@ export default function Paleta3D({ progressRef, onReady }) {
         }
         b.shot = SHOTS[shotName]
         clickShot = b.shot
-        b.active = true; b.t = 0; b.dur = dur
+        b.phase = 'in'; b.tin = 0; b.tinDur = Math.max(0.16, dur * 0.5); b.outT = 0
+        b.active = true
         clickActive = true; clickT = 0; clickDur = dur; clickDir = b.e
       }
       const onDown = (e) => {
@@ -319,20 +324,26 @@ export default function Paleta3D({ progressRef, onReady }) {
         // Pelotas interactivas (click): salen desde el mouse → contacto → la paleta las manda a otro lado
         for (const b of pool) {
           if (!b.active) continue
-          b.t += dt / b.dur
-          if (b.t >= 1) { b.active = false; b.mesh.visible = false; continue }
           b.mesh.visible = true
-          const cT = 0.47
-          if (b.t < cT) {
-            const k = b.t / cT
+          if (b.phase === 'in') {
+            // Llegada: del punto donde clickeaste/tocaste al centro de la cara
+            b.tin += dt / b.tinDur
+            const k = Math.min(1, b.tin)
             b.mesh.position.set(b.sx + (b.cx - b.sx) * k, b.sy + (b.cy - b.sy) * k, b.sz + (b.cz - b.sz) * k)
+            const pop = 1 + 0.4 * smoothstep(0.82, 1, b.tin)   // squash al impactar
+            b.mesh.scale.set(pop, 2 - pop, pop)
+            if (b.tin >= 1) { b.phase = 'out'; b.px = b.cx; b.py = b.cy; b.pz = b.cz }
           } else {
-            const k = (b.t - cT) / (1 - cT)
-            const ko = 1 - (1 - k) * (1 - k)   // ease-out: sale rápido del impacto y sigue hasta salir de pantalla
-            b.mesh.position.set(b.cx + (b.ex - b.cx) * ko, b.cy + (b.ey - b.cy) * ko, b.cz + (b.ez - b.cz) * ko)
+            // Salida: velocidad constante en línea recta hasta salir de la pantalla
+            b.outT += dt
+            b.px += b.vx * dt; b.py += b.vy * dt; b.pz += b.vz * dt
+            b.mesh.position.set(b.px, b.py, b.pz)
+            const pop = 1 + 0.3 * Math.max(0, 1 - b.outT / 0.09)  // pop breve al salir
+            b.mesh.scale.set(pop, 2 - pop, pop)
+            if (Math.abs(b.px) > b.halfW * 1.3 || Math.abs(b.py) > b.halfH * 1.3 || b.outT > 3) {
+              b.active = false; b.mesh.visible = false
+            }
           }
-          const pop = 1 + 0.4 * smoothstep(cT - 0.05, cT, b.t) * (1 - smoothstep(cT, cT + 0.06, b.t))
-          b.mesh.scale.set(pop, 2 - pop, pop)
           b.mesh.rotation.x += 0.4; b.mesh.rotation.y += 0.25
         }
 
