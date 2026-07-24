@@ -121,6 +121,7 @@ export default function IntroHero({ productCount = 0, onExplore }) {
             alt=""
             fill
             priority
+            quality={90}
             sizes="100vw"
             className="object-cover scale-105 blur-[2px]"
           />

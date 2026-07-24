@@ -16,6 +16,7 @@ const TARGET_HEIGHT = 5.2   // alto deseado en unidades de escena
 const ROT_X = 0             // corrección de inclinación inicial
 const ROT_Y = 0             // corrección de giro inicial
 const ROT_Z = 0
+const MODEL_DROP = 0.7      // baja la paleta un poco para que no tape el título
 
 export default function Paleta3D({ progressRef, onReady }) {
   const mountRef = useRef(null)
@@ -236,7 +237,7 @@ export default function Paleta3D({ progressRef, onReady }) {
         // Base de la paleta (sin trasladar el mango): giro por scroll + flote de escena 1
         paleta.rotation.y = baseY
         paleta.rotation.x = baseX
-        paleta.position.y = float
+        paleta.position.y = float - MODEL_DROP
         // Factor para pantallas angostas (mobile portrait): cámara/arco/pelota más contenidos
         const sc = Math.min(1, (camera.aspect || 1) / 0.78)
         camera.position.z = CAM_Z * Math.max(1, 0.78 / (camera.aspect || 1)) - p * 2.0
@@ -253,7 +254,7 @@ export default function Paleta3D({ progressRef, onReady }) {
         if (swing) {
           const swingExt = Math.min(1, Math.abs(swing.rotation.z) / 1.5)
           camPull += (swingExt - camPull) * 0.15
-          camera.position.z += camPull * 2.6
+          camera.position.z += camPull * 3.6
         }
 
         // Pelota del remate por scroll: entra desde izq-arriba → contacto → sale a la derecha
