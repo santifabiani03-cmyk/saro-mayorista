@@ -135,6 +135,11 @@ export default function IntroHero({ productCount = 0, onExplore }) {
             className="absolute inset-0"
             style={{ background: 'linear-gradient(to top, rgba(255,255,255,.92) 0%, rgba(255,255,255,.45) 20%, transparent 46%)' }}
           />
+          {/* Velo ligero del borde superior (logo, eyebrow, título y botones del header) */}
+          <div
+            className="absolute inset-0"
+            style={{ background: 'linear-gradient(to bottom, rgba(255,255,255,.82) 0%, rgba(255,255,255,.38) 15%, transparent 36%)' }}
+          />
         </div>
 
         {/* Glows ambientales */}
