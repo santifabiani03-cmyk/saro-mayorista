@@ -117,7 +117,7 @@ export default function IntroHero({ productCount = 0, onExplore }) {
         {/* Fondo: cancha de pádel + velo blanco (legibilidad del texto y que la paleta siga siendo protagonista) */}
         <div className="absolute inset-0 overflow-hidden pointer-events-none">
           <Image
-            src="/assets/fondo-cancha.png"
+            src="/assets/fondo-cancha.webp"
             alt=""
             fill
             priority

@@ -77,7 +77,7 @@ export default function Paleta3D({ progressRef, onReady }) {
         new THREE.ShadowMaterial({ opacity: 0.22 })
       )
       shadowPlane.rotation.x = -Math.PI / 2
-      shadowPlane.position.y = -3.4
+      shadowPlane.position.y = -3.8   // más abajo: acompaña la bajada del modelo, evita que la paleta flotando la toque
       shadowPlane.receiveShadow = true
       scene.add(shadowPlane)
 
@@ -256,6 +256,9 @@ export default function Paleta3D({ progressRef, onReady }) {
           camPull += (swingExt - camPull) * 0.15
           camera.position.z += camPull * 3.6
         }
+        // La sombra se atenúa durante el golpe (cuando la cámara se aleja) para que no se note
+        // su recorte contra el borde del piso.
+        shadowPlane.material.opacity = 0.22 * (1 - Math.min(1, camPull) * 0.6)
 
         // Pelota del remate por scroll: entra desde izq-arriba → contacto → sale a la derecha
         if (hitT > 0.001 && hitT < 0.999) {
