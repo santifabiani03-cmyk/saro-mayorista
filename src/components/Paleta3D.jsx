@@ -164,17 +164,26 @@ export default function Paleta3D({ progressRef, onReady }) {
       let last = t0
 
       // Interactivo: click en la escena 1 lanza una pelota y la paleta la devuelve.
-      let clickT = 0, clickActive = false, clickDur = 0.7, clickDir = 1
+      let clickT = 0, clickActive = false, clickDur = 0.7, clickDir = 1, clickShot
       let lastLaunch = -999
       // e = lado de entrada de la pelota (+1 = viene por la izquierda, -1 = por la derecha)
-      const setSwing = (prog, e, sc) => {
+      // Tipos de golpe: cambian la amplitud del swing lateral (zAmp), un sesgo en X
+      // (arriba/abajo, para insinuar remate vs globo) y cuánto gira la cara (yAmp).
+      const SHOTS = {
+        drive:  { zAmp: 1.0,  xBias:  0.0,  yAmp: -0.95 },  // derecha plana: swing largo lateral
+        volea:  { zAmp: 0.52, xBias:  0.18, yAmp: -0.45 },  // volea: corta y firme
+        globo:  { zAmp: 0.6,  xBias: -0.32, yAmp: -0.5  },  // globo: cuchareo suave hacia arriba
+        remate: { zAmp: 0.72, xBias:  0.34, yAmp: -0.32 },  // remate/bandeja: de arriba hacia abajo
+      }
+      const setSwing = (prog, e, sc, shot = SHOTS.drive) => {
         if (!swing) return
         const w = smoothstep(0, 0.35, prog), s = smoothstep(0.35, 0.6, prog), r = smoothstep(0.6, 1, prog)
+        const hitEnv = s * (1 - r)   // pico alrededor del impacto
         // windup hacia el lado de entrada, golpe hacia el lado opuesto (salida)
-        swing.rotation.z = (0.55 * w - 1.5 * s + 0.95 * r) * e * sc
-        swing.rotation.x = -0.3 * w * (1 - s)
+        swing.rotation.z = (0.55 * w - 1.5 * s + 0.95 * r) * e * sc * shot.zAmp
+        swing.rotation.x = -0.3 * w * (1 - s) + shot.xBias * (0.35 * w + hitEnv)
         // la cara mira hacia la pelota (lado de entrada), un poco más marcado
-        swing.rotation.y = -0.95 * e * smoothstep(0, 0.3, prog) * (1 - smoothstep(0.62, 1, prog))
+        swing.rotation.y = shot.yAmp * e * smoothstep(0, 0.3, prog) * (1 - smoothstep(0.62, 1, prog))
       }
       const MIN_GAP = 0.45  // tiempo mínimo entre pelota y pelota (seg)
       const launch = () => {
@@ -205,6 +214,13 @@ export default function Paleta3D({ progressRef, onReady }) {
         b.cx = (Math.random() - 0.5) * 1.4
         b.cy = HIT_Y + (Math.random() - 0.5) * 1.1
         b.cz = 0.8
+        // Tipo de golpe según hacia dónde sale la pelota (con algo de azar): sube→globo,
+        // baja→remate, clicks rápidos→volea, si no drive/volea/globo al azar.
+        const upOut = b.ey > halfH * 0.55, downOut = b.ey < -halfH * 0.4
+        const shotName = downOut ? 'remate' : upOut ? 'globo'
+          : (speedK < 0.3 ? 'volea' : ['drive', 'volea', 'globo'][Math.floor(Math.random() * 3)])
+        b.shot = SHOTS[shotName]
+        clickShot = b.shot
         b.active = true; b.t = 0; b.dur = dur
         clickActive = true; clickT = 0; clickDur = dur; clickDir = b.e
       }
@@ -249,9 +265,9 @@ export default function Paleta3D({ progressRef, onReady }) {
 
         // Swing tipo raqueta (pivote en el codo). Prioridad: remate por scroll; si no, click.
         if (clickActive) { clickT += dt / clickDur; if (clickT >= 1) clickActive = false }
-        if (hitT > 0.001) setSwing(hitT, 1, sc)                 // remate por scroll (desde la izq)
-        else if (clickActive) setSwing(clickT, clickDir, sc)    // golpe por click interactivo
-        else setSwing(0, 1, sc)                                 // reposo
+        if (hitT > 0.001) setSwing(hitT, 1, sc, SHOTS.remate)          // remate por scroll (bandeja)
+        else if (clickActive) setSwing(clickT, clickDir, sc, clickShot) // golpe por click (tipo variable)
+        else setSwing(0, 1, sc)                                        // reposo
 
         // Al golpear, la cabeza de la paleta se sale del cuadro de la cámara. Alejamos la
         // cámara SOLO durante el swing (no toca la animación) para que el golpe entre entero;
