@@ -4,5 +4,5 @@
   "minPurchase": 150000,
   "suggestedMinPurchase": 150000,
   "currency": "ARS",
-  "mostrarCompraMinima": true
+  "mostrarCompraMinima": false
 }
