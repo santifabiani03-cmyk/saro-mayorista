@@ -5,6 +5,12 @@ import CartSuggestions from './CartSuggestions'
 import { pesoAproxKg, pesoParaCotizar } from '../utils/envio'
 import { track } from '../utils/analytics'
 
+/**
+ * Cotizador de envío: APAGADO hasta tener las credenciales de la API de MiCorreo
+ * (ver CLAUDE.md §2.9 y §2.10). Para reactivarlo: poner `true` acá y deployar.
+ */
+const ENVIO_HABILITADO = false
+
 export default function Cart({ config }) {
   const { items, removeItem, updateQty, clearCart, total, totalItems, isOpen, setIsOpen } = useCart()
   const [copied, setCopied] = useState(false)
@@ -77,7 +83,9 @@ export default function Cart({ config }) {
       }
     })
 
-    msg += `\n*TOTAL PRODUCTOS: $${total.toLocaleString('es-AR')}*\n`
+    // Si el envío está en juego, aclaramos que este total es sólo de los productos
+    const hayEnvio = ENVIO_HABILITADO && (envioElegido || modoEnvio === 'whatsapp')
+    msg += `\n*TOTAL${hayEnvio ? ' PRODUCTOS' : ''}: $${total.toLocaleString('es-AR')}*\n`
 
     // Envío: se adjunta lo cotizado, o el pedido de coordinarlo por WhatsApp
     if (envioElegido) {
@@ -261,7 +269,8 @@ export default function Cart({ config }) {
               </span>
             </div>
 
-            {/* ── Envío ── */}
+            {/* ── Envío (oculto hasta tener las credenciales de MiCorreo) ── */}
+            {ENVIO_HABILITADO && (
             <div className="rounded-xl border border-gray-100 bg-[#FAFBFC] p-3.5 space-y-3">
               <div className="flex items-center justify-between">
                 <span className="text-sm font-semibold text-gray-700">Envío</span>
@@ -345,6 +354,7 @@ export default function Cart({ config }) {
                 </div>
               )}
             </div>
+            )}
 
             {/* Barra de progreso + sugerencias (solo en modo mayorista con compra mínima) */}
             {showMin && (
