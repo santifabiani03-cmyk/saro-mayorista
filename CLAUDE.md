@@ -5,7 +5,13 @@
 > chats viejos ni preguntar nada. Prioriza ser exhaustivo. Si algo cambia, actualizá este
 > archivo y `docs/ESTETICA.md`.
 
-Última actualización: 2026-07-23.
+Última actualización: 2026-08-07.
+
+> ⚠️ **Cambio importante (agosto 2026): el sitio pasó de MAYORISTA a MINORISTA.**
+> La compra mínima está **oculta** (con un interruptor en el admin para volver a mostrarla) y
+> los textos visibles ya no dicen "mayorista". Quien quiera comprar por mayor entra por la
+> sección **"Trabajá con nosotros"**. El **SEO/metadata todavía dice "Mayorista"** a propósito:
+> es una pasada pendiente (ver §6). El repo y el dominio siguen llamándose `saro-mayorista`.
 
 ---
 
@@ -25,11 +31,15 @@
 
 ## 1. ¿Qué es el proyecto?
 
-SARO es una **marca argentina de paletas de pádel, accesorios de pádel y ropa deportiva**.
-Esta web es su **catálogo mayorista online**.
+SARO es una **marca argentina de paletas de pádel, accesorios de pádel y ropa deportiva**, con
+**15 años en el mercado**. Fundada por **Leonardo Fabiani** (SARO = **Sa**ntiago + **Ro**cío, sus
+hijos). Esta web es su **catálogo online**.
 
-**Para quién es:** comerciantes y revendedores que compran al por mayor (no venta al público
-minorista clásica). Por eso hay una "compra mínima sugerida".
+**Para quién es (desde agosto 2026): el consumidor final (minorista).** Antes era mayorista.
+Quien quiera comprar por mayor o revender entra por **"Trabajá con nosotros"** en la landing:
+completa un formulario (nombre, apellido, provincia, localidad, mensaje) que se manda por
+WhatsApp. La marca también hace **productos personalizados** para clubes y eventos (se coordina
+por WhatsApp).
 
 **Modelo de negocio — MUY IMPORTANTE entender esto:**
 - La web **NO cobra online**. No hay tarjetas, no hay Mercado Pago, no hay carrito con pago.
@@ -38,8 +48,9 @@ minorista clásica). Por eso hay una "compra mínima sugerida".
   número del vendedor. **El pedido y el cierre de la venta pasan por WhatsApp, a mano.**
 - Es, en esencia, una **vitrina digital + generador de pedidos por WhatsApp**.
 
-**Lo que la web NO tiene** (importante para no prometer de más): pasarela de pagos, cálculo/
-integración de envíos, cuentas de usuario, ni envío de emails automáticos.
+**Lo que la web NO tiene** (importante para no prometer de más): pasarela de pagos, cuentas de
+usuario, ni envío de emails automáticos. **Sí tiene** un **cotizador de envío** (estimativo, API
+MiCorreo de Correo Argentino) — pero el envío igual se cierra por WhatsApp.
 
 ---
 
@@ -55,7 +66,8 @@ integración de envíos, cuentas de usuario, ni envío de emails automáticos.
 | 3D del hero | **Three.js 0.185** (la paleta que gira/juega) |
 | Generación de PDF | jspdf + pdf-lib + pdfjs-dist (catálogo y etiquetas) |
 | Quitar fondo de fotos | @imgly/background-removal (corre en el navegador, gratis) |
-| Analytics | @vercel/analytics + @vercel/speed-insights |
+| Analytics | @vercel/analytics + @vercel/speed-insights + **Google Analytics 4** (`G-WSMCJDHZWH`, en `layout.jsx` con `next/script`) |
+| Envíos | **API MiCorreo** (Correo Argentino) para cotizar — ver §2.10 |
 
 No hay backend propio ni servidor aparte: todo corre dentro de Next.js sobre Vercel.
 
@@ -116,16 +128,18 @@ Pagina saro/
 ├── public/
 │   ├── config.json           ← config de la tienda (ver abajo)        ⚠️ lo maneja el admin
 │   ├── manifest.json         ← metadatos PWA (íconos, nombre)
-│   ├── models/paleta-opt.glb ← modelo 3D de la paleta (hero)
-│   └── assets/               ← logos + TODAS las fotos de producto
+│   ├── favicon.png           ← "chip" navy con el logo blanco (ícono de pestaña)
+│   ├── models/paleta-opt.glb ← modelo 3D de la paleta (hero) — la lista está en Paleta3D.jsx
+│   └── assets/               ← logos + fondo-cancha.webp + saro-wordmark.png + fotos de producto
 ├── src/
 │   ├── app/
-│   │   ├── layout.jsx        ← <head>, fuentes, SEO, Analytics
+│   │   ├── layout.jsx        ← <head>, fuentes, SEO, Analytics (Vercel + Google Analytics)
 │   │   ├── globals.css       ← estilos globales + animaciones del hero
 │   │   ├── (shop)/           ← LA TIENDA PÚBLICA (grupo de rutas)
 │   │   │   ├── layout.jsx    ← lee public/config.json y envuelve la tienda
 │   │   │   ├── page.jsx      ← LANDING de entrada (/) — Server Component + preload del .glb
-│   │   │   ├── Landing.jsx   ← la landing en sí: HERO 3D + secciones de scroll + FAQ
+│   │   │   ├── Landing.jsx   ← la landing: HERO 3D + catálogos + cómo comprar + números +
+│   │   │   │                    personalizados + Historia/Trabajá + FAQ
 │   │   │   ├── paletas/page.jsx           ← catálogo SOLO paletas (/paletas)
 │   │   │   ├── ropa-y-accesorios/page.jsx ← catálogo ropa + accesorios (/ropa-y-accesorios)
 │   │   │   ├── CatalogView.jsx    ← arma schema + catálogo + bloque SEO por catálogo
@@ -138,13 +152,17 @@ Pagina saro/
 │   │   ├── Header.jsx, Cart.jsx, Footer (en ShopShell), Filters.jsx
 │   │   ├── ProductCard.jsx, ProductModal.jsx, ImageCarousel.jsx
 │   │   ├── FaqSection.jsx, HowToBuyModal.jsx
-│   │   ├── IntroHero.jsx     ← la intro cinematográfica (texto + escena 3D)
+│   │   ├── HistoriaTrabaja.jsx ← 2 pestañas: historia/política + form "Trabajá con nosotros"
+│   │   ├── GuiaPaletas.jsx   ← guía de compra desplegable (sólo en /paletas)
+│   │   ├── CartSuggestions.jsx ← sugerencias para llegar al mínimo (sólo en modo mayorista)
+│   │   ├── IntroHero.jsx     ← la intro cinematográfica (texto + escena 3D + fondo de cancha)
 │   │   ├── Paleta3D.jsx      ← TODO el motor 3D de la paleta (Three.js)
 │   │   └── admin/            ← ProductForm, ProductList, SettingsPanel, etc.
 │   ├── views/AdminPage.jsx   ← el panel admin completo (pestañas)
-│   └── utils/                ← helpers (colores, slug, export PDF, etc.)
+│   └── utils/                ← helpers (colores, slug, export PDF, envio.js, analytics.js…)
 ├── package.json, next.config.mjs, tailwind.config.js, vercel.json
-└── (archivos locales que NO se deployan: lab.html, IMG_*.jpeg, scripts .py — ver §5)
+└── (archivos locales que NO se deployan: lab.html, IMG_*.jpeg, .py, preview-vendedores.html,
+    scripts/ — ver §5.4)
 ```
 
 ### 2.6 Las rutas de API (qué hace cada una)
@@ -164,6 +182,7 @@ Todas están en `src/app/api/<nombre>/route.js`:
 | `/api/generate-image` | POST | IA (Gemini): genera imagen de escena del producto | Sí |
 | `/api/update-config` | POST | Guarda `config.json` (compra mínima, teléfono) en GitHub | Sí |
 | `/api/sitemap` | GET | Genera el sitemap XML para Google | No |
+| `/api/cotizar-envio` | POST | Cotiza el envío con la **API MiCorreo** (CP + peso → precio a domicilio y a sucursal). Ver §2.10 | No |
 
 ### 2.7 `public/config.json` (configuración de la tienda)
 
@@ -175,9 +194,16 @@ Es un archivo chico con la config editable desde el admin (pestaña **⚙️ Aju
   "whatsappNumber": "5491123208058",   ← número donde caen los pedidos
   "minPurchase": 150000,               ← mínimo real (barra de progreso del carrito)
   "suggestedMinPurchase": 150000,      ← el que se muestra como "compra mín. sugerida"
+  "mostrarCompraMinima": false,        ← ⭐ interruptor mayorista/minorista (ver abajo)
   "currency": "ARS"
 }
 ```
+
+⭐ **`mostrarCompraMinima`** es el interruptor que decide si el sitio se comporta como
+**minorista** (`false`, como está hoy) o **mayorista** (`true`). Cuando está en `false` se
+ocultan solos: el badge del header (desktop y mobile), el chip de la landing, la barra de
+progreso del carrito y las sugerencias (`CartSuggestions`). Se cambia desde el
+**admin → ⚙️ Ajustes**, con un toggle.
 
 ### 2.8 Servicios externos que usa
 
@@ -188,6 +214,9 @@ Es un archivo chico con la config editable desde el admin (pestaña **⚙️ Aju
 | **WhatsApp** (links `wa.me`) | El "checkout" real: ahí llegan los pedidos | número en `config.json` |
 | **Google Gemini** (IA) | Solo en admin: generar descripciones e imágenes de escena | `GEMINI_API_KEY` |
 | **Google Search Console** | SEO / posicionamiento (monitoreo, no integrado en código) | externo |
+| **Google Analytics 4** | Métricas de uso del sitio (`G-WSMCJDHZWH`) | `layout.jsx` + panel de GA |
+| **Correo Argentino (API MiCorreo)** | Cotizador de envío | `MICORREO_*` (ver §2.9 y §2.10) |
+| **Zoho Mail** | Casillas `@saro.com.ar` (plan Forever Free) | panel de Zoho + DNS en Vercel |
 
 ### 2.9 Variables de entorno (secretos)
 
@@ -198,6 +227,32 @@ pongas en el código ni las commitees:
 - `GITHUB_TOKEN`, `GITHUB_OWNER`, `GITHUB_REPO` — para leer/escribir el repo (base de datos e
   imágenes). Hay variantes `NEXT_PUBLIC_GITHUB_*` para uso en el navegador.
 - `GEMINI_API_KEY` — la IA de Google para el admin.
+- **`MICORREO_USER`, `MICORREO_PASSWORD`** — credenciales de **API** de MiCorreo (para el
+  endpoint `/token`). ⚠️ **No son** el email/clave de la cuenta: hay que **pedírselas a un
+  ejecutivo comercial de Correo Argentino**.
+- `MICORREO_CUSTOMER_ID` — id de cliente MiCorreo. Alternativa: `MICORREO_EMAIL` +
+  `MICORREO_EMAIL_PASS` (el endpoint lo resuelve solo vía `/users/validate`).
+- `MICORREO_CP_ORIGEN` — CP desde donde se despacha (**1065**; es el default si falta).
+- `MICORREO_ENV` — poné `test` para pegarle al ambiente de pruebas.
+
+### 2.10 Cotizador de envío (API MiCorreo)
+
+**Estado: código listo y deployado, pero INACTIVO hasta cargar las credenciales.** Sin ellas el
+botón "Cotizar envío" devuelve error; el resto del carrito funciona igual.
+
+- **Flujo:** `POST /token` (Basic Auth, token cacheado en memoria) → `POST /rates` con
+  `customerId`, `postalCodeOrigin`, `postalCodeDestination` y `dimensions`. Sin `deliveredType`
+  la API devuelve **domicilio y sucursal** en una sola llamada.
+- **URLs:** prod `https://api.correoargentino.com.ar/micorreo/v1` · test
+  `https://apitest.correoargentino.com.ar/micorreo/v1`.
+- **Peso** (`src/utils/envio.js`): suma el campo `peso` (gramos) de cada producto — si falta usa
+  **400 g** por defecto — y le agrega un **margen de packaging interno**: `<3 kg` +300 g,
+  `3–10 kg` +400 g, `>10 kg` +500 g. Al cliente se le muestra **sólo el peso final redondeado a
+  kilos enteros** (mínimo 1). ⚠️ **El margen de embalaje NO se menciona nunca en la web.**
+- **En el carrito:** el cliente elige **"Cotizar envío"** (ingresa CP) o **"Acordar por
+  WhatsApp"**. Lo elegido se adjunta al mensaje de WhatsApp (peso, CP, tipo, precio y total).
+- **El peso es sólo para cotizar:** no se muestra en las fichas ni en las cards de producto.
+- Se carga por producto en el **admin** (campo "Peso (gramos)", al lado del precio).
 
 ---
 
@@ -326,8 +381,34 @@ archivos con sufijo `-sr` o prefijo `c-sr` en `public/assets/` (ej. `c-sr-...web
 - **Generador de escenas con IA en el admin** (`/api/generate-image` + sección en ProductForm):
   toma la foto del producto y genera imágenes lifestyle con Gemini. Depende de que la API key
   de Gemini tenga habilitada la generación de imágenes.
-- **Panel de Ajustes en el admin** (compra mínima, compra mínima sugerida, teléfono de WhatsApp
-  con prefijo +54 fijo). Guarda en `config.json` vía `/api/update-config`.
+- **Panel de Ajustes en el admin** (compra mínima, compra mínima sugerida, **toggle de compra
+  mínima**, teléfono de WhatsApp con prefijo +54 fijo). Guarda en `config.json` vía
+  `/api/update-config`.
+
+### 4.3 Decisiones del pivote a minorista (agosto 2026)
+
+- **Rutas separadas:** `/` = landing, `/paletas` y `/ropa-y-accesorios` = catálogos.
+  ⚠️ **`/catalogo` ya existía** y redirige a un catálogo externo (`catalogo.saro.com.ar`) — no es
+  la grilla interna, **no tocar**. Por eso el catálogo interno NO usa esa ruta.
+- **El hero 3D vive en la landing** (se mudó del catálogo). Los catálogos cargan livianos, sin
+  Three.js. El botón del hero baja a la sección "Elegí tu catálogo" (no navega).
+- **Fondo del hero:** foto de cancha (`fondo-cancha.webp`, 2880px). **Sin desenfoque** — el
+  centro va nítido y el velo blanco va sólo en **esquinas superiores y borde inferior** (se probó
+  velo completo y blur, y se veía "de baja calidad").
+- **"SARO" del título del hero** es una imagen (`saro-wordmark.png`), recortada del logo
+  horizontal y recoloreada al degradé azul de marca — no es texto.
+- **Favicon:** `public/favicon.png`, un "chip" navy redondeado con el logo en blanco. Se hizo así
+  porque el logo es 3:1 y dentro del cuadrado de la pestaña no se distinguía.
+- **Filtros:** un grupo con una sola opción **no se muestra** (por eso `/paletas` no tiene filtro
+  de categoría). Los filtros se arman sólo con productos **visibles**.
+- **`/paletas` no muestra el panel de filtros** (prop `showFilters={false}` en `CatalogClient`),
+  y al final tiene la **guía de compra** (`GuiaPaletas.jsx`).
+- **Historia/Política y "Trabajá con nosotros"** son **dos pestañas** al final de la landing: al
+  abrir una, el panel ocupa **todo el ancho** debajo.
+- **Modelos 3D aleatorios:** la lista está en `MODELOS` (arriba de `Paleta3D.jsx`) y en cada
+  carga elige uno al azar. Hoy hay **uno solo**; para sumar, dejar el `.glb` en `public/models/`
+  y agregarlo a la lista. ⚠️ Ojo: `page.jsx` precarga `paleta-opt.glb` fijo — al sumar modelos
+  hay que revisar ese `<link rel="preload">`.
 
 ---
 
@@ -368,6 +449,14 @@ Existen en la carpeta local pero **no** están en git / no van a producción:
   Ya no se usan. No borrarlas apura nada, pero tampoco commitearlas.
 - `generate_descriptions.py`, `import_catalog.py`, `index.html.bak`, `orbitron_temp/` — scripts/
   restos locales.
+- `preview-vendedores.html` — **maqueta no funcional** del modelo mayorista/minorista con login
+  (cuestionario → aprobación → catálogo con precios / catálogo sin precios / vendedores por
+  zona). Se abre con doble clic. Es sólo para **evaluar el modelo**, ver §6.
+- `scripts/generar-fondo-cancha.mjs` — genera fondos con la API de OpenAI. Lee la key de
+  `OPENAI_API_KEY` (en `.env.local`). Se corre con
+  `node --env-file=.env.local scripts/generar-fondo-cancha.mjs`.
+- `public/assets/fondo-cancha (2).png` — PNG de 25 MB (upscale del fondo). El que se usa es el
+  `.webp`; este se puede borrar.
 
 ### 5.5 Correr en local
 
@@ -380,27 +469,38 @@ un problema del código**; Vercel buildea sin problemas. Si el dev local se trab
 ## 6. Estado actual y pendientes
 
 ### ✅ Terminado y en producción (deployado)
-- Rediseño visual completo de la tienda pública.
-- Hero 3D con la paleta MASTER real (modelo Meshy 1.5 MB): flotar+mouse, juego de pelotas por
-  click (destino aleatorio, throttle 0.45 s, swing adaptativo), zoom por scroll y remate bandeja.
-- Sin recortes en desktop ni mobile; sin errores de consola.
-- Panel admin con Ajustes (compra mínima/sugerida, WhatsApp), generador de escenas IA,
-  reordenamiento de imágenes por drag&drop.
-- Seguridad: PIN + rate limiting en endpoints; validación de datos en pedidos.
-- SEO: títulos/keywords de pádel, Schema.org (Organization, WebSite, Product, FAQ), sitemap
-  dinámico, verificado en Google Search Console.
-
-### 🔗 Verificado en producción (última sesión)
-21 productos cargando OK, flujo de compra (abrir producto → carrito → WhatsApp) OK, hero 3D OK
-en desktop y mobile, 0 errores de consola.
+- **Landing** en `/` (hero 3D con fondo de cancha, catálogos, cómo comprar, números, diseños
+  personalizados, historia/trabajá, FAQ) + **catálogos separados** `/paletas` y
+  `/ropa-y-accesorios`, con sitemap y canonicals propios.
+- **Pivote a minorista:** compra mínima oculta (toggle en admin) y textos visibles sin
+  "mayorista". Formulario **"Trabajá con nosotros"** → WhatsApp.
+- Hero 3D: fondo de cancha, 4 tipos de golpe (drive/volea/globo/remate) + giro cada 4–6 golpes,
+  pelotas que salen de pantalla, canvas full-screen sin recortes, placeholder de carga.
+- **Guía de compra de paletas** (desplegable en `/paletas`).
+- **Google Analytics 4** + eventos `finalizar_pedido`, `cotizar_envio`, `trabaja_con_nosotros`.
+- **Campo peso** por producto en el admin + toggle de compra mínima en Ajustes.
+- Rediseño visual completo, seguridad (PIN + rate limiting) y SEO/Schema.org de siempre.
 
 ### 🟡 Pendiente / a decidir con el dueño
-- El hint **"🎾 Tocá la paleta para jugar"** (abajo del hero): falta que smfab confirme si se
-  deja o se saca.
-- El **canto de la paleta 3D** tiene textura imperfecta de Meshy (ver §4.1). Si molesta, la
-  opción real es **regenerar el modelo en Meshy** con fotos de los costados. Por ahora se mitiga
-  con el encuadre.
-- Afinado fino opcional del ritmo/direcciones del juego de pelotas, según feedback en uso real.
+- **Cotizador de envío:** código listo pero **inactivo**. Falta que smfab **pida las credenciales
+  de API a un ejecutivo comercial de Correo Argentino** y las cargue en `.env.local` + Vercel
+  (§2.9). Entrada: https://www.correoargentino.com.ar/MiCorreo/public/primeros-pasos
+- **Cargar el peso de los productos** desde el admin (las paletas ≈ 400 g). Sin peso, el
+  cotizador asume 400 g por producto.
+- **SEO/metadata todavía dice "Mayorista"** (títulos, descriptions, footer del `layout.jsx`,
+  `manifest.json`). Se dejó a propósito para no mover el posicionamiento sin un plan: falta hacer
+  esa pasada.
+- **Email `@saro.com.ar` (Zoho, plan gratis):** dominio verificado y MX cargados en el DNS de
+  Vercel. Falta **crear las casillas** (`ventas@`, `info@`, la personal) y el alias `consultas@`
+  → `info@`. La cuenta admin es `smfabiani11` (no se borra, es la dueña de la organización).
+- **Modelos 3D extra:** smfab va a pasar 2–3 `.glb` más para que el hero rote entre ellos (§4.3).
+- **Opiniones de clientes:** propuesto un carrusel administrable + botón "Dejá tu opinión en
+  Google" (falta el link de la ficha). Traer reseñas automáticas de Google requiere Places API
+  (con costo y límites) — se descartó por ahora.
+- **Modelo mayorista con login** (cuestionario → aprobación → catálogo con precios, catálogo
+  minorista sin precios, vendedores por zona): **en evaluación**, maqueta en
+  `preview-vendedores.html`. ⚠️ Requeriría **base de datos real + autenticación** (hoy no hay
+  ninguna de las dos) y define un **conflicto de canal** (fábrica vs. revendedores) a resolver.
 
 ### 🔮 Ideas a futuro (no pedidas aún)
 Si algún día se quiere vender con pago online, gestionar stock de verdad o mandar mails, ahí sí
@@ -413,7 +513,13 @@ aparte del modelo actual (catálogo + WhatsApp).
 
 - Respondé siempre en **español rioplatense** (Argentina), y para alguien que **no programa**.
 - Antes de tocar el catálogo/stock/pedidos: releé §5. **No pisar `products.json`/`orders.json`/
-  `config.json`.**
-- Antes de tocar el hero 3D: leé §4.1 y `docs/ESTETICA.md`. Es lo más delicado del proyecto.
+  `config.json`.** Si hay que cargar datos (pesos, precios, stock), **lo hace smfab desde
+  `/admin`** — no editar esos archivos desde el código.
+- Antes de tocar el hero 3D: leé §4.1 y §4.3 y `docs/ESTETICA.md`. Es lo más delicado del proyecto.
 - Para cualquier cambio visual, respetá la paleta y convenciones de §3 y `docs/ESTETICA.md`.
 - Deploy = push a `master` (con el cuidado de §5.2). No hay otro paso.
+- **Verificación:** el visor de preview se cuelga con el hero 3D (WebGL) y el `next build` local
+  a veces crashea por memoria (§5.5). Lo confiable es: `npx next build` (si compila y pasa tipos,
+  Vercel lo buildea) + `curl` al dev server para chequear el HTML. Vercel es la verificación real.
+- **Secretos:** nunca pedirle al usuario que pegue credenciales en el chat. Van en `.env.local` /
+  Vercel; el código las lee del entorno (así se hizo con OpenAI y MiCorreo).
