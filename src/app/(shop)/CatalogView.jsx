@@ -1,4 +1,5 @@
 import CatalogClient from './CatalogClient'
+import GuiaPaletas from '../../components/GuiaPaletas'
 
 const getImages = p => (p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : [])
 
@@ -75,6 +76,9 @@ export default function CatalogView({ products, kind }) {
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
       <CatalogClient products={products} heading={meta.heading} showFilters={kind !== 'paletas'} />
+
+      {/* Guía de compra (sólo en el catálogo de paletas) */}
+      {kind === 'paletas' && <GuiaPaletas />}
 
       {/* Sección SEO server-rendered */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-8">
