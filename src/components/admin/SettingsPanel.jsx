@@ -8,6 +8,7 @@ export default function SettingsPanel({ onToast }) {
 
   const [minPurchase, setMinPurchase] = useState('')
   const [suggestedMinPurchase, setSuggestedMinPurchase] = useState('')
+  const [mostrarCompraMinima, setMostrarCompraMinima] = useState(false)
   const [phoneNumber, setPhoneNumber] = useState('')
 
   useEffect(() => {
@@ -17,6 +18,7 @@ export default function SettingsPanel({ onToast }) {
         setConfig(data)
         setMinPurchase(data.minPurchase ?? '')
         setSuggestedMinPurchase(data.suggestedMinPurchase ?? data.minPurchase ?? '')
+        setMostrarCompraMinima(data.mostrarCompraMinima === true)
         const num = data.whatsappNumber ?? ''
         setPhoneNumber(num.startsWith('54') ? num.slice(2) : num)
       })
@@ -29,8 +31,8 @@ export default function SettingsPanel({ onToast }) {
     const sug = Number(suggestedMinPurchase)
     const phone = phoneNumber.replace(/\D/g, '')
 
-    if (!min || min < 0) return onToast?.('La compra mínima debe ser un número positivo', 'error')
-    if (!sug || sug < 0) return onToast?.('La compra mínima sugerida debe ser un número positivo', 'error')
+    if (mostrarCompraMinima && (!min || min < 0)) return onToast?.('La compra mínima debe ser un número positivo', 'error')
+    if (mostrarCompraMinima && (!sug || sug < 0)) return onToast?.('La compra mínima sugerida debe ser un número positivo', 'error')
     if (!phone || phone.length < 8 || phone.length > 13) return onToast?.('El número de teléfono no es válido', 'error')
 
     const fullNumber = '54' + phone
@@ -43,9 +45,10 @@ export default function SettingsPanel({ onToast }) {
         body: JSON.stringify({
           pin: sessionStorage.getItem('saro_admin_pin') ?? '',
           config: {
-            minPurchase: min,
-            suggestedMinPurchase: sug,
+            minPurchase: min || 0,
+            suggestedMinPurchase: sug || 0,
             whatsappNumber: fullNumber,
+            mostrarCompraMinima,
           },
         }),
       })
@@ -78,8 +81,27 @@ export default function SettingsPanel({ onToast }) {
 
         <div className="px-6 py-5 space-y-6">
 
+          {/* Toggle: mostrar compra mínima (modo mayorista) */}
+          <div className="flex items-center justify-between gap-4 bg-gray-50 rounded-xl p-4 border border-gray-100">
+            <div>
+              <label className="block text-sm font-semibold text-gray-700">Mostrar compra mínima</label>
+              <p className="text-xs text-gray-400 mt-0.5">
+                Actívalo solo si vendés por mayor. Apagado = tienda minorista (se oculta en toda la página).
+              </p>
+            </div>
+            <button
+              type="button"
+              role="switch"
+              aria-checked={mostrarCompraMinima}
+              onClick={() => setMostrarCompraMinima(v => !v)}
+              className={`relative w-12 h-7 rounded-full transition-colors flex-shrink-0 ${mostrarCompraMinima ? 'bg-saro-blue' : 'bg-gray-300'}`}
+            >
+              <span className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${mostrarCompraMinima ? 'translate-x-5' : ''}`} />
+            </button>
+          </div>
+
           {/* Compra mínima */}
-          <div>
+          <div className={mostrarCompraMinima ? '' : 'opacity-50 pointer-events-none'}>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">
               Compra mínima
             </label>
@@ -94,6 +116,7 @@ export default function SettingsPanel({ onToast }) {
                 step="1000"
                 value={minPurchase}
                 onChange={e => setMinPurchase(e.target.value)}
+                disabled={!mostrarCompraMinima}
                 className="w-full border-2 border-gray-200 rounded-xl pl-8 pr-4 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
                 placeholder="150000"
               />
@@ -101,7 +124,7 @@ export default function SettingsPanel({ onToast }) {
           </div>
 
           {/* Compra mínima sugerida */}
-          <div>
+          <div className={mostrarCompraMinima ? '' : 'opacity-50 pointer-events-none'}>
             <label className="block text-sm font-semibold text-gray-700 mb-1.5">
               Compra mínima sugerida
             </label>
@@ -116,6 +139,7 @@ export default function SettingsPanel({ onToast }) {
                 step="1000"
                 value={suggestedMinPurchase}
                 onChange={e => setSuggestedMinPurchase(e.target.value)}
+                disabled={!mostrarCompraMinima}
                 className="w-full border-2 border-gray-200 rounded-xl pl-8 pr-4 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
                 placeholder="150000"
               />

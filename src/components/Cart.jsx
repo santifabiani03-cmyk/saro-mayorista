@@ -1,11 +1,13 @@
 'use client'
 import { useState } from 'react'
 import { useCart } from '../context/CartContext'
+import CartSuggestions from './CartSuggestions'
 
 export default function Cart({ config }) {
   const { items, removeItem, updateQty, clearCart, total, totalItems, isOpen, setIsOpen } = useCart()
   const [copied, setCopied] = useState(false)
 
+  const showMin     = config.mostrarCompraMinima === true   // compra mínima (modo mayorista)
   const minPurchase = config.minPurchase
   const progress    = Math.min(100, (total / minPurchase) * 100)
   const remaining   = minPurchase - total
@@ -20,7 +22,7 @@ export default function Cart({ config }) {
       grouped[i.productId].items.push(i)
     })
 
-    let msg = `*Hola!* 📋 Quiero hacer un pedido mayorista:\n`
+    let msg = `*Hola!* 📋 Quiero hacer este pedido:\n`
 
     Object.values(grouped).forEach(prod => {
       const totalQty = prod.items.reduce((s, i) => s + i.cantidad, 0)
@@ -206,23 +208,29 @@ export default function Cart({ config }) {
               </span>
             </div>
 
-            {/* Barra de progreso */}
-            <div className="space-y-1.5">
-              <div className="flex justify-between text-xs text-gray-500">
-                <span className="font-medium">
-                  {canSend
-                    ? '✅ Mínimo alcanzado'
-                    : `Faltan $${remaining.toLocaleString('es-AR')} para el mínimo sugerido`}
-                </span>
-                <span className="font-semibold text-gray-400">${minPurchase.toLocaleString('es-AR')}</span>
-              </div>
-              <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
-                <div
-                  className={`h-full rounded-full transition-all duration-500 ease-out ${canSend ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' : 'bg-gradient-to-r from-saro-blue/70 to-saro-blue'}`}
-                  style={{ width: `${progress}%` }}
-                />
-              </div>
-            </div>
+            {/* Barra de progreso + sugerencias (solo en modo mayorista con compra mínima) */}
+            {showMin && (
+              <>
+                <div className="space-y-1.5">
+                  <div className="flex justify-between text-xs text-gray-500">
+                    <span className="font-medium">
+                      {canSend
+                        ? '✅ Mínimo alcanzado'
+                        : `Faltan $${remaining.toLocaleString('es-AR')} para el mínimo sugerido`}
+                    </span>
+                    <span className="font-semibold text-gray-400">${minPurchase.toLocaleString('es-AR')}</span>
+                  </div>
+                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                    <div
+                      className={`h-full rounded-full transition-all duration-500 ease-out ${canSend ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' : 'bg-gradient-to-r from-saro-blue/70 to-saro-blue'}`}
+                      style={{ width: `${progress}%` }}
+                    />
+                  </div>
+                </div>
+
+                <CartSuggestions gap={remaining} />
+              </>
+            )}
 
             {/* Botón WhatsApp */}
             <button

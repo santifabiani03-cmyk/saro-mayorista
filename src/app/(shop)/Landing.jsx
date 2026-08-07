@@ -5,8 +5,9 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import IntroHero from '../../components/IntroHero'
 import FaqSection from '../../components/FaqSection'
+import TrabajaConNosotros from '../../components/TrabajaConNosotros'
 
-export default function Landing({ stats, whatsappNumber, minPurchase }) {
+export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCompraMinima }) {
   const router = useRouter()
   const rootRef = useRef(null)
 
@@ -143,13 +144,13 @@ export default function Landing({ stats, whatsappNumber, minPurchase }) {
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
           <div data-reveal className="reveal text-center max-w-2xl mx-auto mb-12 sm:mb-16">
             <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[.32em] text-saro-blue mb-3">
-              Dos catálogos, un solo proveedor
+              Dos catálogos, una sola marca
             </p>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-saro-dark tracking-tight leading-[1.08]">
               Elegí tu catálogo
             </h2>
             <p className="text-sm sm:text-base text-gray-500 mt-4 leading-relaxed">
-              Equipá tu tienda o club con la calidad SARO. Precios mayoristas exclusivos por cantidad.
+              Elegí lo que buscás y armá tu pedido. La calidad SARO, directo de fábrica y con envíos a todo el país.
             </p>
           </div>
 
@@ -194,7 +195,7 @@ export default function Landing({ stats, whatsappNumber, minPurchase }) {
               Simple y sin vueltas
             </p>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-saro-dark tracking-tight leading-[1.08]">
-              Cómo comprar al por mayor
+              Cómo comprar
             </h2>
             <p className="text-sm sm:text-base text-gray-500 mt-4 leading-relaxed">
               No cobramos online: armás tu pedido en la web y lo cerramos juntos por WhatsApp.
@@ -218,12 +219,65 @@ export default function Landing({ stats, whatsappNumber, minPurchase }) {
             ))}
           </div>
 
-          <div data-reveal className="reveal mt-10 flex justify-center">
-            <div className="inline-flex items-center gap-2.5 bg-gradient-to-r from-saro-light to-blue-50 text-saro-dark px-5 py-3 rounded-full border border-blue-100/60">
-              <span className="text-saro-blue font-bold text-sm tracking-tight">Compra mín. sugerida:</span>
-              <span className="font-extrabold text-saro-dark">
-                ${minPurchase.toLocaleString('es-AR')}
-              </span>
+          {mostrarCompraMinima && (
+            <div data-reveal className="reveal mt-10 flex justify-center">
+              <div className="inline-flex items-center gap-2.5 bg-gradient-to-r from-saro-light to-blue-50 text-saro-dark px-5 py-3 rounded-full border border-blue-100/60">
+                <span className="text-saro-blue font-bold text-sm tracking-tight">Compra mín. sugerida:</span>
+                <span className="font-extrabold text-saro-dark">
+                  ${minPurchase.toLocaleString('es-AR')}
+                </span>
+              </div>
+            </div>
+          )}
+        </div>
+      </section>
+
+      {/* ── Nuestra historia + política ─────────────── */}
+      <section className="relative bg-[#FAFBFC] py-20 sm:py-28">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-14 sm:space-y-16">
+          <div data-reveal className="reveal">
+            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[.32em] text-saro-blue mb-3">
+              La marca
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-saro-dark tracking-tight leading-[1.1] mb-5">
+              Nuestra historia
+            </h2>
+            <div className="space-y-4 text-sm sm:text-base text-gray-500 leading-relaxed">
+              <p>
+                SARO nació de la pasión por el pádel de <strong className="text-saro-dark font-semibold">Leonardo Fabiani</strong>,
+                quien durante casi 20 años se desempeñó como vendedor mayorista de la marca Dabber en Argentina, junto a otros
+                referentes del rubro. De esa experiencia y de una oportunidad que surgió con ese grupo de vendedores, decidió
+                lanzar sus propias paletas bajo un nombre propio: <strong className="text-saro-blue font-semibold">SARO</strong>,
+                que combina <strong className="text-saro-dark font-semibold">Santiago</strong> y{' '}
+                <strong className="text-saro-dark font-semibold">Rocío</strong>, sus hijos.
+              </p>
+              <p>
+                Desde aquellas primeras paletas, hace ya <strong className="text-saro-dark font-semibold">15 años</strong> que
+                SARO es marca en el mercado. Con el tiempo fuimos sumando indumentaria y otros productos, y acompañando el
+                crecimiento con presencia en torneos como forma de estar cerca de los jugadores y los clubes.
+              </p>
+            </div>
+          </div>
+
+          <div data-reveal className="reveal">
+            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[.32em] text-saro-accent mb-3">
+              Lo que nos mueve
+            </p>
+            <h2 className="text-3xl sm:text-4xl font-extrabold text-saro-dark tracking-tight leading-[1.1] mb-5">
+              Nuestra política
+            </h2>
+            <div className="space-y-4 text-sm sm:text-base text-gray-500 leading-relaxed">
+              <p>
+                Aunque nacimos y crecimos de la mano del pádel, no nos definimos únicamente por ese deporte: nuestro objetivo
+                es consolidarnos como <strong className="text-saro-dark font-semibold">manufactura textil de indumentaria
+                deportiva</strong>, más allá del nicho de origen.
+              </p>
+              <p>
+                Lo que nos identifica es la <strong className="text-saro-dark font-semibold">relación calidad-precio</strong> y
+                el trato cercano con cada club y cliente. Trabajamos codo a codo con quienes nos compran, priorizando el
+                vínculo por sobre la transacción — por eso la venta se maneja principalmente vía WhatsApp, de forma directa y
+                personal.
+              </p>
             </div>
           </div>
         </div>
@@ -259,7 +313,7 @@ export default function Landing({ stats, whatsappNumber, minPurchase }) {
                 </svg>
               </div>
               <p className="text-xs sm:text-sm font-semibold text-gray-500 mt-2 uppercase tracking-wider">
-                Precios mayoristas
+                Precios de fábrica
               </p>
             </div>
 
@@ -278,6 +332,9 @@ export default function Landing({ stats, whatsappNumber, minPurchase }) {
         </div>
       </section>
 
+      {/* ── Trabajá con nosotros (mayorista) ────────── */}
+      <TrabajaConNosotros whatsappNumber={whatsappNumber} />
+
       {/* ── CTA final ───────────────────────────────── */}
       <section className="relative overflow-hidden bg-saro-dark py-20 sm:py-28">
         <div
@@ -291,7 +348,7 @@ export default function Landing({ stats, whatsappNumber, minPurchase }) {
               Entrá al catálogo y armá tu pedido
             </h2>
             <p className="text-sm sm:text-base text-slate-300 mt-4 max-w-lg mx-auto leading-relaxed">
-              {stats.total > 0 ? `${stats.total} productos` : 'Catálogo completo'} con precios mayoristas, promos por cantidad y envíos a todo el país.
+              {stats.total > 0 ? `${stats.total} productos` : 'Catálogo completo'} con la calidad SARO, directo de fábrica y envíos a todo el país.
             </p>
             <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link

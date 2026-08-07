@@ -178,7 +178,7 @@ export default function IntroHero({ productCount = 0, onExplore }) {
         <div className="absolute inset-x-0 top-[8%] sm:top-[9%] px-6 text-center z-20">
           <div ref={t1Ref} className="will-change-[opacity,transform]">
             <p className="intro-rise intro-rise-1 text-[11px] sm:text-xs font-bold uppercase tracking-[.32em] text-saro-blue mb-3">
-              Venta mayorista · Argentina
+              Tienda oficial · Argentina
             </p>
             <p className="intro-rise intro-rise-2 text-4xl sm:text-6xl font-extrabold text-saro-dark leading-[1.05] tracking-tight max-w-4xl mx-auto">
               El padel arranca<br className="hidden sm:block" /> en{' '}

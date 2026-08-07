@@ -35,7 +35,12 @@ export default function HomePage() {
     <>
       {/* Precarga del modelo 3D: empieza a bajar en paralelo, así la paleta aparece antes */}
       <link rel="preload" href="/models/paleta-opt.glb" as="fetch" crossOrigin="anonymous" />
-      <Landing stats={stats} whatsappNumber={config.whatsappNumber} minPurchase={minPurchase} />
+      <Landing
+        stats={stats}
+        whatsappNumber={config.whatsappNumber}
+        minPurchase={minPurchase}
+        mostrarCompraMinima={config.mostrarCompraMinima === true}
+      />
     </>
   )
 }

@@ -31,10 +31,14 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Config inválida' }, { status: 400 })
   }
 
-  const allowed = ['storeName', 'whatsappNumber', 'minPurchase', 'suggestedMinPurchase', 'currency']
+  const allowed = ['storeName', 'whatsappNumber', 'minPurchase', 'suggestedMinPurchase', 'currency', 'mostrarCompraMinima']
   const sanitized = {}
   for (const key of allowed) {
     if (key in config) sanitized[key] = config[key]
+  }
+
+  if (sanitized.mostrarCompraMinima != null && typeof sanitized.mostrarCompraMinima !== 'boolean') {
+    return NextResponse.json({ error: 'Valor de "mostrar compra mínima" inválido' }, { status: 400 })
   }
 
   if (sanitized.whatsappNumber && !/^\d{10,15}$/.test(sanitized.whatsappNumber)) {
