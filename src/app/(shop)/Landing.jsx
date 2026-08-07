@@ -5,7 +5,7 @@ import Link from 'next/link'
 import { useRouter } from 'next/navigation'
 import IntroHero from '../../components/IntroHero'
 import FaqSection from '../../components/FaqSection'
-import TrabajaConNosotros from '../../components/TrabajaConNosotros'
+import HistoriaTrabaja from '../../components/HistoriaTrabaja'
 
 export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCompraMinima }) {
   const router = useRouter()
@@ -232,57 +232,6 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
         </div>
       </section>
 
-      {/* ── Nuestra historia + política ─────────────── */}
-      <section className="relative bg-[#FAFBFC] py-20 sm:py-28">
-        <div className="max-w-4xl mx-auto px-4 sm:px-6 space-y-14 sm:space-y-16">
-          <div data-reveal className="reveal">
-            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[.32em] text-saro-blue mb-3">
-              La marca
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-saro-dark tracking-tight leading-[1.1] mb-5">
-              Nuestra historia
-            </h2>
-            <div className="space-y-4 text-sm sm:text-base text-gray-500 leading-relaxed">
-              <p>
-                SARO nació de la pasión por el pádel de <strong className="text-saro-dark font-semibold">Leonardo Fabiani</strong>,
-                quien durante casi 20 años se desempeñó como vendedor mayorista de la marca Dabber en Argentina, junto a otros
-                referentes del rubro. De esa experiencia y de una oportunidad que surgió con ese grupo de vendedores, decidió
-                lanzar sus propias paletas bajo un nombre propio: <strong className="text-saro-blue font-semibold">SARO</strong>,
-                que combina <strong className="text-saro-dark font-semibold">Santiago</strong> y{' '}
-                <strong className="text-saro-dark font-semibold">Rocío</strong>, sus hijos.
-              </p>
-              <p>
-                Desde aquellas primeras paletas, hace ya <strong className="text-saro-dark font-semibold">15 años</strong> que
-                SARO es marca en el mercado. Con el tiempo fuimos sumando indumentaria y otros productos, y acompañando el
-                crecimiento con presencia en torneos como forma de estar cerca de los jugadores y los clubes.
-              </p>
-            </div>
-          </div>
-
-          <div data-reveal className="reveal">
-            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[.32em] text-saro-accent mb-3">
-              Lo que nos mueve
-            </p>
-            <h2 className="text-3xl sm:text-4xl font-extrabold text-saro-dark tracking-tight leading-[1.1] mb-5">
-              Nuestra política
-            </h2>
-            <div className="space-y-4 text-sm sm:text-base text-gray-500 leading-relaxed">
-              <p>
-                Aunque nacimos y crecimos de la mano del pádel, no nos definimos únicamente por ese deporte: nuestro objetivo
-                es consolidarnos como <strong className="text-saro-dark font-semibold">manufactura textil de indumentaria
-                deportiva</strong>, más allá del nicho de origen.
-              </p>
-              <p>
-                Lo que nos identifica es la <strong className="text-saro-dark font-semibold">relación calidad-precio</strong> y
-                el trato cercano con cada club y cliente. Trabajamos codo a codo con quienes nos compran, priorizando el
-                vínculo por sobre la transacción — por eso la venta se maneja principalmente vía WhatsApp, de forma directa y
-                personal.
-              </p>
-            </div>
-          </div>
-        </div>
-      </section>
-
       {/* ── Por qué SARO (números + valor) ──────────── */}
       <section className="relative overflow-hidden bg-[#FAFBFC] py-20 sm:py-24">
         <div
@@ -304,16 +253,15 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
               </p>
             </div>
 
-            {/* Precios mayoristas */}
+            {/* 15 años en el mercado */}
             <div data-reveal className="reveal flex flex-col items-center" style={{ transitionDelay: '90ms' }}>
               <div className="h-14 sm:h-20 flex items-center justify-center text-saro-blue">
-                <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.7" className="w-11 h-11 sm:w-14 sm:h-14">
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M9.568 3H5.25A2.25 2.25 0 0 0 3 5.25v4.318c0 .597.237 1.17.659 1.591l9.581 9.581c.699.699 1.78.872 2.607.33a18.095 18.095 0 0 0 5.223-5.223c.542-.827.369-1.908-.33-2.607L11.16 3.66A2.25 2.25 0 0 0 9.568 3Z" />
-                  <path strokeLinecap="round" strokeLinejoin="round" d="M6 6h.008v.008H6V6Z" />
-                </svg>
+                <span className="text-4xl sm:text-6xl font-extrabold tracking-tight leading-none">
+                  <span data-count="15">0</span>
+                </span>
               </div>
               <p className="text-xs sm:text-sm font-semibold text-gray-500 mt-2 uppercase tracking-wider">
-                Precios de fábrica
+                Años en el mercado
               </p>
             </div>
 
@@ -331,9 +279,6 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
           </div>
         </div>
       </section>
-
-      {/* ── Trabajá con nosotros (mayorista) ────────── */}
-      <TrabajaConNosotros whatsappNumber={whatsappNumber} />
 
       {/* ── CTA final ───────────────────────────────── */}
       <section className="relative overflow-hidden bg-saro-dark py-20 sm:py-28">
@@ -385,6 +330,9 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
           </div>
         </div>
       </section>
+
+      {/* ── Nuestra historia + Trabajá con nosotros (desplegables) ── */}
+      <HistoriaTrabaja whatsappNumber={whatsappNumber} />
 
       {/* ── Preguntas frecuentes (al final de todo) ──── */}
       <section className="bg-[#FAFBFC] py-16 sm:py-20">

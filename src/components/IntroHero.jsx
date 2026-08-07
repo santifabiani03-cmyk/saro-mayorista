@@ -230,10 +230,10 @@ export default function IntroHero({ productCount = 0, onExplore }) {
           className="absolute inset-x-0 bottom-[12%] sm:bottom-[14%] px-6 text-center z-20 opacity-0 will-change-[opacity,transform]"
         >
           <h2 className="text-2xl sm:text-4xl font-extrabold text-saro-dark leading-tight tracking-tight max-w-2xl mx-auto">
-            {productCount > 0 ? `${productCount} productos` : 'Catálogo completo'} con precios mayoristas
+            Paletas, accesorios y ropa<br className="hidden sm:block" /> directo de fábrica
           </h2>
           <p className="text-sm sm:text-base text-slate-500 mt-3 max-w-lg mx-auto">
-            Promos por cantidad, envíos a todo el país y la calidad SARO en cada pieza.
+            La calidad SARO en cada pieza, con envíos a todo el país.
           </p>
           <button
             onClick={onExplore}

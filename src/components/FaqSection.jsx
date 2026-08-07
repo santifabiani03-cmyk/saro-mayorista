@@ -5,7 +5,7 @@ import { useState } from 'react'
 const faqs = [
   {
     q: '¿Hacen envíos a todo el país?',
-    a: 'Sí, realizamos envíos de paletas de padel, accesorios de padel y ropa deportiva a toda la Argentina a través de las principales empresas de logística. El costo de envío se coordina al momento de confirmar tu pedido.',
+    a: 'Sí, realizamos envíos a toda la Argentina mediante Correo Argentino y vía Cargo. El costo de envío se coordina al momento de confirmar tu pedido.',
   },
   {
     q: '¿Cómo hago un pedido?',

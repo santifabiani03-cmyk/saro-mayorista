@@ -110,6 +110,13 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body>
+        {/* Limpia service workers/caché viejos (evita ver por un instante la versión anterior de la página) */}
+        <script
+          dangerouslySetInnerHTML={{
+            __html:
+              "if('serviceWorker' in navigator){navigator.serviceWorker.getRegistrations().then(function(rs){rs.forEach(function(r){r.unregister()})}).catch(function(){});if(window.caches&&caches.keys){caches.keys().then(function(ks){ks.forEach(function(k){caches.delete(k)})}).catch(function(){})}}",
+          }}
+        />
         {/* Contenido para crawlers (visible antes de que cargue React) */}
         <noscript>
           <h1>SARO Mayorista — Paletas de Padel y Ropa Deportiva al por Mayor</h1>
