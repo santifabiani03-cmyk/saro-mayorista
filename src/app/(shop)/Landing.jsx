@@ -280,6 +280,40 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
         </div>
       </section>
 
+      {/* ── Diseños personalizados (clubes y eventos) ── */}
+      <section className="relative bg-[#FAFBFC] py-20 sm:py-28">
+        <div className="max-w-4xl mx-auto px-4 sm:px-6">
+          <div data-reveal className="reveal relative rounded-3xl bg-gradient-to-br from-saro-light to-blue-50 border border-blue-100/60 p-8 sm:p-12 overflow-hidden">
+            <div className="relative sm:flex sm:items-center sm:justify-between sm:gap-8">
+              <div className="max-w-lg">
+                <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[.32em] text-saro-blue mb-3">
+                  Para clubes y eventos
+                </p>
+                <h2 className="text-3xl sm:text-4xl font-extrabold text-saro-dark tracking-tight leading-[1.08]">
+                  Diseños personalizados
+                </h2>
+                <p className="text-sm sm:text-base text-gray-600 mt-4 leading-relaxed">
+                  ¿Tenés un club o estás organizando un evento? Hacemos <strong className="text-saro-dark font-semibold">ropa y paletas
+                  personalizadas</strong> con tu diseño, colores y marca. Lo coordinamos y lo armamos juntos por WhatsApp.
+                </p>
+              </div>
+              <a
+                href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hola SARO! Quiero consultar por productos personalizados (ropa y/o paletas) para un club o evento.')}`}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-6 sm:mt-0 inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-7 py-4 rounded-xl shadow-lg shadow-emerald-500/25 transition-all duration-200 btn-press flex-shrink-0"
+              >
+                <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
+                  <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                  <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.853L.054 23.446a.5.5 0 0 0 .612.612l5.598-1.479A11.947 11.947 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.686-.523-5.212-1.43l-.374-.22-3.878 1.023 1.023-3.877-.22-.374A9.955 9.955 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+                </svg>
+                Consultar personalizados
+              </a>
+            </div>
+          </div>
+        </div>
+      </section>
+
       {/* ── CTA final ───────────────────────────────── */}
       <section className="relative overflow-hidden bg-saro-dark py-20 sm:py-28">
         <div
