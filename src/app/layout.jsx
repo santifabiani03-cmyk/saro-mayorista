@@ -1,4 +1,5 @@
 import './globals.css'
+import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 
@@ -129,6 +130,18 @@ export default function RootLayout({ children }) {
         {children}
         <Analytics />
         <SpeedInsights />
+
+        {/* Google Analytics (gtag.js) */}
+        <Script
+          src="https://www.googletagmanager.com/gtag/js?id=G-WSMCJDHZWH"
+          strategy="afterInteractive"
+        />
+        <Script id="ga-gtag" strategy="afterInteractive">
+          {`window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-WSMCJDHZWH');`}
+        </Script>
       </body>
     </html>
   )

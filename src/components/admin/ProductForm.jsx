@@ -450,7 +450,7 @@ function AdminLightbox({ images, startIdx, onClose, onUpdateImage }) {
 }
 
 const BLANK = {
-  nombre: '', precio: '', descripcion: '', tags: [],
+  nombre: '', precio: '', peso: '', descripcion: '', tags: [],
   categoria: '', genero: '', parteCuerpo: '',
   colores: [], talles: [], noStock: [], emoji: '📦',
   promos: [],
@@ -1535,7 +1535,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     const { imagen: _img, imagenes: _imgs, ...rest } = initial
     // Migrar campo legacy `tag` → `tags` array
     const tags = getProductTags(initial)
-    return { ...BLANK, ...rest, tags, precio: String(initial.precio) }
+    return { ...BLANK, ...rest, tags, precio: String(initial.precio), peso: initial.peso != null ? String(initial.peso) : '' }
   })
   // imagenes: array de URLs ya subidas
   const [imagenes, setImagenes] = useState(
@@ -1591,6 +1591,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
       ...form,
       id:       form.id ?? `p${Date.now()}`,
       precio:   Number(form.precio),
+      peso:     Number(form.peso) || 0,
       imagenes,
       promos:   cleanPromos,
       ...(Object.keys(colorDefs).length > 0 && { colorDefs }),
@@ -1598,6 +1599,8 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     // Eliminar campos legacy
     delete product.imagen
     delete product.tag
+    // Si no se cargó peso, no lo guardamos (para no ensuciar el catálogo)
+    if (!product.peso) delete product.peso
 
     onSave(product)
   }
@@ -1707,6 +1710,20 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
             {form.precio && !isNaN(+form.precio) && (
               <p className="text-xs text-gray-500">${(+form.precio).toLocaleString('es-AR')}</p>
             )}
+          </Field>
+
+          <Field>
+            <Label>Peso (gramos)</Label>
+            <input
+              type="number"
+              min="0"
+              step="10"
+              value={form.peso}
+              onChange={e => set('peso', e.target.value)}
+              placeholder="Ej: 400"
+              className="w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue border-gray-200"
+            />
+            <p className="text-xs text-gray-400">Para calcular el costo de envío. Dejalo vacío si no aplica.</p>
           </Field>
 
           <Field>
