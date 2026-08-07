@@ -1,13 +1,35 @@
 'use client'
 
 import { useState } from 'react'
+import { track } from '../utils/analytics'
 
-const PROVINCIAS = [
-  'Buenos Aires', 'CABA', 'Catamarca', 'Chaco', 'Chubut', 'Córdoba', 'Corrientes',
-  'Entre Ríos', 'Formosa', 'Jujuy', 'La Pampa', 'La Rioja', 'Mendoza', 'Misiones',
-  'Neuquén', 'Río Negro', 'Salta', 'San Juan', 'San Luis', 'Santa Cruz', 'Santa Fe',
-  'Santiago del Estero', 'Tierra del Fuego', 'Tucumán',
-]
+// Cada provincia con una localidad de ejemplo (se usa como placeholder del campo Localidad)
+const PROVINCIAS = {
+  'Buenos Aires': 'San Isidro',
+  'CABA': 'Palermo',
+  'Catamarca': 'San Fernando del Valle',
+  'Chaco': 'Resistencia',
+  'Chubut': 'Puerto Madryn',
+  'Córdoba': 'Villa Carlos Paz',
+  'Corrientes': 'Goya',
+  'Entre Ríos': 'Paraná',
+  'Formosa': 'Clorinda',
+  'Jujuy': 'San Salvador de Jujuy',
+  'La Pampa': 'Santa Rosa',
+  'La Rioja': 'Chilecito',
+  'Mendoza': 'Godoy Cruz',
+  'Misiones': 'Posadas',
+  'Neuquén': 'San Martín de los Andes',
+  'Río Negro': 'Bariloche',
+  'Salta': 'San Ramón de la Nueva Orán',
+  'San Juan': 'Rawson',
+  'San Luis': 'Villa Mercedes',
+  'Santa Cruz': 'Río Gallegos',
+  'Santa Fe': 'Rosario',
+  'Santiago del Estero': 'La Banda',
+  'Tierra del Fuego': 'Ushuaia',
+  'Tucumán': 'Yerba Buena',
+}
 
 const inputCls =
   'w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-saro-dark placeholder:text-gray-400 focus:outline-none focus:border-saro-blue focus:ring-2 focus:ring-saro-blue/10 transition'
@@ -91,6 +113,7 @@ function Formulario({ whatsappNumber }) {
     l.push(`• *Provincia:* ${f.provincia}`)
     l.push(`• *Localidad:* ${f.localidad.trim()}`)
     if (f.mensaje.trim()) l.push(`• *Mensaje:* ${f.mensaje.trim()}`)
+    track('trabaja_con_nosotros', { provincia: f.provincia })
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(l.join('\n'))}`, '_blank')
   }
 
@@ -115,7 +138,7 @@ function Formulario({ whatsappNumber }) {
             <label className={labelCls}>Provincia *</label>
             <select value={f.provincia} onChange={on('provincia')} required className={`${inputCls} bg-white`}>
               <option value="">Elegí tu provincia…</option>
-              {PROVINCIAS.map(p => <option key={p} value={p}>{p}</option>)}
+              {Object.keys(PROVINCIAS).map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
           <div>
@@ -126,7 +149,7 @@ function Formulario({ whatsappNumber }) {
               required
               disabled={!f.provincia}
               className={inputCls}
-              placeholder={f.provincia ? 'Ej: San Isidro' : 'Elegí primero la provincia'}
+              placeholder={f.provincia ? `Ej: ${PROVINCIAS[f.provincia]}` : 'Elegí primero la provincia'}
             />
           </div>
         </div>

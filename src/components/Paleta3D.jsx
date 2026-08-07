@@ -19,6 +19,16 @@ const ROT_Z = 0
 const MODEL_DROP = 0.7      // baja la paleta un poco para que no tape el título
 const HIT_Y = 0.6          // altura de impacto de la pelota: centro de la cara (bajó al bajar el modelo)
 
+/**
+ * Modelos disponibles del hero. Al abrir/recargar la página se elige uno al azar.
+ * Para sumar modelos: dejar el .glb en public/models/ y agregarlo a esta lista.
+ * (El encuadre se autoajusta: la escena escala el modelo a TARGET_HEIGHT.)
+ */
+const MODELOS = [
+  '/models/paleta-opt.glb',
+]
+const MODELO_ELEGIDO = MODELOS[Math.floor(Math.random() * MODELOS.length)]
+
 export default function Paleta3D({ progressRef, onReady }) {
   const mountRef = useRef(null)
 
@@ -106,7 +116,7 @@ export default function Paleta3D({ progressRef, onReady }) {
       const ELBOW = 1.4  // el pivote baja por debajo del mango (como el codo)
       const loader = new GLTFLoader()
       loader.setMeshoptDecoder(MeshoptDecoder)
-      loader.load('/models/paleta-opt.glb', (gltf) => {
+      loader.load(MODELO_ELEGIDO, (gltf) => {
         if (disposed) return
         model = gltf.scene
         model.traverse(o => {

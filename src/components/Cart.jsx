@@ -2,10 +2,42 @@
 import { useState } from 'react'
 import { useCart } from '../context/CartContext'
 import CartSuggestions from './CartSuggestions'
+import { pesoAproxKg, pesoParaCotizar } from '../utils/envio'
+import { track } from '../utils/analytics'
 
 export default function Cart({ config }) {
   const { items, removeItem, updateQty, clearCart, total, totalItems, isOpen, setIsOpen } = useCart()
   const [copied, setCopied] = useState(false)
+
+  // ── Envío: el cliente elige cotizar o coordinarlo por WhatsApp ──
+  const [modoEnvio, setModoEnvio] = useState(null)   // null | 'cotizar' | 'whatsapp'
+  const [cp, setCp] = useState('')
+  const [cotizando, setCotizando] = useState(false)
+  const [rates, setRates] = useState(null)
+  const [errorEnvio, setErrorEnvio] = useState('')
+  const [envioElegido, setEnvioElegido] = useState(null)
+
+  const pesoKg = pesoAproxKg(items)
+
+  const cotizar = async () => {
+    setCotizando(true); setErrorEnvio(''); setRates(null); setEnvioElegido(null)
+    try {
+      const res = await fetch('/api/cotizar-envio', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ cp, peso: pesoParaCotizar(items) }),
+      })
+      const data = await res.json()
+      if (!res.ok) throw new Error(data.error ?? 'No pudimos cotizar el envío')
+      setRates(data.rates ?? [])
+      track('cotizar_envio', { cp, peso_kg: pesoKg })
+      if (!data.rates?.length) setErrorEnvio('No hay envíos disponibles para ese código postal')
+    } catch (e) {
+      setErrorEnvio(e.message ?? 'No pudimos cotizar el envío')
+    } finally {
+      setCotizando(false)
+    }
+  }
 
   const showMin     = config.mostrarCompraMinima === true   // compra mínima (modo mayorista)
   const minPurchase = config.minPurchase
@@ -45,7 +77,22 @@ export default function Cart({ config }) {
       }
     })
 
-    msg += `\n*TOTAL: $${total.toLocaleString('es-AR')}*\n\nGracias!`
+    msg += `\n*TOTAL PRODUCTOS: $${total.toLocaleString('es-AR')}*\n`
+
+    // Envío: se adjunta lo cotizado, o el pedido de coordinarlo por WhatsApp
+    if (envioElegido) {
+      msg += `\n*ENVÍO*\n`
+      msg += `• Peso aprox.: ${pesoKg} kg\n`
+      msg += `• CP destino: ${cp}\n`
+      msg += `• ${envioElegido.tipo === 'sucursal' ? 'A sucursal' : 'A domicilio'}: $${Math.round(envioElegido.precio).toLocaleString('es-AR')}`
+      if (envioElegido.diasMin) msg += ` (${envioElegido.diasMin} a ${envioElegido.diasMax} días hábiles)`
+      msg += `\n_Valor estimado por Correo Argentino, a confirmar._\n`
+      msg += `\n*TOTAL CON ENVÍO: $${(total + Math.round(envioElegido.precio)).toLocaleString('es-AR')}*\n`
+    } else if (modoEnvio === 'whatsapp') {
+      msg += `\n*ENVÍO:* a coordinar por acá (peso aprox.: ${pesoKg} kg)\n`
+    }
+
+    msg += `\nGracias!`
     return msg
   }
 
@@ -56,6 +103,12 @@ export default function Cart({ config }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items, total, totalItems }),
     }).catch(() => {})
+    track('finalizar_pedido', {
+      value: total,
+      currency: 'ARS',
+      items: totalItems,
+      envio: envioElegido ? envioElegido.tipo : (modoEnvio === 'whatsapp' ? 'a_coordinar' : 'sin_definir'),
+    })
     window.open(`https://wa.me/${config.whatsappNumber}?text=${encodeURIComponent(buildMessage())}`, '_blank')
   }
 
@@ -206,6 +259,91 @@ export default function Cart({ config }) {
               <span className="text-2xl font-extrabold text-saro-dark tracking-tight">
                 ${total.toLocaleString('es-AR')}
               </span>
+            </div>
+
+            {/* ── Envío ── */}
+            <div className="rounded-xl border border-gray-100 bg-[#FAFBFC] p-3.5 space-y-3">
+              <div className="flex items-center justify-between">
+                <span className="text-sm font-semibold text-gray-700">Envío</span>
+                <span className="text-xs text-gray-400 font-medium">Peso aprox.: {pesoKg} kg</span>
+              </div>
+
+              {/* Elección: cotizar o coordinar por WhatsApp */}
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => { setModoEnvio('cotizar'); setEnvioElegido(null) }}
+                  className={`py-2 rounded-lg text-xs font-bold border transition-all ${
+                    modoEnvio === 'cotizar'
+                      ? 'bg-saro-blue border-saro-blue text-white shadow-sm shadow-saro-blue/20'
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue/40 hover:text-saro-blue'
+                  }`}
+                >
+                  Cotizar envío
+                </button>
+                <button
+                  onClick={() => { setModoEnvio('whatsapp'); setRates(null); setEnvioElegido(null); setErrorEnvio('') }}
+                  className={`py-2 rounded-lg text-xs font-bold border transition-all ${
+                    modoEnvio === 'whatsapp'
+                      ? 'bg-saro-dark border-saro-dark text-white shadow-sm'
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                  }`}
+                >
+                  Acordar por WhatsApp
+                </button>
+              </div>
+
+              {modoEnvio === 'cotizar' && (
+                <div className="space-y-2.5">
+                  <div className="flex gap-2">
+                    <input
+                      value={cp}
+                      onChange={e => setCp(e.target.value.replace(/\D/g, '').slice(0, 4))}
+                      inputMode="numeric"
+                      placeholder="Tu código postal"
+                      className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-saro-blue"
+                    />
+                    <button
+                      onClick={cotizar}
+                      disabled={cp.length !== 4 || cotizando}
+                      className="px-4 rounded-lg bg-saro-dark hover:bg-saro-blue text-white text-xs font-bold transition-colors disabled:opacity-50"
+                    >
+                      {cotizando ? '…' : 'Calcular'}
+                    </button>
+                  </div>
+
+                  {errorEnvio && <p className="text-xs text-red-500">{errorEnvio}</p>}
+
+                  {rates?.map(r => (
+                    <button
+                      key={r.tipo}
+                      onClick={() => setEnvioElegido(r)}
+                      className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg border text-left transition-all ${
+                        envioElegido?.tipo === r.tipo
+                          ? 'border-saro-blue bg-saro-light'
+                          : 'border-gray-200 bg-white hover:border-saro-blue/40'
+                      }`}
+                    >
+                      <span className="text-xs">
+                        <span className="font-semibold text-gray-700">
+                          {r.tipo === 'sucursal' ? 'A sucursal' : 'A domicilio'}
+                        </span>
+                        {r.diasMin && (
+                          <span className="block text-[11px] text-gray-400">{r.diasMin} a {r.diasMax} días hábiles</span>
+                        )}
+                      </span>
+                      <span className="font-extrabold text-saro-blue text-sm">
+                        ${Math.round(r.precio).toLocaleString('es-AR')}
+                      </span>
+                    </button>
+                  ))}
+
+                  {rates?.length > 0 && (
+                    <p className="text-[11px] text-gray-400 leading-snug">
+                      Valores estimados de Correo Argentino. Se confirman al cerrar el pedido.
+                    </p>
+                  )}
+                </div>
+              )}
             </div>
 
             {/* Barra de progreso + sugerencias (solo en modo mayorista con compra mínima) */}

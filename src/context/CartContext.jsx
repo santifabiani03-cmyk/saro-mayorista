@@ -40,6 +40,7 @@ export function CartProvider({ children }) {
             imagen,
             precio:    product.precio,
             promos:    product.promos ?? [],
+            peso:      product.peso ?? 0,   // gramos, para cotizar el envío
             color,
             talle,
             cantidad,
