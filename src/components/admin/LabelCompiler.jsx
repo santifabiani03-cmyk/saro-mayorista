@@ -246,7 +246,9 @@ async function detectLabelBboxes(pdfBytes, cropMode) {
  * Cada PDF se analiza por separado (bbox propio) y todas las páginas
  * se compilan en un único documento de salida.
  */
-async function compileLabels(pdfBuffers, { perPage = 4, marginMm = 8, gapMm = 4, cropMode = 'auto', onStatus }) {
+async function compileLabels(pdfBuffers, {
+  perPage = 4, marginMm = 8, gapMm = 4, cropMode = 'auto', individualScalePct = 90, onStatus,
+}) {
   const { cols, rows } = LAYOUTS[perPage]
   const margin = marginMm * MM_TO_PT
   const gap = gapMm * MM_TO_PT
@@ -265,10 +267,13 @@ async function compileLabels(pdfBuffers, { perPage = 4, marginMm = 8, gapMm = 4,
   }
 
   // 2) Construir lista plana de { srcDoc, pageIndex, bbox }
+  //    Un PDF con una sola etiqueta viene en formato "página completa": esas se
+  //    achican un poco para que no queden pegadas al borde del área de impresión.
   const allPages = []
   for (const src of sources) {
+    const individual = src.bboxes.length === 1
     src.bboxes.forEach((bbox, i) => {
-      allPages.push({ srcDoc: src.srcDoc, pageIndex: i, bbox })
+      allPages.push({ srcDoc: src.srcDoc, pageIndex: i, bbox, individual })
     })
   }
 
@@ -282,15 +287,17 @@ async function compileLabels(pdfBuffers, { perPage = 4, marginMm = 8, gapMm = 4,
     const batchEnd = Math.min(pageStart + perPage, totalLabels)
 
     for (let i = pageStart; i < batchEnd; i++) {
-      const { srcDoc, pageIndex, bbox } = allPages[i]
+      const { srcDoc, pageIndex, bbox, individual } = allPages[i]
       const slot = i - pageStart
       const col = slot % cols
       const row = Math.floor(slot / cols)
 
-      // Escala según el bbox de este PDF en particular
+      // Escala según el bbox de este PDF en particular. Las de página completa
+      // (una etiqueta por PDF) se reducen un poco para despegarlas del margen.
       const labelW = bbox.x1 - bbox.x0
       const labelH = bbox.y1 - bbox.y0
-      const scale = Math.min(cellW / labelW, cellH / labelH)
+      const fit = Math.min(cellW / labelW, cellH / labelH)
+      const scale = individual ? fit * (individualScalePct / 100) : fit
       const drawW = labelW * scale
       const drawH = labelH * scale
 
@@ -333,6 +340,7 @@ export default function LabelCompiler() {
   const [marginMm, setMarginMm] = useState(8)
   const [gapMm, setGapMm] = useState(4)
   const [cropMode, setCropMode] = useState('auto') // 'auto' | 'siempre' | 'nunca'
+  const [individualScalePct, setIndividualScalePct] = useState(90)
   const [processing, setProcessing] = useState(false)
   const [statusMsg, setStatusMsg] = useState('')
   const [result, setResult] = useState(null)
@@ -344,7 +352,7 @@ export default function LabelCompiler() {
   const [history, setHistory] = useState(loadHistory)
   const [statFilter, setStatFilter] = useState('todo') // 'semana' | 'mes' | 'todo'
 
-  const isDefault = perPage === 4 && marginMm === 8 && gapMm === 4 && cropMode === 'auto'
+  const isDefault = perPage === 4 && marginMm === 8 && gapMm === 4 && cropMode === 'auto' && individualScalePct === 90
 
   const filteredStats = useMemo(() => {
     const now = Date.now()
@@ -402,6 +410,7 @@ export default function LabelCompiler() {
         marginMm,
         gapMm,
         cropMode,
+        individualScalePct,
         onStatus: setStatusMsg,
       })
 
@@ -561,7 +570,7 @@ export default function LabelCompiler() {
           {!isDefault && (
             <button
               type="button"
-              onClick={() => { setPerPage(4); setMarginMm(8); setGapMm(4); setCropMode('auto') }}
+              onClick={() => { setPerPage(4); setMarginMm(8); setGapMm(4); setCropMode('auto'); setIndividualScalePct(90) }}
               className="text-xs text-saro-blue hover:text-saro-dark font-medium transition-colors"
             >
               ↺ Restablecer valores
@@ -607,6 +616,27 @@ export default function LabelCompiler() {
               className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-saro-blue"
             />
           </div>
+        </div>
+
+        {/* Tamaño de las etiquetas que vienen solas (una por PDF) */}
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+            Tamaño de etiquetas individuales
+          </label>
+          <div className="flex items-center gap-3">
+            <input
+              type="range"
+              min={60} max={100} step={1}
+              value={individualScalePct}
+              onChange={e => setIndividualScalePct(Number(e.target.value))}
+              className="flex-1 accent-saro-blue"
+            />
+            <span className="text-sm font-bold text-saro-blue w-12 text-right">{individualScalePct}%</span>
+          </div>
+          <p className="text-[11px] text-gray-400 mt-1.5">
+            Sólo afecta a los PDFs que traen una única etiqueta a página completa: las achica
+            para despegarlas del borde. Las que vienen varias en un PDF no se tocan.
+          </p>
         </div>
 
         {/* Recorte del cuadro vacío al pie de la etiqueta */}
