@@ -175,6 +175,29 @@ export default function AdminPage() {
     showToast('🗑️ Producto eliminado')
   }
 
+  // ── Limpieza del catálogo importado del PDF (22/05/2026) ──
+  // Son los productos que se cargaron en esa importación, quedaron ocultos y
+  // nunca se editaron. Los que se editaron o están publicados NO se tocan.
+  const IMPORT_DATE = '2026-05-22'
+  const esImportSinUsar = p =>
+    (p.fechaPublicacion ?? '').slice(0, 10) === IMPORT_DATE &&
+    !((p.fechaActualizacion ?? '').slice(0, 10) > IMPORT_DATE) &&
+    p.visible === false
+
+  const importSinUsar = products.filter(esImportSinUsar)
+
+  const handleCleanupImport = async () => {
+    const n = importSinUsar.length
+    if (!n) return
+    if (!confirm(
+      `Se van a eliminar ${n} productos de la importación del 22/05 que están ocultos y nunca se editaron.\n\n` +
+      `NO se tocan los productos publicados ni los que editaste.\n\n` +
+      `Después hay que tocar "Publicar en sitio" para aplicarlo. ¿Continuar?`
+    )) return
+    await persistProducts(products.filter(p => !esImportSinUsar(p)))
+    showToast(`🧹 ${n} productos eliminados. Tocá "Publicar en sitio" para aplicarlo.`, 'success', 6000)
+  }
+
   const handleEdit = (product) => {
     setEditing(product)
     changeTab('nuevo')
@@ -436,14 +459,41 @@ export default function AdminPage() {
         ) : tab === 'ajustes' ? (
           <SettingsPanel onToast={showToast} />
         ) : (
-          <ProductList
-            products={products}
-            onEdit={handleEdit}
-            onDelete={handleDelete}
-            onToggleVisible={handleToggleVisible}
-            onToggleSinStock={handleToggleSinStock}
-            saving={saving}
-          />
+          <>
+            {/* Limpieza de la importación del PDF viejo (sólo aparece si queda algo) */}
+            {importSinUsar.length > 0 && (
+              <div className="max-w-5xl mx-auto mb-5 bg-amber-50 border border-amber-200 rounded-2xl p-4 sm:p-5">
+                <div className="sm:flex sm:items-center sm:justify-between gap-4">
+                  <div>
+                    <p className="font-bold text-amber-900 text-sm">
+                      🧹 Limpieza del catálogo importado
+                    </p>
+                    <p className="text-xs text-amber-800/80 mt-1 leading-relaxed">
+                      Quedan <strong>{importSinUsar.length} productos</strong> de la importación del
+                      22/05 que están <strong>ocultos</strong> y nunca se editaron. Los publicados y
+                      los que editaste no se tocan.
+                    </p>
+                  </div>
+                  <button
+                    onClick={handleCleanupImport}
+                    disabled={saving}
+                    className="mt-3 sm:mt-0 flex-shrink-0 px-4 py-2.5 rounded-xl bg-amber-600 hover:bg-amber-700 text-white text-sm font-bold transition-colors disabled:opacity-60"
+                  >
+                    Eliminar {importSinUsar.length}
+                  </button>
+                </div>
+              </div>
+            )}
+
+            <ProductList
+              products={products}
+              onEdit={handleEdit}
+              onDelete={handleDelete}
+              onToggleVisible={handleToggleVisible}
+              onToggleSinStock={handleToggleSinStock}
+              saving={saving}
+            />
+          </>
         )}
       </div>
 
