@@ -4,6 +4,7 @@ import Image from 'next/image'
 import { CartProvider } from '../../context/CartContext'
 import Header from '../../components/Header'
 import Cart from '../../components/Cart'
+import ChatWidget from '../../components/ChatWidget'
 
 export default function ShopShell({ config, children }) {
   return (
@@ -14,6 +15,8 @@ export default function ShopShell({ config, children }) {
         {children}
 
         <Cart config={config} />
+
+        <ChatWidget whatsappNumber={config.whatsappNumber} />
 
         {/* Footer */}
         <footer className="bg-white border-t border-gray-100/80 mt-16 py-10 px-4">
