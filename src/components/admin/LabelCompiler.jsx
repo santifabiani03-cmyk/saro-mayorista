@@ -20,6 +20,12 @@ const MM_TO_PT = 72 / 25.4
 const DETECT_SCALE = 2 // resolución para escaneo (2x = ~144 DPI)
 const BOTTOM_CROP_MM = 21 // recorte inferior para eliminar cuadro blanco de la etiqueta
 
+// Algunas etiquetas traen un cuadro vacío (con borde) debajo del último código de
+// barras: ese se recorta. Las etiquetas individuales no lo traen, y recortarlas
+// se come contenido real. Si en esa franja hay menos de este % de tinta, se
+// considera "cuadro vacío" y se recorta.
+const EMPTY_BAND_MAX_INK = 0.012 // 1,2% de píxeles con contenido
+
 // ── Historial de envíos compilados (persistido en localStorage) ──
 const HISTORY_KEY = 'saro_label_history'
 
@@ -62,9 +68,20 @@ function rowHasContent(data, width, y, threshold) {
  */
 const GAP_THRESHOLD_PX = 40 // ~20pt @ 2x — gap mínimo para considerar "separado"
 
-async function detectLabelBbox(pdfBytes) {
-  const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise
-  const page = await pdf.getPage(1)
+/** Porcentaje de píxeles con contenido dentro de un rectángulo del canvas. */
+function inkRatio(data, width, xa, xb, ya, yb, threshold) {
+  let dark = 0, total = 0
+  for (let y = ya; y <= yb; y++) {
+    for (let x = xa; x <= xb; x++) {
+      const idx = (y * width + x) * 4
+      total++
+      if (data[idx] < threshold || data[idx + 1] < threshold || data[idx + 2] < threshold) dark++
+    }
+  }
+  return total ? dark / total : 0
+}
+
+async function detectPageBbox(page, cropMode) {
   const viewport = page.getViewport({ scale: DETECT_SCALE })
 
   // Renderizar a canvas offscreen
@@ -153,23 +170,47 @@ async function detectLabelBbox(pdfBytes) {
     if (hasContent) { rightPx = x; break }
   }
 
-  // 5) Convertir píxeles a coordenadas PDF (puntos)
+  // 5) ¿Hay que recortar la franja inferior?
+  //    Sólo si ahí abajo hay un cuadro vacío (el de las etiquetas del correo).
+  //    En las etiquetas individuales esa franja tiene contenido real (el código
+  //    de barras final) y recortarla se lo comería.
+  const bandPx = Math.round(BOTTOM_CROP_MM * MM_TO_PT * DETECT_SCALE)
+  let recortar
+  if (cropMode === 'siempre')      recortar = true
+  else if (cropMode === 'nunca')   recortar = false
+  else {
+    const bandTop = Math.max(topPx, bottomPx - bandPx + 1)
+    const ratio = inkRatio(data, width, leftPx, rightPx, bandTop, bottomPx, threshold)
+    recortar = ratio < EMPTY_BAND_MAX_INK
+  }
+
+  // 6) Convertir píxeles a coordenadas PDF (puntos)
   const pageW = page.getViewport({ scale: 1 }).width
   const pageH = page.getViewport({ scale: 1 }).height
   const pxToPt = 1 / DETECT_SCALE
 
   const pad = 2 // padding en puntos
-  const bottomCrop = BOTTOM_CROP_MM * MM_TO_PT // recorte cuadro blanco inferior
   const x0 = Math.max(0, leftPx * pxToPt - pad)
   const x1 = Math.min(pageW, rightPx * pxToPt + pad)
   // PDF tiene origen bottom-left, canvas tiene origen top-left
   const y0raw = Math.max(0, pageH - (bottomPx * pxToPt) - pad)
   const y1 = Math.min(pageH, pageH - (topPx * pxToPt) + pad)
-  // Subir el borde inferior para recortar el cuadro blanco
-  const y0 = y0raw + bottomCrop
+  // Subir el borde inferior sólo si corresponde recortar el cuadro vacío
+  const y0 = recortar ? Math.min(y0raw + BOTTOM_CROP_MM * MM_TO_PT, y1 - 10) : y0raw
 
+  return { x0, y0, x1, y1, pageW, pageH, recortado: recortar }
+}
+
+/** Detecta el bbox de CADA página del PDF (pueden tener formatos distintos). */
+async function detectLabelBboxes(pdfBytes, cropMode) {
+  const pdf = await pdfjsLib.getDocument({ data: pdfBytes }).promise
+  const bboxes = []
+  for (let p = 1; p <= pdf.numPages; p++) {
+    const page = await pdf.getPage(p)
+    bboxes.push(await detectPageBbox(page, cropMode))
+  }
   pdf.destroy()
-  return { x0, y0, x1, y1, pageW, pageH }
+  return bboxes
 }
 
 /**
@@ -177,30 +218,30 @@ async function detectLabelBbox(pdfBytes) {
  * Cada PDF se analiza por separado (bbox propio) y todas las páginas
  * se compilan en un único documento de salida.
  */
-async function compileLabels(pdfBuffers, { perPage = 4, marginMm = 8, gapMm = 4, onStatus }) {
+async function compileLabels(pdfBuffers, { perPage = 4, marginMm = 8, gapMm = 4, cropMode = 'auto', onStatus }) {
   const { cols, rows } = LAYOUTS[perPage]
   const margin = marginMm * MM_TO_PT
   const gap = gapMm * MM_TO_PT
   const cellW = (LETTER_W - 2 * margin - (cols - 1) * gap) / cols
   const cellH = (LETTER_H - 2 * margin - (rows - 1) * gap) / rows
 
-  // 1) Analizar cada PDF: detectar bbox y extraer páginas
-  //    Cada PDF puede tener distinto tamaño de etiqueta
-  const sources = [] // { srcDoc, bbox, pageCount }
+  // 1) Analizar cada PDF: se detecta el bbox de CADA página, así un mismo PDF
+  //    puede mezclar etiquetas con y sin cuadro vacío al pie.
+  const sources = [] // { srcDoc, bboxes }
   for (let f = 0; f < pdfBuffers.length; f++) {
     onStatus?.(`Detectando etiquetas (${f + 1}/${pdfBuffers.length})…`)
     const bytes = pdfBuffers[f]
-    const bbox = await detectLabelBbox(new Uint8Array(bytes))
+    const bboxes = await detectLabelBboxes(new Uint8Array(bytes), cropMode)
     const srcDoc = await PDFDocument.load(bytes)
-    sources.push({ srcDoc, bbox, pageCount: srcDoc.getPageCount() })
+    sources.push({ srcDoc, bboxes })
   }
 
   // 2) Construir lista plana de { srcDoc, pageIndex, bbox }
   const allPages = []
   for (const src of sources) {
-    for (let i = 0; i < src.pageCount; i++) {
-      allPages.push({ srcDoc: src.srcDoc, pageIndex: i, bbox: src.bbox })
-    }
+    src.bboxes.forEach((bbox, i) => {
+      allPages.push({ srcDoc: src.srcDoc, pageIndex: i, bbox })
+    })
   }
 
   const totalLabels = allPages.length
@@ -253,6 +294,8 @@ async function compileLabels(pdfBuffers, { perPage = 4, marginMm = 8, gapMm = 4,
     totalLabels,
     sheets: Math.ceil(totalLabels / perPage),
     layout: `${cols}×${rows}`,
+    // cuántas tenían el cuadro vacío al pie (y se recortó)
+    recortadas: allPages.filter(p => p.bbox.recortado).length,
   }
 }
 
@@ -261,6 +304,7 @@ export default function LabelCompiler() {
   const [perPage, setPerPage] = useState(4)
   const [marginMm, setMarginMm] = useState(8)
   const [gapMm, setGapMm] = useState(4)
+  const [cropMode, setCropMode] = useState('auto') // 'auto' | 'siempre' | 'nunca'
   const [processing, setProcessing] = useState(false)
   const [statusMsg, setStatusMsg] = useState('')
   const [result, setResult] = useState(null)
@@ -272,7 +316,7 @@ export default function LabelCompiler() {
   const [history, setHistory] = useState(loadHistory)
   const [statFilter, setStatFilter] = useState('todo') // 'semana' | 'mes' | 'todo'
 
-  const isDefault = perPage === 4 && marginMm === 8 && gapMm === 4
+  const isDefault = perPage === 4 && marginMm === 8 && gapMm === 4 && cropMode === 'auto'
 
   const filteredStats = useMemo(() => {
     const now = Date.now()
@@ -329,6 +373,7 @@ export default function LabelCompiler() {
         perPage,
         marginMm,
         gapMm,
+        cropMode,
         onStatus: setStatusMsg,
       })
 
@@ -361,6 +406,7 @@ export default function LabelCompiler() {
         totalLabels: info.totalLabels,
         sheets: info.sheets,
         layout: info.layout,
+        recortadas: info.recortadas,
       })
     } catch (e) {
       setError('Error al procesar el PDF: ' + (e.message || 'desconocido'))
@@ -487,7 +533,7 @@ export default function LabelCompiler() {
           {!isDefault && (
             <button
               type="button"
-              onClick={() => { setPerPage(4); setMarginMm(8); setGapMm(4) }}
+              onClick={() => { setPerPage(4); setMarginMm(8); setGapMm(4); setCropMode('auto') }}
               className="text-xs text-saro-blue hover:text-saro-dark font-medium transition-colors"
             >
               ↺ Restablecer valores
@@ -535,6 +581,38 @@ export default function LabelCompiler() {
           </div>
         </div>
 
+        {/* Recorte del cuadro vacío al pie de la etiqueta */}
+        <div>
+          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+            Recorte inferior
+          </label>
+          <div className="grid grid-cols-3 gap-2">
+            {[
+              { key: 'auto',    label: 'Automático', hint: 'Detecta solo si hay cuadro vacío al pie' },
+              { key: 'siempre', label: 'Siempre',    hint: 'Recorta siempre los 21 mm inferiores' },
+              { key: 'nunca',   label: 'Nunca',      hint: 'No recorta (etiqueta completa)' },
+            ].map(o => (
+              <button
+                key={o.key}
+                type="button"
+                onClick={() => setCropMode(o.key)}
+                title={o.hint}
+                className={`py-2 rounded-xl text-xs font-bold border transition-all ${
+                  cropMode === o.key
+                    ? 'bg-saro-blue border-saro-blue text-white'
+                    : 'bg-white border-gray-200 text-gray-500 hover:border-saro-blue/40 hover:text-saro-blue'
+                }`}
+              >
+                {o.label}
+              </button>
+            ))}
+          </div>
+          <p className="text-[11px] text-gray-400 mt-1.5">
+            En automático detecta, etiqueta por etiqueta, si abajo hay un cuadro vacío para
+            recortar. Si alguna sale cortada, probá con <strong>Nunca</strong>.
+          </p>
+        </div>
+
         {/* Botón compilar */}
         <button
           onClick={handleCompile}
@@ -580,6 +658,15 @@ export default function LabelCompiler() {
               <p className="text-xs text-gray-500 mt-0.5">Por hoja</p>
             </div>
           </div>
+          {cropMode === 'auto' && (
+            <p className="text-xs text-green-700/80 mt-3">
+              {result.recortadas === 0
+                ? 'Ninguna tenía cuadro vacío al pie: se imprimen completas.'
+                : result.recortadas === result.totalLabels
+                ? 'Todas tenían cuadro vacío al pie: se recortó en todas.'
+                : `${result.recortadas} de ${result.totalLabels} tenían cuadro vacío al pie (recortadas); el resto va completa.`}
+            </p>
+          )}
         </div>
       )}
 
