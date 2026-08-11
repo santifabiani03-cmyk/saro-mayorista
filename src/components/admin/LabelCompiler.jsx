@@ -22,9 +22,14 @@ const BOTTOM_CROP_MM = 21 // recorte inferior para eliminar cuadro blanco de la 
 
 // Algunas etiquetas traen un cuadro vacío (con borde) debajo del último código de
 // barras: ese se recorta. Las etiquetas individuales no lo traen, y recortarlas
-// se come contenido real. Si en esa franja hay menos de este % de tinta, se
-// considera "cuadro vacío" y se recorta.
-const EMPTY_BAND_MAX_INK = 0.012 // 1,2% de píxeles con contenido
+// se come contenido real.
+//
+// En vez de recortar una franja fija, se busca dónde termina el contenido real
+// (texto/códigos de barras) mirando de abajo hacia arriba, ignorando las líneas
+// finas del marco. Lo que sobre debajo de eso es el cuadro vacío → se recorta.
+const ROW_INK_RATIO = 0.10  // desde qué % del ancho una fila cuenta como "con contenido"
+const MARCO_MAX_PX   = 6    // una línea del marco no es más alta que esto (a DETECT_SCALE)
+const MIN_CROP_PX    = 10   // por debajo de esto no vale la pena recortar
 
 // ── Historial de envíos compilados (persistido en localStorage) ──
 const HISTORY_KEY = 'saro_label_history'
@@ -68,17 +73,35 @@ function rowHasContent(data, width, y, threshold) {
  */
 const GAP_THRESHOLD_PX = 40 // ~20pt @ 2x — gap mínimo para considerar "separado"
 
-/** Porcentaje de píxeles con contenido dentro de un rectángulo del canvas. */
-function inkRatio(data, width, xa, xb, ya, yb, threshold) {
-  let dark = 0, total = 0
-  for (let y = ya; y <= yb; y++) {
+/**
+ * Busca la última fila con contenido real de la etiqueta, de abajo hacia arriba.
+ * Las líneas finas (bordes del marco y del cuadro vacío al pie) se ignoran, así
+ * que devuelve el final del último texto o código de barras.
+ * Devuelve null si no encuentra nada.
+ */
+function findContentBottom(data, width, xa, xb, ya, yb, threshold) {
+  const bandW = xb - xa + 1
+  if (bandW <= 0 || yb < ya) return null
+
+  const tieneContenido = y => {
+    let dark = 0
     for (let x = xa; x <= xb; x++) {
       const idx = (y * width + x) * 4
-      total++
       if (data[idx] < threshold || data[idx + 1] < threshold || data[idx + 2] < threshold) dark++
     }
+    return dark / bandW > ROW_INK_RATIO
   }
-  return total ? dark / total : 0
+
+  let y = yb
+  while (y >= ya) {
+    if (!tieneContenido(y)) { y--; continue }
+    // Medir el alto del bloque al que pertenece esta fila
+    let top = y
+    while (top - 1 >= ya && tieneContenido(top - 1)) top--
+    if (y - top + 1 > MARCO_MAX_PX) return y  // bloque grueso → contenido real
+    y = top - 1                                // línea fina del marco → seguir subiendo
+  }
+  return null
 }
 
 async function detectPageBbox(page, cropMode) {
@@ -174,15 +197,22 @@ async function detectPageBbox(page, cropMode) {
   //    Sólo si ahí abajo hay un cuadro vacío (el de las etiquetas del correo).
   //    En las etiquetas individuales esa franja tiene contenido real (el código
   //    de barras final) y recortarla se lo comería.
-  const bandPx = Math.round(BOTTOM_CROP_MM * MM_TO_PT * DETECT_SCALE)
-  let recortar
-  if (cropMode === 'siempre')      recortar = true
-  else if (cropMode === 'nunca')   recortar = false
-  else {
-    const bandTop = Math.max(topPx, bottomPx - bandPx + 1)
-    const ratio = inkRatio(data, width, leftPx, rightPx, bandTop, bottomPx, threshold)
-    recortar = ratio < EMPTY_BAND_MAX_INK
+  let recortar = false
+  let cropBottomPx = bottomPx   // hasta dónde llega la etiqueta una vez recortada
+
+  if (cropMode === 'siempre') {
+    // Comportamiento clásico: franja fija de 21 mm
+    cropBottomPx = bottomPx - Math.round(BOTTOM_CROP_MM * MM_TO_PT * DETECT_SCALE)
+    recortar = true
+  } else if (cropMode === 'auto') {
+    const contentBottom = findContentBottom(data, width, leftPx, rightPx, topPx, bottomPx, threshold)
+    // Si debajo del último contenido real sobra espacio (el cuadro vacío), se recorta ahí
+    if (contentBottom !== null && bottomPx - contentBottom > MIN_CROP_PX) {
+      cropBottomPx = contentBottom + Math.round(2 * MM_TO_PT * DETECT_SCALE) // 2 mm de aire
+      recortar = true
+    }
   }
+  const effBottomPx = Math.max(topPx + 1, Math.min(bottomPx, cropBottomPx))
 
   // 6) Convertir píxeles a coordenadas PDF (puntos)
   const pageW = page.getViewport({ scale: 1 }).width
@@ -193,10 +223,8 @@ async function detectPageBbox(page, cropMode) {
   const x0 = Math.max(0, leftPx * pxToPt - pad)
   const x1 = Math.min(pageW, rightPx * pxToPt + pad)
   // PDF tiene origen bottom-left, canvas tiene origen top-left
-  const y0raw = Math.max(0, pageH - (bottomPx * pxToPt) - pad)
   const y1 = Math.min(pageH, pageH - (topPx * pxToPt) + pad)
-  // Subir el borde inferior sólo si corresponde recortar el cuadro vacío
-  const y0 = recortar ? Math.min(y0raw + BOTTOM_CROP_MM * MM_TO_PT, y1 - 10) : y0raw
+  const y0 = Math.max(0, Math.min(pageH - (effBottomPx * pxToPt) - pad, y1 - 10))
 
   return { x0, y0, x1, y1, pageW, pageH, recortado: recortar }
 }
