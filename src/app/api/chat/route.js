@@ -48,6 +48,15 @@ function catalogoParaPrompt() {
           .join(' / '))
       }
       if (p.sinStock) partes.push('SIN STOCK')
+      // Combinaciones color/talle agotadas, para no ofrecer lo que no hay
+      if (p.noStock?.length) {
+        partes.push('agotado en: ' + p.noStock.map(ns => `${ns.color}/${ns.talle}`).join(', '))
+      }
+      // La descripción trae las specs reales (materiales, forma, núcleo): sin esto
+      // el modelo las deduce y termina inventando características.
+      if (p.descripcion?.trim()) {
+        partes.push(`descripción: ${p.descripcion.trim().replace(/\s+/g, ' ').slice(0, 320)}`)
+      }
       return partes.join(' | ')
     })
     .join('\n')
@@ -86,8 +95,8 @@ export async function POST(request) {
     '\n## CATÁLOGO ACTUAL (los únicos productos y precios válidos)\n' + catalogoParaPrompt(),
   ].join('\n')
 
-  try {
-    const res = await fetch(
+  const pedirAGemini = () =>
+    fetch(
       `https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=${apiKey}`,
       {
         method: 'POST',
@@ -109,6 +118,15 @@ export async function POST(request) {
       }
     )
 
+  try {
+    let res = await pedirAGemini()
+
+    // Gemini limita las consultas por minuto: si justo se junta con otro cliente,
+    // esperamos un momento y reintentamos una vez antes de darnos por vencidos.
+    if (res.status === 429 || res.status === 503) {
+      await new Promise(r => setTimeout(r, 1200))
+      res = await pedirAGemini()
+    }
     if (!res.ok) throw new Error(`Gemini ${res.status}`)
 
     const data = await res.json()
