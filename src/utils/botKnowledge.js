@@ -30,6 +30,23 @@ Hacemos envíos a todo el país mediante Correo Argentino y vía Cargo.
 El costo del envío se coordina al confirmar el pedido (depende del destino y del peso).
 No tenemos local a la calle para retiro: todo se coordina por WhatsApp.
 
+## Plazos de entrega
+El pedido llega entre 5 y 7 días hábiles DESPUÉS de realizado el pago.
+(El plazo se cuenta desde el pago, no desde que se hace el pedido.)
+
+## Horario de atención
+Atendemos de 8 a 16 hs. Los mensajes que entran fuera de ese horario se responden
+al siguiente día hábil.
+
+## Cambios, devoluciones y garantía
+- Se aceptan cambios y devoluciones por FALLA o ERROR DE FABRICACIÓN.
+- Las paletas tienen garantía, y también se cambian por falla.
+- IMPORTANTE: el plazo exacto de la garantía todavía no está definido acá. NUNCA digas una
+  cantidad de meses. Si preguntan cuánto dura, decí que la paleta tiene garantía y que el
+  plazo y las condiciones se confirman por WhatsApp.
+- Cualquier otro caso (arrepentimiento, desgaste por uso, etc.) no está definido acá: no
+  afirmes ni que sí ni que no, decí que se ve por WhatsApp caso por caso.
+
 ## Medios de pago
 Aceptamos transferencia bancaria y otros medios que se coordinan de forma directa.
 Los datos para pagar se envían una vez confirmado el pedido, por WhatsApp.

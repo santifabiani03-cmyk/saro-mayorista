@@ -270,10 +270,15 @@ export default function AdminPage() {
         showToast('🚀 ¡Publicado! Actualizando catálogo PDF…', 'ok', 6000)
       }
 
-      // Subir catálogo PDF en background después de publicar
-      uploadCatalogPdf(products, () => {}).then(() => {
+      // Subir catálogo PDF en background después de publicar.
+      // Se usa la lista recién publicada (products puede estar desactualizado si hubo merge).
+      const listaPublicada = await fetch('/api/catalog').then(r => r.json()).catch(() => products)
+      uploadCatalogPdf(listaPublicada, () => {}).then(() => {
         showToast('📄 Catálogo PDF actualizado', 'ok', 3000)
-      }).catch(() => {})
+      }).catch(e => {
+        showToast('⚠️ Se publicó el sitio, pero el PDF del catálogo no se pudo actualizar: ' +
+          (e?.message ?? 'error desconocido'), 'error', 9000)
+      })
     } catch (e) {
       showToast('❌ Error al publicar: ' + (e?.message ?? 'desconocido'), 'error', 6000)
     } finally {

@@ -2,6 +2,11 @@ import { jsPDF } from 'jspdf'
 import { COLOR_MAP } from './colors'
 import orbitronBase64 from '../fonts/orbitron-base64'
 
+// Ancho máximo (px) al que se reducen las fotos antes de meterlas en el PDF.
+// Las cards del catálogo son chicas, así que con esto se ven bien y el archivo
+// queda liviano: con las fotos en tamaño original el PDF no se podía subir.
+const MAX_IMG_W = 700
+
 /**
  * Carga una imagen y la devuelve con esquinas superiores redondeadas.
  * Las esquinas redondeadas se rellenan con blanco para que se fundan
@@ -12,8 +17,11 @@ function loadImageRounded(url, cornerPct = 3) {
     const img = new Image()
     img.crossOrigin = 'anonymous'
     img.onload = () => {
-      const w = img.naturalWidth
-      const h = img.naturalHeight
+      // Se redimensiona: las fotos originales (1200px+) hacían un PDF tan pesado
+      // que la subida fallaba. A este ancho la card se sigue viendo nítida.
+      const escala = Math.min(1, MAX_IMG_W / img.naturalWidth)
+      const w = Math.round(img.naturalWidth * escala)
+      const h = Math.round(img.naturalHeight * escala)
       const r = Math.round(w * cornerPct / 100)
 
       const canvas = document.createElement('canvas')
@@ -37,10 +45,10 @@ function loadImageRounded(url, cornerPct = 3) {
       ctx.closePath()
       ctx.clip()
 
-      ctx.drawImage(img, 0, 0)
+      ctx.drawImage(img, 0, 0, w, h)
 
       try {
-        resolve({ dataUrl: canvas.toDataURL('image/jpeg', 0.85), width: w, height: h })
+        resolve({ dataUrl: canvas.toDataURL('image/jpeg', 0.82), width: w, height: h })
       } catch { resolve(null) }
     }
     img.onerror = () => resolve(null)
@@ -58,8 +66,8 @@ function loadPaletaImage(url, targetW, targetH, cornerPct = 3) {
     const img = new Image()
     img.crossOrigin = 'anonymous'
     img.onload = () => {
-      const cw = Math.round(targetW * 4) // resolución interna
-      const ch = Math.round(targetH * 4)
+      const cw = Math.round(targetW * 3) // resolución interna (3x alcanza y pesa bastante menos)
+      const ch = Math.round(targetH * 3)
       const r = Math.round(cw * cornerPct / 100)
 
       const canvas = document.createElement('canvas')
@@ -120,7 +128,7 @@ function loadPaletaImage(url, targetW, targetH, cornerPct = 3) {
       ctx.restore()
 
       try {
-        resolve({ dataUrl: canvas.toDataURL('image/jpeg', 0.90), width: cw, height: ch })
+        resolve({ dataUrl: canvas.toDataURL('image/jpeg', 0.86), width: cw, height: ch })
       } catch { resolve(null) }
     }
     img.onerror = () => resolve(null)
@@ -630,23 +638,34 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
  */
 export async function uploadCatalogPdf(products, onProgress) {
   const visible = products.filter(p => p.visible !== false)
-  if (visible.length === 0) return
+  if (visible.length === 0) throw new Error('No hay productos visibles para el catálogo')
 
-  try {
-    const result = await exportCatalogPdf(products, onProgress, { skipDownload: true })
-    if (!result?.doc) return
+  const result = await exportCatalogPdf(products, onProgress, { skipDownload: true })
+  if (!result?.doc) throw new Error('No se pudo generar el PDF')
 
-    onProgress?.('Subiendo catálogo…')
-    const pdfBase64 = result.doc.output('datauristring').split(',')[1]
-    const pin = sessionStorage.getItem('saro_admin_pin') ?? ''
-    const res = await fetch('/api/upload-catalog', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ data: pdfBase64, pin }),
-    })
-    const json = await res.json()
-    if (!json.ok) throw new Error(json.error)
-  } catch (e) {
-    console.error('Error subiendo catálogo PDF:', e)
+  onProgress?.('Subiendo catálogo…')
+  const pdfBase64 = result.doc.output('datauristring').split(',')[1]
+
+  // El servidor no acepta cuerpos muy grandes: si el PDF quedó pesado, avisamos
+  // en vez de fallar en silencio (era lo que dejaba el catálogo desactualizado).
+  const mb = (pdfBase64.length * 0.75) / 1048576
+  if (mb > 4) {
+    throw new Error(
+      `El PDF quedó en ${mb.toFixed(1)} MB y no se puede subir (máximo ~4 MB). ` +
+      `Probá reduciendo la cantidad de productos visibles o el peso de las fotos.`
+    )
   }
+
+  const pin = sessionStorage.getItem('saro_admin_pin') ?? ''
+  const res = await fetch('/api/upload-catalog', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ data: pdfBase64, pin }),
+  })
+
+  if (res.status === 413) throw new Error('El PDF es demasiado pesado para subirlo')
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok || !json.ok) throw new Error(json.error ?? `Error ${res.status} al subir el catálogo`)
+
+  return json
 }

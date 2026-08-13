@@ -62,6 +62,32 @@ function catalogoParaPrompt() {
     .join('\n')
 }
 
+/**
+ * Día y hora de Argentina, para que el asistente sepa si estamos dentro del
+ * horario de atención (8 a 16 hs) y avise cuándo le van a contestar.
+ */
+function momentoActual() {
+  const ahora = new Date()
+  const fmt = new Intl.DateTimeFormat('es-AR', {
+    timeZone: 'America/Argentina/Buenos_Aires',
+    weekday: 'long', day: 'numeric', month: 'long', hour: '2-digit', minute: '2-digit', hour12: false,
+  })
+  const partes = Object.fromEntries(
+    new Intl.DateTimeFormat('en-US', {
+      timeZone: 'America/Argentina/Buenos_Aires',
+      weekday: 'short', hour: 'numeric', hour12: false,
+    }).formatToParts(ahora).map(p => [p.type, p.value])
+  )
+  const hora = Number(partes.hour)
+  const finDeSemana = ['Sat', 'Sun'].includes(partes.weekday)
+  const enHorario = !finDeSemana && hora >= 8 && hora < 16
+
+  return `En Argentina es ${fmt.format(ahora)} hs. ` + (enHorario
+    ? 'Estamos DENTRO del horario de atención: si derivás a WhatsApp, te responden a la brevedad.'
+    : 'Estamos FUERA del horario de atención (8 a 16 hs, días hábiles). Si derivás a WhatsApp, ' +
+      'aclarale con naturalidad que le van a responder en el próximo día hábil a partir de las 8.')
+}
+
 export async function POST(request) {
   const apiKey = (process.env.GEMINI_API_KEY ?? '').trim()
   if (!apiKey) {
@@ -92,6 +118,7 @@ export async function POST(request) {
   const systemPrompt = [
     INSTRUCCIONES,
     '\n## INFORMACIÓN DE SARO\n' + CONOCIMIENTO,
+    '\n## MOMENTO ACTUAL\n' + momentoActual(),
     '\n## CATÁLOGO ACTUAL (los únicos productos y precios válidos)\n' + catalogoParaPrompt(),
   ].join('\n')
 
@@ -126,6 +153,16 @@ export async function POST(request) {
     if (res.status === 429 || res.status === 503) {
       await new Promise(r => setTimeout(r, 1200))
       res = await pedirAGemini()
+    }
+
+    // Si sigue sin poder (cuota agotada), no mostramos un error técnico:
+    // se lo pasamos a una persona por WhatsApp.
+    if (res.status === 429) {
+      return NextResponse.json({
+        reply: 'Uf, estoy con mucha demanda en este momento y no te puedo responder bien. ' +
+               'Escribinos por WhatsApp así te atiende alguien del equipo 👇',
+        whatsapp: true,
+      })
     }
     if (!res.ok) throw new Error(`Gemini ${res.status}`)
 
