@@ -261,9 +261,7 @@
     "nombre": "NECESER OBJ. PERSONALES ",
     "precio": 13000,
     "descripcion": "Neceser deportivo para objetos personales mas pequeños (celular, llaves, billetera, pelotas, etc.)\nMedidas Largo 28cm / Alto 13cm / Profundidad 13cm\n",
-    "tags": [
-      "nuevo"
-    ],
+    "tags": [],
     "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "accesorio",
@@ -283,11 +281,11 @@
     "visible": true,
     "sinStock": false,
     "fechaPublicacion": "2026-05-22T21:20:53.000Z",
+    "fechaActualizacion": "2026-08-13T13:14:45.267Z",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/protectores-elastizados-1779973541116.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/protectores-elastizados-1779973546168.webp"
-    ],
-    "fechaActualizacion": "2026-05-28T13:08:40.544Z"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/protectores-elastizados-1779973546168.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/protectores-elastizados-1779973541116.webp"
+    ]
   },
   {
     "nombre": "Pelotas Nova Padel Pro",
@@ -659,5 +657,105 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786625815315.webp"
     ],
     "fechaPublicacion": "2026-08-13T12:58:12.440Z"
+  },
+  {
+    "nombre": "MOCHILA RAQUETERA",
+    "precio": 42000,
+    "descripcion": "Esta mochila raquetera ofrece un diseño funcional y resistente. Cuenta con tiradores de mochila y espalda acolchonada para un transporte cómodo. Incluye un compartimento específico para computadora portátil y un bolsillo delantero independiente para objetos de fácil acceso. Sus bolsillos laterales complementan la capacidad de almacenamiento.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "",
+    "genero": "unisex",
+    "parteCuerpo": "",
+    "colores": [
+      "Azul",
+      "Rosa"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 1,
+    "id": "p1786626183132",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626041062.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626049326.webp"
+    ],
+    "fechaPublicacion": "2026-08-13T13:03:03.132Z"
+  },
+  {
+    "nombre": "BOLSO MEDIANO LONA ",
+    "precio": 31000,
+    "descripcion": "Este bolso mochila paletero mediano ofrece una opción básica y económica para deportistas. Cuenta con dos compartimentos principales, ideales para llevar paletas, indumentaria y objetos personales. Además, incluye un bolsillo delantero con cierre, perfecto para guardar artículos pequeños esenciales. Es el compañero ideal para quienes priorizan llevar lo justo y necesario al deporte.",
+    "tags": [],
+    "categoria": "",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro",
+      "Gris",
+      "Rosa",
+      "Azul",
+      "Celeste",
+      "Verde"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [
+      {
+        "cantidad": 4,
+        "precioTotal": 120000
+      }
+    ],
+    "_aiLoading": false,
+    "_aiCount": 2,
+    "id": "p1786626453330",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626251431.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626198103.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626211318.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626256299.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626260414.webp"
+    ],
+    "fechaPublicacion": "2026-08-13T13:07:33.330Z"
+  },
+  {
+    "nombre": "BOLSO MOCHILA GRANDE LONA ",
+    "precio": 40000,
+    "descripcion": "Bolso paletero grande de lona, diseñado para transportar equipamiento deportivo completo. Incorpora tres compartimentos principales: dos para paletas y uno espacioso para objetos personales. Cuenta con un compartimento independiente e impermeable ideal para zapatillas o ropa húmeda. Incluye una correa regulable y reforzada para mayor comodidad, junto con una manija frontal para un transporte rápido y sencillo.",
+    "tags": [],
+    "categoria": "",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro",
+      "Gris"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [
+      {
+        "cantidad": 4,
+        "precioTotal": 156000
+      }
+    ],
+    "_aiLoading": false,
+    "_aiCount": 3,
+    "id": "p1786626830320",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626667811.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626643468.webp"
+    ],
+    "fechaPublicacion": "2026-08-13T13:13:50.320Z"
   }
 ]
