@@ -94,5 +94,21 @@
     ],
     "total": 152500,
     "totalItems": 7
+  },
+  {
+    "id": "o1786589777404",
+    "fecha": "2026-08-13T02:56:17.404Z",
+    "items": [
+      {
+        "productId": "p1782405898282",
+        "nombre": "COMBO TORNEO BOLSO GRANDE ",
+        "precio": 150000,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 2
+      }
+    ],
+    "total": 280000,
+    "totalItems": 2
   }
 ]
