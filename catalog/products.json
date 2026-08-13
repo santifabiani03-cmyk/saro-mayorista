@@ -347,17 +347,19 @@
   },
   {
     "nombre": "Saro SR Junior ",
-    "precio": 85000,
-    "descripcion": "La paleta Saro SR Junior está diseñada específicamente para niños. Su matriz especial ofrece un equilibrio óptimo para el desarrollo de jóvenes jugadores de pádel. Este modelo asegura un control adecuado y una experiencia de juego cómoda. Es una opción confiable para iniciarse en el deporte.",
+    "precio": 75000,
+    "peso": 300,
+    "descripcion": "La paleta Saro SR Junior está diseñada específicamente para niños. Entre los  6 a 12 años. \nSu matriz especial ofrece un equilibrio óptimo para el desarrollo de jóvenes jugadores de pádel. Este modelo asegura un control adecuado y una experiencia de juego cómoda. Es una opción confiable para iniciarse en el deporte.\nEl peso puede variar entre los 290g a 310g ",
     "tags": [
-      "nuevo",
       "destacado"
     ],
     "categoria": "paleta",
     "genero": "",
     "parteCuerpo": "",
     "colores": [
-      "Blanco/Celeste"
+      "Blanco/Celeste",
+      "Azul",
+      "Rosa"
     ],
     "talles": [
       "Única"
@@ -373,11 +375,12 @@
         "Celeste"
       ]
     },
-    "fechaActualizacion": "2026-05-28T17:51:09.767Z",
+    "fechaActualizacion": "2026-08-13T17:19:41.447Z",
     "_aiLoading": false,
     "_aiCount": 2,
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1779990622240.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786641531419.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786641526292.webp"
     ]
   },
   {
