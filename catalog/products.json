@@ -622,7 +622,7 @@
     ],
     "id": "p1782405898282",
     "fechaPublicacion": "2026-06-25T16:44:58.283Z",
-    "fechaActualizacion": "2026-08-13T12:59:44.552Z",
+    "fechaActualizacion": "2026-08-13T16:12:12.234Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782405816945.webp"
     ]
@@ -757,5 +757,136 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626643468.webp"
     ],
     "fechaPublicacion": "2026-08-13T13:13:50.320Z"
+  },
+  {
+    "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+    "precio": 8000,
+    "descripcion": "",
+    "tags": [
+      "stock_limitado"
+    ],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro",
+      "Blanco"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1786640460659",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640424052.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640426768.webp"
+    ],
+    "fechaPublicacion": "2026-08-13T17:01:00.659Z"
+  },
+  {
+    "nombre": "CAMPERA ALGODON DOBLE NEO (SQUBA)",
+    "precio": 21000,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1786640518778",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640476927.webp"
+    ],
+    "fechaPublicacion": "2026-08-13T17:01:58.778Z"
+  },
+  {
+    "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+    "precio": 13500,
+    "descripcion": "",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro",
+      "LILA"
+    ],
+    "talles": [
+      "S",
+      "L",
+      "M",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1786640582410",
+    "fechaPublicacion": "2026-08-13T17:03:02.410Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640534115.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pollera-lycra-c-short-y-bolsillo-abertura-pierna-1786640746515.webp"
+    ],
+    "colorDefs": {
+      "LILA": [
+        "Fucsia"
+      ]
+    },
+    "fechaActualizacion": "2026-08-13T17:06:46.573Z"
+  },
+  {
+    "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO CLASICA ",
+    "precio": 13500,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Gris",
+      "NEGRA/SHORT LILA"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1786640675695",
+    "colorDefs": {
+      "NEGRA/SHORT LILA": [
+        "Negro"
+      ]
+    },
+    "fechaPublicacion": "2026-08-13T17:04:35.695Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640596225.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640619728.webp"
+    ],
+    "fechaActualizacion": "2026-08-13T17:05:20.702Z"
   }
 ]
