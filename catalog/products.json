@@ -132,11 +132,9 @@
   },
   {
     "nombre": "CARAMELERA NOAC PERFORADOS X60u. ",
-    "precio": 58000,
+    "precio": 60000,
     "descripcion": "Caramelera cubre grip importados NOAC \n60 unidades surtidas o todas blancas.\nimportados. ",
-    "tags": [
-      "nuevo"
-    ],
+    "tags": [],
     "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "accesorio",
@@ -149,20 +147,25 @@
     ],
     "noStock": [],
     "emoji": "🎾",
+    "promos": [
+      {
+        "cantidad": 3,
+        "precioTotal": 172000
+      }
+    ],
     "id": "p1779452463276",
+    "fechaPublicacion": "2026-05-22T12:21:03.276Z",
+    "visible": true,
     "imagenes": [
       "/assets/imagen-1779452345276.webp"
     ],
-    "fechaPublicacion": "2026-05-22T12:21:03.276Z",
-    "visible": true
+    "fechaActualizacion": "2026-08-13T12:56:28.394Z"
   },
   {
     "nombre": "TOALLA DE MANO MICROFIBRA ",
-    "precio": 4000,
+    "precio": 4200,
     "descripcion": "Toalla de mano micrifibra.\nSecado rapido \nIncluye estuche",
-    "tags": [
-      "nuevo"
-    ],
+    "tags": [],
     "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "accesorio",
@@ -174,31 +177,38 @@
       "Gris osc.",
       "Violeta",
       "Naranja",
-      "Surtido"
+      "Surtido",
+      "Azul"
     ],
     "talles": [
       "Única"
     ],
     "noStock": [],
     "emoji": "🎾",
+    "promos": [
+      {
+        "cantidad": 10,
+        "precioTotal": 38000
+      }
+    ],
     "id": "p1779452642845",
+    "fechaPublicacion": "2026-05-22T12:24:02.845Z",
     "imagenes": [
       "/assets/imagen-1779452499007.webp"
     ],
-    "fechaPublicacion": "2026-05-22T12:24:02.845Z"
+    "fechaActualizacion": "2026-08-13T12:54:28.445Z"
   },
   {
     "nombre": "Mochila Paletera",
-    "precio": 26000,
+    "precio": 27000,
     "descripcion": "Práctica, cómoda y funcional, la mochila paletera fue diseñada para acompañarte en cada entrenamiento o partido, ofreciendo el espacio justo con una estructura compacta pero amplia al mismo tiempo. \n\nCuenta con un compartimento delantero especial para transportar tu paleta de forma segura y accesible. Su interior amplio permite llevar indumentaria, accesorios y objetos personales sin perder comodidad al trasladarla.",
-    "tags": [
-      "nuevo"
-    ],
+    "tags": [],
     "categoria": "padel",
     "genero": "",
     "parteCuerpo": "",
     "colores": [
-      "Rojo"
+      "Negro",
+      "Gris"
     ],
     "talles": [
       "Única"
@@ -210,42 +220,11 @@
     "visible": true,
     "sinStock": false,
     "fechaPublicacion": "2026-05-22T21:19:26.000Z",
+    "fechaActualizacion": "2026-08-13T12:59:03.265Z",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-paletera-1779969247304.webp"
-    ],
-    "fechaActualizacion": "2026-05-28T11:57:24.236Z"
-  },
-  {
-    "nombre": "Mochila Multi Compartimentos",
-    "precio": 30000,
-    "descripcion": "Diseñada para quienes buscan máxima organización y comodidad, la mochila multi compartimentos SARO combina gran capacidad, practicidad y un diseño moderno ideal para entrenamiento, viajes o uso diario deportivo.\n\nCuenta con un depósito delantero independiente para zapatillas, permitiendo transportar el calzado separado del resto de tus pertenencias. Además, incorpora doble depósito lateral con cierre para accesorios y objetos de acceso rápido.\n\nSu compartimento principal amplio es ideal para llevar indumentaria, toallas, accesorios deportivos y objetos de mayor tamaño. También incluye un bolsillo delantero de mayor capacidad y un bolsillo interior pequeño para guardar elementos personales de forma más segura y organizada.\n\nLos tiradores acolchonados brindan mayor confort durante el uso, incluso en traslados prolongados.",
-    "tags": [
-      "oferta"
-    ],
-    "categoria": "padel",
-    "genero": "unisex",
-    "parteCuerpo": "accesorio",
-    "colores": [
-      "Azul",
-      "Verde",
-      "Gris"
-    ],
-    "talles": [
-      "Única"
-    ],
-    "noStock": [],
-    "emoji": "🎾",
-    "promos": [],
-    "id": "p1779495576234",
-    "visible": true,
-    "sinStock": false,
-    "fechaPublicacion": "2026-05-22T21:19:52.000Z",
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-multi-compartimentos-1779969565360.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-multi-compartimentos-1779969570292.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-multi-compartimentos-1779969575774.webp"
-    ],
-    "fechaActualizacion": "2026-05-28T12:00:57.226Z"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-paletera-1786625926376.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-paletera-1786625929921.webp"
+    ]
   },
   {
     "nombre": "Bolso Mochila Ecocuero",
@@ -256,10 +235,7 @@
     "genero": "unisex",
     "parteCuerpo": "accesorio",
     "colores": [
-      "Azul",
-      "Rosa",
-      "Gris",
-      "Negro"
+      "Rosa"
     ],
     "talles": [
       "Única"
@@ -273,13 +249,13 @@
     "fechaPublicacion": "2026-05-22T21:20:20.000Z",
     "_aiLoading": false,
     "_aiCount": 1,
+    "fechaActualizacion": "2026-08-13T13:00:01.176Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968378771.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968383284.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968388897.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968393193.webp"
-    ],
-    "fechaActualizacion": "2026-05-28T11:48:37.638Z"
+    ]
   },
   {
     "nombre": "NECESER OBJ. PERSONALES ",
@@ -410,9 +386,7 @@
     "nombre": "Muñequera x par ",
     "precio": 5000,
     "descripcion": "Muñequeras x par - Algodon \nSuper elastizadas ",
-    "tags": [
-      "nuevo"
-    ],
+    "tags": [],
     "categoria": "",
     "genero": "unisex",
     "parteCuerpo": "accesorio",
@@ -421,7 +395,8 @@
       "Blanco",
       "Negro",
       "Azul",
-      "Naranja"
+      "Naranja",
+      "Gris"
     ],
     "talles": [
       "Única"
@@ -430,10 +405,11 @@
     "emoji": "📦",
     "promos": [],
     "id": "p1779968140080",
+    "fechaPublicacion": "2026-05-28T11:35:40.080Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1779968065148.webp"
     ],
-    "fechaPublicacion": "2026-05-28T11:35:40.080Z"
+    "fechaActualizacion": "2026-08-13T13:00:19.211Z"
   },
   {
     "nombre": "Saro Nexus woman ",
@@ -523,17 +499,11 @@
     "nombre": "Bolso mochila ELITE ",
     "precio": 52000,
     "descripcion": "El bolso mochila paletero ELITE es un accesorio versátil para el equipamiento deportivo. Cuenta con dos compartimentos laterales diseñados para paletas, junto con depósitos independientes para zapatillas y ropa. Incorpora tiradores de mochila regulables, una manija superior y un bolsillo específico para objetos personales pequeños.\nCompuesto por ecocuero resistente y facil de limpiar, lona reforzada e interior forrado. ",
-    "tags": [
-      "nuevo"
-    ],
+    "tags": [],
     "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "",
     "colores": [
-      "Azul",
-      "Celeste",
-      "Negro",
-      "Gris",
       "Rosa"
     ],
     "talles": [
@@ -545,15 +515,12 @@
       {
         "cantidad": 4,
         "precioTotal": 200000
-      },
-      {
-        "cantidad": 8,
-        "precioTotal": 384000
       }
     ],
     "_aiLoading": false,
     "_aiCount": 1,
     "id": "p1782388768791",
+    "fechaPublicacion": "2026-06-25T11:59:28.791Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388169727.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388108644.webp",
@@ -561,7 +528,7 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388111268.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388112957.webp"
     ],
-    "fechaPublicacion": "2026-06-25T11:59:28.791Z"
+    "fechaActualizacion": "2026-08-13T12:59:29.055Z"
   },
   {
     "nombre": "TUBO PELOTAS x2 NOVA ",
@@ -641,7 +608,8 @@
     "genero": "unisex",
     "parteCuerpo": "accesorio",
     "colores": [
-      "Negro"
+      "Negro",
+      "Gris"
     ],
     "talles": [
       "Única"
@@ -651,13 +619,45 @@
     "promos": [
       {
         "cantidad": 2,
-        "precioTotal": 280000
+        "precioTotal": 290000
       }
     ],
     "id": "p1782405898282",
+    "fechaPublicacion": "2026-06-25T16:44:58.283Z",
+    "fechaActualizacion": "2026-08-13T12:59:44.552Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782405816945.webp"
+    ]
+  },
+  {
+    "nombre": "CARAMALERA NOAC LISA ",
+    "precio": 58000,
+    "descripcion": "",
+    "tags": [
+      "destacado"
     ],
-    "fechaPublicacion": "2026-06-25T16:44:58.283Z"
+    "categoria": "",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Blanco",
+      "MULTICOLOR"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [
+      {
+        "cantidad": 3,
+        "precioTotal": 168000
+      }
+    ],
+    "id": "p1786625892440",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786625815315.webp"
+    ],
+    "fechaPublicacion": "2026-08-13T12:58:12.440Z"
   }
 ]
