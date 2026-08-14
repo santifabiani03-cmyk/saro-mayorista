@@ -110,15 +110,28 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 3a6 6 0 0 0-6 6c0 2.4 1.4 4.5 3.5 5.5L9 21h6l-.5-6.5A6 6 0 0 0 18 9a6 6 0 0 0-6-6Z" />
       ),
     },
-    stats.ropaAcc > 0 && {
-      key: 'ropa',
+    stats.ropaMinorista > 0 && {
+      key: 'ropa-minorista',
       href: '/ropa-y-accesorios',
       titulo: 'Ropa y accesorios',
-      count: stats.ropaAcc,
-      unidad: stats.ropaAcc === 1 ? 'producto' : 'productos',
-      desc: 'Remeras, buzos, calzas, camperas, grips, pelotas, bolsos y mochilas.',
+      badge: 'Minorista',
+      count: stats.ropaMinorista,
+      unidad: stats.ropaMinorista === 1 ? 'producto' : 'productos',
+      desc: 'Comprá por unidad, sin cantidad mínima. Remeras, buzos, calzas, grips, pelotas y bolsos.',
       icon: (
         <path strokeLinecap="round" strokeLinejoin="round" d="M8 3 4 6l2 3 2-1v10h8V8l2 1 2-3-4-3-2 2a3 3 0 0 1-4 0L8 3Z" />
+      ),
+    },
+    stats.ropaAcc > 0 && {
+      key: 'ropa-mayorista',
+      href: '/ropa-y-accesorios/mayorista',
+      titulo: 'Ropa y accesorios',
+      badge: 'Mayorista',
+      count: stats.ropaAcc,
+      unidad: stats.ropaAcc === 1 ? 'producto' : 'productos',
+      desc: 'Precios por mayor para comercios y revendedores, con compra mínima.',
+      icon: (
+        <path strokeLinecap="round" strokeLinejoin="round" d="M3.75 6h16.5M4.5 6l1 13.5a1.5 1.5 0 0 0 1.5 1.4h10a1.5 1.5 0 0 0 1.5-1.4L19.5 6M9 6V4.5a3 3 0 0 1 6 0V6" />
       ),
     },
   ].filter(Boolean)
@@ -144,13 +157,15 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
         <div className="relative max-w-7xl mx-auto px-4 sm:px-6">
           <div data-reveal className="reveal text-center max-w-2xl mx-auto mb-12 sm:mb-16">
             <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[.32em] text-saro-blue mb-3">
-              Dos catálogos, una sola marca
+              ¿Cómo querés comprar?
             </p>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-saro-dark tracking-tight leading-[1.08]">
               Elegí tu catálogo
             </h2>
             <p className="text-sm sm:text-base text-gray-500 mt-4 leading-relaxed">
-              Elegí lo que buscás y armá tu pedido. La calidad SARO, directo de fábrica y con envíos a todo el país.
+              En ropa y accesorios tenemos dos catálogos: <strong className="text-saro-dark font-semibold">minorista</strong>,
+              para comprar por unidad sin mínimo, y <strong className="text-saro-dark font-semibold">mayorista</strong>,
+              con precios por cantidad para comercios.
             </p>
           </div>
 
@@ -168,7 +183,18 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
                     {c.icon}
                   </svg>
                 </span>
-                <h3 className="text-lg font-bold text-saro-dark tracking-tight">{c.titulo}</h3>
+                <div className="flex items-center gap-2 flex-wrap">
+                  <h3 className="text-lg font-bold text-saro-dark tracking-tight">{c.titulo}</h3>
+                  {c.badge && (
+                    <span className={`px-2 py-0.5 rounded-full text-[10px] font-bold uppercase tracking-wide ${
+                      c.badge === 'Mayorista'
+                        ? 'bg-saro-dark text-white'
+                        : 'bg-saro-light text-saro-blue border border-blue-100'
+                    }`}>
+                      {c.badge}
+                    </span>
+                  )}
+                </div>
                 <p className="text-sm text-gray-500 mt-2 leading-relaxed flex-1">{c.desc}</p>
                 <div className="flex items-center justify-between mt-6 pt-5 border-t border-gray-100/80">
                   <span className="text-sm font-semibold text-gray-400">

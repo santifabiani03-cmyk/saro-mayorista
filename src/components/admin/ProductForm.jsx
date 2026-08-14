@@ -450,7 +450,7 @@ function AdminLightbox({ images, startIdx, onClose, onUpdateImage }) {
 }
 
 const BLANK = {
-  nombre: '', precio: '', peso: '', descripcion: '', tags: [],
+  nombre: '', precio: '', precioMinorista: '', peso: '', descripcion: '', tags: [],
   categoria: '', genero: '', parteCuerpo: '',
   colores: [], talles: [], noStock: [], emoji: '📦',
   promos: [],
@@ -1535,7 +1535,12 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     const { imagen: _img, imagenes: _imgs, ...rest } = initial
     // Migrar campo legacy `tag` → `tags` array
     const tags = getProductTags(initial)
-    return { ...BLANK, ...rest, tags, precio: String(initial.precio), peso: initial.peso != null ? String(initial.peso) : '' }
+    return {
+      ...BLANK, ...rest, tags,
+      precio: String(initial.precio),
+      precioMinorista: initial.precioMinorista != null ? String(initial.precioMinorista) : '',
+      peso: initial.peso != null ? String(initial.peso) : '',
+    }
   })
   // imagenes: array de URLs ya subidas
   const [imagenes, setImagenes] = useState(
@@ -1591,6 +1596,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
       ...form,
       id:       form.id ?? `p${Date.now()}`,
       precio:   Number(form.precio),
+      precioMinorista: Number(form.precioMinorista) || 0,
       peso:     Number(form.peso) || 0,
       imagenes,
       promos:   cleanPromos,
@@ -1601,6 +1607,8 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     delete product.tag
     // Si no se cargó peso, no lo guardamos (para no ensuciar el catálogo)
     if (!product.peso) delete product.peso
+    // Sin precio minorista el producto no se publica en ese catálogo
+    if (!product.precioMinorista) delete product.precioMinorista
 
     onSave(product)
   }
@@ -1697,7 +1705,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
           </Field>
 
           <Field>
-            <Label required>Precio (ARS)</Label>
+            <Label required>Precio mayorista (ARS)</Label>
             <input
               type="number"
               min="0"
@@ -1710,6 +1718,24 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
             {form.precio && !isNaN(+form.precio) && (
               <p className="text-xs text-gray-500">${(+form.precio).toLocaleString('es-AR')}</p>
             )}
+          </Field>
+
+          <Field>
+            <Label>Precio minorista (ARS)</Label>
+            <input
+              type="number"
+              min="0"
+              value={form.precioMinorista}
+              onChange={e => set('precioMinorista', e.target.value)}
+              placeholder="Ej: 25000"
+              className="w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue border-gray-200"
+            />
+            {form.precioMinorista && !isNaN(+form.precioMinorista) && (
+              <p className="text-xs text-gray-500">${(+form.precioMinorista).toLocaleString('es-AR')}</p>
+            )}
+            <p className="text-xs text-gray-400">
+              Si lo dejás vacío, el producto no aparece en el catálogo minorista.
+            </p>
           </Field>
 
           <Field>

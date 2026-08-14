@@ -47,6 +47,12 @@ export async function GET() {
     <changefreq>daily</changefreq>
     <priority>0.9</priority>
   </url>`,
+      `  <url>
+    <loc>${BASE_URL}/ropa-y-accesorios/mayorista</loc>
+    <lastmod>${homeLastmod}</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>`,
       ...visibleProducts.map(
         p => {
           const lastmod = p.fechaActualizacion || p.fechaPublicacion

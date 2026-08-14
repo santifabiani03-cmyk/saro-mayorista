@@ -1,3 +1,4 @@
+import Link from 'next/link'
 import CatalogClient from './CatalogClient'
 import GuiaPaletas from '../../components/GuiaPaletas'
 
@@ -33,9 +34,18 @@ const SEO = {
   },
 }
 
-export default function CatalogView({ products, kind }) {
+export default function CatalogView({ products, kind, modo = 'mayorista' }) {
   const meta = SEO[kind]
-  const visible = products.filter(p => p.visible !== false)
+
+  // En minorista se muestra el precio minorista y sólo los productos que lo tienen
+  // cargado. Se reemplaza `precio` para que el resto (cards, carrito, WhatsApp)
+  // funcione igual sin tener que saber en qué catálogo está.
+  const visible = products
+    .filter(p => p.visible !== false)
+    .filter(p => modo !== 'minorista' || Number(p.precioMinorista) > 0)
+    .map(p => modo === 'minorista'
+      ? { ...p, precio: Number(p.precioMinorista), promos: [], modo }
+      : { ...p, modo })
 
   const itemListJsonLd = {
     '@context': 'https://schema.org',
@@ -75,7 +85,39 @@ export default function CatalogView({ products, kind }) {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(itemListJsonLd) }}
       />
-      <CatalogClient products={products} heading={meta.heading} showFilters={kind !== 'paletas'} />
+      {modo === 'minorista' && visible.length === 0 ? (
+        <main className="max-w-3xl mx-auto px-4 sm:px-6 py-16 text-center">
+          <h1 className="text-2xl sm:text-3xl font-extrabold text-saro-dark tracking-tight">
+            {meta.heading}
+          </h1>
+          <p className="text-sm text-gray-500 mt-4 leading-relaxed">
+            Estamos terminando de cargar los precios por unidad de esta sección.
+            Mientras tanto podés ver el catálogo por mayor o escribirnos y te pasamos
+            el precio del producto que te interese.
+          </p>
+          <div className="mt-7 flex flex-col sm:flex-row justify-center gap-3">
+            <Link
+              href="/ropa-y-accesorios/mayorista"
+              className="inline-flex items-center justify-center gap-2 bg-saro-dark hover:bg-saro-blue text-white font-bold text-sm px-6 py-3 rounded-xl transition-colors btn-press"
+            >
+              Ver catálogo mayorista
+            </Link>
+            <Link
+              href="/paletas"
+              className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 hover:border-saro-blue text-saro-dark hover:text-saro-blue font-bold text-sm px-6 py-3 rounded-xl transition-colors btn-press"
+            >
+              Ver paletas
+            </Link>
+          </div>
+        </main>
+      ) : (
+        <CatalogClient
+          products={visible}
+          heading={meta.heading}
+          modo={kind === 'paletas' ? null : modo}
+          showFilters={kind !== 'paletas'}
+        />
+      )}
 
       {/* Guía de compra (sólo en el catálogo de paletas) */}
       {kind === 'paletas' && <GuiaPaletas />}

@@ -22,11 +22,14 @@ export default function HomePage() {
   const visible = products.filter(p => p.visible !== false)
 
   const paletas = visible.filter(p => p.categoria === 'paleta').length
+  const noPaleta = visible.filter(p => p.categoria !== 'paleta')
   const stats = {
     total: visible.length,
     paletas,
     // Ropa + accesorios = todo lo que no es paleta (incluye 'padel', 'ropa' y sin categoría).
-    ropaAcc: visible.length - paletas,
+    ropaAcc: noPaleta.length,
+    // En el catálogo minorista sólo entran los que tienen precio minorista cargado.
+    ropaMinorista: noPaleta.filter(p => Number(p.precioMinorista) > 0).length,
   }
 
   const minPurchase = config.suggestedMinPurchase ?? config.minPurchase

@@ -5,9 +5,10 @@ import { useRouter } from 'next/navigation'
 import Filters from '../../components/Filters'
 import ProductCard from '../../components/ProductCard'
 import ProductModal from '../../components/ProductModal'
+import Link from 'next/link'
 import { toSlug } from '../../utils/slug'
 
-export default function CatalogClient({ products, heading, showFilters = true }) {
+export default function CatalogClient({ products, heading, showFilters = true, modo = null }) {
   const router = useRouter()
   const [filters, setFilters] = useState({
     categoria: '',
@@ -45,12 +46,33 @@ export default function CatalogClient({ products, heading, showFilters = true })
     <>
       <main className="max-w-7xl mx-auto px-4 sm:px-6 py-6 sm:py-8 space-y-6">
         {heading ? (
-          <h1 className="text-2xl sm:text-3xl font-extrabold text-saro-dark tracking-tight">
-            {heading}
-          </h1>
+          <div className="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <h1 className="text-2xl sm:text-3xl font-extrabold text-saro-dark tracking-tight">
+                {heading}
+              </h1>
+              {modo && (
+                <span className={`inline-flex items-center gap-1.5 mt-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
+                  modo === 'mayorista'
+                    ? 'bg-saro-dark text-white'
+                    : 'bg-saro-light text-saro-blue border border-blue-100'
+                }`}>
+                  {modo === 'mayorista' ? 'Precios mayoristas' : 'Precios minoristas'}
+                </span>
+              )}
+            </div>
+            {modo && (
+              <Link
+                href={modo === 'mayorista' ? '/ropa-y-accesorios' : '/ropa-y-accesorios/mayorista'}
+                className="text-xs font-semibold text-saro-blue hover:text-saro-mid underline underline-offset-2"
+              >
+                {modo === 'mayorista' ? 'Ver precios minoristas' : 'Comprar por mayor'}
+              </Link>
+            )}
+          </div>
         ) : (
           <h1 className="sr-only">
-            Catalogo mayorista de paletas de padel, accesorios de padel y ropa deportiva en Argentina
+            Catalogo de paletas de padel, accesorios de padel y ropa deportiva en Argentina
           </h1>
         )}
         {showFilters && (

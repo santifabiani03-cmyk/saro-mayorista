@@ -41,6 +41,7 @@ export function CartProvider({ children }) {
             precio:    product.precio,
             promos:    product.promos ?? [],
             peso:      product.peso ?? 0,   // gramos, para cotizar el envío
+            modo:      product.modo ?? 'mayorista',  // catálogo del que salió (define la compra mínima)
             color,
             talle,
             cantidad,

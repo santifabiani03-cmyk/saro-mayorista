@@ -14,6 +14,7 @@ const ENVIO_HABILITADO = false
 export default function Cart({ config }) {
   const { items, removeItem, updateQty, clearCart, total, totalItems, isOpen, setIsOpen } = useCart()
   const [copied, setCopied] = useState(false)
+  const [yaEsCliente, setYaEsCliente] = useState(false)  // define qué compra mínima aplica
 
   // ── Envío: el cliente elige cotizar o coordinarlo por WhatsApp ──
   const [modoEnvio, setModoEnvio] = useState(null)   // null | 'cotizar' | 'whatsapp'
@@ -45,11 +46,19 @@ export default function Cart({ config }) {
     }
   }
 
-  const showMin     = config.mostrarCompraMinima === true   // compra mínima (modo mayorista)
-  const minPurchase = config.minPurchase
-  const progress    = Math.min(100, (total / minPurchase) * 100)
-  const remaining   = minPurchase - total
-  const canSend     = total >= minPurchase
+  // ── Compra mínima ──
+  // Sólo aplica si hay algo del catálogo mayorista. El monto depende de si es la
+  // primera compra o si ya es cliente (lo indica el propio cliente).
+  const hayMayorista = items.some(i => i.modo !== 'minorista')
+  const showMin = config.mostrarCompraMinima === true && hayMayorista
+
+  const minNuevo   = config.minPurchaseNuevo   ?? config.suggestedMinPurchase ?? 180000
+  const minCliente = config.minPurchaseCliente ?? config.minPurchase ?? 100000
+  const minPurchase = yaEsCliente ? minCliente : minNuevo
+
+  const progress  = Math.min(100, (total / minPurchase) * 100)
+  const remaining = minPurchase - total
+  const canSend   = total >= minPurchase
 
   const buildMessage = () => {
     const grouped = {}
@@ -61,6 +70,9 @@ export default function Cart({ config }) {
     })
 
     let msg = `*Hola!* 📋 Quiero hacer este pedido:\n`
+    if (hayMayorista) {
+      msg += `_(Pedido MAYORISTA — ${yaEsCliente ? 'ya soy cliente' : 'primera compra'})_\n`
+    }
 
     Object.values(grouped).forEach(prod => {
       const totalQty = prod.items.reduce((s, i) => s + i.cantidad, 0)
@@ -359,6 +371,35 @@ export default function Cart({ config }) {
             {/* Barra de progreso + sugerencias (solo en modo mayorista con compra mínima) */}
             {showMin && (
               <>
+                {/* La compra mínima cambia según sea la primera compra o no */}
+                <div className="rounded-xl border border-gray-100 bg-[#FAFBFC] p-3 space-y-2">
+                  <p className="text-[11px] font-semibold text-gray-500">Tu compra mínima</p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => setYaEsCliente(false)}
+                      className={`py-2 px-1 rounded-lg text-[11px] font-bold border transition-all leading-tight ${
+                        !yaEsCliente
+                          ? 'bg-saro-blue border-saro-blue text-white'
+                          : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue/40'
+                      }`}
+                    >
+                      Primera compra
+                      <span className="block font-extrabold">${minNuevo.toLocaleString('es-AR')}</span>
+                    </button>
+                    <button
+                      onClick={() => setYaEsCliente(true)}
+                      className={`py-2 px-1 rounded-lg text-[11px] font-bold border transition-all leading-tight ${
+                        yaEsCliente
+                          ? 'bg-saro-blue border-saro-blue text-white'
+                          : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue/40'
+                      }`}
+                    >
+                      Ya soy cliente
+                      <span className="block font-extrabold">${minCliente.toLocaleString('es-AR')}</span>
+                    </button>
+                  </div>
+                </div>
+
                 <div className="space-y-1.5">
                   <div className="flex justify-between text-xs text-gray-500">
                     <span className="font-medium">

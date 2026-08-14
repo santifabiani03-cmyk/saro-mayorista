@@ -246,14 +246,11 @@ export default function IntroHero({ productCount = 0, onExplore }) {
           </button>
         </div>
 
-        {/* Indicador de scroll + hint de juego */}
+        {/* Indicador de scroll */}
         <div
           ref={cueRef}
           className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1.5 text-slate-400"
         >
-          <span className="hidden sm:flex items-center gap-1.5 text-[11px] font-semibold text-saro-blue mb-1">
-            <span className="text-sm">🎾</span> Tocá la paleta para jugar
-          </span>
           <span className="text-[10px] font-semibold uppercase tracking-widest">Scrolleá</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 intro-bob">
             <path strokeLinecap="round" strokeLinejoin="round" d="M19 14l-7 7m0 0l-7-7m7 7V3" />

@@ -9,6 +9,8 @@ export default function SettingsPanel({ onToast }) {
   const [minPurchase, setMinPurchase] = useState('')
   const [suggestedMinPurchase, setSuggestedMinPurchase] = useState('')
   const [mostrarCompraMinima, setMostrarCompraMinima] = useState(false)
+  const [minNuevo, setMinNuevo] = useState('')
+  const [minCliente, setMinCliente] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
 
   useEffect(() => {
@@ -19,6 +21,8 @@ export default function SettingsPanel({ onToast }) {
         setMinPurchase(data.minPurchase ?? '')
         setSuggestedMinPurchase(data.suggestedMinPurchase ?? data.minPurchase ?? '')
         setMostrarCompraMinima(data.mostrarCompraMinima === true)
+        setMinNuevo(data.minPurchaseNuevo ?? data.suggestedMinPurchase ?? 180000)
+        setMinCliente(data.minPurchaseCliente ?? data.minPurchase ?? 100000)
         const num = data.whatsappNumber ?? ''
         setPhoneNumber(num.startsWith('54') ? num.slice(2) : num)
       })
@@ -47,6 +51,8 @@ export default function SettingsPanel({ onToast }) {
           config: {
             minPurchase: min || 0,
             suggestedMinPurchase: sug || 0,
+            minPurchaseNuevo: Number(minNuevo) || 0,
+            minPurchaseCliente: Number(minCliente) || 0,
             whatsappNumber: fullNumber,
             mostrarCompraMinima,
           },
@@ -98,6 +104,40 @@ export default function SettingsPanel({ onToast }) {
             >
               <span className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${mostrarCompraMinima ? 'translate-x-5' : ''}`} />
             </button>
+          </div>
+
+          {/* Compras mínimas del catálogo mayorista */}
+          <div className={`grid grid-cols-2 gap-3 ${mostrarCompraMinima ? '' : 'opacity-50 pointer-events-none'}`}>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mínimo · primera compra</label>
+              <p className="text-xs text-gray-400 mb-2">Cliente mayorista nuevo</p>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">$</span>
+                <input
+                  type="number" min="0" step="1000"
+                  value={minNuevo}
+                  onChange={e => setMinNuevo(e.target.value)}
+                  disabled={!mostrarCompraMinima}
+                  className="w-full border-2 border-gray-200 rounded-xl pl-8 pr-3 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
+                  placeholder="180000"
+                />
+              </div>
+            </div>
+            <div>
+              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mínimo · ya es cliente</label>
+              <p className="text-xs text-gray-400 mb-2">Mayorista que ya compró</p>
+              <div className="relative">
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">$</span>
+                <input
+                  type="number" min="0" step="1000"
+                  value={minCliente}
+                  onChange={e => setMinCliente(e.target.value)}
+                  disabled={!mostrarCompraMinima}
+                  className="w-full border-2 border-gray-200 rounded-xl pl-8 pr-3 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
+                  placeholder="100000"
+                />
+              </div>
+            </div>
           </div>
 
           {/* Compra mínima */}
