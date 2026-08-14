@@ -991,5 +991,257 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712495196.webp"
     ],
     "fechaPublicacion": "2026-08-14T13:02:28.448Z"
+  },
+  {
+    "nombre": "CAMISETA TERMICA DAMA ",
+    "precio": 10000,
+    "descripcion": "",
+    "tags": [
+      "sale"
+    ],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro",
+      "Blanco",
+      "Gris"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [
+      {
+        "color": "Negro",
+        "talle": "S"
+      },
+      {
+        "color": "Blanco",
+        "talle": "XXL"
+      }
+    ],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715256504",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715207372.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715204272.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715209179.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:47:36.504Z"
+  },
+  {
+    "nombre": "SHORT CON CALZA CABALLERO ",
+    "precio": 14500,
+    "descripcion": "",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1786715312225",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715285779.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:48:32.225Z"
+  },
+  {
+    "nombre": "BUZO ENTRENAMIENTO LIVIANO DAMA ",
+    "precio": 16000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro",
+      "Naranja"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "noStock": [
+      {
+        "color": "Negro",
+        "talle": "M"
+      }
+    ],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715378297",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715338319.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715340495.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:49:38.297Z"
+  },
+  {
+    "nombre": "CAMPERA ROMPEVIENTOS BASICA ESTAMPADA DAMA ",
+    "precio": 19500,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Blanco",
+      "Verde"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715433764",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715400682.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715398160.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:50:33.764Z"
+  },
+  {
+    "nombre": "BUZO MICROPOLAR LIVIANO OVERSIZE DAMA",
+    "precio": 18000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Rosa",
+      "Marino",
+      "Negro",
+      "Verde"
+    ],
+    "talles": [
+      "S/M",
+      "L/XL"
+    ],
+    "noStock": [
+      {
+        "color": "Rosa",
+        "talle": "S/M"
+      }
+    ],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715494561",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715450427.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715452312.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715454113.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715456868.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:51:34.561Z"
+  },
+  {
+    "nombre": "CAMPERA ELAST. MICROFRIZA DAMA ",
+    "precio": 20000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Gris",
+      "Tramado Blanco/Negro"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715591759",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715521074.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715523882.webp"
+    ],
+    "colorDefs": {
+      "Tramado Blanco/Negro": [
+        "Blanco",
+        "Negro"
+      ]
+    },
+    "fechaPublicacion": "2026-08-14T13:53:11.759Z"
+  },
+  {
+    "nombre": "JOGGER MICROFRIZA ELAST. C/CIERRE DAMA ",
+    "precio": 16500,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "S",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1786715676728",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/jogger-microfriza-elast-c-cierre-dama-1786715666298.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:54:36.728Z"
+  },
+  {
+    "nombre": "CAMISETA TERMICA C/DEDAL CAB. ",
+    "precio": 15000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715721456",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715697068.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:55:21.456Z"
   }
 ]
