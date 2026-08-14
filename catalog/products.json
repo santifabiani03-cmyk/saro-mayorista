@@ -57,9 +57,7 @@
     "nombre": "CUBRE GRIP PERFORADO C/RELIEVE ",
     "precio": 1800,
     "descripcion": "CUBRE GRIP PERFORADO RELIEVE NOAC IMPORTADOS\n\nColores disponibles: ROJO-NEGRO-BLANCO-FUCSIA-AMARILLO-VERDE-NARANJA\n\n                          $1.800 c/u \n20u. x $33.000 \n40u. x $64.000 \n60u. x $93.000 \n100u. x $150.000 🔥",
-    "tags": [
-      "nuevo"
-    ],
+    "tags": [],
     "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "accesorio",
@@ -68,7 +66,6 @@
       "Negro",
       "Blanco",
       "Fucsia",
-      "Amarillo",
       "Verde",
       "Naranja"
     ],
@@ -80,24 +77,24 @@
     "promos": [
       {
         "cantidad": 20,
-        "precioTotal": 33000
+        "precioTotal": 32000
       },
       {
         "cantidad": 40,
-        "precioTotal": 64000
+        "precioTotal": 60000
       },
       {
         "cantidad": 60,
-        "precioTotal": 93000
+        "precioTotal": 87000
       },
       {
         "cantidad": 100,
-        "precioTotal": 150000
+        "precioTotal": 140000
       }
     ],
     "id": "p1779452132920",
     "fechaPublicacion": "2026-05-22T12:15:32.920Z",
-    "fechaActualizacion": "2026-05-28T11:37:22.084Z",
+    "fechaActualizacion": "2026-08-14T13:04:14.540Z",
     "visible": true,
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/cubre-grip-perforado-c-relieve-1779968166734.webp"
