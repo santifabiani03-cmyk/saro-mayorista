@@ -1243,5 +1243,97 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715697068.webp"
     ],
     "fechaPublicacion": "2026-08-14T13:55:21.456Z"
+  },
+  {
+    "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+    "precio": 13500,
+    "descripcion": "",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro",
+      "Gris",
+      "Azul",
+      "Rojo",
+      "Verde"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [
+      {
+        "color": "Verde",
+        "talle": "L"
+      },
+      {
+        "color": "Verde",
+        "talle": "XL"
+      }
+    ],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715805040",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715759694.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715762001.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715763794.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715765496.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715768236.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:56:45.040Z"
+  },
+  {
+    "nombre": "REMERA DRY ELAST. FULLPRINT CAB.",
+    "precio": 15500,
+    "descripcion": "",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Celeste",
+      "Rojo",
+      "Multicolor"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [
+      {
+        "color": "Multicolor",
+        "talle": "XXL"
+      },
+      {
+        "color": "Rojo",
+        "talle": "XXL"
+      }
+    ],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715980257",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715847362.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715849420.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715851123.webp"
+    ],
+    "colorDefs": {
+      "Multicolor": [
+        "Azul",
+        "Violeta"
+      ]
+    },
+    "fechaPublicacion": "2026-08-14T13:59:40.257Z"
   }
 ]
