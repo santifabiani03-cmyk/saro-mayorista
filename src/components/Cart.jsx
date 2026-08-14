@@ -270,16 +270,10 @@ export default function Cart({ config }) {
           )}
         </div>
 
-        {/* Footer con total + WhatsApp */}
+        {/* Envío y compra mínima: van dentro del área que scrollea, así el pie
+            queda chico y no tapa los productos del carrito. */}
         {items.length > 0 && (
-          <div className="px-5 py-4 border-t border-gray-100/80 space-y-4 flex-shrink-0 bg-white">
-            {/* Total */}
-            <div className="flex items-center justify-between">
-              <span className="font-semibold text-gray-700">Total</span>
-              <span className="text-2xl font-extrabold text-saro-dark tracking-tight">
-                ${total.toLocaleString('es-AR')}
-              </span>
-            </div>
+          <div className="px-4 pb-3 space-y-4 flex-shrink-0 overflow-y-auto max-h-[45%]">
 
             {/* ── Envío (oculto hasta tener las credenciales de MiCorreo) ── */}
             {ENVIO_HABILITADO && (
@@ -420,6 +414,18 @@ export default function Cart({ config }) {
                 <CartSuggestions gap={remaining} />
               </>
             )}
+          </div>
+        )}
+
+        {/* Pie fijo: total + acciones (compacto, para no tapar los productos) */}
+        {items.length > 0 && (
+          <div className="px-5 py-3.5 border-t border-gray-100/80 space-y-3 flex-shrink-0 bg-white">
+            <div className="flex items-center justify-between">
+              <span className="font-semibold text-gray-700">Total</span>
+              <span className="text-2xl font-extrabold text-saro-dark tracking-tight">
+                ${total.toLocaleString('es-AR')}
+              </span>
+            </div>
 
             {/* Botón WhatsApp */}
             <button

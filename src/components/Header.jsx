@@ -13,6 +13,9 @@ export default function Header({ config }) {
   // En la landing el header flota transparente sobre el hero (sin barra de
   // compra mínima ni carrito). En el resto de las páginas es la barra sólida.
   const isLanding = pathname === '/'
+  // El catálogo minorista no tiene compra mínima, así que ahí no se muestra el badge
+  const esMinorista = pathname === '/ropa-y-accesorios'
+  const verCompraMinima = config.mostrarCompraMinima && !esMinorista
 
   return (
     <>
@@ -48,7 +51,7 @@ export default function Header({ config }) {
           <div className="flex items-center gap-2.5 sm:gap-3">
 
             {/* Badge mínimo de compra (no en la landing, y solo si está activado) */}
-            {!isLanding && config.mostrarCompraMinima && (
+            {!isLanding && verCompraMinima && (
               <div className="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-saro-light to-blue-50 text-saro-dark px-3.5 py-2 rounded-full text-sm font-medium border border-blue-100/60">
                 <span className="text-saro-blue font-bold text-xs tracking-tight">Compra mín. sugerida:</span>
                 <span className="font-extrabold text-saro-dark">
@@ -101,7 +104,7 @@ export default function Header({ config }) {
         </div>
 
         {/* Badge móvil mínimo (no en la landing, y solo si está activado) */}
-        {!isLanding && config.mostrarCompraMinima && (
+        {!isLanding && verCompraMinima && (
           <div className="sm:hidden bg-gradient-to-r from-saro-light to-blue-50 px-4 py-2 text-center text-xs text-saro-dark font-medium border-t border-blue-100/40">
             Compra mín. sugerida: <strong className="text-saro-blue">${(config.suggestedMinPurchase ?? config.minPurchase).toLocaleString('es-AR')}</strong>
           </div>

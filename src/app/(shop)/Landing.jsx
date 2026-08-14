@@ -110,7 +110,7 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
         <path strokeLinecap="round" strokeLinejoin="round" d="M12 3a6 6 0 0 0-6 6c0 2.4 1.4 4.5 3.5 5.5L9 21h6l-.5-6.5A6 6 0 0 0 18 9a6 6 0 0 0-6-6Z" />
       ),
     },
-    stats.ropaMinorista > 0 && {
+    stats.ropaAcc > 0 && {
       key: 'ropa-minorista',
       href: '/ropa-y-accesorios',
       titulo: 'Ropa y accesorios',
@@ -169,7 +169,7 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
             </p>
           </div>
 
-          <div className="grid sm:grid-cols-2 gap-4 sm:gap-6 max-w-4xl mx-auto">
+          <div className="grid sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-6 max-w-5xl mx-auto">
             {catalogos.map((c, i) => (
               <Link
                 key={c.key}
@@ -198,7 +198,9 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
                 <p className="text-sm text-gray-500 mt-2 leading-relaxed flex-1">{c.desc}</p>
                 <div className="flex items-center justify-between mt-6 pt-5 border-t border-gray-100/80">
                   <span className="text-sm font-semibold text-gray-400">
-                    <span className="text-saro-blue font-extrabold">{c.count}</span> {c.unidad}
+                    {c.count > 0
+                      ? <><span className="text-saro-blue font-extrabold">{c.count}</span> {c.unidad}</>
+                      : 'Próximamente'}
                   </span>
                   <span className="inline-flex items-center gap-1 text-sm font-bold text-saro-blue group-hover:gap-2 transition-all">
                     Ver catálogo
@@ -245,16 +247,6 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
             ))}
           </div>
 
-          {mostrarCompraMinima && (
-            <div data-reveal className="reveal mt-10 flex justify-center">
-              <div className="inline-flex items-center gap-2.5 bg-gradient-to-r from-saro-light to-blue-50 text-saro-dark px-5 py-3 rounded-full border border-blue-100/60">
-                <span className="text-saro-blue font-bold text-sm tracking-tight">Compra mín. sugerida:</span>
-                <span className="font-extrabold text-saro-dark">
-                  ${minPurchase.toLocaleString('es-AR')}
-                </span>
-              </div>
-            </div>
-          )}
         </div>
       </section>
 
