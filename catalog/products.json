@@ -830,7 +830,8 @@
     "colores": [
       "Negro",
       "LILA",
-      "Azul"
+      "Azul",
+      "Short Azul AERO"
     ],
     "talles": [
       "S",
@@ -847,13 +848,17 @@
     "colorDefs": {
       "LILA": [
         "Fucsia"
+      ],
+      "Short Azul AERO": [
+        "Marino"
       ]
     },
-    "fechaActualizacion": "2026-08-14T12:41:32.488Z",
+    "fechaActualizacion": "2026-08-14T13:06:35.743Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640534115.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pollera-lycra-c-short-y-bolsillo-abertura-pierna-1786640746515.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pollera-lycra-c-short-y-bolsillo-abertura-pierna-1786711274537.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pollera-lycra-c-short-y-bolsillo-abertura-pierna-1786712736935.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pollera-lycra-c-short-y-bolsillo-abertura-pierna-1786712742065.webp"
     ]
   },
   {
