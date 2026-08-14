@@ -832,7 +832,8 @@
     "parteCuerpo": "",
     "colores": [
       "Negro",
-      "LILA"
+      "LILA",
+      "Azul"
     ],
     "talles": [
       "S",
@@ -846,16 +847,17 @@
     "promos": [],
     "id": "p1786640582410",
     "fechaPublicacion": "2026-08-13T17:03:02.410Z",
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640534115.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pollera-lycra-c-short-y-bolsillo-abertura-pierna-1786640746515.webp"
-    ],
     "colorDefs": {
       "LILA": [
         "Fucsia"
       ]
     },
-    "fechaActualizacion": "2026-08-13T17:06:46.573Z"
+    "fechaActualizacion": "2026-08-14T12:41:32.488Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640534115.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pollera-lycra-c-short-y-bolsillo-abertura-pierna-1786640746515.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pollera-lycra-c-short-y-bolsillo-abertura-pierna-1786711274537.webp"
+    ]
   },
   {
     "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO CLASICA ",
@@ -891,5 +893,101 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640619728.webp"
     ],
     "fechaActualizacion": "2026-08-13T17:05:20.702Z"
+  },
+  {
+    "nombre": "SHORT C/CALZA DRY ELASTIZADO DAMA",
+    "precio": 13500,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro",
+      "Gris"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1786712282456",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712225912.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712237649.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T12:58:02.456Z"
+  },
+  {
+    "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+    "precio": 7000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1786712445285",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712313630.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:00:45.285Z"
+  },
+  {
+    "nombre": "CALZA TERMICA RECTA DAMA ",
+    "precio": 10000,
+    "descripcion": "",
+    "tags": [
+      "sale"
+    ],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Gris",
+      "Negro"
+    ],
+    "talles": [
+      "S",
+      "L",
+      "XXL",
+      "M",
+      "XL"
+    ],
+    "noStock": [
+      {
+        "color": "Gris",
+        "talle": "M"
+      },
+      {
+        "color": "Gris",
+        "talle": "XL"
+      }
+    ],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1786712548448",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712493455.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712495196.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:02:28.448Z"
   }
 ]
