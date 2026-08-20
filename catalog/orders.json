@@ -230,5 +230,109 @@
     ],
     "total": 204400,
     "totalItems": 25
+  },
+  {
+    "id": "o1787226852743",
+    "fecha": "2026-08-20T11:54:12.743Z",
+    "items": [
+      {
+        "productId": "p1782389218836",
+        "nombre": "TUBO PELOTAS x2 NOVA ",
+        "precio": 5800,
+        "color": "Amarillo Fluo",
+        "talle": "Única",
+        "cantidad": 8
+      },
+      {
+        "productId": "p10",
+        "nombre": "Tubo pelotas NOAC x2u. ",
+        "precio": 6500,
+        "color": "Amarillo",
+        "talle": "Única",
+        "cantidad": 5
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "XL",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "XXL",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "LILA",
+        "talle": "XL",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Short Azul AERO",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "XL",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Blanco",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 204400,
+    "totalItems": 25
   }
 ]
