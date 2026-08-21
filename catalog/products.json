@@ -1481,5 +1481,35 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787354001974.webp"
     ],
     "fechaPublicacion": "2026-08-21T23:15:32.455Z"
+  },
+  {
+    "nombre": "Flash Carbono 3k",
+    "precio": 150000,
+    "precioMinorista": 180000,
+    "peso": 360,
+    "descripcion": "La paleta de pádel Flash Carbono 3k está diseñada para jugadores que buscan control y potencia equilibrados. Su composición de carbono 3k en las caras ofrece una respuesta firme y duradera, optimizando cada golpe. Cuenta con un núcleo de goma EVA que proporciona una excelente salida de bola y absorción de vibraciones. Es una opción confiable para un juego dinámico y preciso en la cancha.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Blanco",
+      "Fucsia"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 10,
+    "id": "p1787355012462",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787354935277.webp"
+    ],
+    "fechaPublicacion": "2026-08-21T23:30:12.463Z"
   }
 ]
