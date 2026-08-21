@@ -1511,5 +1511,35 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787354935277.webp"
     ],
     "fechaPublicacion": "2026-08-21T23:30:12.463Z"
+  },
+  {
+    "nombre": "Nexus Carbono 12k ",
+    "precio": 140000,
+    "precioMinorista": 175000,
+    "peso": 360,
+    "descripcion": "La paleta de pádel Saro Nexus 12K integra carbono para una estructura ligera y resistente. Su composición de carbono 12K optimiza la potencia y el control en cada golpe. Diseñada para jugadores que buscan alto rendimiento, ofrece durabilidad y una respuesta consistente en juego. Es una opción confiable para el pádel competitivo.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro",
+      "Rojo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 11,
+    "id": "p1787356327294",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787356252259.webp"
+    ],
+    "fechaPublicacion": "2026-08-21T23:52:07.295Z"
   }
 ]
