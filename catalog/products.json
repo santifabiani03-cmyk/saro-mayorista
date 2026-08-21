@@ -1335,5 +1335,34 @@
       ]
     },
     "fechaPublicacion": "2026-08-14T13:59:40.257Z"
+  },
+  {
+    "nombre": "Raptor Carbono 12k ",
+    "precio": 150000,
+    "precioMinorista": 190000,
+    "peso": 360,
+    "descripcion": "La Raptor Carbono 12k es una pala de pádel diseñada para jugadores avanzados. Su construcción en carbono 12k ofrece una combinación óptima de potencia y control. La tecnología implementada asegura una gran durabilidad y estabilidad en cada golpe.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Rojo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 4,
+    "id": "p1787353287653",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353195821.webp"
+    ],
+    "fechaPublicacion": "2026-08-21T23:01:27.653Z"
   }
 ]
