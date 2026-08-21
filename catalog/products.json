@@ -1393,5 +1393,34 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353339545.webp"
     ],
     "fechaPublicacion": "2026-08-21T23:04:25.696Z"
+  },
+  {
+    "nombre": "Silver Carbono 12K ",
+    "precio": 150000,
+    "precioMinorista": 190000,
+    "peso": 360,
+    "descripcion": "La pala Silver Carbono 12K presenta una construcción integral de carbono 12K, ofreciendo una combinación óptima de resistencia y ligereza. Su diseño de balance medio y amplio punto dulce facilita un control preciso y potencia equilibrada en cada golpe. Es una opción confiable para jugadores avanzados que buscan rendimiento y durabilidad en la cancha de pádel.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "padel",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Rojo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 6,
+    "id": "p1787353539609",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353488041.webp"
+    ],
+    "fechaPublicacion": "2026-08-21T23:05:39.609Z"
   }
 ]
