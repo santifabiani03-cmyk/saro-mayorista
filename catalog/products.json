@@ -1422,5 +1422,34 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353488041.webp"
     ],
     "fechaPublicacion": "2026-08-21T23:05:39.609Z"
+  },
+  {
+    "nombre": "Vortice X",
+    "precio": 150000,
+    "precioMinorista": 190000,
+    "peso": 360,
+    "descripcion": "Vortice X es una línea de indumentaria deportiva de alto rendimiento diseñada para pádel y entrenamiento. Sus prendas incorporan tecnología de tejidos avanzada que optimiza la transpirabilidad y la libertad de movimiento. Esto asegura confort y eficiencia durante la actividad física intensa. La colección representa una opción confiable para el mercado mayorista en Argentina.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Azul"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 7,
+    "id": "p1787353757330",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353704421.webp"
+    ],
+    "fechaPublicacion": "2026-08-21T23:09:17.330Z"
   }
 ]
