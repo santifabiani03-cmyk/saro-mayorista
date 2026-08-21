@@ -1403,7 +1403,7 @@
     "tags": [
       "nuevo"
     ],
-    "categoria": "padel",
+    "categoria": "paleta",
     "genero": "",
     "parteCuerpo": "",
     "colores": [
@@ -1413,15 +1413,16 @@
       "Única"
     ],
     "noStock": [],
-    "emoji": "📦",
+    "emoji": "🏓",
     "promos": [],
     "_aiLoading": false,
     "_aiCount": 6,
     "id": "p1787353539609",
+    "fechaPublicacion": "2026-08-21T23:05:39.609Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353488041.webp"
     ],
-    "fechaPublicacion": "2026-08-21T23:05:39.609Z"
+    "fechaActualizacion": "2026-08-21T23:12:24.147Z"
   },
   {
     "nombre": "Vortice X",
@@ -1451,5 +1452,34 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353704421.webp"
     ],
     "fechaPublicacion": "2026-08-21T23:09:17.330Z"
+  },
+  {
+    "nombre": "Kids de 3 a 6.años ",
+    "precio": 62000,
+    "precioMinorista": 75000,
+    "peso": 290,
+    "descripcion": "Esta paleta está diseñado para niños de 3 a 6 años, es un producto recreativo para los más pequeños de la casa. ",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Blanco"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 8,
+    "id": "p1787354132455",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787354001974.webp"
+    ],
+    "fechaPublicacion": "2026-08-21T23:15:32.455Z"
   }
 ]
