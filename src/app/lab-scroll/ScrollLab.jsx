@@ -92,10 +92,21 @@ export default function ScrollLab() {
       scene.add(linea)
 
       // Placeholders: brazo, paleta, pelota y paquete
-      const brazo = new THREE.Mesh(
-        new THREE.CapsuleGeometry(0.3, 2.4, 6, 12),
-        new THREE.MeshStandardMaterial({ color: '#e8b48c' })
-      )
+      // Mano + antebrazo. Se arma como grupo para poder moverlo junto con la paleta.
+      const piel = new THREE.MeshStandardMaterial({ color: '#d99b6c', roughness: 0.75 })
+      const brazo = new THREE.Group()
+      const antebrazo = new THREE.Mesh(new THREE.CapsuleGeometry(0.34, 2.2, 6, 14), piel)
+      antebrazo.rotation.z = 0.5
+      antebrazo.position.set(-1.05, -1.15, 0.15)
+      const palma = new THREE.Mesh(new THREE.SphereGeometry(0.44, 18, 14), piel)
+      palma.scale.set(1, 1.25, 0.72)
+      const dedos = new THREE.Mesh(new THREE.CapsuleGeometry(0.16, 0.62, 5, 10), piel)
+      dedos.rotation.x = Math.PI / 2
+      dedos.position.set(0.06, 0.16, 0.34)
+      const pulgar = new THREE.Mesh(new THREE.CapsuleGeometry(0.14, 0.42, 5, 10), piel)
+      pulgar.rotation.set(Math.PI / 2, 0, 0.5)
+      pulgar.position.set(-0.05, -0.18, 0.3)
+      brazo.add(antebrazo, palma, dedos, pulgar)
       const paleta = new THREE.Group()
       const cara = new THREE.Mesh(
         new THREE.CylinderGeometry(1.15, 1.15, 0.16, 26),
@@ -156,25 +167,28 @@ export default function ScrollLab() {
         paleta.rotation.z = mix(mix(0, 0.8, aMano), -1.0, aGolpe)   // amaga y golpea
         paleta.visible = aVuelo < 0.9
 
-        // ── Mano/brazo: entra desde abajo y se queda en el mango ──
+        // ── Mano: entra desde abajo, toma el mango y de ahí acompaña a la paleta ──
         brazo.visible = aMano > 0.02 && aVuelo < 0.9
-        brazo.rotation.z = Math.PI / 2.6
+        // el mango de la paleta cae ~1.1 abajo de su centro
+        const mangoX = paleta.position.x + Math.sin(paleta.rotation.z) * 1.1
+        const mangoY = paleta.position.y - Math.cos(paleta.rotation.z) * 1.1
         brazo.position.set(
-          mix(-5.5, -1.9, aMano) - 4.5 * aVuelo,
-          mix(-4.2, -1.5, aMano),
-          0
+          mix(mangoX - 3.2, mangoX, aMano),
+          mix(mangoY - 3.4, mangoY, aMano),
+          0.35                                   // apenas adelante, para que no la tape la paleta
         )
+        brazo.rotation.z = paleta.rotation.z     // gira con la paleta: se ve que la sostiene
 
         // ── Pelota ──
         // Entra desde la pared (z negativo) → la golpean → sale HACIA la cámara (z positivo).
         const yaEntro = aEntra > 0.01
         pelota.visible = yaEntro && aMorph < 0.55
-        const zEntrada = mix(-15, 0, aEntra)            // viene del fondo hasta la paleta
-        const zSalida  = mix(0, 11.5, aVuelo)           // sale hacia adelante, hacia la cámara
+        const zEntrada = mix(4.5, 0, aEntra)           // entra por el borde del cuadro, del lado de la cámara
+        const zSalida  = mix(0, 11.5, aVuelo)           // la paleta la devuelve hacia el frente
         const pz = aGolpe > 0 ? zSalida : zEntrada
-        const pxBall = mix(-1.5, 0, aEntra) + mix(0, 3.2, aVuelo) + 1.6 * aPique
+        const pxBall = mix(-3.8, 0, aEntra) + mix(0, 4, aVuelo) + 1.6 * aPique
         // altura: llega a la altura de la paleta, sale, y después cae para el pique
-        const yAntes = mix(1.6, 0.5, aEntra)
+        const yAntes = mix(2.6, 0.5, aEntra)   // baja mientras se acerca
         const ySale  = mix(0.5, 1.8, aGolpe) - 0.8 * aVuelo
         const yPique = aPique < 0.5
           ? mix(ySale, -2.6, aPique * 2)                // cae y toca el piso
@@ -217,7 +231,7 @@ export default function ScrollLab() {
       cleanup = () => {
         cancelAnimationFrame(raf)
         ro.disconnect()
-        ;[piso, pared, linea, cara, mango, pelota, paquete, brazo].forEach(m => {
+        ;[piso, pared, linea, cara, mango, pelota, paquete, antebrazo, palma, dedos, pulgar].forEach(m => {
           m.geometry?.dispose(); m.material?.dispose()
         })
         renderer.dispose()
