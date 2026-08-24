@@ -193,6 +193,35 @@ export default function ScrollLab() {
 
       const loader = new GLTFLoader()
       loader.setMeshoptDecoder(MeshoptDecoder)
+      // Paquete real (Meshy, 79 KB) con el logo de la marca pegado en la cara.
+      loader.load('/models/paquete.glb', gltf => {
+        if (disposed) return
+        const m = gltf.scene
+        const bb = new THREE.Box3().setFromObject(m)
+        const sz = new THREE.Vector3(); bb.getSize(sz)
+        const ct = new THREE.Vector3(); bb.getCenter(ct)
+        m.position.sub(ct)
+        const cont = new THREE.Group()
+        cont.add(m)
+        const escala = 1.6 / Math.max(sz.x, sz.y, sz.z)
+        cont.scale.setScalar(escala)
+
+        // El logo va como calcomanía sobre la cara frontal: así queda nítido y
+        // se puede ubicar con precisión, sin tocar la textura del modelo.
+        const texLogo = new THREE.TextureLoader().load('/assets/logo-caja.png')
+        texLogo.colorSpace = THREE.SRGBColorSpace
+        const anchoCara = sz.x * escala
+        const logo = new THREE.Mesh(
+          new THREE.PlaneGeometry(anchoCara * 0.62, anchoCara * 0.62 * (180 / 900)),
+          new THREE.MeshBasicMaterial({ map: texLogo, transparent: true, opacity: 0.85 })
+        )
+        logo.position.set(0, 0, sz.z * escala / 2 + 0.012)   // apenas sobre la cara
+        cont.add(logo)
+
+        paquete.add(cont)
+        ;[caja, cintaH, cintaV, tapa].forEach(o => { o.visible = false })
+      }, undefined, () => { /* si falla, queda la caja simple */ })
+
       // Mano generada con Meshy (101 KB ya optimizada). Si carga, reemplaza a la
       // mano de cápsulas; si falla, queda la simple y el guion sigue igual.
       loader.load('/models/mano.glb', gltf => {
