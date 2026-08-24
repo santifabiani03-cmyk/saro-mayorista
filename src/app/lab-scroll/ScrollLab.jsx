@@ -29,6 +29,15 @@ const ACTOS = [
   { at: 0.86, lado: 'izq', k: 'Tu pedido', t: 'Armalo en 2 minutos',             d: 'Elegís y cerramos por WhatsApp.' },
 ]
 
+// Ajuste fino del jugador: escala, dónde se para y cómo sostiene la paleta.
+const JUGADOR = {
+  altura: 11.5,          // alto en unidades de escena (la paleta mide ~2.9)
+  pos: [-1.2, -3, 0.4],  // parado sobre el piso (y = -3)
+  giro: Math.PI,         // mira hacia la cámara
+  // la paleta cuelga de la mano derecha:
+  paletaEnMano: { pos: [0, 0.3, 0], rot: [0, 0, 0], escala: 1 },  // escala 1 = tamaño propio de la paleta
+}
+
 // Ajuste fino de la mano 3D: como el modelo viene con su propia orientación,
 // estos valores son los que hay que tocar si el agarre no queda bien.
 const MANO = {
@@ -201,6 +210,45 @@ export default function ScrollLab() {
 
       const loader = new GLTFLoader()
       loader.setMeshoptDecoder(MeshoptDecoder)
+      // ── JUGADOR con esqueleto (Meshy, riggeado) ──
+      // Se guardan los huesos del brazo para animarlos según el scroll, y la
+      // paleta se cuelga de la mano derecha para que la siga sola.
+      const jugadorRef = {}
+      const huesos = {}
+      loader.load('/models/jugador.glb', gltf => {
+        if (disposed) return
+        const j = gltf.scene
+        const bb = new THREE.Box3().setFromObject(j)
+        const sz = new THREE.Vector3(); bb.getSize(sz)
+        const escalaJug = JUGADOR.altura / sz.y
+        j.scale.setScalar(escalaJug)
+        // apoyarlo sobre el piso
+        const bb2 = new THREE.Box3().setFromObject(j)
+        j.position.set(JUGADOR.pos[0], JUGADOR.pos[1] - bb2.min.y, JUGADOR.pos[2])
+        j.rotation.y = JUGADOR.giro
+        j.traverse(o => {
+          if (o.isBone) huesos[o.name] = o
+          if (o.isMesh) o.frustumCulled = false   // el skinning mueve la malla
+        })
+        // guardar la rotación de reposo de cada hueso que vamos a animar
+        ;['RightArm', 'RightForeArm', 'RightHand', 'Spine', 'Spine01'].forEach(n => {
+          if (huesos[n]) huesos[n].userData.base = huesos[n].rotation.clone()
+        })
+        // la paleta pasa a colgar de la mano
+        if (huesos.RightHand) {
+          // compensa la escala heredada del jugador: la paleta debe conservar su tamaño
+          paleta.scale.setScalar(JUGADOR.paletaEnMano.escala / escalaJug)
+          paleta.position.set(...JUGADOR.paletaEnMano.pos)
+          paleta.rotation.set(...JUGADOR.paletaEnMano.rot)
+          huesos.RightHand.add(paleta)
+        }
+        scene.add(j)
+        jugadorRef.obj = j
+        // con el jugador completo ya no hace falta la mano suelta
+        brazo.visible = false
+        brazo.userData.oculto = true
+      }, undefined, () => { /* sin jugador, queda la mano suelta */ })
+
       // Paquete real (Meshy, 79 KB) con el logo de la marca pegado en la cara.
       loader.load('/models/paquete.glb', gltf => {
         if (disposed) return
@@ -329,16 +377,53 @@ export default function ScrollLab() {
         const aFinal  = suave(seg(t, 0.86, 1.00))
 
         // ── Paleta ──
-        // Queda QUIETA hasta que la mano la toma (aMano). Recién ahí se prepara y golpea.
-        paleta.position.set(mix(0, -0.6, aMano) - 4.5 * aVuelo, 0.4, 0)
-        paleta.rotation.y = mix(0, -0.35, aMano)
-        paleta.rotation.z = mix(mix(0, 0.8, aMano), -1.0, aGolpe)   // amaga y golpea
+        // Si el jugador cargó, la paleta cuelga de su mano y la mueve el brazo.
+        // Si no, se mueve sola como antes (fallback).
+        if (!jugadorRef.obj) {
+          paleta.position.set(mix(0, -0.6, aMano) - 4.5 * aVuelo, 0.4, 0)
+          paleta.rotation.y = mix(0, -0.35, aMano)
+          paleta.rotation.z = mix(mix(0, 0.8, aMano), -1.0, aGolpe)
+        }
         paleta.visible = aVuelo < 0.9
+
+        // ── ARTICULACIONES DEL JUGADOR ──
+        // El brazo se estira para tomar la paleta, se contrae para cargar el
+        // golpe y se extiende de nuevo al impactar. El torso acompaña.
+        if (jugadorRef.obj) {
+          const estira  = suave(seg(t, 0.14, 0.28))   // extiende el brazo
+          const carga   = suave(seg(t, 0.28, 0.36))   // contrae el codo (amague)
+          const impacto = suave(seg(t, 0.36, 0.44))   // suelta el golpe
+          const baja    = suave(seg(t, 0.50, 0.75))   // vuelve a la guardia
+
+          const b = huesos.RightArm, c = huesos.RightForeArm
+          const m = huesos.RightHand, sp = huesos.Spine01 || huesos.Spine
+
+          if (b?.userData.base) {
+            // desde T-pose: el brazo baja al costado y luego se lleva al golpe
+            const reposo = -1.25
+            b.rotation.z = b.userData.base.z + reposo
+              + mix(0, 0.55, estira) - 0.35 * carga + mix(0, 0.85, impacto) - 0.5 * baja
+            b.rotation.y = b.userData.base.y + mix(0, -0.5, carga) + mix(0, 1.1, impacto)
+            b.rotation.x = b.userData.base.x + 0.25 * estira - 0.15 * baja
+          }
+          if (c?.userData.base) {
+            // el codo: casi recto al estirar, muy doblado al cargar, se abre al golpear
+            c.rotation.y = c.userData.base.y
+              + mix(0, -0.25, estira) + mix(0, -1.5, carga) + mix(0, 1.4, impacto) - 0.4 * baja
+          }
+          if (m?.userData.base) {
+            m.rotation.z = m.userData.base.z + mix(0, -0.4, carga) + mix(0, 0.7, impacto)
+          }
+          if (sp?.userData.base) {
+            // el torso rota con el golpe: sin esto el swing se ve de brazo solo
+            sp.rotation.y = sp.userData.base.y + mix(0, 0.3, carga) + mix(0, -0.55, impacto) + 0.25 * baja
+          }
+        }
 
         // ── Mano: entra desde abajo, toma el mango y de ahí acompaña a la paleta ──
         // La mano recién aparece cuando va a tomar la paleta, y se desvanece al salir
         const visMano = seg(t, 0.19, 0.24)
-        brazo.visible = visMano > 0.01 && aVuelo < 0.9
+        brazo.visible = !brazo.userData.oculto && visMano > 0.01 && aVuelo < 0.9
         brazo.traverse(o => {
           if (o.isMesh && o.material) {
             o.material.transparent = true
@@ -399,15 +484,17 @@ export default function ScrollLab() {
         paquete.rotation.set(0.18 * cambio, mix(0, 0.7, cambio) + 0.4 * aFinal, 0)
 
         // ── Cámara ──
-        // Empieza de frente; cuando la pelota viene hacia ella, retrocede para que
-        // se vea venir; al final se corre para dejar el paquete a un costado.
+        // Arranca lo bastante lejos para que entre el jugador completo (necesita
+        // ~15 unidades), se acerca en el golpe y después acompaña a la pelota.
+        const acerca = suave(seg(t, 0.28, 0.44))
         camera.position.set(
-          mix(0, 2.5, aFinal),
-          mix(1.6, 2.2, aVuelo) - 0.7 * aPique + 0.2 * aFinal,
-          mix(9, 8, aMano) + mix(0, 9, aVuelo) + 2.5 * aPique - 2 * aFinal
+          mix(0.5, 2.2, acerca) + mix(0, 3.5, aVuelo) + 2 * aFinal,
+          mix(3.2, 2.2, acerca) + 1.2 * aVuelo - 0.6 * aPique,
+          mix(17, 11.5, acerca) + mix(0, 8, aVuelo) + 2.5 * aPique - 2 * aFinal
         )
-        const mira = paquete.visible ? paquete.position : (pelota.visible ? pelota.position : paleta.position)
-        camera.lookAt(mira.x * 0.85, mix(0.4, mira.y, 0.6), mira.z * 0.5)
+        const mira = paquete.visible ? paquete.position
+          : (pelota.visible ? pelota.position : new THREE.Vector3(-1, mix(2.6, 0.8, acerca), 0))
+        camera.lookAt(mira.x * 0.8, mix(mix(2.6, 0.8, acerca), mira.y, pelota.visible ? 0.7 : 0), mira.z * 0.5)
 
         renderer.render(scene, camera)
       }
