@@ -45,7 +45,12 @@ export default function ScrollLab() {
     let disposed = false
     let cleanup = () => {}
 
-    import('three').then(THREE => {
+    Promise.all([
+      import('three'),
+      import('three/examples/jsm/loaders/GLTFLoader.js'),
+      import('three/examples/jsm/libs/meshopt_decoder.module.js'),
+      import('three/examples/jsm/environments/RoomEnvironment.js'),
+    ]).then(([THREE, { GLTFLoader }, { MeshoptDecoder }, { RoomEnvironment }]) => {
       if (disposed) return
       const mount = mountRef.current
       if (!mount) return
@@ -62,7 +67,10 @@ export default function ScrollLab() {
       renderer.setSize(W(), H())
       mount.appendChild(renderer.domElement)
 
-      scene.add(new THREE.HemisphereLight('#ffffff', '#c3d1e5', 1.15))
+      // Iluminación de entorno: el modelo real necesita reflejos para verse bien
+      const pmrem = new THREE.PMREMGenerator(renderer)
+      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
+      scene.add(new THREE.HemisphereLight('#ffffff', '#c3d1e5', 0.9))
       const sol = new THREE.DirectionalLight('#ffffff', 1.5)
       sol.position.set(4, 8, 6)
       scene.add(sol)
@@ -78,9 +86,11 @@ export default function ScrollLab() {
 
       // Pared del fondo: es contra la que se juega, queda DETRÁS de la paleta.
       // Sirve de referencia para entender de dónde viene la pelota.
+      const texCancha = new THREE.TextureLoader().load('/assets/fondo-cancha.webp')
+      texCancha.colorSpace = THREE.SRGBColorSpace
       const pared = new THREE.Mesh(
         new THREE.PlaneGeometry(46, 20),
-        new THREE.MeshStandardMaterial({ color: '#dbe6f5', roughness: 1 })
+        new THREE.MeshStandardMaterial({ map: texCancha, roughness: 1 })
       )
       pared.position.set(0, 4, -16)
       scene.add(pared)
@@ -107,6 +117,8 @@ export default function ScrollLab() {
       pulgar.rotation.set(Math.PI / 2, 0, 0.5)
       pulgar.position.set(-0.05, -0.18, 0.3)
       brazo.add(antebrazo, palma, dedos, pulgar)
+      // La paleta real del sitio. Mientras carga se muestra una silueta simple,
+      // así el guion se puede seguir aunque el .glb tarde.
       const paleta = new THREE.Group()
       const cara = new THREE.Mesh(
         new THREE.CylinderGeometry(1.15, 1.15, 0.16, 26),
@@ -119,6 +131,23 @@ export default function ScrollLab() {
       )
       mango.position.y = -1.5
       paleta.add(cara, mango)
+
+      const loader = new GLTFLoader()
+      loader.setMeshoptDecoder(MeshoptDecoder)
+      loader.load('/models/paleta-opt.glb', gltf => {
+        if (disposed) return
+        const modelo = gltf.scene
+        const box = new THREE.Box3().setFromObject(modelo)
+        const size = new THREE.Vector3(); box.getSize(size)
+        const centro = new THREE.Vector3(); box.getCenter(centro)
+        modelo.position.sub(centro)
+        const cont = new THREE.Group()
+        cont.add(modelo)
+        cont.scale.setScalar(2.9 / size.y)   // alto aproximado al del placeholder
+        paleta.add(cont)
+        cara.visible = false                  // se van los placeholders
+        mango.visible = false
+      }, undefined, () => { /* si falla, queda la silueta simple */ })
 
       const pelota = new THREE.Mesh(
         new THREE.SphereGeometry(0.4, 22, 16),
@@ -234,6 +263,7 @@ export default function ScrollLab() {
         ;[piso, pared, linea, cara, mango, pelota, paquete, antebrazo, palma, dedos, pulgar].forEach(m => {
           m.geometry?.dispose(); m.material?.dispose()
         })
+        pmrem.dispose()
         renderer.dispose()
         if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement)
       }
