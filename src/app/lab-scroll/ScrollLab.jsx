@@ -22,10 +22,10 @@ gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 // `at` = punto del guion (0 a 1) donde entra cada texto; `lado` deja libre el otro.
 const ACTOS = [
-  { at: 0.02, lado: 'izq', k: 'La marca',  t: 'Paletas que se sienten distinto', d: '15 años fabricando en Argentina.' },
-  { at: 0.24, lado: 'der', k: 'El golpe',  t: 'Potencia que responde',           d: 'Carbono 12K: cada golpe vuelve.' },
-  { at: 0.45, lado: 'izq', k: 'En vuelo',  t: 'De la cancha a tu casa',          d: 'Seguimos la pelota hasta tu pedido.' },
-  { at: 0.66, lado: 'der', k: 'El envío',  t: 'Llega a todo el país',            d: 'Correo Argentino y vía Cargo.' },
+  { at: 0.01, lado: 'izq', k: 'La marca',  t: 'Paletas que se sienten distinto', d: '15 años fabricando en Argentina.' },
+  { at: 0.30, lado: 'der', k: 'El golpe',  t: 'Potencia que responde',           d: 'Carbono 12K: cada golpe vuelve.' },
+  { at: 0.48, lado: 'izq', k: 'En vuelo',  t: 'De la cancha a tu casa',          d: 'Seguimos la pelota hasta tu pedido.' },
+  { at: 0.68, lado: 'der', k: 'El envío',  t: 'Llega a todo el país',            d: 'Correo Argentino y vía Cargo.' },
   { at: 0.86, lado: 'izq', k: 'Tu pedido', t: 'Armalo en 2 minutos',             d: 'Elegís y cerramos por WhatsApp.' },
 ]
 
@@ -76,6 +76,21 @@ export default function ScrollLab() {
       piso.position.y = -3
       scene.add(piso)
 
+      // Pared del fondo: es contra la que se juega, queda DETRÁS de la paleta.
+      // Sirve de referencia para entender de dónde viene la pelota.
+      const pared = new THREE.Mesh(
+        new THREE.PlaneGeometry(46, 20),
+        new THREE.MeshStandardMaterial({ color: '#dbe6f5', roughness: 1 })
+      )
+      pared.position.set(0, 4, -16)
+      scene.add(pared)
+      const linea = new THREE.Mesh(
+        new THREE.BoxGeometry(46, 0.12, 0.12),
+        new THREE.MeshStandardMaterial({ color: '#ffffff' })
+      )
+      linea.position.set(0, 0.6, -15.9)
+      scene.add(linea)
+
       // Placeholders: brazo, paleta, pelota y paquete
       const brazo = new THREE.Mesh(
         new THREE.CapsuleGeometry(0.3, 2.4, 6, 12),
@@ -118,61 +133,79 @@ export default function ScrollLab() {
         const t = progRef.current.t
 
         // ── El guion, escrito en función del progreso ──
-        // 0.00–0.18 · la paleta se presenta
-        // 0.18–0.30 · entra el brazo y prepara
-        // 0.30–0.42 · el golpe: la pelota sale
-        // 0.42–0.62 · POV: la cámara viaja con la pelota
+        // 0.00–0.16 · la paleta espera quieta, de frente
+        // 0.16–0.26 · entra la mano y la agarra
+        // 0.26–0.36 · la pelota INGRESA desde la pared del fondo
+        // 0.36–0.44 · el golpe
+        // 0.44–0.62 · la pelota viene HACIA la cámara y la cámara retrocede
         // 0.62–0.74 · pique y rebote
-        // 0.74–0.88 · la pelota se vuelve paquete
-        // 0.88–1.00 · el paquete se acomoda al costado
-        const aPresenta = suave(seg(t, 0.00, 0.18))
-        const aPrepara  = suave(seg(t, 0.18, 0.30))
-        const aGolpe    = suave(seg(t, 0.30, 0.42))
-        const aVuelo    = suave(seg(t, 0.42, 0.62))
-        const aPique    = suave(seg(t, 0.62, 0.74))
-        const aMorph    = suave(seg(t, 0.74, 0.88))
-        const aFinal    = suave(seg(t, 0.88, 1.00))
+        // 0.74–0.86 · se transforma en paquete (mismo lugar, transición limpia)
+        // 0.86–1.00 · el paquete se acomoda al costado
+        const aMano   = suave(seg(t, 0.16, 0.26))
+        const aEntra  = suave(seg(t, 0.26, 0.36))
+        const aGolpe  = suave(seg(t, 0.36, 0.44))
+        const aVuelo  = suave(seg(t, 0.44, 0.62))
+        const aPique  = suave(seg(t, 0.62, 0.74))
+        const aMorph  = suave(seg(t, 0.74, 0.86))
+        const aFinal  = suave(seg(t, 0.86, 1.00))
 
-        // Paleta: gira, amaga y golpea; después sale de cuadro
-        paleta.position.set(mix(0, -5, aGolpe), 0.4, 0)
-        paleta.rotation.y = mix(0.9 * aPresenta, -0.4, aPrepara)
-        paleta.rotation.z = mix(mix(0, 0.85, aPrepara), -1.15, aGolpe)
-        paleta.visible = aGolpe < 0.98
+        // ── Paleta ──
+        // Queda QUIETA hasta que la mano la toma (aMano). Recién ahí se prepara y golpea.
+        paleta.position.set(mix(0, -0.6, aMano) - 4.5 * aVuelo, 0.4, 0)
+        paleta.rotation.y = mix(0, -0.35, aMano)
+        paleta.rotation.z = mix(mix(0, 0.8, aMano), -1.0, aGolpe)   // amaga y golpea
+        paleta.visible = aVuelo < 0.9
 
-        // Brazo: aparece sólo para el golpe
-        brazo.visible = aPrepara > 0.05 && aGolpe < 0.98
+        // ── Mano/brazo: entra desde abajo y se queda en el mango ──
+        brazo.visible = aMano > 0.02 && aVuelo < 0.9
         brazo.rotation.z = Math.PI / 2.6
-        brazo.position.set(mix(-6.5, -2.5, aPrepara) - 5 * aGolpe, -1.5, 0)
+        brazo.position.set(
+          mix(-5.5, -1.9, aMano) - 4.5 * aVuelo,
+          mix(-4.2, -1.5, aMano),
+          0
+        )
 
-        // Pelota: sale del impacto, vuela, pica y rebota
-        const enVuelo = aGolpe > 0.35 && aMorph < 0.5
-        pelota.visible = enVuelo
-        const px = mix(0, 7, aGolpe) + mix(0, 5, aVuelo) + 2 * aPique
-        const pyVuelo = mix(0.4, 3.2, aGolpe) - 2.2 * aVuelo
-        const pyPique = aPique < 0.5
-          ? mix(pyVuelo, -2.6, aPique * 2)          // baja y toca el piso
-          : mix(-2.6, 1.4, (aPique - 0.5) * 2)      // rebota hacia arriba
-        pelota.position.set(px, aPique > 0 ? pyPique : pyVuelo, mix(0, -9, aVuelo))
-        pelota.scale.setScalar(mix(1, 0.01, suave(seg(t, 0.76, 0.82))))
-        pelota.rotation.x += 0.25
+        // ── Pelota ──
+        // Entra desde la pared (z negativo) → la golpean → sale HACIA la cámara (z positivo).
+        const yaEntro = aEntra > 0.01
+        pelota.visible = yaEntro && aMorph < 0.55
+        const zEntrada = mix(-15, 0, aEntra)            // viene del fondo hasta la paleta
+        const zSalida  = mix(0, 11.5, aVuelo)           // sale hacia adelante, hacia la cámara
+        const pz = aGolpe > 0 ? zSalida : zEntrada
+        const pxBall = mix(-1.5, 0, aEntra) + mix(0, 3.2, aVuelo) + 1.6 * aPique
+        // altura: llega a la altura de la paleta, sale, y después cae para el pique
+        const yAntes = mix(1.6, 0.5, aEntra)
+        const ySale  = mix(0.5, 1.8, aGolpe) - 0.8 * aVuelo
+        const yPique = aPique < 0.5
+          ? mix(ySale, -2.6, aPique * 2)                // cae y toca el piso
+          : mix(-2.6, 1.2, (aPique - 0.5) * 2)          // rebota
+        pelota.position.set(pxBall, aPique > 0 ? yPique : (aGolpe > 0 ? ySale : yAntes), pz)
+        pelota.rotation.x += 0.3
 
-        // Paquete: crece donde quedó la pelota y se acomoda a un costado
-        paquete.visible = aMorph > 0.1
-        paquete.scale.setScalar(mix(0.01, 1, suave(seg(t, 0.78, 0.88))))
-        paquete.position.set(mix(px, 10.5, aFinal), mix(1.4, 0.5, aFinal), mix(-9, -6.5, aFinal))
-        paquete.rotation.set(0.22 * aMorph, mix(0, 0.9, aMorph) + 0.3 * aFinal, 0)
+        // ── Paquete: aparece exactamente donde está la pelota ──
+        // La pelota se achica y el paquete crece en el MISMO tramo: la transición
+        // queda limpia porque comparten lugar y no se pisan con otros movimientos.
+        const cambio = suave(seg(t, 0.76, 0.84))
+        pelota.scale.setScalar(1 - cambio)
+        paquete.visible = cambio > 0.01
+        paquete.scale.setScalar(cambio)
+        paquete.position.set(
+          mix(pelota.position.x, 9.5, aFinal),
+          mix(pelota.position.y, 0.6, aFinal),
+          mix(pelota.position.z, 10.5, aFinal)
+        )
+        paquete.rotation.set(0.18 * cambio, mix(0, 0.7, cambio) + 0.4 * aFinal, 0)
 
-        // Cámara: arranca al frente, acompaña la pelota y termina mirando el paquete
+        // ── Cámara ──
+        // Empieza de frente; cuando la pelota viene hacia ella, retrocede para que
+        // se vea venir; al final se corre para dejar el paquete a un costado.
         camera.position.set(
-          mix(0, 4, aVuelo) + mix(0, 4.5, aFinal),
-          mix(1.6, 1.4, aPresenta) + 1.4 * aVuelo - 0.6 * aPique,
-          mix(9, 7.4, aPresenta) - 6 * aVuelo + 1.5 * aFinal
+          mix(0, 2.5, aFinal),
+          mix(1.6, 2.2, aVuelo) - 0.7 * aPique + 0.2 * aFinal,
+          mix(9, 8, aMano) + mix(0, 9, aVuelo) + 2.5 * aPique - 2 * aFinal
         )
-        camera.lookAt(
-          enVuelo ? pelota.position.x * 0.7 : (paquete.visible ? paquete.position.x * 0.8 : 0),
-          0.4,
-          enVuelo ? pelota.position.z * 0.6 : -3
-        )
+        const mira = paquete.visible ? paquete.position : (pelota.visible ? pelota.position : paleta.position)
+        camera.lookAt(mira.x * 0.85, mix(0.4, mira.y, 0.6), mira.z * 0.5)
 
         renderer.render(scene, camera)
       }
@@ -184,7 +217,7 @@ export default function ScrollLab() {
       cleanup = () => {
         cancelAnimationFrame(raf)
         ro.disconnect()
-        ;[piso, cara, mango, pelota, paquete, brazo].forEach(m => {
+        ;[piso, pared, linea, cara, mango, pelota, paquete, brazo].forEach(m => {
           m.geometry?.dispose(); m.material?.dispose()
         })
         renderer.dispose()
