@@ -34,6 +34,26 @@ const seg = (t, a, b) => Math.max(0, Math.min(1, (t - a) / (b - a)))
 const mix = (x, y, k) => x + (y - x) * k
 const suave = k => k * k * (3 - 2 * k)
 
+/**
+ * Altura de la pelota con física real: cae como parábola y cuando toca el piso
+ * rebota más bajo (pierde energía, como una pelota de verdad).
+ *   y0/v0 = altura y velocidad al salir · g = gravedad · e = cuánto rebota (0-1)
+ */
+function balistica(t, y0, v0, g, suelo, e) {
+  let y = y0, v = v0, resto = t
+  for (let i = 0; i < 6; i++) {
+    const disc = v * v + 2 * g * (y - suelo)
+    if (disc <= 0) break
+    const tSuelo = (v + Math.sqrt(disc)) / g      // cuándo toca el piso
+    if (resto < tSuelo) return y + v * resto - 0.5 * g * resto * resto
+    resto -= tSuelo
+    y = suelo
+    v = Math.sqrt(disc) * e                        // rebota con menos fuerza
+    if (v < 0.35) return suelo                     // ya casi no pica
+  }
+  return Math.max(suelo, y + v * resto - 0.5 * g * resto * resto)
+}
+
 export default function ScrollLab() {
   const rootRef = useRef(null)
   const stageRef = useRef(null)
@@ -60,6 +80,7 @@ export default function ScrollLab() {
 
       const scene = new THREE.Scene()
       scene.background = new THREE.Color('#eef2f8')
+      scene.fog = new THREE.Fog('#eef2f8', 26, 62)   // da profundidad al fondo
 
       const camera = new THREE.PerspectiveCamera(50, W() / H(), 0.1, 200)
       const renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -89,31 +110,31 @@ export default function ScrollLab() {
       const texCancha = new THREE.TextureLoader().load('/assets/fondo-cancha.webp')
       texCancha.colorSpace = THREE.SRGBColorSpace
       const pared = new THREE.Mesh(
-        new THREE.PlaneGeometry(46, 20),
+        new THREE.PlaneGeometry(70, 30),
         new THREE.MeshStandardMaterial({ map: texCancha, roughness: 1 })
       )
-      pared.position.set(0, 4, -16)
+      pared.position.set(0, 7, -18)
       scene.add(pared)
       const linea = new THREE.Mesh(
-        new THREE.BoxGeometry(46, 0.12, 0.12),
+        new THREE.BoxGeometry(70, 0.12, 0.12),
         new THREE.MeshStandardMaterial({ color: '#ffffff' })
       )
-      linea.position.set(0, 0.6, -15.9)
+      linea.position.set(0, 0.6, -17.9)
       scene.add(linea)
 
       // Placeholders: brazo, paleta, pelota y paquete
       // Mano + antebrazo. Se arma como grupo para poder moverlo junto con la paleta.
-      const piel = new THREE.MeshStandardMaterial({ color: '#d99b6c', roughness: 0.75 })
+      const piel = new THREE.MeshStandardMaterial({ color: '#dda87d', roughness: 0.85, metalness: 0 })
       const brazo = new THREE.Group()
-      const antebrazo = new THREE.Mesh(new THREE.CapsuleGeometry(0.34, 2.2, 6, 14), piel)
+      const antebrazo = new THREE.Mesh(new THREE.CapsuleGeometry(0.36, 2.1, 8, 18), piel)
       antebrazo.rotation.z = 0.5
       antebrazo.position.set(-1.05, -1.15, 0.15)
-      const palma = new THREE.Mesh(new THREE.SphereGeometry(0.44, 18, 14), piel)
+      const palma = new THREE.Mesh(new THREE.SphereGeometry(0.45, 24, 18), piel)
       palma.scale.set(1, 1.25, 0.72)
-      const dedos = new THREE.Mesh(new THREE.CapsuleGeometry(0.16, 0.62, 5, 10), piel)
+      const dedos = new THREE.Mesh(new THREE.CapsuleGeometry(0.17, 0.66, 7, 14), piel)
       dedos.rotation.x = Math.PI / 2
       dedos.position.set(0.06, 0.16, 0.34)
-      const pulgar = new THREE.Mesh(new THREE.CapsuleGeometry(0.14, 0.42, 5, 10), piel)
+      const pulgar = new THREE.Mesh(new THREE.CapsuleGeometry(0.145, 0.46, 7, 14), piel)
       pulgar.rotation.set(Math.PI / 2, 0, 0.5)
       pulgar.position.set(-0.05, -0.18, 0.3)
       brazo.add(antebrazo, palma, dedos, pulgar)
@@ -149,14 +170,39 @@ export default function ScrollLab() {
         mango.visible = false
       }, undefined, () => { /* si falla, queda la silueta simple */ })
 
-      const pelota = new THREE.Mesh(
-        new THREE.SphereGeometry(0.4, 22, 16),
-        new THREE.MeshStandardMaterial({ color: '#d4ff00' })
-      )
-      const paquete = new THREE.Mesh(
-        new THREE.BoxGeometry(1.5, 1.2, 1.2),
-        new THREE.MeshStandardMaterial({ color: '#c98b4b' })
-      )
+      // Pelota de pádel: fieltro (nada de brillo) y las costuras blancas curvas
+      const pelota = new THREE.Group()
+      const geoBola = new THREE.SphereGeometry(0.4, 32, 24)
+      const matFieltro = new THREE.MeshStandardMaterial({
+        color: '#d8e83c', roughness: 0.95, metalness: 0,
+      })
+      const bola = new THREE.Mesh(geoBola, matFieltro)
+      const geoCostura = new THREE.TorusGeometry(0.395, 0.028, 10, 48)
+      const matCostura = new THREE.MeshStandardMaterial({ color: '#fdfdf5', roughness: 0.85 })
+      const costuraA = new THREE.Mesh(geoCostura, matCostura)
+      costuraA.rotation.set(Math.PI / 2, 0, 0)
+      costuraA.position.y = 0.12
+      costuraA.scale.set(0.93, 0.93, 1)
+      const costuraB = new THREE.Mesh(geoCostura, matCostura)
+      costuraB.rotation.set(Math.PI / 2, 0, 0)
+      costuraB.position.y = -0.12
+      costuraB.scale.set(0.93, 0.93, 1)
+      pelota.add(bola, costuraA, costuraB)
+      // Paquete: caja de cartón con cinta cruzada, para que se lea como un envío
+      const paquete = new THREE.Group()
+      const geoCaja = new THREE.BoxGeometry(1.5, 1.2, 1.2)
+      const matCarton = new THREE.MeshStandardMaterial({ color: '#c69a6b', roughness: 0.92 })
+      const caja = new THREE.Mesh(geoCaja, matCarton)
+      const matCinta = new THREE.MeshStandardMaterial({ color: '#e8d9bd', roughness: 0.7 })
+      const geoCintaH = new THREE.BoxGeometry(1.53, 0.26, 1.23)
+      const cintaH = new THREE.Mesh(geoCintaH, matCinta)
+      const geoCintaV = new THREE.BoxGeometry(0.26, 1.23, 1.23)
+      const cintaV = new THREE.Mesh(geoCintaV, matCinta)
+      // línea de la tapa, para que se note que es una caja cerrada
+      const geoTapa = new THREE.BoxGeometry(1.52, 0.03, 1.22)
+      const tapa = new THREE.Mesh(geoTapa, new THREE.MeshStandardMaterial({ color: '#a97f52' }))
+      tapa.position.y = 0.6
+      paquete.add(caja, cintaH, cintaV, tapa)
       scene.add(brazo, paleta, pelota, paquete)
 
       const onResize = () => {
@@ -209,21 +255,30 @@ export default function ScrollLab() {
         brazo.rotation.z = paleta.rotation.z     // gira con la paleta: se ve que la sostiene
 
         // ── Pelota ──
-        // Entra desde la pared (z negativo) → la golpean → sale HACIA la cámara (z positivo).
+        // Llega desde el frente cayendo, la golpean, y sale en parábola real:
+        // sube, cae por gravedad y pica perdiendo altura en cada rebote.
         const yaEntro = aEntra > 0.01
         pelota.visible = yaEntro && aMorph < 0.55
-        const zEntrada = mix(4.5, 0, aEntra)           // entra por el borde del cuadro, del lado de la cámara
-        const zSalida  = mix(0, 11.5, aVuelo)           // la paleta la devuelve hacia el frente
-        const pz = aGolpe > 0 ? zSalida : zEntrada
-        const pxBall = mix(-3.8, 0, aEntra) + mix(0, 4, aVuelo) + 1.6 * aPique
-        // altura: llega a la altura de la paleta, sale, y después cae para el pique
-        const yAntes = mix(2.6, 0.5, aEntra)   // baja mientras se acerca
-        const ySale  = mix(0.5, 1.8, aGolpe) - 0.8 * aVuelo
-        const yPique = aPique < 0.5
-          ? mix(ySale, -2.6, aPique * 2)                // cae y toca el piso
-          : mix(-2.6, 1.2, (aPique - 0.5) * 2)          // rebota
-        pelota.position.set(pxBall, aPique > 0 ? yPique : (aGolpe > 0 ? ySale : yAntes), pz)
-        pelota.rotation.x += 0.3
+
+        const G = 15, SUELO = -2.6, REBOTE = 0.55
+        let bx, by, bz
+        if (aGolpe <= 0) {
+          // Entrada: viene desde el frente y va cayendo hacia la paleta
+          bx = mix(-3.8, 0, aEntra)
+          bz = mix(4.5, 0, aEntra)
+          by = balistica(aEntra * 0.62, 3.4, 0.4, G, 0.5, 0)   // cae hasta la altura del golpe
+        } else {
+          // Salida: tiempo continuo desde el impacto (así el vuelo y el pique
+          // son una sola trayectoria, sin cortes entre tramos)
+          const tv = aGolpe * 0.22 + aVuelo * 0.85 + aPique * 0.75
+          bx = mix(0, 4.6, aVuelo) + 2.2 * aPique
+          bz = mix(0, 11.5, aVuelo) + 1.5 * aPique
+          by = balistica(tv, 0.5, 6.2, G, SUELO, REBOTE)
+        }
+        pelota.position.set(bx, by, bz)
+        // gira acompañando el movimiento (más rápido cuanto más rápido va)
+        pelota.rotation.x += 0.12 + 0.3 * (aGolpe - aPique * 0.6)
+        pelota.rotation.z += 0.05
 
         // ── Paquete: aparece exactamente donde está la pelota ──
         // La pelota se achica y el paquete crece en el MISMO tramo: la transición
@@ -260,7 +315,7 @@ export default function ScrollLab() {
       cleanup = () => {
         cancelAnimationFrame(raf)
         ro.disconnect()
-        ;[piso, pared, linea, cara, mango, pelota, paquete, antebrazo, palma, dedos, pulgar].forEach(m => {
+        ;[piso, pared, linea, cara, mango, bola, costuraA, costuraB, caja, cintaH, cintaV, tapa, antebrazo, palma, dedos, pulgar].forEach(m => {
           m.geometry?.dispose(); m.material?.dispose()
         })
         pmrem.dispose()
