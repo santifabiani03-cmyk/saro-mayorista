@@ -122,6 +122,44 @@ export default function ScrollLab() {
       linea.position.set(0, 0.6, -17.9)
       scene.add(linea)
 
+      // ── LA RED ──
+      // Va ENTRE la paleta y la cámara: uno está en su lado de la cancha, la
+      // pelota se devuelve por encima de la red y pica en el campo de enfrente.
+      const RED_Z = 5.5, RED_ALTO = 1.5, SUELO_Y = -3
+      const red = new THREE.Group()
+      const matMalla = new THREE.MeshStandardMaterial({
+        color: '#1b2b3d', roughness: 0.9, transparent: true, opacity: 0.55, side: THREE.DoubleSide,
+      })
+      const malla = new THREE.Mesh(new THREE.PlaneGeometry(20, RED_ALTO), matMalla)
+      malla.position.y = SUELO_Y + RED_ALTO / 2
+      // cinta blanca del borde superior
+      const cinta = new THREE.Mesh(
+        new THREE.BoxGeometry(20, 0.16, 0.06),
+        new THREE.MeshStandardMaterial({ color: '#f8fafc', roughness: 0.6 })
+      )
+      cinta.position.y = SUELO_Y + RED_ALTO
+      const matPoste = new THREE.MeshStandardMaterial({ color: '#243447', roughness: 0.6, metalness: 0.3 })
+      const posteIzq = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, RED_ALTO + 0.2, 10), matPoste)
+      posteIzq.position.set(-10, SUELO_Y + (RED_ALTO + 0.2) / 2, 0)
+      const posteDer = posteIzq.clone()
+      posteDer.position.x = 10
+      red.add(malla, cinta, posteIzq, posteDer)
+      red.position.z = RED_Z
+      scene.add(red)
+
+      // Líneas de la cancha (dan referencia de profundidad al vuelo)
+      const matLinea = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.5 })
+      const lineas = new THREE.Group()
+      ;[-12, -6, 12].forEach(z => {
+        const l = new THREE.Mesh(new THREE.BoxGeometry(20, 0.02, 0.14), matLinea)
+        l.position.set(0, SUELO_Y + 0.02, RED_Z + z)
+        lineas.add(l)
+      })
+      const central = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.02, 24), matLinea)
+      central.position.set(0, SUELO_Y + 0.02, RED_Z)
+      lineas.add(central)
+      scene.add(lineas)
+
       // Placeholders: brazo, paleta, pelota y paquete
       // Mano + antebrazo. Se arma como grupo para poder moverlo junto con la paleta.
       const piel = new THREE.MeshStandardMaterial({ color: '#dda87d', roughness: 0.85, metalness: 0 })
@@ -260,20 +298,23 @@ export default function ScrollLab() {
         const yaEntro = aEntra > 0.01
         pelota.visible = yaEntro && aMorph < 0.55
 
+        // Física del tiro. El tiempo avanza LINEAL con el scroll (sin suavizado):
+        // si no, la pelota parece frenar y acelerar sola. En el plano viaja a
+        // velocidad constante y la altura sigue la parábola con rebotes.
         const G = 15, SUELO = -2.6, REBOTE = 0.55
+        const VZ = 6.5, VX = 2.6, V0Y = 6.2      // velocidades al salir del golpe
         let bx, by, bz
         if (aGolpe <= 0) {
-          // Entrada: viene desde el frente y va cayendo hacia la paleta
-          bx = mix(-3.8, 0, aEntra)
-          bz = mix(4.5, 0, aEntra)
-          by = balistica(aEntra * 0.62, 3.4, 0.4, G, 0.5, 0)   // cae hasta la altura del golpe
+          // Entrada: llega desde el frente cayendo hacia la paleta
+          const te = seg(t, 0.26, 0.36)
+          bx = mix(-3.8, 0, te)
+          bz = mix(4.5, 0, te)
+          by = balistica(te * 0.62, 3.4, 0.4, G, 0.5, 0)
         } else {
-          // Salida: tiempo continuo desde el impacto (así el vuelo y el pique
-          // son una sola trayectoria, sin cortes entre tramos)
-          const tv = aGolpe * 0.22 + aVuelo * 0.85 + aPique * 0.75
-          bx = mix(0, 4.6, aVuelo) + 2.2 * aPique
-          bz = mix(0, 11.5, aVuelo) + 1.5 * aPique
-          by = balistica(tv, 0.5, 6.2, G, SUELO, REBOTE)
+          const tv = seg(t, 0.36, 0.88) * 2.2     // segundos de vuelo, lineales
+          bx = VX * tv
+          bz = VZ * tv                            // cruza la red y sigue de largo
+          by = balistica(tv, 0.5, V0Y, G, SUELO, REBOTE)
         }
         pelota.position.set(bx, by, bz)
         // gira acompañando el movimiento (más rápido cuanto más rápido va)
@@ -315,7 +356,7 @@ export default function ScrollLab() {
       cleanup = () => {
         cancelAnimationFrame(raf)
         ro.disconnect()
-        ;[piso, pared, linea, cara, mango, bola, costuraA, costuraB, caja, cintaH, cintaV, tapa, antebrazo, palma, dedos, pulgar].forEach(m => {
+        ;[piso, pared, linea, malla, cinta, posteIzq, posteDer, central, cara, mango, bola, costuraA, costuraB, caja, cintaH, cintaV, tapa, antebrazo, palma, dedos, pulgar].forEach(m => {
           m.geometry?.dispose(); m.material?.dispose()
         })
         pmrem.dispose()
