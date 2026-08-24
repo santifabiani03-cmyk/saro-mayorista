@@ -29,6 +29,14 @@ const ACTOS = [
   { at: 0.86, lado: 'izq', k: 'Tu pedido', t: 'Armalo en 2 minutos',             d: 'Elegís y cerramos por WhatsApp.' },
 ]
 
+// Ajuste fino de la mano 3D: como el modelo viene con su propia orientación,
+// estos valores son los que hay que tocar si el agarre no queda bien.
+const MANO = {
+  escala: 2.0,
+  rot: [0, Math.PI / 2, Math.PI],   // gira el puño para que el hueco quede vertical
+  offset: [0.05, -0.15, 0],         // corrimiento fino sobre el mango
+}
+
 /** Progreso 0→1 dentro del tramo [a,b] del guion. */
 const seg = (t, a, b) => Math.max(0, Math.min(1, (t - a) / (b - a)))
 const mix = (x, y, k) => x + (y - x) * k
@@ -80,7 +88,7 @@ export default function ScrollLab() {
 
       const scene = new THREE.Scene()
       scene.background = new THREE.Color('#eef2f8')
-      scene.fog = new THREE.Fog('#eef2f8', 26, 62)   // da profundidad al fondo
+      scene.fog = new THREE.Fog('#eef2f8', 20, 52)   // funde el fondo con el aire
 
       const camera = new THREE.PerspectiveCamera(50, W() / H(), 0.1, 200)
       const renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -110,16 +118,16 @@ export default function ScrollLab() {
       const texCancha = new THREE.TextureLoader().load('/assets/fondo-cancha.webp')
       texCancha.colorSpace = THREE.SRGBColorSpace
       const pared = new THREE.Mesh(
-        new THREE.PlaneGeometry(70, 30),
-        new THREE.MeshStandardMaterial({ map: texCancha, roughness: 1 })
+        new THREE.PlaneGeometry(96, 42),
+        new THREE.MeshStandardMaterial({ map: texCancha, roughness: 1, transparent: true, opacity: 0.55 })
       )
-      pared.position.set(0, 7, -18)
+      pared.position.set(0, 8, -26)
       scene.add(pared)
       const linea = new THREE.Mesh(
-        new THREE.BoxGeometry(70, 0.12, 0.12),
+        new THREE.BoxGeometry(96, 0.12, 0.12),
         new THREE.MeshStandardMaterial({ color: '#ffffff' })
       )
-      linea.position.set(0, 0.6, -17.9)
+      linea.position.set(0, 0.6, -25.9)
       scene.add(linea)
 
       // ── LA RED ──
@@ -233,9 +241,9 @@ export default function ScrollLab() {
         m.position.sub(ct)
         const cont = new THREE.Group()
         cont.add(m)
-        cont.scale.setScalar(2.1 / Math.max(sz.x, sz.y, sz.z))
-        // la mano mira hacia el mango y el antebrazo cae hacia afuera
-        cont.rotation.set(0, Math.PI / 2, -Math.PI / 2)
+        cont.scale.setScalar(MANO.escala / Math.max(sz.x, sz.y, sz.z))
+        cont.rotation.set(...MANO.rot)
+        cont.position.set(...MANO.offset)
         brazo.add(cont)
         ;[antebrazo, palma, dedos, pulgar].forEach(o => { o.visible = false })
       }, undefined, () => { /* si falla, quedan las cápsulas */ })
@@ -312,7 +320,7 @@ export default function ScrollLab() {
         // 0.62–0.74 · pique y rebote
         // 0.74–0.86 · se transforma en paquete (mismo lugar, transición limpia)
         // 0.86–1.00 · el paquete se acomoda al costado
-        const aMano   = suave(seg(t, 0.16, 0.26))
+        const aMano   = suave(seg(t, 0.20, 0.30))
         const aEntra  = suave(seg(t, 0.26, 0.36))
         const aGolpe  = suave(seg(t, 0.36, 0.44))
         const aVuelo  = suave(seg(t, 0.44, 0.62))
@@ -328,7 +336,15 @@ export default function ScrollLab() {
         paleta.visible = aVuelo < 0.9
 
         // ── Mano: entra desde abajo, toma el mango y de ahí acompaña a la paleta ──
-        brazo.visible = aMano > 0.02 && aVuelo < 0.9
+        // La mano recién aparece cuando va a tomar la paleta, y se desvanece al salir
+        const visMano = seg(t, 0.19, 0.24)
+        brazo.visible = visMano > 0.01 && aVuelo < 0.9
+        brazo.traverse(o => {
+          if (o.isMesh && o.material) {
+            o.material.transparent = true
+            o.material.opacity = visMano * (1 - suave(seg(t, 0.62, 0.9)))
+          }
+        })
         // el mango de la paleta cae ~1.1 abajo de su centro
         const mangoX = paleta.position.x + Math.sin(paleta.rotation.z) * 1.1
         const mangoY = paleta.position.y - Math.cos(paleta.rotation.z) * 1.1
@@ -358,7 +374,7 @@ export default function ScrollLab() {
           bz = mix(4.5, 0, te)
           by = balistica(te * 0.62, 3.4, 0.4, G, 0.5, 0)
         } else {
-          const tv = seg(t, 0.36, 0.88) * 2.2     // segundos de vuelo, lineales
+          const tv = seg(t, 0.36, 0.88) * 1.62    // segundos de vuelo: alcanza para UN pique
           bx = VX * tv
           bz = VZ * tv                            // cruza la red y sigue de largo
           by = balistica(tv, 0.5, V0Y, G, SUELO, REBOTE)
