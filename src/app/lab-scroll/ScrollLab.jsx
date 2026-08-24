@@ -193,6 +193,24 @@ export default function ScrollLab() {
 
       const loader = new GLTFLoader()
       loader.setMeshoptDecoder(MeshoptDecoder)
+      // Mano generada con Meshy (101 KB ya optimizada). Si carga, reemplaza a la
+      // mano de cápsulas; si falla, queda la simple y el guion sigue igual.
+      loader.load('/models/mano.glb', gltf => {
+        if (disposed) return
+        const m = gltf.scene
+        const bb = new THREE.Box3().setFromObject(m)
+        const sz = new THREE.Vector3(); bb.getSize(sz)
+        const ct = new THREE.Vector3(); bb.getCenter(ct)
+        m.position.sub(ct)
+        const cont = new THREE.Group()
+        cont.add(m)
+        cont.scale.setScalar(2.1 / Math.max(sz.x, sz.y, sz.z))
+        // la mano mira hacia el mango y el antebrazo cae hacia afuera
+        cont.rotation.set(0, Math.PI / 2, -Math.PI / 2)
+        brazo.add(cont)
+        ;[antebrazo, palma, dedos, pulgar].forEach(o => { o.visible = false })
+      }, undefined, () => { /* si falla, quedan las cápsulas */ })
+
       loader.load('/models/paleta-opt.glb', gltf => {
         if (disposed) return
         const modelo = gltf.scene
