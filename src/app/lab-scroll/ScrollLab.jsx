@@ -13,7 +13,7 @@
  * objetos directamente, quedaría desincronizado según qué termine de cargar antes.
  */
 
-import { useRef, useEffect } from 'react'
+import { useRef, useEffect, useState } from 'react'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -77,6 +77,12 @@ export default function ScrollLab() {
   const stageRef = useRef(null)
   const mountRef = useRef(null)
   const progRef = useRef({ t: 0 })   // ← el único puente entre GSAP y Three
+  // Quien pide "reducir movimiento" suele hacerlo por mareo o vértigo. No
+  // alcanza con no animar: hay que darle la misma historia en forma legible.
+  const [sinMovimiento, setSinMovimiento] = useState(false)
+  useEffect(() => {
+    setSinMovimiento(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
+  }, [])
 
   // ── Escena 3D: lee progRef en cada frame ──
   useEffect(() => {
@@ -305,33 +311,6 @@ export default function ScrollLab() {
       const loader = new GLTFLoader()
       loader.setMeshoptDecoder(MeshoptDecoder)
       // Paquete real (Meshy, 79 KB) con el logo de la marca pegado en la cara.
-      loader.load('/models/paquete.glb', gltf => {
-        if (disposed) return
-        const m = gltf.scene
-        const bb = new THREE.Box3().setFromObject(m)
-        const sz = new THREE.Vector3(); bb.getSize(sz)
-        const ct = new THREE.Vector3(); bb.getCenter(ct)
-        m.position.sub(ct)
-        const cont = new THREE.Group()
-        cont.add(m)
-        const escala = 1.6 / Math.max(sz.x, sz.y, sz.z)
-        cont.scale.setScalar(escala)
-
-        // El logo va como calcomanía sobre la cara frontal: así queda nítido y
-        // se puede ubicar con precisión, sin tocar la textura del modelo.
-        const texLogo = new THREE.TextureLoader().load('/assets/logo-caja.png')
-        texLogo.colorSpace = THREE.SRGBColorSpace
-        const anchoCara = sz.x * escala
-        const logo = new THREE.Mesh(
-          new THREE.PlaneGeometry(anchoCara * 0.62, anchoCara * 0.62 * (180 / 900)),
-          new THREE.MeshBasicMaterial({ map: texLogo, transparent: true, opacity: 0.85 })
-        )
-        logo.position.set(0, 0, sz.z * escala / 2 + 0.012)   // apenas sobre la cara
-        cont.add(logo)
-
-        paquete.add(cont)
-        ;[caja, cintaH, cintaV, tapa].forEach(o => { o.visible = false })
-      }, undefined, () => { /* si falla, queda la caja simple */ })
 
       // Mano generada con Meshy (101 KB ya optimizada). Si carga, reemplaza a la
       // mano de cápsulas; si falla, queda la simple y el guion sigue igual.
@@ -483,7 +462,20 @@ export default function ScrollLab() {
           },
         }
       }
+      // Three dibuja 60 veces por segundo. Sin esto seguía haciéndolo con la
+      // sección fuera de pantalla, gastando batería para nada.
+      let aLaVista = true
+      const centinela = new IntersectionObserver(
+        ([e]) => {
+          aLaVista = e.isIntersecting
+          if (aLaVista && !raf) frame()
+        },
+        { rootMargin: '200px' }
+      )
+      centinela.observe(mount)
+
       const frame = () => {
+        if (!aLaVista) { raf = 0; return }
         raf = requestAnimationFrame(frame)
         dibujar(progRef.current.t)
       }
@@ -506,9 +498,18 @@ export default function ScrollLab() {
         // Va por ENCIMA del borde de la red (2.67) para que el golpe se lea como
         // un golpe de pádel y no como una devolución a ras del piso. Rota desde
         // el codo, así el mango acompaña el arco.
-        codo.position.set(IMPACTO.x, IMPACTO.y - (ALTO_PALETA / 2 + CODO), IMPACTO.z)
         codo.rotation.y = mix(0, -0.35, aMano)
         codo.rotation.z = mix(mix(0, 0.55, aMano), -0.95, aGolpe)
+        // El codo va corrigiendo su posición según el ángulo, para que la CARA
+        // de la paleta quede siempre en el punto de impacto. Sin esto la paleta
+        // describe un arco y en el momento del golpe la cara está lejos de la
+        // pelota: se veían separadas en pantalla.
+        const BRAZO = ALTO_PALETA / 2 + CODO
+        codo.position.set(
+          IMPACTO.x + Math.sin(codo.rotation.z) * BRAZO,
+          IMPACTO.y - Math.cos(codo.rotation.z) * BRAZO,
+          IMPACTO.z
+        )
         // después del golpe acompaña y se va apagando, no se corta de golpe
         const salePaleta = suave(seg(t, 0.44, 0.62))
         codo.position.x -= 1.4 * salePaleta
@@ -623,6 +624,7 @@ export default function ScrollLab() {
 
       cleanup = () => {
         cancelAnimationFrame(raf)
+        centinela.disconnect()
         ro.disconnect()
         ;scene.traverse(o => {
           o.geometry?.dispose()
@@ -641,7 +643,12 @@ export default function ScrollLab() {
 
   // ── Scroll: una timeline que sólo mueve el progreso y los textos ──
   useGSAP(() => {
-    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) return
+    if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+      // La escena queda en un cuadro que ya cuenta el final (la caja formada) y
+      // no se crea el pin: antes quedaban siete pantallas de scroll vacío.
+      progRef.current.t = 0.97
+      return
+    }
 
     const tl = gsap.timeline({
       scrollTrigger: {
@@ -672,15 +679,27 @@ export default function ScrollLab() {
         MAQUETA · formas simples para validar el guion
       </div>
 
-      <section ref={stageRef} className="lab-stage relative h-screen w-full overflow-hidden">
+      <section
+        ref={stageRef}
+        className={`lab-stage relative w-full overflow-hidden ${
+          sinMovimiento ? 'min-h-screen py-16' : 'h-screen'
+        }`}
+      >
         <div ref={mountRef} className="absolute inset-0" />
 
         {ACTOS.map((a, i) => (
           <div
             key={i}
-            className={`acto acto-${i} absolute top-1/2 -translate-y-1/2 w-[min(86vw,380px)] ${
-              a.lado === 'izq' ? 'left-5 sm:left-16 text-left' : 'right-5 sm:right-16 text-right'
-            }`}
+            className={
+              sinMovimiento
+                // en columna y sobre un fondo propio: los cinco textos comparten
+                // el mismo punto absoluto y, sin la animación que los turna,
+                // quedarían encimados e ilegibles
+                ? 'acto relative mx-auto w-[min(90vw,560px)] text-left bg-white/85 backdrop-blur rounded-2xl px-5 py-4 mb-3 shadow-card'
+                : `acto acto-${i} absolute top-1/2 -translate-y-1/2 w-[min(86vw,380px)] ${
+                    a.lado === 'izq' ? 'left-5 sm:left-16 text-left' : 'right-5 sm:right-16 text-right'
+                  }`
+            }
           >
             <p className="text-[11px] font-bold uppercase tracking-[.32em] text-saro-blue mb-2">{a.k}</p>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-saro-dark tracking-tight leading-[1.05]">
