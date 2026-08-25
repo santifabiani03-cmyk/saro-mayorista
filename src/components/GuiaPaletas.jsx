@@ -66,7 +66,7 @@ export default function GuiaPaletas() {
           </svg>
         </button>
 
-        <div className={`grid transition-all duration-300 ease-in-out ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+        <div className={`grid transition duration-300 ease-in-out ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
           <div className="overflow-hidden">
             <div className="px-5 sm:px-6 pb-6 pt-5 border-t border-gray-100/80 space-y-8">
 

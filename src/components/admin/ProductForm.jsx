@@ -426,7 +426,7 @@ function AdminLightbox({ images, startIdx, onClose, onUpdateImage }) {
             <button
               key={i}
               onClick={e => { e.stopPropagation(); setIdx(i) }}
-              className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all
+              className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 transition
                 ${i === idx
                   ? 'border-white scale-110'
                   : 'border-transparent opacity-50 hover:opacity-80'}`}
@@ -548,7 +548,7 @@ function RadioGroup({ options, value, onChange }) {
           key={val}
           type="button"
           onClick={() => onChange(val)}
-          className={`px-3 py-1.5 rounded-full text-sm font-medium border transition-all ${
+          className={`px-3 py-1.5 rounded-full text-sm font-medium border transition ${
             value === val
               ? 'bg-saro-blue border-saro-blue text-white'
               : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue'
@@ -659,7 +659,7 @@ function MultiImageUploader({ images, onChange, productName, applyLogo }) {
             onDragOver={e => onThumbDragOver(e, i)}
             onDrop={e => onThumbDrop(e, i)}
             onDragEnd={onThumbDragEnd}
-            className={`relative aspect-square rounded-xl overflow-hidden bg-gray-100 group transition-all
+            className={`relative aspect-square rounded-xl overflow-hidden bg-gray-100 group transition
               ${dragIdx === i ? 'opacity-40 scale-95' : ''}
               ${overIdx === i && dragIdx !== null && dragIdx !== i ? 'ring-2 ring-saro-blue ring-offset-1' : ''}
               ${dragIdx !== null ? 'cursor-grabbing' : 'cursor-grab'}`}
@@ -722,7 +722,7 @@ function MultiImageUploader({ images, onChange, productName, applyLogo }) {
         <button
           type="button"
           onClick={() => inputRef.current.click()}
-          className="aspect-square rounded-xl border-2 border-dashed border-gray-200 hover:border-saro-blue hover:bg-saro-light text-gray-400 hover:text-saro-blue transition-all flex flex-col items-center justify-center gap-1 select-none"
+          className="aspect-square rounded-xl border-2 border-dashed border-gray-200 hover:border-saro-blue hover:bg-saro-light text-gray-400 hover:text-saro-blue transition flex flex-col items-center justify-center gap-1 select-none"
         >
           <span className="text-2xl leading-none">+</span>
           <span className="text-xs font-medium">Agregar</span>
@@ -872,7 +872,7 @@ function AiSceneSection({ images, onChange, productName }) {
                     key={url + i}
                     type="button"
                     onClick={() => setSrcIdx(i)}
-                    className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition-all ${
+                    className={`w-12 h-12 rounded-lg overflow-hidden border-2 transition ${
                       srcIdx === i ? 'border-violet-500 scale-105' : 'border-transparent opacity-60 hover:opacity-100'
                     }`}
                   >
@@ -890,7 +890,7 @@ function AiSceneSection({ images, onChange, productName }) {
                 key={s.key}
                 type="button"
                 onClick={() => setScene(s.key)}
-                className={`flex flex-col items-start gap-0.5 rounded-xl border px-3 py-2 text-left transition-all ${
+                className={`flex flex-col items-start gap-0.5 rounded-xl border px-3 py-2 text-left transition ${
                   scene === s.key
                     ? 'border-violet-500 bg-white shadow-sm'
                     : 'border-violet-100 bg-white/60 hover:border-violet-300'
@@ -1053,7 +1053,7 @@ function BgRemovalSection({ images, onChange, productName, applyLogo, isPaleta =
             key={key}
             type="button"
             onClick={() => setBgType(key)}
-            className={`flex-1 py-1.5 rounded-lg text-[11px] font-semibold border transition-all ${
+            className={`flex-1 py-1.5 rounded-lg text-[11px] font-semibold border transition ${
               bgType === key
                 ? 'bg-violet-500 border-violet-500 text-white'
                 : 'bg-white border-violet-200 text-violet-600 hover:border-violet-400'
@@ -1075,7 +1075,7 @@ function BgRemovalSection({ images, onChange, productName, applyLogo, isPaleta =
               type="button"
               disabled={isProc}
               onClick={() => !isProc && toggle(i)}
-              className={`relative aspect-square rounded-xl overflow-hidden border-2 transition-all ${
+              className={`relative aspect-square rounded-xl overflow-hidden border-2 transition ${
                 isProc ? 'border-violet-300 opacity-70'
                 : isSel ? 'border-violet-500 ring-2 ring-violet-300'
                 : 'border-transparent hover:border-violet-300'
@@ -1103,7 +1103,7 @@ function BgRemovalSection({ images, onChange, productName, applyLogo, isPaleta =
         type="button"
         disabled={selected.size === 0 || anyProcessing}
         onClick={processSelected}
-        className={`w-full py-2 rounded-xl text-sm font-bold transition-all ${
+        className={`w-full py-2 rounded-xl text-sm font-bold transition ${
           selected.size > 0 && !anyProcessing
             ? 'bg-violet-500 hover:bg-violet-600 text-white shadow-sm'
             : 'bg-violet-100 text-violet-300 cursor-not-allowed'
@@ -1203,7 +1203,7 @@ function ColorPicker({ selected, onChange }) {
           return (
             <button
               key={c} type="button" onClick={() => toggle(c)} title={c}
-              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition-all ${
+              className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition ${
                 active
                   ? 'border-saro-blue bg-saro-light text-saro-dark ring-2 ring-saro-blue/20'
                   : 'border-gray-200 text-gray-600 hover:border-gray-400'
@@ -1245,7 +1245,7 @@ function ColorPicker({ selected, onChange }) {
                 return (
                   <button
                     key={c} type="button" onClick={() => toggleBasePick(c)} title={c}
-                    className={`w-6 h-6 rounded-full border-2 transition-all ${
+                    className={`w-6 h-6 rounded-full border-2 transition ${
                       picked
                         ? 'border-saro-blue ring-2 ring-saro-blue/30 scale-110'
                         : 'border-gray-200 hover:border-gray-400'
@@ -1287,7 +1287,7 @@ function ColorPicker({ selected, onChange }) {
                   {/* Checkbox */}
                   <button type="button" onClick={() => toggleCheck(c)}
                     title={checked ? 'Quitar del producto' : 'Incluir en producto'}
-                    className={`w-5 h-5 rounded-md border-2 flex items-center justify-center text-xs font-bold transition-all flex-shrink-0 ${
+                    className={`w-5 h-5 rounded-md border-2 flex items-center justify-center text-xs font-bold transition flex-shrink-0 ${
                       checked ? 'bg-saro-blue border-saro-blue text-white' : 'bg-white border-gray-300 text-transparent hover:border-saro-blue'
                     }`}
                   >✓</button>
@@ -1300,7 +1300,7 @@ function ColorPicker({ selected, onChange }) {
                   {/* Pin con indicador visual */}
                   <button type="button" onClick={() => togglePin(c)}
                     title={isPinned ? 'Quitar de fijos' : 'Fijar para futuras publicaciones'}
-                    className={`px-1.5 py-0.5 rounded-md text-xs font-medium transition-all flex items-center gap-1 ${
+                    className={`px-1.5 py-0.5 rounded-md text-xs font-medium transition flex items-center gap-1 ${
                       isPinned
                         ? 'bg-amber-100 text-amber-600 border border-amber-200'
                         : 'text-gray-300 hover:text-amber-400 hover:bg-gray-100 border border-transparent'
@@ -1355,7 +1355,7 @@ function TallePicker({ selected, onChange }) {
             key={t}
             type="button"
             onClick={() => toggle(t)}
-            className={`px-3 py-1 rounded-lg text-sm font-medium border transition-all ${
+            className={`px-3 py-1 rounded-lg text-sm font-medium border transition ${
               selected.includes(t)
                 ? 'bg-saro-blue border-saro-blue text-white'
                 : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue'
@@ -1430,7 +1430,7 @@ function NoStockMatrix({ colores, talles, noStock, onChange }) {
                   <button
                     type="button"
                     onClick={() => toggle(color, talle)}
-                    className={`w-6 h-6 rounded-md border text-xs font-bold transition-all ${
+                    className={`w-6 h-6 rounded-md border text-xs font-bold transition ${
                       isOut(color, talle)
                         ? 'bg-red-500 border-red-500 text-white'
                         : 'bg-white border-gray-200 text-gray-300 hover:border-red-300'
@@ -1638,7 +1638,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               <Label>Imágenes del producto</Label>
               <div className="relative group">
                 <span className="w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-[10px] font-bold flex items-center justify-center cursor-help select-none">i</span>
-                <div className="absolute top-0 left-full ml-2 w-72 bg-gray-900 text-white text-[11px] leading-relaxed rounded-xl px-3 py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+                <div className="absolute top-0 left-full ml-2 w-72 bg-gray-900 text-white text-[11px] leading-relaxed rounded-xl px-3 py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition z-50 pointer-events-none">
                   <p className="font-semibold mb-1.5">Imágenes del producto</p>
                   <p>• Subí una o más fotos (JPG, PNG, WEBP). La primera es la imagen principal que se muestra en el catálogo.</p>
                   <p className="mt-1">• Arrastrá para reordenar o hacé clic en + para agregar más.</p>
@@ -1767,7 +1767,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                     key={k}
                     type="button"
                     onClick={() => set('tags', active ? form.tags.filter(t => t !== k) : [...form.tags, k])}
-                    className={`px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition-all ${
+                    className={`px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition ${
                       active
                         ? `${v.cls} border-transparent shadow-sm`
                         : 'bg-white border-gray-200 text-gray-500 hover:border-gray-400'
@@ -1825,7 +1825,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                   }
                 }}
                 disabled={form._aiLoading || !form.nombre.trim()}
-                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition-all ${
+                className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold transition ${
                   form._aiLoading
                     ? 'bg-purple-100 text-purple-400 cursor-not-allowed'
                     : 'bg-purple-50 hover:bg-purple-100 text-purple-600 border border-purple-200 hover:border-purple-300'
@@ -1842,7 +1842,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               </span>
               <div className="relative group">
                 <span className="w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-[10px] font-bold flex items-center justify-center cursor-help select-none">i</span>
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-[11px] leading-relaxed rounded-xl px-3 py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition-all z-50 pointer-events-none">
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-[11px] leading-relaxed rounded-xl px-3 py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition z-50 pointer-events-none">
                   <p className="font-semibold mb-1.5">✨ Generador con IA</p>
                   <p>• Escribí palabras clave en la descripción y tocá ✨ para que la IA las desarrolle en un texto atractivo.</p>
                   <p className="mt-1">• Si dejás la descripción vacía, la IA genera a partir del nombre del producto.</p>
@@ -1875,7 +1875,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                     key={opt.val}
                     type="button"
                     onClick={() => set('categoria', opt.val === form.categoria ? '' : opt.val)}
-                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition-all ${
+                    className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition ${
                       form.categoria === opt.val
                         ? 'bg-saro-blue border-saro-blue text-white shadow-sm'
                         : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue hover:text-saro-blue'
@@ -2025,7 +2025,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
             <button
               type="submit"
               disabled={busy}
-              className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all ${
+              className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition ${
                 busy
                   ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
                   : 'bg-saro-blue hover:bg-saro-dark text-white shadow-sm'

@@ -175,7 +175,7 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
                 key={c.key}
                 href={c.href}
                 data-reveal
-                className="reveal group relative bg-white rounded-2xl border border-gray-100/80 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 p-7 flex flex-col"
+                className="reveal group relative bg-white rounded-2xl border border-gray-100/80 shadow-card hover:shadow-card-hover hover:-translate-y-1 transition duration-300 p-7 flex flex-col"
                 style={{ transitionDelay: `${i * 90}ms` }}
               >
                 <span className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-saro-light text-saro-blue mb-5">
@@ -319,7 +319,7 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
                 href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hola SARO! Quiero consultar por productos personalizados (ropa y/o paletas) para un club o evento.')}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="mt-6 sm:mt-0 inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-7 py-4 rounded-xl shadow-lg shadow-emerald-500/25 transition-all duration-200 btn-press flex-shrink-0"
+                className="mt-6 sm:mt-0 inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-7 py-4 rounded-xl shadow-lg shadow-emerald-500/25 transition duration-200 btn-press flex-shrink-0"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
@@ -350,7 +350,7 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
             <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
               <Link
                 href="/paletas"
-                className="inline-flex items-center gap-2 bg-white text-saro-dark hover:bg-saro-blue hover:text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg shadow-black/20 transition-all duration-200 btn-press"
+                className="inline-flex items-center gap-2 bg-white text-saro-dark hover:bg-saro-blue hover:text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg shadow-black/20 transition duration-200 btn-press"
               >
                 Ver paletas
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="w-4 h-4">
@@ -359,7 +359,7 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
               </Link>
               <Link
                 href="/ropa-y-accesorios"
-                className="inline-flex items-center gap-2 bg-saro-blue text-white hover:bg-saro-mid font-bold text-sm px-8 py-4 rounded-xl shadow-lg shadow-saro-blue/25 transition-all duration-200 btn-press"
+                className="inline-flex items-center gap-2 bg-saro-blue text-white hover:bg-saro-mid font-bold text-sm px-8 py-4 rounded-xl shadow-lg shadow-saro-blue/25 transition duration-200 btn-press"
               >
                 Ropa y accesorios
                 <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="w-4 h-4">
@@ -370,7 +370,7 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
                 href={`https://wa.me/${whatsappNumber}`}
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg shadow-emerald-500/20 transition-all duration-200 btn-press"
+                className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg shadow-emerald-500/20 transition duration-200 btn-press"
               >
                 <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
                   <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />

@@ -102,7 +102,7 @@ export default function HowToBuyModal({ onClose }) {
             </div>
             <button
               onClick={onClose}
-              className="w-full mt-3 py-3 bg-saro-blue hover:bg-saro-mid text-white font-bold rounded-xl transition-all duration-200 text-sm shadow-md shadow-saro-blue/20 active:scale-[.98]"
+              className="w-full mt-3 py-3 bg-saro-blue hover:bg-saro-mid text-white font-bold rounded-xl transition duration-200 text-sm shadow-md shadow-saro-blue/20 active:scale-[.98]"
             >
               ¡Entendido, voy a comprar!
             </button>

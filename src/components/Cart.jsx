@@ -287,7 +287,7 @@ export default function Cart({ config }) {
               <div className="grid grid-cols-2 gap-2">
                 <button
                   onClick={() => { setModoEnvio('cotizar'); setEnvioElegido(null) }}
-                  className={`py-2 rounded-lg text-xs font-bold border transition-all ${
+                  className={`py-2 rounded-lg text-xs font-bold border transition ${
                     modoEnvio === 'cotizar'
                       ? 'bg-saro-blue border-saro-blue text-white shadow-sm shadow-saro-blue/20'
                       : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue/40 hover:text-saro-blue'
@@ -297,7 +297,7 @@ export default function Cart({ config }) {
                 </button>
                 <button
                   onClick={() => { setModoEnvio('whatsapp'); setRates(null); setEnvioElegido(null); setErrorEnvio('') }}
-                  className={`py-2 rounded-lg text-xs font-bold border transition-all ${
+                  className={`py-2 rounded-lg text-xs font-bold border transition ${
                     modoEnvio === 'whatsapp'
                       ? 'bg-saro-dark border-saro-dark text-white shadow-sm'
                       : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
@@ -334,7 +334,7 @@ export default function Cart({ config }) {
                     <button
                       key={r.tipo}
                       onClick={() => setEnvioElegido(r)}
-                      className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg border text-left transition-all ${
+                      className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg border text-left transition ${
                         envioElegido?.tipo === r.tipo
                           ? 'border-saro-blue bg-saro-light'
                           : 'border-gray-200 bg-white hover:border-saro-blue/40'
@@ -373,7 +373,7 @@ export default function Cart({ config }) {
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setYaEsCliente(false)}
-                      className={`py-2 px-1 rounded-lg text-[11px] font-bold border transition-all leading-tight ${
+                      className={`py-2 px-1 rounded-lg text-[11px] font-bold border transition leading-tight ${
                         !yaEsCliente
                           ? 'bg-saro-blue border-saro-blue text-white'
                           : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue/40'
@@ -384,7 +384,7 @@ export default function Cart({ config }) {
                     </button>
                     <button
                       onClick={() => setYaEsCliente(true)}
-                      className={`py-2 px-1 rounded-lg text-[11px] font-bold border transition-all leading-tight ${
+                      className={`py-2 px-1 rounded-lg text-[11px] font-bold border transition leading-tight ${
                         yaEsCliente
                           ? 'bg-saro-blue border-saro-blue text-white'
                           : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue/40'
@@ -407,7 +407,7 @@ export default function Cart({ config }) {
                   </div>
                   <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition-all duration-500 ease-out ${canSend ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' : 'bg-gradient-to-r from-saro-blue/70 to-saro-blue'}`}
+                      className={`h-full rounded-full transition duration-500 ease-out ${canSend ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' : 'bg-gradient-to-r from-saro-blue/70 to-saro-blue'}`}
                       style={{ width: `${progress}%` }}
                     />
                   </div>
@@ -432,7 +432,7 @@ export default function Cart({ config }) {
             {/* Botón WhatsApp */}
             <button
               onClick={sendWhatsApp}
-              className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all duration-200 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/25 active:scale-[.98]"
+              className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition duration-200 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/25 active:scale-[.98]"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 flex-shrink-0">
                 <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
@@ -444,7 +444,7 @@ export default function Cart({ config }) {
             {/* Botón copiar mensaje */}
             <button
               onClick={copyMessage}
-              className="w-full py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition-all duration-200 bg-gray-50 hover:bg-gray-100 text-gray-600 border border-gray-200 active:scale-[.98]"
+              className="w-full py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition duration-200 bg-gray-50 hover:bg-gray-100 text-gray-600 border border-gray-200 active:scale-[.98]"
             >
               {copied
                 ? <><span>✅</span> ¡Copiado!</>

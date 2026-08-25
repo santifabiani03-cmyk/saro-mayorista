@@ -237,7 +237,7 @@ export default function IntroHero({ productCount = 0, onExplore }) {
           </p>
           <button
             onClick={onExplore}
-            className="mt-7 inline-flex items-center gap-2 bg-saro-dark hover:bg-saro-blue text-white font-bold text-sm px-7 py-3.5 rounded-xl shadow-lg shadow-saro-dark/20 transition-all duration-200 btn-press"
+            className="mt-7 inline-flex items-center gap-2 bg-saro-dark hover:bg-saro-blue text-white font-bold text-sm px-7 py-3.5 rounded-xl shadow-lg shadow-saro-dark/20 transition duration-200 btn-press"
           >
             Ver catálogo
             <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.2" className="w-4 h-4">

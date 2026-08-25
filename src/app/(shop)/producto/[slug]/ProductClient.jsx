@@ -289,7 +289,7 @@ export default function ProductClient({ product }) {
                       return (
                         <span
                           key={i}
-                          className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition-all duration-200 ${
+                          className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition duration-200 ${
                             active
                               ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
                               : 'bg-gray-50 border-gray-200 text-gray-500'
@@ -344,7 +344,7 @@ export default function ProductClient({ product }) {
                 <button
                   onClick={handleAgregar}
                   disabled={totalUnidades === 0}
-                  className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition-all duration-200 active:scale-[.98] ${
+                  className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition duration-200 active:scale-[.98] ${
                     totalUnidades > 0
                       ? 'bg-saro-blue hover:bg-saro-mid text-white shadow-md shadow-saro-blue/20'
                       : 'bg-gray-100 text-gray-400 cursor-not-allowed'

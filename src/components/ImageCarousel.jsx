@@ -93,7 +93,7 @@ function Lightbox({ images, startIdx, onClose }) {
             <button
               key={i}
               onClick={e => { e.stopPropagation(); setIdx(i) }}
-              className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 transition-all
+              className={`w-12 h-12 sm:w-14 sm:h-14 rounded-lg overflow-hidden border-2 flex-shrink-0 transition
                 ${i === idx
                   ? 'border-white scale-110'
                   : 'border-transparent opacity-50 hover:opacity-80'}`}
@@ -182,7 +182,7 @@ export default function ImageCarousel({
       {!compact && (
         <button
           onClick={openLightbox}
-          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition-all opacity-0 group-hover/car:opacity-100"
+          className="absolute top-2 right-2 w-8 h-8 rounded-full bg-black/40 hover:bg-black/60 text-white flex items-center justify-center transition opacity-0 group-hover/car:opacity-100"
           title="Ampliar imagen"
         >
           <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20" fill="currentColor" className="w-4 h-4">
@@ -198,7 +198,7 @@ export default function ImageCarousel({
             onClick={e => go(-1, e)}
             className={`absolute left-2 top-1/2 -translate-y-1/2 bg-white/85 hover:bg-white
               rounded-full shadow flex items-center justify-center text-gray-800 font-semibold
-              transition-all select-none
+              transition select-none
               ${compact
                 ? 'w-7 h-7 text-base opacity-0 group-hover/car:opacity-100'
                 : 'w-9 h-9 text-xl'}`}
@@ -207,7 +207,7 @@ export default function ImageCarousel({
             onClick={e => go(1, e)}
             className={`absolute right-2 top-1/2 -translate-y-1/2 bg-white/85 hover:bg-white
               rounded-full shadow flex items-center justify-center text-gray-800 font-semibold
-              transition-all select-none
+              transition select-none
               ${compact
                 ? 'w-7 h-7 text-base opacity-0 group-hover/car:opacity-100'
                 : 'w-9 h-9 text-xl'}`}
@@ -218,7 +218,7 @@ export default function ImageCarousel({
             {images.map((_, i) => (
               <span
                 key={i}
-                className={`rounded-full bg-white transition-all duration-200
+                className={`rounded-full bg-white transition duration-200
                   ${i === idx
                     ? compact ? 'w-3 h-1.5' : 'w-4 h-1.5'
                     : 'w-1.5 h-1.5 opacity-50'}`}
@@ -243,7 +243,7 @@ export default function ImageCarousel({
               key={i}
               type="button"
               onClick={() => setIdx(i)}
-              className={`w-14 h-14 rounded-xl overflow-hidden border-2 flex-shrink-0 transition-all
+              className={`w-14 h-14 rounded-xl overflow-hidden border-2 flex-shrink-0 transition
                 ${i === idx
                   ? 'border-saro-blue scale-105'
                   : 'border-gray-100 opacity-60 hover:opacity-100 hover:border-gray-300'}`}

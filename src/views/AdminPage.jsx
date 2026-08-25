@@ -359,7 +359,7 @@ export default function AdminPage() {
               <button
                 onClick={handleDeploy}
                 disabled={deploying || isSynced}
-                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 text-white text-[11px] sm:text-sm font-bold rounded-lg sm:rounded-xl transition-all ${
+                className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 text-white text-[11px] sm:text-sm font-bold rounded-lg sm:rounded-xl transition ${
                   deploying
                     ? 'bg-gray-500 opacity-60 cursor-not-allowed'
                     : isSynced
@@ -376,7 +376,7 @@ export default function AdminPage() {
               <div className="relative">
                 <button
                   onClick={() => setShowShare(s => !s)}
-                  className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold rounded-lg sm:rounded-xl transition-all ${
+                  className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold rounded-lg sm:rounded-xl transition ${
                     exporting
                       ? 'bg-gray-500 opacity-60 text-white'
                       : 'bg-white/15 hover:bg-white/25 text-white'
@@ -456,7 +456,7 @@ export default function AdminPage() {
 
       {/* Toast */}
       {toast && (
-        <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-xl text-sm font-medium transition-all ${
+        <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-xl text-sm font-medium transition ${
           toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-900 text-white'
         }`}>
           {toast.msg}

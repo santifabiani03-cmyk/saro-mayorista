@@ -117,7 +117,7 @@ export default function CatalogClient({ products, heading, showFilters = true, m
               onClick={() =>
                 setPriceSort(s => (s === null ? 'asc' : s === 'asc' ? 'desc' : null))
               }
-              className={`flex items-center gap-1.5 text-sm px-3 py-2 rounded-xl border transition-all duration-200 flex-shrink-0 btn-press ${
+              className={`flex items-center gap-1.5 text-sm px-3 py-2 rounded-xl border transition duration-200 flex-shrink-0 btn-press ${
                 priceSort
                   ? 'border-saro-blue text-saro-blue bg-saro-light font-semibold shadow-sm shadow-saro-blue/10'
                   : 'border-gray-200 text-gray-500 hover:border-gray-300 bg-white'

@@ -10,7 +10,7 @@ function Bar({ label, value, max, color = 'bg-saro-blue' }) {
       <span className="text-xs text-gray-600 w-32 truncate text-right">{label}</span>
       <div className="flex-1 bg-gray-100 rounded-full h-5 overflow-hidden">
         <div
-          className={`h-full rounded-full ${color} transition-all duration-500`}
+          className={`h-full rounded-full ${color} transition duration-500`}
           style={{ width: `${pct}%` }}
         />
       </div>
@@ -142,7 +142,7 @@ export default function DemandDashboard() {
             <button
               key={p.val}
               onClick={() => setPeriod(p.val)}
-              className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition-all ${
+              className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition ${
                 period === p.val
                   ? 'bg-saro-blue border-saro-blue text-white'
                   : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue'
@@ -173,7 +173,7 @@ export default function DemandDashboard() {
                 <span className="text-[10px] font-bold text-saro-blue">{count}</span>
                 <div className="w-full bg-gray-100 rounded-t-md overflow-hidden" style={{ height: '80px' }}>
                   <div
-                    className="w-full bg-saro-blue rounded-t-md transition-all duration-500"
+                    className="w-full bg-saro-blue rounded-t-md transition duration-500"
                     style={{ height: `${(count / maxDaily) * 100}%`, marginTop: 'auto', position: 'relative', top: `${100 - (count / maxDaily) * 100}%` }}
                   />
                 </div>
@@ -246,7 +246,7 @@ export default function DemandDashboard() {
                     </span>
                     <div className="w-full bg-gray-100 rounded-t-md overflow-hidden" style={{ height: '80px' }}>
                       <div
-                        className={`w-full rounded-t-md transition-all duration-500 ${isBest ? 'bg-saro-blue' : 'bg-gray-300'}`}
+                        className={`w-full rounded-t-md transition duration-500 ${isBest ? 'bg-saro-blue' : 'bg-gray-300'}`}
                         style={{ height: `${pct}%`, position: 'relative', top: `${100 - pct}%` }}
                       />
                     </div>

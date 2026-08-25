@@ -42,7 +42,7 @@ function FaqItem({ faq }) {
           <polyline points="6 9 12 15 18 9" />
         </svg>
       </button>
-      <div className={`grid transition-all duration-200 ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
+      <div className={`grid transition duration-200 ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="overflow-hidden">
           <p className="text-sm text-gray-500 leading-relaxed pb-4 pr-8">
             {faq.a}
@@ -78,7 +78,7 @@ export default function FaqSection() {
 
       {/* Contenido desplegable */}
       <div
-        className={`grid transition-all duration-300 ease-in-out ${
+        className={`grid transition duration-300 ease-in-out ${
           expanded ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'
         }`}
       >

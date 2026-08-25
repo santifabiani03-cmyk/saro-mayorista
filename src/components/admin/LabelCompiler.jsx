@@ -505,7 +505,7 @@ export default function LabelCompiler() {
         onDragLeave={() => setDragOver(false)}
         onDrop={handleDrop}
         onClick={() => inputRef.current?.click()}
-        className={`relative border-2 border-dashed rounded-2xl px-6 py-12 text-center cursor-pointer transition-all ${
+        className={`relative border-2 border-dashed rounded-2xl px-6 py-12 text-center cursor-pointer transition ${
           dragOver
             ? 'border-saro-blue bg-saro-light'
             : files.length > 0
@@ -655,7 +655,7 @@ export default function LabelCompiler() {
                 type="button"
                 onClick={() => setCropMode(o.key)}
                 title={o.hint}
-                className={`py-2 rounded-xl text-xs font-bold border transition-all ${
+                className={`py-2 rounded-xl text-xs font-bold border transition ${
                   cropMode === o.key
                     ? 'bg-saro-blue border-saro-blue text-white'
                     : 'bg-white border-gray-200 text-gray-500 hover:border-saro-blue/40 hover:text-saro-blue'
@@ -675,7 +675,7 @@ export default function LabelCompiler() {
         <button
           onClick={handleCompile}
           disabled={files.length === 0 || processing}
-          className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition-all ${
+          className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition ${
             files.length === 0 || processing
               ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
               : 'bg-saro-dark hover:bg-saro-blue text-white shadow-lg'

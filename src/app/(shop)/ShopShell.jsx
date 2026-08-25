@@ -10,9 +10,17 @@ export default function ShopShell({ config, children }) {
   return (
     <CartProvider>
       <div className="min-h-screen bg-[#FAFBFC]">
+        {/* Primer elemento enfocable de la página: permite saltarse el
+            encabezado sin recorrerlo con Tab en cada página. */}
+        <a href="#contenido" className="saltar-al-contenido">Saltar al contenido</a>
+
         <Header config={config} />
 
-        {children}
+        {/* <main> en vez de un div suelto: los lectores de pantalla lo usan para
+            ir directo al contenido principal. */}
+        <main id="contenido">
+          {children}
+        </main>
 
         <Cart config={config} />
 

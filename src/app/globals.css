@@ -6,6 +6,42 @@
 
 body { margin: 0; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
+/* Navegación por teclado
+   El sitio no tenía ningún estilo de foco: quien navega con Tab no veía dónde
+   estaba parado. Se usa :focus-visible para que el anillo aparezca al usar el
+   teclado y no al hacer clic con el mouse. El azul es el de la marca. */
+:focus-visible {
+  outline: 2px solid #2563EB;
+  outline-offset: 2px;
+  border-radius: 4px;
+}
+
+/* Los anclas de la landing bajan de a poco en vez de saltar de golpe */
+html { scroll-behavior: smooth; }
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+}
+
+/* Enlace para saltar directo al contenido: invisible hasta que se lo enfoca
+   con Tab. Es lo primero que necesita quien no usa mouse, para no recorrer
+   todo el encabezado en cada página. */
+.saltar-al-contenido {
+  position: absolute;
+  left: -9999px;
+  top: 0;
+  z-index: 100;
+}
+.saltar-al-contenido:focus {
+  left: 1rem;
+  top: 1rem;
+  padding: 0.75rem 1.25rem;
+  background: #0F172A;
+  color: #fff;
+  border-radius: 0.75rem;
+  font-weight: 600;
+  font-size: 0.875rem;
+}
+
 ::-webkit-scrollbar { width: 5px; height: 5px; }
 ::-webkit-scrollbar-track { background: transparent; }
 ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 99px; }

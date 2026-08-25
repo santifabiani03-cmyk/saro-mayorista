@@ -96,7 +96,7 @@ export default function ChatWidget({ whatsappNumber }) {
       <button
         onClick={() => { setOpen(o => !o); if (!open) track('chat_abierto') }}
         aria-label={open ? 'Cerrar chat' : 'Abrir chat de ayuda'}
-        className={`fixed bottom-5 right-5 z-40 w-14 h-14 rounded-full shadow-float flex items-center justify-center transition-all duration-300 btn-press ${
+        className={`fixed bottom-5 right-5 z-40 w-14 h-14 rounded-full shadow-float flex items-center justify-center transition duration-300 btn-press ${
           open ? 'bg-saro-dark rotate-90' : 'bg-saro-blue hover:bg-saro-mid'
         }`}
       >
@@ -113,7 +113,7 @@ export default function ChatWidget({ whatsappNumber }) {
 
       {/* Panel */}
       <div
-        className={`fixed bottom-24 right-5 z-40 w-[min(92vw,380px)] bg-white rounded-2xl shadow-float border border-gray-100/80 flex flex-col overflow-hidden transition-all duration-300 origin-bottom-right ${
+        className={`fixed bottom-24 right-5 z-40 w-[min(92vw,380px)] bg-white rounded-2xl shadow-float border border-gray-100/80 flex flex-col overflow-hidden transition duration-300 origin-bottom-right ${
           open ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'
         }`}
         style={{ height: 'min(70vh, 520px)' }}

@@ -10,7 +10,7 @@ function StandardCard({ product, onClick, tags, imgs, sinStock }) {
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-2xl shadow-card border border-gray-100/80 overflow-hidden cursor-pointer group hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 ease-out"
+      className="bg-white rounded-2xl shadow-card border border-gray-100/80 overflow-hidden cursor-pointer group hover:shadow-card-hover hover:-translate-y-1 transition duration-300 ease-out"
     >
       {/* Imagen / carrusel */}
       <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100/50 overflow-hidden">
@@ -82,7 +82,7 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
   return (
     <div
       onClick={onClick}
-      className="relative bg-white rounded-2xl shadow-card border border-gray-100/80 overflow-hidden cursor-pointer group hover:shadow-card-hover hover:-translate-y-1 transition-all duration-300 ease-out"
+      className="relative bg-white rounded-2xl shadow-card border border-gray-100/80 overflow-hidden cursor-pointer group hover:shadow-card-hover hover:-translate-y-1 transition duration-300 ease-out"
     >
       {/* Estructura invisible: replica la altura de StandardCard */}
       <div className="invisible" aria-hidden="true">

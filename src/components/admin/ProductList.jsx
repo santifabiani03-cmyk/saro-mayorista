@@ -242,7 +242,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                 <button
                   key={cat.val}
                   onClick={() => setFilterCat(cat.val)}
-                  className={`flex items-center gap-1 px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium border transition-all ${
+                  className={`flex items-center gap-1 px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium border transition ${
                     filterCat === cat.val
                       ? 'bg-saro-blue border-saro-blue text-white'
                       : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue'
@@ -270,7 +270,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
               <button
                 key={opt.key}
                 onClick={() => handleSort(opt.key)}
-                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-medium border transition-all flex-shrink-0 ${
+                className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-medium border transition flex-shrink-0 ${
                   active
                     ? 'border-saro-blue text-saro-blue bg-saro-light'
                     : 'border-gray-200 text-gray-500 bg-white hover:border-gray-300'
