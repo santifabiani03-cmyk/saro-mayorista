@@ -90,7 +90,9 @@ export default function ScrollLab() {
 
       const scene = new THREE.Scene()
       scene.background = new THREE.Color('#eef2f8')
-      scene.fog = new THREE.Fog('#eef2f8', 20, 52)   // funde el fondo con el aire
+      // Niebla suave y lejana: antes cerraba a 52 unidades y borraba la cancha
+      // entera, dejando una franja blanca a media pantalla.
+      scene.fog = new THREE.Fog('#e8f1fa', 70, 210)
 
       const camera = new THREE.PerspectiveCamera(50, W() / H(), 0.1, 200)
       // preserveDrawingBuffer permite leer el cuadro ya dibujado (para inspeccionarlo)
@@ -118,6 +120,36 @@ export default function ScrollLab() {
       const RED_ALTO = 5.67        // 0.88 m: la altura real de una red de pádel
       const RED_Z = 5.5
       const MEDIA = 32
+
+      // Domo de cielo: un degradé suave alrededor de todo, para que fuera de la
+      // cancha no quede el vacío blanco. Va por dentro de una esfera enorme, así
+      // acompaña el giro de la cámara (un fondo plano se delataría al rotar).
+      const cieloCnv = document.createElement('canvas')
+      cieloCnv.width = 4; cieloCnv.height = 256
+      const cieloCtx = cieloCnv.getContext('2d')
+      const grad = cieloCtx.createLinearGradient(0, 0, 0, 256)
+      grad.addColorStop(0, '#cfe3f7')      // arriba, cielo
+      grad.addColorStop(0.55, '#eaf4fd')
+      grad.addColorStop(1, '#f7fbff')      // abajo, casi blanco
+      cieloCtx.fillStyle = grad
+      cieloCtx.fillRect(0, 0, 4, 256)
+      const texCielo = new THREE.CanvasTexture(cieloCnv)
+      texCielo.colorSpace = THREE.SRGBColorSpace
+      const cielo = new THREE.Mesh(
+        new THREE.SphereGeometry(170, 32, 20),
+        new THREE.MeshBasicMaterial({ map: texCielo, side: THREE.BackSide, fog: false })
+      )
+      scene.add(cielo)
+
+      // Explanada exterior: el terreno que se ve más allá del vidrio, en un tono
+      // distinto al de la cancha para que se lea el límite.
+      const explanada = new THREE.Mesh(
+        new THREE.PlaneGeometry(420, 420),
+        new THREE.MeshStandardMaterial({ color: '#dfe9f2', roughness: 1 })
+      )
+      explanada.rotation.x = -Math.PI / 2
+      explanada.position.y = -3.06
+      scene.add(explanada)
 
       const piso = new THREE.Mesh(
         new THREE.PlaneGeometry(240, 240),
@@ -161,6 +193,23 @@ export default function ScrollLab() {
       ponerPared(84, -MEDIA, RED_Z, Math.PI / 2)
       ponerPared(84, MEDIA, RED_Z, Math.PI / 2)
       scene.add(paredes)
+
+      // Techo: vigas cruzadas bien altas. Cierran la escena por arriba, que era
+      // lo que quedaba más vacío, sin taparle el cielo al fondo.
+      const TECHO_Y = -3 + 34
+      const matViga = new THREE.MeshStandardMaterial({ color: '#c8d6e5', roughness: 0.8 })
+      const techo = new THREE.Group()
+      for (let x = -MEDIA; x <= MEDIA + 0.01; x += 16) {
+        const v = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.9, 96), matViga)
+        v.position.set(x, TECHO_Y, RED_Z)
+        techo.add(v)
+      }
+      for (let z = -42; z <= 42.01; z += 14) {
+        const v = new THREE.Mesh(new THREE.BoxGeometry(MEDIA * 2, 0.5, 0.5), matViga)
+        v.position.set(0, TECHO_Y - 0.7, RED_Z + z)
+        techo.add(v)
+      }
+      scene.add(techo)
 
       // ── LA RED ──
       // La malla usa una rejilla dibujada al vuelo, así se ve el tejido en lugar
@@ -334,6 +383,15 @@ export default function ScrollLab() {
       // Los detalles del envío (cintas + etiqueta) NO son otra caja: se apoyan
       // sobre la misma malla que antes era pelota, y aparecen recién cuando la
       // forma ya es cúbica. Así nunca hay dos objetos pisándose.
+      // Sombra de contacto: una mancha suave debajo. Sin esto la caja se ve
+      // despegada del piso por más que esté apoyada.
+      const matSombra = new THREE.MeshBasicMaterial({
+        color: '#4a6885', transparent: true, opacity: 0, depthWrite: false,
+      })
+      const sombra = new THREE.Mesh(new THREE.CircleGeometry(R_BOLA * 1.9, 28), matSombra)
+      sombra.rotation.x = -Math.PI / 2
+      scene.add(sombra)
+
       const paquete = new THREE.Group()
       const L = R_BOLA * 2                       // la caja mide esto de cara a cara
       const matCinta = new THREE.MeshStandardMaterial({
@@ -457,7 +515,10 @@ export default function ScrollLab() {
           by = balistica(tv, 0.5, V0Y, G, SUELO, REBOTE)
         }
         // Al final se apoya en el piso: con la física pura quedaría flotando.
-        by = mix(by, SUELO_Y + R_BOLA, suave(seg(t, 0.86, 1.00)))
+        // Al volverse cubo la cara de abajo queda a R_BOLA del centro, así que
+        // apoyarla pide esa altura exacta más un pelín para que no se funda con
+        // el piso ni lo atraviese.
+        by = mix(by, SUELO_Y + R_BOLA + 0.04, suave(seg(t, 0.86, 1.00)))
         pelota.position.set(bx, by, bz)
 
         // ── Cámara: un giro continuo de 90° alrededor de la pelota ──
@@ -466,8 +527,11 @@ export default function ScrollLab() {
         const sigue = suave(seg(t, 0.24, 0.46))          // suelta la paleta, toma la pelota
         const giro = suave(seg(t, 0.42, 0.90)) * (Math.PI / 2)
         const foco = new THREE.Vector3(0, 0.9, PAL_Z).lerp(pelota.position, sigue)
-        const dist = mix(15, 8, suave(seg(t, 0.40, 0.92)))
-        const alto = mix(3.2, 1.5, suave(seg(t, 0.45, 0.92)))
+        // Arranca cerca para que la paleta se lea como protagonista, y termina
+        // un poco más lejos y más alta: pegada al piso, la red entraba de canto
+        // cortando la pantalla en diagonal.
+        const dist = mix(8.5, 12, suave(seg(t, 0.40, 0.92)))
+        const alto = mix(1.6, 3.6, suave(seg(t, 0.45, 0.92)))
         camera.position.set(
           foco.x + Math.sin(giro) * dist,
           foco.y + alto,
@@ -497,6 +561,13 @@ export default function ScrollLab() {
         matEtiqueta.opacity = detalle
         paquete.position.copy(pelota.position)
         paquete.rotation.copy(pelota.rotation)
+
+        // La sombra sigue a la pelota por el piso: se agranda y se aclara cuanto
+        // más alto va, como una sombra de verdad.
+        const altura = Math.max(0, pelota.position.y - SUELO_Y)
+        sombra.position.set(pelota.position.x, SUELO_Y + 0.03, pelota.position.z)
+        sombra.scale.setScalar(1 + altura * 0.16)
+        matSombra.opacity = pelota.visible ? Math.max(0, 0.34 - altura * 0.035) : 0
 
         renderer.render(scene, camera)
       }
