@@ -330,6 +330,33 @@ export default function ScrollLab() {
         const size = new THREE.Vector3(); box.getSize(size)
         const centro = new THREE.Vector3(); box.getCenter(centro)
         modelo.position.sub(centro)
+
+        // El modelo se centra por su caja completa, que incluye el mango, así que
+        // el origen NO cae en el centro de la cara: la pelota terminaba pegándole
+        // al borde. Se busca la cara midiendo dónde el modelo es más ANCHO —
+        // la cabeza es ancha, el mango es fino — y se corrige esa diferencia.
+        const FRANJAS = 40
+        const ancho = new Array(FRANJAS).fill(0)
+        modelo.updateMatrixWorld(true)
+        modelo.traverse(o => {
+          const pos = o.isMesh && o.geometry?.attributes?.position
+          if (!pos) return
+          const v = new THREE.Vector3()
+          for (let i = 0; i < pos.count; i += 3) {          // 1 de cada 3 alcanza
+            v.fromBufferAttribute(pos, i).applyMatrix4(o.matrixWorld)
+            const f = Math.min(FRANJAS - 1, Math.max(0, Math.floor(((v.y - box.min.y + centro.y) / size.y) * FRANJAS)))
+            ancho[f] = Math.max(ancho[f], Math.abs(v.x))
+          }
+        })
+        const anchoMax = Math.max(...ancho)
+        let suma = 0, peso = 0
+        ancho.forEach((a2, i) => {
+          if (a2 < anchoMax * 0.62) return                  // descarta el mango
+          const y = (i + 0.5) / FRANJAS * size.y - size.y / 2
+          suma += y * a2; peso += a2
+        })
+        if (peso > 0) modelo.position.y -= suma / peso      // la cara queda en el origen
+
         const cont = new THREE.Group()
         cont.add(modelo)
         cont.scale.setScalar(ALTO_PALETA / size.y)
