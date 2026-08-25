@@ -30,7 +30,14 @@ const ACTOS = [
 ]
 
 // Tramo del scroll en el que transcurre el golpe completo (para la animación mocap)
-const GOLPE = { desde: 0.14, hasta: 0.52, cual: 'goalie-throw' }
+// Tramos del guion. El jugador primero ESTIRA el brazo y toma la paleta, y
+// recién después arranca el golpe.
+const AGARRE = { desde: 0.10, hasta: 0.28 }
+const GOLPE  = { desde: 0.28, hasta: 0.62, cual: 'goalie-throw', impacto: 0.44 }
+
+// La animación de Mixamo no mueve la muñeca (medido: 0° en todo el clip), así
+// que el latigazo final se agrega por código encima del mocap.
+const MUNECA = { fuerza: 0.55, ancho: 3.0 }
 
 // Ajuste fino del jugador: escala, dónde se para y cómo sostiene la paleta.
 const JUGADOR = {
@@ -244,22 +251,34 @@ export default function ScrollLab() {
         ;['RightArm', 'RightForeArm', 'RightHand', 'Spine', 'Spine01'].forEach(n => {
           if (huesos[n]) huesos[n].userData.base = huesos[n].rotation.clone()
         })
-        // la paleta pasa a colgar de la mano
+        // La paleta NO se cuelga de la mano: queda suelta en la escena para que
+        // al principio se la vea sola, y recién cuando el jugador la toma pasa a
+        // seguirla. En la mano se deja un "ancla" invisible que marca dónde y con
+        // qué inclinación debe quedar el mango.
         if (huesos.RightHand) {
-          huesos.RightHand.add(paleta)
-          paleta.rotation.set(...JUGADOR.paletaEnMano.rot)
-          // La mano hereda una escala propia del esqueleto, así que en lugar de
-          // calcularla se mide el tamaño real y se corrige con una regla de tres.
-          paleta.scale.setScalar(1)
-          paleta.position.set(0, 0, 0)
+          const ancla = new THREE.Object3D()
+          huesos.RightHand.add(ancla)
           j.updateMatrixWorld(true)
-          const bp = new THREE.Box3().setFromObject(paleta)
-          if (!bp.isEmpty()) {
-            const sp2 = new THREE.Vector3(); bp.getSize(sp2)
-            const mayor = Math.max(sp2.x, sp2.y, sp2.z)
-            if (mayor > 0) paleta.scale.setScalar(JUGADOR.paletaEnMano.largo / mayor)
-          }
-          paleta.position.set(...JUGADOR.paletaEnMano.pos)
+          // el hueso trae su propia escala: se divide para que el offset se pueda
+          // escribir en unidades de la escena y no en las del esqueleto
+          const eh = ancla.getWorldScale(new THREE.Vector3()).x || 1
+          const [ox, oy, oz] = JUGADOR.paletaEnMano.pos
+          ancla.position.set(ox / eh, oy / eh, oz / eh)
+          ancla.rotation.set(...JUGADOR.paletaEnMano.rot)
+          jugadorRef.ancla = ancla
+
+          // ¿Dónde queda la mano con el brazo estirado? La paleta espera JUSTO
+          // ahí. Si no, tendría que volar varias unidades para meterse sola en la
+          // mano, y el agarre se ve falso.
+          const bb = huesos.RightArm, cc = huesos.RightForeArm
+          const guardaB = bb?.rotation.clone(), guardaC = cc?.rotation.clone()
+          if (bb) { bb.rotation.y -= 0.95; bb.rotation.x += 0.30 }
+          if (cc) cc.rotation.x += 0.55
+          j.updateMatrixWorld(true)
+          jugadorRef.espera = ancla.getWorldPosition(new THREE.Vector3())
+          if (bb && guardaB) bb.rotation.copy(guardaB)
+          if (cc && guardaC) cc.rotation.copy(guardaC)
+          j.updateMatrixWorld(true)
         }
         // El golpe sale de una animación de captura de movimiento (Mixamo). Se
         // carga aparte, como pistas sueltas de 61 KB, y se aplica sobre este
@@ -481,14 +500,16 @@ export default function ScrollLab() {
         const aMorph  = suave(seg(t, 0.74, 0.86))
         const aFinal  = suave(seg(t, 0.86, 1.00))
 
-        // ── Paleta ──
-        // Si el jugador cargó, la paleta cuelga de su mano y la mueve el brazo.
-        // Si no, se mueve sola como antes (fallback).
-        if (!jugadorRef.obj) {
+        // ── Paleta (posición libre; si la agarran, más abajo pasa a la mano) ──
+        if (jugadorRef.espera) {
+          // espera flotando al alcance del brazo, con un cabeceo apenas visible
+          const e = jugadorRef.espera
+          paleta.position.set(e.x, e.y + Math.sin(t * 40) * 0.05, e.z)
+        } else {
           paleta.position.set(mix(0, -0.6, aMano) - 4.5 * aVuelo, 0.4, 0)
-          paleta.rotation.y = mix(0, -0.35, aMano)
-          paleta.rotation.z = mix(mix(0, 0.8, aMano), -1.0, aGolpe)
         }
+        paleta.rotation.y = mix(0, -0.35, aMano)
+        paleta.rotation.z = mix(mix(0, 0.8, aMano), -1.0, aGolpe)
         paleta.visible = aVuelo < 0.9
 
         // ── ARTICULACIONES DEL JUGADOR ──
@@ -505,6 +526,28 @@ export default function ScrollLab() {
             const fase = suave(seg(t, GOLPE.desde, GOLPE.hasta))
             jugadorRef.accion.time = fase * jugadorRef.duracion
             jugadorRef.mixer.update(0)
+
+            // ── Estirar el brazo a buscar la paleta ──
+            // El mocap arranca ya en posición de golpe, así que antes del agarre
+            // se le resta esa pose para que el brazo salga de abajo, se estire
+            // hacia la paleta, y recién ahí empalme con la animación.
+            const busca = 1 - suave(seg(t, AGARRE.desde, AGARRE.hasta))
+            if (busca > 0.001) {
+              const b = huesos.RightArm, c = huesos.RightForeArm
+              if (b) { b.rotation.y -= 0.95 * busca; b.rotation.x += 0.30 * busca }
+              if (c) c.rotation.x += 0.55 * busca
+            }
+
+            // ── Latigazo de muñeca ──
+            // Se atrasa mientras carga y se suelta justo pasado el impacto: es lo
+            // que hace que el golpe se lea como un golpe y no como un empujón.
+            const mn = huesos.RightHand
+            if (mn) {
+              const d = fase - GOLPE.impacto
+              const pulso = Math.sin(d * Math.PI * 2.2) * Math.exp(-((d * MUNECA.ancho) ** 2))
+              mn.rotation.x += pulso * MUNECA.fuerza
+              mn.rotation.z += pulso * MUNECA.fuerza * 0.4
+            }
           } else {
             // ── Camino B (respaldo): rotar las articulaciones a mano ──
             const b = huesos.RightArm, c = huesos.RightForeArm
@@ -528,6 +571,20 @@ export default function ScrollLab() {
               // el torso acompaña el swing: sin esto se ve un golpe de brazo suelto
               sp.rotation.y = sp.userData.base.y + 0.28 * carga - 0.50 * impacto + 0.22 * baja
             }
+          }
+        }
+
+        // ── El agarre: la paleta pasa de estar suelta a seguir la mano ──
+        // Se hace mezclando posición y giro, no colgándola del hueso, así se ve
+        // el momento en que la toma en vez de aparecer ya agarrada.
+        if (jugadorRef.ancla && jugadorRef.obj) {
+          const toma = suave(seg(t, AGARRE.desde, AGARRE.hasta))
+          if (toma > 0.001) {
+            jugadorRef.obj.updateMatrixWorld(true)
+            const pm = jugadorRef.ancla.getWorldPosition(new THREE.Vector3())
+            const qm = jugadorRef.ancla.getWorldQuaternion(new THREE.Quaternion())
+            paleta.position.lerp(pm, toma)
+            paleta.quaternion.slerp(qm, toma)
           }
         }
 
