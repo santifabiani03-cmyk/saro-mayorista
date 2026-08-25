@@ -33,9 +33,10 @@ const ACTOS = [
 const JUGADOR = {
   altura: 11.5,          // alto en unidades de escena (la paleta mide ~2.9)
   pos: [-1.2, -3, 0.4],  // parado sobre el piso (y = -3)
-  giro: Math.PI,         // mira hacia la cámara
+  giro: 0,               // mira hacia la cámara (el modelo ya viene de frente)
   // la paleta cuelga de la mano derecha:
-  paletaEnMano: { pos: [0, 0.3, 0], rot: [0, 0, 0], escala: 1 },  // escala 1 = tamaño propio de la paleta
+  // 'largo' = cuánto mide la paleta dentro de la escena (el jugador mide 11.5)
+  paletaEnMano: { pos: [0, 0, 0], rot: [0, 0, 0], largo: 2.9 },
 }
 
 // Ajuste fino de la mano 3D: como el modelo viene con su propia orientación,
@@ -100,7 +101,8 @@ export default function ScrollLab() {
       scene.fog = new THREE.Fog('#eef2f8', 20, 52)   // funde el fondo con el aire
 
       const camera = new THREE.PerspectiveCamera(50, W() / H(), 0.1, 200)
-      const renderer = new THREE.WebGLRenderer({ antialias: true })
+      // preserveDrawingBuffer permite leer el cuadro ya dibujado (para inspeccionarlo)
+      const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true })
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
       renderer.setSize(W(), H())
       mount.appendChild(renderer.domElement)
@@ -236,11 +238,20 @@ export default function ScrollLab() {
         })
         // la paleta pasa a colgar de la mano
         if (huesos.RightHand) {
-          // compensa la escala heredada del jugador: la paleta debe conservar su tamaño
-          paleta.scale.setScalar(JUGADOR.paletaEnMano.escala / escalaJug)
-          paleta.position.set(...JUGADOR.paletaEnMano.pos)
-          paleta.rotation.set(...JUGADOR.paletaEnMano.rot)
           huesos.RightHand.add(paleta)
+          paleta.rotation.set(...JUGADOR.paletaEnMano.rot)
+          // La mano hereda una escala propia del esqueleto, así que en lugar de
+          // calcularla se mide el tamaño real y se corrige con una regla de tres.
+          paleta.scale.setScalar(1)
+          paleta.position.set(0, 0, 0)
+          j.updateMatrixWorld(true)
+          const bp = new THREE.Box3().setFromObject(paleta)
+          if (!bp.isEmpty()) {
+            const sp2 = new THREE.Vector3(); bp.getSize(sp2)
+            const mayor = Math.max(sp2.x, sp2.y, sp2.z)
+            if (mayor > 0) paleta.scale.setScalar(JUGADOR.paletaEnMano.largo / mayor)
+          }
+          paleta.position.set(...JUGADOR.paletaEnMano.pos)
         }
         scene.add(j)
         jugadorRef.obj = j
@@ -355,9 +366,72 @@ export default function ScrollLab() {
       ro.observe(mount)
 
       let raf = 0
+      // Permite pedir un cuadro concreto del guion sin depender del scroll ni de
+      // requestAnimationFrame. Sirve para inspeccionar la escena cuadro a cuadro.
+      if (typeof window !== 'undefined') {
+        window.__lab = {
+          ver(t) { progRef.current.t = t; dibujar(t); return renderer.domElement.toDataURL('image/webp', 0.7) },
+          huesos: () => Object.keys(huesos),
+          // encuadra TODA la escena: sirve para ver si hay geometría y dónde quedó
+          vistaGeneral(t = 0.05) {
+            progRef.current.t = t
+            dibujar(t)
+            const caja = new THREE.Box3()
+            let mallas = 0
+            scene.traverse(o => {
+              if (o.isMesh && o.visible) { mallas++; caja.expandByObject(o) }
+            })
+            if (caja.isEmpty()) return { mallas, caja: 'vacia' }
+            const c = new THREE.Vector3(), sz = new THREE.Vector3()
+            caja.getCenter(c); caja.getSize(sz)
+            const d = Math.max(sz.x, sz.y, sz.z) * 1.4
+            camera.position.set(c.x, c.y + sz.y * 0.1, c.z + d)
+            camera.lookAt(c)
+            renderer.render(scene, camera)
+            return {
+              mallas,
+              centro: c.toArray().map(n => +n.toFixed(1)),
+              tam: sz.toArray().map(n => +n.toFixed(1)),
+              img: renderer.domElement.toDataURL('image/webp', 0.7),
+            }
+          },
+          // prueba: fija una rotación en un hueso y dibuja, para descubrir qué eje sirve
+          probar(nombre, eje, rad, t = 0.05) {
+            progRef.current.t = t
+            dibujar(t)
+            const h = huesos[nombre]
+            if (!h) return 'sin hueso ' + nombre
+            h.rotation[eje] = (h.userData.base ? h.userData.base[eje] : 0) + rad
+            renderer.render(scene, camera)
+            return renderer.domElement.toDataURL('image/webp', 0.7)
+          },
+          info() {
+            const j = jugadorRef.obj
+            if (!j) return { jugador: 'no cargó' }
+            const h = huesos.RightHand
+            const v = new THREE.Vector3()
+            return {
+              jugador: 'ok',
+              paletaVisible: paleta.visible,
+              paletaPadre: paleta.parent?.name || 'escena',
+              manoEnMundo: h ? h.getWorldPosition(v).toArray().map(n => +n.toFixed(2)) : null,
+              paletaEnMundo: paleta.getWorldPosition(new THREE.Vector3()).toArray().map(n => +n.toFixed(2)),
+              camara: camera.position.toArray().map(n => +n.toFixed(1)),
+              paletaHijos: paleta.children.length,
+              paletaEscalaMundo: paleta.getWorldScale(new THREE.Vector3()).toArray().map(n => +n.toFixed(3)),
+              paletaTam: (() => {
+                const b = new THREE.Box3().setFromObject(paleta), v = new THREE.Vector3()
+                return b.isEmpty() ? 'vacia' : b.getSize(v).toArray().map(n => +n.toFixed(2))
+              })(),
+            }
+          },
+        }
+      }
       const frame = () => {
         raf = requestAnimationFrame(frame)
-        const t = progRef.current.t
+        dibujar(progRef.current.t)
+      }
+      const dibujar = (t) => {
 
         // ── El guion, escrito en función del progreso ──
         // 0.00–0.16 · la paleta espera quieta, de frente
@@ -397,26 +471,24 @@ export default function ScrollLab() {
 
           const b = huesos.RightArm, c = huesos.RightForeArm
           const m = huesos.RightHand, sp = huesos.Spine01 || huesos.Spine
-
+          // Ejes verificados sobre el modelo real: el hombro sube/baja girando en
+          // Y, y el codo dobla en X. (Rotar en Z sólo torcía el brazo sobre sí
+          // mismo, por eso antes la pose no cambiaba.)
           if (b?.userData.base) {
-            // desde T-pose: el brazo baja al costado y luego se lleva al golpe
-            const reposo = -1.25
-            b.rotation.z = b.userData.base.z + reposo
-              + mix(0, 0.55, estira) - 0.35 * carga + mix(0, 0.85, impacto) - 0.5 * baja
-            b.rotation.y = b.userData.base.y + mix(0, -0.5, carga) + mix(0, 1.1, impacto)
-            b.rotation.x = b.userData.base.x + 0.25 * estira - 0.15 * baja
+            const REPOSO = -1.30   // sale de la T-pose y deja el brazo al costado
+            b.rotation.y = b.userData.base.y + REPOSO
+              + 0.55 * estira - 0.30 * carga + 0.95 * impacto - 0.55 * baja
           }
           if (c?.userData.base) {
-            // el codo: casi recto al estirar, muy doblado al cargar, se abre al golpear
-            c.rotation.y = c.userData.base.y
-              + mix(0, -0.25, estira) + mix(0, -1.5, carga) + mix(0, 1.4, impacto) - 0.4 * baja
+            c.rotation.x = c.userData.base.x
+              - 0.30 * estira - 1.35 * carga + 1.50 * impacto - 0.35 * baja
           }
           if (m?.userData.base) {
-            m.rotation.z = m.userData.base.z + mix(0, -0.4, carga) + mix(0, 0.7, impacto)
+            m.rotation.x = m.userData.base.x - 0.35 * carga + 0.60 * impacto
           }
           if (sp?.userData.base) {
-            // el torso rota con el golpe: sin esto el swing se ve de brazo solo
-            sp.rotation.y = sp.userData.base.y + mix(0, 0.3, carga) + mix(0, -0.55, impacto) + 0.25 * baja
+            // el torso acompaña el swing: sin esto se ve un golpe de brazo suelto
+            sp.rotation.y = sp.userData.base.y + 0.28 * carga - 0.50 * impacto + 0.22 * baja
           }
         }
 
