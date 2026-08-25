@@ -56,6 +56,14 @@ const CODO = 1.5              // cuánto por debajo del mango está el pivote de
 // Punto exacto donde la pelota toca el centro de la cara. Lo comparten la
 // entrada, el golpe y la salida: si cada tramo usa el suyo, la pelota salta.
 const IMPACTO = { x: 0, y: 3.2, z: -6 }
+// La pelota NO debe llegar al centro de la paleta sino a su CARA: la paleta
+// tiene 0.33 de grosor y la pelota 0.29 de radio, así que el contacto ocurre
+// 0.45 antes. Y en el instante del golpe el swing adelanta la paleta 0.42.
+// Sin esto la pelota entraba media unidad dentro del modelo: la atravesaba.
+const CONTACTO = { x: 0, y: 3.2, z: -6 + 0.42 + 0.45 }
+// Momento exacto en que la cara pasa por el punto de impacto (mitad del tramo
+// de golpe del swing). La pelota tiene que cambiar de rumbo JUSTO acá.
+const T_IMPACTO = 0.291
 
 function balistica(t, y0, v0, g, suelo, e) {
   let y = y0, v = v0, resto = t
@@ -557,19 +565,19 @@ export default function ScrollLab() {
         const VZ = 15, VX = 2.1, V0Y = 8.5
         const T_PIQUE = 1.62                     // cuándo toca el piso (calculado)
         let bx, by, bz
-        if (aGolpe <= 0) {
+        if (t < T_IMPACTO) {
           // ENTRADA por el costado, no de frente a la cámara: antes venía casi
           // pegada al lente y no se leía la trayectoria.
-          const te = suave(seg(t, 0.02, 0.30))
-          bx = mix(-17, IMPACTO.x, te)
-          bz = mix(3.5, IMPACTO.z, te)
-          by = mix(8.2, IMPACTO.y, te) - Math.sin(te * Math.PI) * 1.4
+          const te = suave(seg(t, 0.02, T_IMPACTO))
+          bx = mix(-17, CONTACTO.x, te)
+          bz = mix(3.5, CONTACTO.z, te)
+          by = mix(8.2, CONTACTO.y, te) - Math.sin(te * Math.PI) * 1.4
         } else {
-          const tv = seg(t, 0.30, 0.92) * 2.60   // segundos de vuelo: da para UN pique
+          const tv = seg(t, T_IMPACTO, 0.92) * 2.60   // segundos de vuelo: da para UN pique
           const rz = tv < T_PIQUE ? tv : T_PIQUE + (tv - T_PIQUE) * 0.42
-          bx = IMPACTO.x + VX * rz
-          bz = IMPACTO.z + VZ * rz                // cruza la red y pica del otro lado
-          by = balistica(tv, IMPACTO.y, V0Y, G, PISO_FORMA, REBOTE)
+          bx = CONTACTO.x + VX * rz
+          bz = CONTACTO.z + VZ * rz               // cruza la red y pica del otro lado
+          by = balistica(tv, CONTACTO.y, V0Y, G, PISO_FORMA, REBOTE)
         }
         by = Math.max(by, PISO_FORMA)
         by = mix(by, SUELO_Y + R_BOLA + 0.03, suave(seg(t, 0.86, 1.00)))
