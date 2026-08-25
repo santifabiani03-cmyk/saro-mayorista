@@ -190,29 +190,48 @@ export default function ScrollLab() {
       // se leía como un plano verde vacío. Se agregan árboles y una segunda
       // cancha a lo lejos, que dan escala y profundidad a través del vidrio.
       const afuera = new THREE.Group()
-      const matHoja = new THREE.MeshStandardMaterial({ color: '#5f8f56', roughness: 1 })
-      const matTronco = new THREE.MeshStandardMaterial({ color: '#6b5744', roughness: 1 })
-      const geoHoja = new THREE.SphereGeometry(1, 10, 8)
-      const geoTronco = new THREE.CylinderGeometry(0.34, 0.46, 5, 7)
-      // sembrados con una fórmula fija: siempre caen igual, sin sorpresas al recargar
+      // Posiciones fijas, repartidas con el ángulo áureo: separa sin agrupar y
+      // siempre caen igual, así el fondo no cambia entre recargas.
+      const lugares = []
       for (let i = 0; i < 26; i++) {
-        const ang = i * 2.399                       // ángulo áureo: reparte sin agrupar
+        const ang = i * 2.399
         const rad = 52 + (i % 5) * 16
         const x = Math.cos(ang) * rad
         const z = RED_Z + Math.sin(ang) * rad
-        if (Math.abs(x) < 44 && Math.abs(z - RED_Z) < 76) continue   // ni en la cancha ni en la vereda
-        const alto = 7 + (i % 4) * 2.4
-        const arbol = new THREE.Group()
-        const tr = new THREE.Mesh(geoTronco, matTronco)
-        tr.scale.y = alto / 5
-        tr.position.y = -3 + alto / 2
-        const copa = new THREE.Mesh(geoHoja, matHoja)
-        copa.scale.setScalar(alto * 0.42)
-        copa.position.y = -3 + alto * 1.05
-        arbol.add(tr, copa)
-        arbol.position.set(x, 0, z)
-        afuera.add(arbol)
+        if (Math.abs(x) < 44 && Math.abs(z - RED_Z) < 76) continue   // ni cancha ni vereda
+        lugares.push({ x, z, escala: 3.4 + (i % 4) * 1.1, giro: ang })
       }
+
+      // Árbol real (Meshy, 227 KB). Se dibuja con InstancedMesh: los 20 y pico
+      // de árboles cuestan lo mismo que uno solo para la placa de video.
+      loader.load('/models/arbol.glb', gltf => {
+        if (disposed) return
+        const base = new THREE.Box3().setFromObject(gltf.scene)
+        const tam = new THREE.Vector3(); base.getSize(tam)
+        const cen = new THREE.Vector3(); base.getCenter(cen)
+        const unidad = 1 / (tam.y || 1)            // normalizado a 1 de alto
+        gltf.scene.traverse(o => {
+          if (!o.isMesh) return
+          const geo = o.geometry.clone()
+          geo.translate(-cen.x, -base.min.y, -cen.z)   // apoyado en su base
+          geo.scale(unidad, unidad, unidad)
+          const inst = new THREE.InstancedMesh(geo, o.material, lugares.length)
+          const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler()
+          lugares.forEach((l, i) => {
+            e.set(0, l.giro, 0)
+            m.compose(
+              new THREE.Vector3(l.x, SUELO_Y, l.z),
+              q.setFromEuler(e),
+              new THREE.Vector3(l.escala, l.escala, l.escala)
+            )
+            inst.setMatrixAt(i, m)
+          })
+          inst.instanceMatrix.needsUpdate = true
+          inst.frustumCulled = false
+          afuera.add(inst)
+        })
+      }, undefined, () => { /* sin árboles queda el césped solo */ })
+
       // otra cancha a lo lejos, apenas insinuada: da idea de club, no de cancha suelta
       const vecina = new THREE.Mesh(
         new THREE.PlaneGeometry(58, 26),
