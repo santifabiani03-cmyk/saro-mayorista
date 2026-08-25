@@ -107,68 +107,105 @@ export default function ScrollLab() {
       sol.position.set(4, 8, 6)
       scene.add(sol)
 
-      // Piso (referencia visual para el pique)
+      // ───────────────────────── LA CANCHA ─────────────────────────
+      // Todo geometría real, no una foto de fondo: la cámara gira 90° durante el
+      // guion y una imagen plana se delataría al rotar. Además así la red no
+      // aparece dos veces (antes estaba la de verdad y la de la foto de fondo).
+      //
+      // Escala: la paleta mide 2.9 unidades y en la vida real 45 cm, así que
+      // 1 unidad ≈ 15.5 cm. De ahí salen todas las medidas de abajo.
+      const SUELO_Y = -3
+      const RED_ALTO = 5.67        // 0.88 m: la altura real de una red de pádel
+      const RED_Z = 5.5
+      const MEDIA = 32
+
       const piso = new THREE.Mesh(
-        new THREE.PlaneGeometry(200, 200),
-        new THREE.MeshStandardMaterial({ color: '#2563EB', transparent: true, opacity: 0.14 })
+        new THREE.PlaneGeometry(240, 240),
+        new THREE.MeshStandardMaterial({ color: '#7fb3e3', roughness: 0.95 })
       )
       piso.rotation.x = -Math.PI / 2
-      piso.position.y = -3
+      piso.position.y = SUELO_Y
       scene.add(piso)
 
-      // Pared del fondo: es contra la que se juega, queda DETRÁS de la paleta.
-      // Sirve de referencia para entender de dónde viene la pelota.
-      const texCancha = new THREE.TextureLoader().load('/assets/fondo-cancha.webp')
-      texCancha.colorSpace = THREE.SRGBColorSpace
-      const pared = new THREE.Mesh(
-        new THREE.PlaneGeometry(96, 42),
-        new THREE.MeshStandardMaterial({ map: texCancha, roughness: 1, transparent: true, opacity: 0.55 })
-      )
-      pared.position.set(0, 8, -26)
-      scene.add(pared)
-      const linea = new THREE.Mesh(
-        new THREE.BoxGeometry(96, 0.12, 0.12),
-        new THREE.MeshStandardMaterial({ color: '#ffffff' })
-      )
-      linea.position.set(0, 0.6, -25.9)
-      scene.add(linea)
+      // Paredes de vidrio: el vidrio se sugiere con opacidad baja y poca
+      // rugosidad, no con transmisión real (cara y acá no se notaría).
+      const matVidrio = new THREE.MeshStandardMaterial({
+        color: '#dff0fb', roughness: 0.08, metalness: 0.1,
+        transparent: true, opacity: 0.2, side: THREE.DoubleSide,
+      })
+      const matMarco = new THREE.MeshStandardMaterial({ color: '#2f4257', roughness: 0.5, metalness: 0.35 })
+      const VIDRIO_ALTO = 26
+      const paredes = new THREE.Group()
+      const ponerPared = (ancho, x, z, giro) => {
+        const g = new THREE.Group()
+        const v = new THREE.Mesh(new THREE.PlaneGeometry(ancho, VIDRIO_ALTO), matVidrio)
+        v.position.y = SUELO_Y + VIDRIO_ALTO / 2
+        g.add(v)
+        for (let k = -ancho / 2; k <= ancho / 2 + 0.01; k += 8) {
+          const m = new THREE.Mesh(new THREE.BoxGeometry(0.22, VIDRIO_ALTO, 0.22), matMarco)
+          m.position.set(k, SUELO_Y + VIDRIO_ALTO / 2, 0)
+          g.add(m)
+        }
+        ;[SUELO_Y + 0.15, SUELO_Y + VIDRIO_ALTO].forEach(y => {
+          const h = new THREE.Mesh(new THREE.BoxGeometry(ancho, 0.26, 0.26), matMarco)
+          h.position.set(0, y, 0)
+          g.add(h)
+        })
+        g.position.set(x, 0, z)
+        g.rotation.y = giro
+        paredes.add(g)
+        return v
+      }
+      const pared = ponerPared(80, 0, RED_Z - 42, 0)
+      ponerPared(80, 0, RED_Z + 42, 0)
+      ponerPared(84, -MEDIA, RED_Z, Math.PI / 2)
+      ponerPared(84, MEDIA, RED_Z, Math.PI / 2)
+      scene.add(paredes)
 
       // ── LA RED ──
-      // Va ENTRE la paleta y la cámara: uno está en su lado de la cancha, la
-      // pelota se devuelve por encima de la red y pica en el campo de enfrente.
-      const RED_Z = 5.5, RED_ALTO = 1.5, SUELO_Y = -3
+      // La malla usa una rejilla dibujada al vuelo, así se ve el tejido en lugar
+      // de un panel gris uniforme.
       const red = new THREE.Group()
+      const cnv = document.createElement('canvas')
+      cnv.width = cnv.height = 64
+      const ctx = cnv.getContext('2d')
+      ctx.strokeStyle = '#16283c'
+      ctx.lineWidth = 8
+      ctx.strokeRect(0, 0, 64, 64)
+      const texRed = new THREE.CanvasTexture(cnv)
+      texRed.wrapS = texRed.wrapT = THREE.RepeatWrapping
+      texRed.repeat.set(100, 9)
       const matMalla = new THREE.MeshStandardMaterial({
-        color: '#1b2b3d', roughness: 0.9, transparent: true, opacity: 0.55, side: THREE.DoubleSide,
+        map: texRed, alphaMap: texRed, transparent: true, opacity: 0.92,
+        roughness: 0.95, side: THREE.DoubleSide, depthWrite: false,
       })
-      const malla = new THREE.Mesh(new THREE.PlaneGeometry(20, RED_ALTO), matMalla)
+      const malla = new THREE.Mesh(new THREE.PlaneGeometry(MEDIA * 2, RED_ALTO), matMalla)
       malla.position.y = SUELO_Y + RED_ALTO / 2
-      // cinta blanca del borde superior
       const cinta = new THREE.Mesh(
-        new THREE.BoxGeometry(20, 0.16, 0.06),
+        new THREE.BoxGeometry(MEDIA * 2, 0.42, 0.14),
         new THREE.MeshStandardMaterial({ color: '#f8fafc', roughness: 0.6 })
       )
       cinta.position.y = SUELO_Y + RED_ALTO
       const matPoste = new THREE.MeshStandardMaterial({ color: '#243447', roughness: 0.6, metalness: 0.3 })
-      const posteIzq = new THREE.Mesh(new THREE.CylinderGeometry(0.09, 0.09, RED_ALTO + 0.2, 10), matPoste)
-      posteIzq.position.set(-10, SUELO_Y + (RED_ALTO + 0.2) / 2, 0)
+      const posteIzq = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, RED_ALTO + 1.1, 12), matPoste)
+      posteIzq.position.set(-MEDIA, SUELO_Y + (RED_ALTO + 1.1) / 2, 0)
       const posteDer = posteIzq.clone()
-      posteDer.position.x = 10
+      posteDer.position.x = MEDIA
       red.add(malla, cinta, posteIzq, posteDer)
       red.position.z = RED_Z
       scene.add(red)
 
-      // Líneas de la cancha (dan referencia de profundidad al vuelo)
-      const matLinea = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.5 })
+      // Líneas de la cancha: dan la referencia de profundidad del vuelo
+      const matLinea = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.6 })
       const lineas = new THREE.Group()
-      ;[-12, -6, 12].forEach(z => {
-        const l = new THREE.Mesh(new THREE.BoxGeometry(20, 0.02, 0.14), matLinea)
+      ;[-22, -10, 10, 22].forEach(z => {
+        const l = new THREE.Mesh(new THREE.BoxGeometry(MEDIA * 2, 0.02, 0.2), matLinea)
         l.position.set(0, SUELO_Y + 0.02, RED_Z + z)
         lineas.add(l)
       })
-      const central = new THREE.Mesh(new THREE.BoxGeometry(0.14, 0.02, 24), matLinea)
-      central.position.set(0, SUELO_Y + 0.02, RED_Z)
-      lineas.add(central)
+      const linea = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.02, 44), matLinea)
+      linea.position.set(0, SUELO_Y + 0.02, RED_Z)
+      lineas.add(linea)
       scene.add(lineas)
 
       // Placeholders: paleta, pelota y paquete
@@ -257,7 +294,7 @@ export default function ScrollLab() {
       }
       // colores entre los que viaja la superficie: fieltro → cartón
       const COLOR_FIELTRO = new THREE.Color('#d8e83c')
-      const COLOR_CARTON = new THREE.Color('#c69a6b')
+      const COLOR_CARTON = new THREE.Color('#eef2f7')   // claro y plano, no cartón realista
 
       const pelota = new THREE.Group()
       const matFieltro = new THREE.MeshStandardMaterial({
@@ -287,7 +324,7 @@ export default function ScrollLab() {
         posBola.needsUpdate = true
         geoBola.computeVertexNormals()
         matFieltro.color.copy(COLOR_FIELTRO).lerp(COLOR_CARTON, k)
-        matFieltro.roughness = mix(0.95, 0.92, k)
+        matFieltro.roughness = mix(0.95, 0.75, k)
         // las costuras se borran en la primera mitad: son de la pelota, no de la caja
         const vc = Math.max(0, 1 - k * 2)
         matCostura.opacity = vc
@@ -300,7 +337,7 @@ export default function ScrollLab() {
       const paquete = new THREE.Group()
       const L = R_BOLA * 2                       // la caja mide esto de cara a cara
       const matCinta = new THREE.MeshStandardMaterial({
-        color: '#e8d9bd', roughness: 0.7, transparent: true, opacity: 0,
+        color: '#2563EB', roughness: 0.55, transparent: true, opacity: 0,   // cintas en el azul de la marca
       })
       const geoCintaH = new THREE.BoxGeometry(L * 1.02, L * 0.17, L * 1.02)
       const cintaH = new THREE.Mesh(geoCintaH, matCinta)
@@ -376,82 +413,90 @@ export default function ScrollLab() {
         const aGolpe  = suave(seg(t, 0.30, 0.38))
         const aVuelo  = suave(seg(t, 0.38, 0.64))
 
-        // ── Paleta: espera, amaga y golpea. Después sale de cuadro. ──
-        paleta.position.set(mix(0, -0.6, aMano) - 4.5 * aVuelo, 0.4, 0)
+        // ── Paleta: espera al fondo, amaga y golpea hacia la cámara ──
+        // Queda del otro lado de la red, así la pelota viene hacia vos, cruza
+        // por encima y pica de este lado. No se corta de golpe: acompaña el
+        // golpe y se va apagando.
+        const PAL_Z = -6
+        paleta.position.set(mix(0, -0.8, aMano) - 1.4 * aVuelo, 0.4 + 1.1 * aVuelo, PAL_Z)
         paleta.rotation.y = mix(0, -0.35, aMano)
-        paleta.rotation.z = mix(mix(0, 0.8, aMano), -1.0, aGolpe)
-        paleta.visible = aVuelo < 0.9
+        paleta.rotation.z = mix(mix(0, 0.8, aMano), -1.1, aGolpe)
+        const salePaleta = suave(seg(t, 0.44, 0.62))
+        paleta.visible = salePaleta < 0.99
+        paleta.traverse(o => {
+          if (o.isMesh && o.material) {
+            o.material.transparent = true
+            o.material.opacity = 1 - salePaleta
+          }
+        })
 
         // ── Pelota ──
-        // Llega desde el frente cayendo, la golpean, y sale en parábola real.
         // Ya NO se oculta en ningún momento: es esta misma malla la que termina
         // siendo la caja, así que tiene que estar siempre en pantalla.
         pelota.visible = aEntra > 0.01
 
         // Física del tiro. El tiempo avanza LINEAL con el scroll (sin suavizado):
         // si no, la pelota parece frenar y acelerar sola.
-        const G = 15, SUELO = -2.6, REBOTE = 0.55
-        const VZ = 6.5, VX = 2.6, V0Y = 6.2      // velocidades al salir del golpe
-        const T_PIQUE = 1.18                     // cuándo toca el piso (calculado)
+        const G = 15, SUELO = SUELO_Y + R_BOLA, REBOTE = 0.55
+        // Velocidades calculadas para que PASE la red de 5.67 de alto: al llegar
+        // a la red va por 3.8 de altura, bien por encima del borde (2.67).
+        const VZ = 10, VX = 1.6, V0Y = 11.5
+        const T_PIQUE = 1.77                     // cuándo toca el piso (calculado)
         let bx, by, bz
         if (aGolpe <= 0) {
-          // Entrada: llega desde el frente cayendo hacia la paleta
-          const te = seg(t, 0.18, 0.30)
-          bx = mix(-3.8, 0, te)
-          bz = mix(4.5, 0, te)
-          by = balistica(te * 0.62, 3.4, 0.4, G, 0.5, 0)
+          const te = seg(t, 0.18, 0.30)          // entra desde el frente, cayendo
+          bx = mix(-3.2, 0, te)
+          bz = mix(15, PAL_Z, te)
+          by = balistica(te * 0.62, 5.5, 0.4, G, 0.5, 0)
         } else {
-          const tv = seg(t, 0.30, 0.92) * 1.90   // segundos de vuelo: da para UN pique
-          // al picar pierde parte del avance horizontal, como una pelota de verdad
-          const rec = tv < T_PIQUE ? tv : T_PIQUE + (tv - T_PIQUE) * 0.45
+          const tv = seg(t, 0.30, 0.92) * 2.30   // segundos de vuelo: da para UN pique
+          // al picar pierde parte del avance, como una pelota de verdad
+          const rec = tv < T_PIQUE ? tv : T_PIQUE + (tv - T_PIQUE) * 0.42
           bx = VX * rec
-          bz = VZ * rec                          // cruza la red y sigue de largo
+          bz = PAL_Z + VZ * rec                  // cruza la red y pica del otro lado
           by = balistica(tv, 0.5, V0Y, G, SUELO, REBOTE)
         }
-        // Al final la caja se apoya en el piso y queda quieta: si siguiera la
-        // física pura terminaría flotando a media parábola.
-        const asienta = suave(seg(t, 0.86, 1.00))
-        by = mix(by, SUELO + R_BOLA, asienta)
+        // Al final se apoya en el piso: con la física pura quedaría flotando.
+        by = mix(by, SUELO_Y + R_BOLA, suave(seg(t, 0.86, 1.00)))
         pelota.position.set(bx, by, bz)
-        // gira acompañando el movimiento, y se va frenando al volverse caja
-        const giroBola = (0.12 + 0.3 * aGolpe) * (1 - suave(seg(t, 0.70, 0.94)))
-        pelota.rotation.x += giroBola
-        pelota.rotation.z += giroBola * 0.4
 
-        // ── DE PELOTA A ENVÍO ──
-        // La misma malla cambia de forma y de color. No se achica ni desaparece
-        // para dejarle lugar a otra: es la pelota la que se vuelve caja.
-        const cambio = suave(seg(t, 0.68, 0.95))
-        transformar(cambio)
-
-        // Los detalles del envío se apoyan encima, y sólo cuando la forma ya es
-        // cúbica: si aparecieran antes se verían flotando alrededor de una esfera.
-        const detalle = suave(seg(t, 0.82, 0.99))
-        paquete.visible = detalle > 0.01
-        matCinta.opacity = detalle
-        matEtiqueta.opacity = detalle * 0.95
-        paquete.position.copy(pelota.position)
-        paquete.rotation.copy(pelota.rotation)
-        paquete.scale.setScalar(1)
-
-        // ── Cámara ──
-        // Un solo movimiento continuo: empieza mirando la paleta de frente y va
-        // rotando 90° alrededor de la pelota mientras se acerca. El giro usa el
-        // progreso suavizado, así arranca y termina sin tirón.
-        const FOCO_INICIAL = new THREE.Vector3(0, 0.6, 0)
-        const sigue = suave(seg(t, 0.24, 0.46))       // deja la paleta, toma la pelota
-        const foco = FOCO_INICIAL.clone().lerp(pelota.position, sigue)
-
-        const giro = suave(seg(t, 0.42, 0.90)) * (Math.PI / 2)   // los 90°
-        const dist = mix(11, 5.2, suave(seg(t, 0.40, 0.90)))     // se va acercando
-        const alto = mix(2.4, 1.1, suave(seg(t, 0.45, 0.92)))
-
+        // ── Cámara: un giro continuo de 90° alrededor de la pelota ──
+        // Se resuelve ANTES que la caja, porque la caja tiene que terminar
+        // enfrentando a la cámara para que el logo se lea.
+        const sigue = suave(seg(t, 0.24, 0.46))          // suelta la paleta, toma la pelota
+        const giro = suave(seg(t, 0.42, 0.90)) * (Math.PI / 2)
+        const foco = new THREE.Vector3(0, 0.9, PAL_Z).lerp(pelota.position, sigue)
+        const dist = mix(15, 8, suave(seg(t, 0.40, 0.92)))
+        const alto = mix(3.2, 1.5, suave(seg(t, 0.45, 0.92)))
         camera.position.set(
           foco.x + Math.sin(giro) * dist,
           foco.y + alto,
           foco.z + Math.cos(giro) * dist
         )
         camera.lookAt(foco)
+
+        // ── DE PELOTA A ENVÍO ──
+        // La misma malla cambia de forma y de color. No se achica ni desaparece
+        // para dejarle lugar a otra: es la pelota la que se vuelve caja.
+        transformar(suave(seg(t, 0.68, 0.95)))
+
+        // Gira mientras es pelota; al volverse caja se alinea y queda QUIETA, con
+        // la cara del logo enfrentando a la cámara. Se calcula en función del
+        // scroll (no acumulando) para que ir y volver den lo mismo.
+        const vueltas = seg(t, 0.30, 0.72) * 9
+        const alinea = suave(seg(t, 0.68, 0.90))
+        pelota.rotation.x = vueltas * (1 - alinea)
+        pelota.rotation.z = vueltas * 0.4 * (1 - alinea)
+        pelota.rotation.y = mix(vueltas * 0.3, giro, alinea)
+
+        // Cintas y etiqueta: se apoyan encima y sólo cuando la forma ya es
+        // cúbica. Antes se verían flotando alrededor de una esfera.
+        const detalle = suave(seg(t, 0.80, 0.98))
+        paquete.visible = detalle > 0.01
+        matCinta.opacity = detalle
+        matEtiqueta.opacity = detalle
+        paquete.position.copy(pelota.position)
+        paquete.rotation.copy(pelota.rotation)
 
         renderer.render(scene, camera)
       }
@@ -463,9 +508,12 @@ export default function ScrollLab() {
       cleanup = () => {
         cancelAnimationFrame(raf)
         ro.disconnect()
-        ;[piso, pared, linea, malla, cinta, posteIzq, posteDer, central, cara, mango, bola, costuraA, costuraB, caja, cintaH, cintaV, tapa].forEach(m => {
-          m.geometry?.dispose(); m.material?.dispose()
+        ;scene.traverse(o => {
+          o.geometry?.dispose()
+          if (Array.isArray(o.material)) o.material.forEach(m => m.dispose())
+          else o.material?.dispose()
         })
+        texRed.dispose()
         pmrem.dispose()
         renderer.dispose()
         if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement)
