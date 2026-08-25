@@ -146,7 +146,7 @@ export default function ScrollLab() {
       const SUELO_Y = -3
       const RED_ALTO = 5.67        // 0.88 m: la altura real de una red de pádel
       const RED_Z = 5.5
-      const MEDIA = 32
+      const MEDIA = 32.5   // media cancha a lo ancho (65 / 2)
 
       // Domo de cielo: un degradé suave alrededor de todo, para que fuera de la
       // cancha no quede el vacío blanco. Va por dentro de una esfera enorme, así
@@ -197,10 +197,10 @@ export default function ScrollLab() {
       // sembrados con una fórmula fija: siempre caen igual, sin sorpresas al recargar
       for (let i = 0; i < 26; i++) {
         const ang = i * 2.399                       // ángulo áureo: reparte sin agrupar
-        const rad = 62 + (i % 5) * 15
+        const rad = 52 + (i % 5) * 16
         const x = Math.cos(ang) * rad
         const z = RED_Z + Math.sin(ang) * rad
-        if (Math.abs(x) < 44 && Math.abs(z - RED_Z) < 52) continue   // no dentro de la cancha
+        if (Math.abs(x) < 44 && Math.abs(z - RED_Z) < 76) continue   // ni en la cancha ni en la vereda
         const alto = 7 + (i % 4) * 2.4
         const arbol = new THREE.Group()
         const tr = new THREE.Mesh(geoTronco, matTronco)
@@ -231,13 +231,26 @@ export default function ScrollLab() {
       explanada.position.y = -3.06
       scene.add(explanada)
 
+      // Medidas reales: una cancha de pádel es de 20 x 10 m, que con esta escala
+      // son 129 x 65 unidades. Antes el piso medía 240 x 240 — casi siete veces
+      // el área — y por eso nunca se veía dónde terminaba la cancha ni el césped
+      // que hay alrededor.
+      const CANCHA_LARGO = 129, CANCHA_ANCHO = 65
       const piso = new THREE.Mesh(
-        new THREE.PlaneGeometry(240, 240),
+        new THREE.PlaneGeometry(CANCHA_ANCHO, CANCHA_LARGO),
         new THREE.MeshStandardMaterial({ color: '#7fb3e3', roughness: 0.95 })
       )
       piso.rotation.x = -Math.PI / 2
-      piso.position.y = SUELO_Y
+      piso.position.set(0, SUELO_Y, RED_Z)
       scene.add(piso)
+      // vereda perimetral: el borde de cemento que rodea la cancha
+      const vereda = new THREE.Mesh(
+        new THREE.PlaneGeometry(CANCHA_ANCHO + 16, CANCHA_LARGO + 16),
+        new THREE.MeshStandardMaterial({ color: '#c9d4dd', roughness: 1 })
+      )
+      vereda.rotation.x = -Math.PI / 2
+      vereda.position.set(0, SUELO_Y - 0.02, RED_Z)
+      scene.add(vereda)
 
       // Paredes de vidrio: el vidrio se sugiere con opacidad baja y poca
       // rugosidad, no con transmisión real (cara y acá no se notaría).
@@ -268,10 +281,10 @@ export default function ScrollLab() {
         paredes.add(g)
         return v
       }
-      const pared = ponerPared(80, 0, RED_Z - 42, 0)
-      ponerPared(80, 0, RED_Z + 42, 0)
-      ponerPared(84, -MEDIA, RED_Z, Math.PI / 2)
-      ponerPared(84, MEDIA, RED_Z, Math.PI / 2)
+      const pared = ponerPared(CANCHA_ANCHO, 0, RED_Z - CANCHA_LARGO / 2, 0)
+      ponerPared(CANCHA_ANCHO, 0, RED_Z + CANCHA_LARGO / 2, 0)
+      ponerPared(CANCHA_LARGO, -CANCHA_ANCHO / 2, RED_Z, Math.PI / 2)
+      ponerPared(CANCHA_LARGO, CANCHA_ANCHO / 2, RED_Z, Math.PI / 2)
       scene.add(paredes)
 
       // Techo: vigas cruzadas bien altas. Cierran la escena por arriba, que era
