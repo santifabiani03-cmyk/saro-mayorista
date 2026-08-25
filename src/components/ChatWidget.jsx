@@ -36,7 +36,11 @@ export default function ChatWidget({ whatsappNumber }) {
   }, [messages, loading])
 
   useEffect(() => {
-    if (open) setTimeout(() => inputRef.current?.focus(), 250)
+    if (!open) return
+    // se guarda el id para cancelarlo: si cierran el chat antes de los 250 ms,
+    // el temporizador quedaba vivo apuntando a un componente ya desmontado
+    const id = setTimeout(() => inputRef.current?.focus(), 250)
+    return () => clearTimeout(id)
   }, [open])
 
   const enviar = async (texto) => {
@@ -192,6 +196,7 @@ export default function ChatWidget({ whatsappNumber }) {
           <div className="flex items-end gap-2">
             <textarea
               ref={inputRef}
+              aria-label="Escribí tu consulta"
               value={input}
               onChange={e => setInput(e.target.value.slice(0, 500))}
               onKeyDown={e => {

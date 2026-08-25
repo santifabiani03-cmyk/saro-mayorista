@@ -75,6 +75,7 @@ function PinGate({ onAuth }) {
             type="password"
             value={pin}
             onChange={e => { setPin(e.target.value); setError(false) }}
+            aria-label="PIN de acceso al panel"
             placeholder="••••••••"
             autoFocus
             className={`w-full border-2 rounded-xl px-4 py-3 text-center text-lg tracking-widest font-mono focus:outline-none transition-colors ${
@@ -98,8 +99,12 @@ function PinGate({ onAuth }) {
 }
 
 export default function AdminPage() {
-  const [authed, setAuthed]             = useState(() => sessionStorage.getItem(SESSION_KEY) === 'ok')
-  const [tab, setTab]                   = useState(() => sessionStorage.getItem('saro_admin_tab') ?? 'editar')
+  // sessionStorage y window no existen en el servidor, así que se leen ya en el
+  // navegador. 'listo' evita que asome el PIN un instante cuando la sesión sigue
+  // abierta: hasta saberlo no se dibuja nada.
+  const [authed, setAuthed]             = useState(false)
+  const [tab, setTab]                   = useState('editar')
+  const [listo, setListo]               = useState(false)
   const [products, setProducts]         = useState([])
   const [publishedSnap, setPublishedSnap] = useState(null) // snapshot de lo que está publicado
   const [baseProducts, setBaseProducts]   = useState(null) // base para three-way merge (lo que cargamos del server)
@@ -112,9 +117,19 @@ export default function AdminPage() {
   const [showQr, setShowQr]             = useState(false)
   const [showShare, setShowShare]       = useState(false)
   // isDev = true solo cuando corre en localhost (desarrollo local)
-  const isDev = window.location.hostname === 'localhost'
+  const [isDev, setIsDev] = useState(false)
 
-  const changeTab = (t) => { sessionStorage.setItem('saro_admin_tab', t); setTab(t) }
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem(SESSION_KEY) === 'ok') setAuthed(true)
+      const guardada = sessionStorage.getItem('saro_admin_tab')
+      if (guardada) setTab(guardada)
+    } catch {}
+    setIsDev(window.location.hostname === 'localhost')
+    setListo(true)
+  }, [])
+
+  const changeTab = (t) => { try { sessionStorage.setItem('saro_admin_tab', t) } catch {}; setTab(t) }
 
   // Sincronizado = el estado actual coincide con lo que está publicado
   const isSynced = publishedSnap !== null &&
@@ -302,6 +317,7 @@ export default function AdminPage() {
     }
   }
 
+  if (!listo) return null                     // todavía no sabemos si hay sesión
   if (!authed) return <PinGate onAuth={() => setAuthed(true)} />
 
   return (

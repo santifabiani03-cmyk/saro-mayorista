@@ -6,19 +6,30 @@ const CartContext = createContext(null)
 const CART_KEY = 'saro_cart_v1'
 
 export function CartProvider({ children }) {
-  // Inicializar desde localStorage para que el carrito sobreviva recargas
-  const [items, setItems] = useState(() => {
+  // Arranca vacío y el carrito guardado se lee YA EN EL NAVEGADOR.
+  // Leer localStorage al inicializar el estado parece más directo, pero ese
+  // código también corre en el servidor, donde localStorage no existe: el
+  // servidor devolvía el carrito vacío, el navegador lo devolvía con productos,
+  // y React se quejaba de que no coincidían (los errores de hidratación).
+  const [items, setItems] = useState([])
+  const [isOpen, setIsOpen] = useState(false)
+  // Hasta no haber leído lo guardado no se escribe nada: si no, el primer
+  // guardado pisaría el carrito real con la lista vacía del arranque.
+  const [leido, setLeido] = useState(false)
+
+  useEffect(() => {
     try {
       const saved = localStorage.getItem(CART_KEY)
-      return saved ? JSON.parse(saved) : []
-    } catch { return [] }
-  })
-  const [isOpen, setIsOpen] = useState(false)
+      if (saved) setItems(JSON.parse(saved))
+    } catch {}
+    setLeido(true)
+  }, [])
 
-  // Persistir en localStorage cada vez que cambia el carrito
+  // Persistir cada vez que cambia el carrito, ya con lo guardado a la vista
   useEffect(() => {
+    if (!leido) return
     try { localStorage.setItem(CART_KEY, JSON.stringify(items)) } catch {}
-  }, [items])
+  }, [items, leido])
 
   const addItems = (product, selections) => {
     // Guardar la primera imagen para mostrarla en el carrito

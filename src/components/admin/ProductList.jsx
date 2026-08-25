@@ -226,6 +226,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
           <div className="flex gap-2 flex-wrap flex-1 min-w-0">
             <input
               type="text"
+              aria-label="Buscar producto"
               placeholder="Buscar producto…"
               value={search}
               onChange={e => setSearch(e.target.value)}

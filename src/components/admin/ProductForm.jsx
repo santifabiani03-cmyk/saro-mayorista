@@ -1222,7 +1222,7 @@ function ColorPicker({ selected, onChange }) {
       <div className="space-y-2">
         <div className="flex gap-2">
           <input
-            type="text" placeholder="Color personalizado…"
+            type="text" aria-label="Nombre del color personalizado" placeholder="Color personalizado…"
             value={customName} onChange={e => setCustomName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addCustom())}
             className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-saro-blue"
@@ -1368,6 +1368,7 @@ function TallePicker({ selected, onChange }) {
       <div className="flex gap-2">
         <input
           type="text"
+          aria-label="Nombre del talle personalizado"
           placeholder="Talle personalizado…"
           value={custom}
           onChange={e => setCustom(e.target.value)}
@@ -1485,7 +1486,7 @@ function PromoEditor({ promos, onChange, precioBase }) {
               <div key={p._idx} className="flex items-center gap-2 bg-gray-50 rounded-xl p-2.5">
                 <div className="flex items-center gap-1.5 flex-1">
                   <input
-                    type="number" min="1" placeholder="Cant."
+                    type="number" min="1" aria-label="Cantidad de la promoción" placeholder="Cant."
                     value={p.cantidad}
                     onChange={e => updatePromo(p._idx, 'cantidad', e.target.value)}
                     className="w-20 text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-saro-blue text-center"
@@ -1494,7 +1495,7 @@ function PromoEditor({ promos, onChange, precioBase }) {
                   <div className="relative flex-1">
                     <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-gray-400">$</span>
                     <input
-                      type="number" min="0" placeholder="Precio total"
+                      type="number" min="0" aria-label="Precio total de la promoción" placeholder="Precio total"
                       value={p.precioTotal}
                       onChange={e => updatePromo(p._idx, 'precioTotal', e.target.value)}
                       className="w-full text-sm border border-gray-200 rounded-lg pl-5 pr-2 py-1.5 focus:outline-none focus:border-saro-blue"
@@ -1698,6 +1699,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               type="text"
               value={form.nombre}
               onChange={e => set('nombre', e.target.value)}
+              aria-label="Nombre del producto"
               placeholder="Ej: Remera Training Pro"
               className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue ${errors.nombre ? 'border-red-400' : 'border-gray-200'}`}
             />
@@ -1711,6 +1713,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               min="0"
               value={form.precio}
               onChange={e => set('precio', e.target.value)}
+              aria-label="Precio mayorista"
               placeholder="18500"
               className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue ${errors.precio ? 'border-red-400' : 'border-gray-200'}`}
             />
@@ -1727,6 +1730,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               min="0"
               value={form.precioMinorista}
               onChange={e => set('precioMinorista', e.target.value)}
+              aria-label="Precio minorista"
               placeholder="Ej: 25000"
               className="w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue border-gray-200"
             />
@@ -1746,6 +1750,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               step="10"
               value={form.peso}
               onChange={e => set('peso', e.target.value)}
+              aria-label="Peso en gramos"
               placeholder="Ej: 400"
               className="w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue border-gray-200"
             />
@@ -1784,6 +1789,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               rows={4}
               value={form.descripcion}
               onChange={e => set('descripcion', e.target.value)}
+              aria-label="Descripción del producto"
               placeholder="Escribí palabras clave y usá ✨ para generar, o dejalo vacío y la IA usa el nombre"
               className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue resize-none ${errors.descripcion ? 'border-red-400' : 'border-gray-200'}`}
             />

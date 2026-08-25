@@ -123,27 +123,31 @@ function Formulario({ whatsappNumber }) {
         Si querés revender SARO o comprar por mayor, dejanos tus datos y te contactamos para armar un acuerdo.
       </p>
       <form onSubmit={enviar} className="space-y-4">
+        {/* Cada etiqueta va atada a su campo con htmlFor/id: así el lector de
+            pantalla la anuncia, y al tocar el texto se enfoca el campo. */}
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className={labelCls}>Nombre *</label>
-            <input value={f.nombre} onChange={on('nombre')} required className={inputCls} placeholder="Juan" />
+            <label htmlFor="tcn-nombre" className={labelCls}>Nombre *</label>
+            <input id="tcn-nombre" name="nombre" autoComplete="given-name" value={f.nombre} onChange={on('nombre')} required className={inputCls} placeholder="Juan" />
           </div>
           <div>
-            <label className={labelCls}>Apellido *</label>
-            <input value={f.apellido} onChange={on('apellido')} required className={inputCls} placeholder="Pérez" />
+            <label htmlFor="tcn-apellido" className={labelCls}>Apellido *</label>
+            <input id="tcn-apellido" name="apellido" autoComplete="family-name" value={f.apellido} onChange={on('apellido')} required className={inputCls} placeholder="Pérez" />
           </div>
         </div>
         <div className="grid sm:grid-cols-2 gap-4">
           <div>
-            <label className={labelCls}>Provincia *</label>
-            <select value={f.provincia} onChange={on('provincia')} required className={`${inputCls} bg-white`}>
+            <label htmlFor="tcn-provincia" className={labelCls}>Provincia *</label>
+            <select id="tcn-provincia" name="provincia" value={f.provincia} onChange={on('provincia')} required className={`${inputCls} bg-white`}>
               <option value="">Elegí tu provincia…</option>
               {Object.keys(PROVINCIAS).map(p => <option key={p} value={p}>{p}</option>)}
             </select>
           </div>
           <div>
-            <label className={labelCls}>Localidad *</label>
+            <label htmlFor="tcn-localidad" className={labelCls}>Localidad *</label>
             <input
+              id="tcn-localidad"
+              name="localidad"
               value={f.localidad}
               onChange={on('localidad')}
               required
@@ -154,8 +158,8 @@ function Formulario({ whatsappNumber }) {
           </div>
         </div>
         <div>
-          <label className={labelCls}>Mensaje</label>
-          <textarea value={f.mensaje} onChange={on('mensaje')} rows={3} className={inputCls} placeholder="Contanos qué vendés o qué te interesa (opcional)" />
+          <label htmlFor="tcn-mensaje" className={labelCls}>Mensaje</label>
+          <textarea id="tcn-mensaje" name="mensaje" value={f.mensaje} onChange={on('mensaje')} rows={3} className={inputCls} placeholder="Contanos qué vendés o qué te interesa (opcional)" />
         </div>
         <button
           type="submit"

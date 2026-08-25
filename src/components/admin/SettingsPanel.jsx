@@ -115,6 +115,7 @@ export default function SettingsPanel({ onToast }) {
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">$</span>
                 <input
                   type="number" min="0" step="1000"
+                  aria-label="Compra mínima para cliente mayorista nuevo"
                   value={minNuevo}
                   onChange={e => setMinNuevo(e.target.value)}
                   disabled={!mostrarCompraMinima}
@@ -130,6 +131,7 @@ export default function SettingsPanel({ onToast }) {
                 <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">$</span>
                 <input
                   type="number" min="0" step="1000"
+                  aria-label="Compra mínima para mayorista que ya compró"
                   value={minCliente}
                   onChange={e => setMinCliente(e.target.value)}
                   disabled={!mostrarCompraMinima}
@@ -154,6 +156,7 @@ export default function SettingsPanel({ onToast }) {
                 type="number"
                 min="0"
                 step="1000"
+                aria-label="Compra mínima"
                 value={minPurchase}
                 onChange={e => setMinPurchase(e.target.value)}
                 disabled={!mostrarCompraMinima}
@@ -177,6 +180,7 @@ export default function SettingsPanel({ onToast }) {
                 type="number"
                 min="0"
                 step="1000"
+                aria-label="Compra mínima sugerida"
                 value={suggestedMinPurchase}
                 onChange={e => setSuggestedMinPurchase(e.target.value)}
                 disabled={!mostrarCompraMinima}
@@ -203,6 +207,7 @@ export default function SettingsPanel({ onToast }) {
                 value={phoneNumber}
                 onChange={e => setPhoneNumber(e.target.value.replace(/[^\d]/g, ''))}
                 className="flex-1 border-2 border-gray-200 rounded-r-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
+                aria-label="Teléfono de WhatsApp"
                 placeholder="9 11 2320 8058"
                 maxLength={13}
               />
