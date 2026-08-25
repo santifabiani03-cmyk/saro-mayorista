@@ -49,6 +49,14 @@ const suave = k => k * k * (3 - 2 * k)
  * rebota más bajo (pierde energía, como una pelota de verdad).
  *   y0/v0 = altura y velocidad al salir · g = gravedad · e = cuánto rebota (0-1)
  */
+// La paleta usa el mismo alto que el hero de la página pública (5.2 allá con
+// cámara de FOV 34), para que se lea igual de grande.
+const ALTO_PALETA = 2.9
+const CODO = 1.5              // cuánto por debajo del mango está el pivote del swing
+// Punto exacto donde la pelota toca el centro de la cara. Lo comparten la
+// entrada, el golpe y la salida: si cada tramo usa el suyo, la pelota salta.
+const IMPACTO = { x: 0, y: 3.2, z: -6 }
+
 function balistica(t, y0, v0, g, suelo, e) {
   let y = y0, v = v0, resto = t
   for (let i = 0; i < 6; i++) {
@@ -94,7 +102,9 @@ export default function ScrollLab() {
       // entera, dejando una franja blanca a media pantalla.
       scene.fog = new THREE.Fog('#e8f1fa', 70, 210)
 
-      const camera = new THREE.PerspectiveCamera(50, W() / H(), 0.1, 200)
+      // FOV 34 como el hero de la página pública: menos distorsión de
+      // perspectiva y la paleta se lee del mismo modo.
+      const camera = new THREE.PerspectiveCamera(34, W() / H(), 0.1, 400)
       // preserveDrawingBuffer permite leer el cuadro ya dibujado (para inspeccionarlo)
       const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true })
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
@@ -143,9 +153,24 @@ export default function ScrollLab() {
 
       // Explanada exterior: el terreno que se ve más allá del vidrio, en un tono
       // distinto al de la cancha para que se lea el límite.
+      // Césped alrededor: da un afuera creíble en vez de una explanada neutra.
+      // El moteado se dibuja al vuelo para que no se lea como un verde plano.
+      const cesCnv = document.createElement('canvas')
+      cesCnv.width = cesCnv.height = 128
+      const cesCtx = cesCnv.getContext('2d')
+      cesCtx.fillStyle = '#8fbf7a'
+      cesCtx.fillRect(0, 0, 128, 128)
+      for (let i = 0; i < 900; i++) {
+        cesCtx.fillStyle = i % 2 ? 'rgba(122,171,101,0.55)' : 'rgba(166,205,143,0.5)'
+        cesCtx.fillRect(Math.random() * 128, Math.random() * 128, 2, 3)
+      }
+      const texCesped = new THREE.CanvasTexture(cesCnv)
+      texCesped.colorSpace = THREE.SRGBColorSpace
+      texCesped.wrapS = texCesped.wrapT = THREE.RepeatWrapping
+      texCesped.repeat.set(40, 40)
       const explanada = new THREE.Mesh(
         new THREE.PlaneGeometry(420, 420),
-        new THREE.MeshStandardMaterial({ color: '#dfe9f2', roughness: 1 })
+        new THREE.MeshStandardMaterial({ map: texCesped, roughness: 1 })
       )
       explanada.rotation.x = -Math.PI / 2
       explanada.position.y = -3.06
@@ -258,7 +283,13 @@ export default function ScrollLab() {
       scene.add(lineas)
 
       // Placeholders: paleta, pelota y paquete
+      // La paleta cuelga de un pivote que hace de CODO, igual que en el hero de
+      // la página pública: al rotar el pivote el mango acompaña el arco en vez
+      // de girar sobre su propio centro, y el golpe se lee como un brazo.
+      const codo = new THREE.Group()
       const paleta = new THREE.Group()
+      paleta.position.y = ALTO_PALETA / 2 + CODO
+      codo.add(paleta)
       const cara = new THREE.Mesh(
         new THREE.CylinderGeometry(1.15, 1.15, 0.16, 26),
         new THREE.MeshStandardMaterial({ color: '#F59E0B', metalness: 0.2, roughness: 0.4 })
@@ -314,7 +345,7 @@ export default function ScrollLab() {
         modelo.position.sub(centro)
         const cont = new THREE.Group()
         cont.add(modelo)
-        cont.scale.setScalar(2.9 / size.y)   // alto aproximado al del placeholder
+        cont.scale.setScalar(ALTO_PALETA / size.y)
         paleta.add(cont)
         cara.visible = false                  // se van los placeholders
         mango.visible = false
@@ -418,7 +449,7 @@ export default function ScrollLab() {
       })
       paquete.add(cintaH, cintaV, caja, tapa)
 
-      scene.add(paleta, pelota, paquete)
+      scene.add(codo, pelota, paquete)
 
       const onResize = () => {
         renderer.setSize(W(), H())
@@ -472,16 +503,18 @@ export default function ScrollLab() {
         const aVuelo  = suave(seg(t, 0.38, 0.64))
 
         // ── Paleta: espera al fondo, amaga y golpea hacia la cámara ──
-        // Queda del otro lado de la red, así la pelota viene hacia vos, cruza
-        // por encima y pica de este lado. No se corta de golpe: acompaña el
-        // golpe y se va apagando.
-        const PAL_Z = -6
-        paleta.position.set(mix(0, -0.8, aMano) - 1.4 * aVuelo, 0.4 + 1.1 * aVuelo, PAL_Z)
-        paleta.rotation.y = mix(0, -0.35, aMano)
-        paleta.rotation.z = mix(mix(0, 0.8, aMano), -1.1, aGolpe)
+        // Va por ENCIMA del borde de la red (2.67) para que el golpe se lea como
+        // un golpe de pádel y no como una devolución a ras del piso. Rota desde
+        // el codo, así el mango acompaña el arco.
+        codo.position.set(IMPACTO.x, IMPACTO.y - (ALTO_PALETA / 2 + CODO), IMPACTO.z)
+        codo.rotation.y = mix(0, -0.35, aMano)
+        codo.rotation.z = mix(mix(0, 0.55, aMano), -0.95, aGolpe)
+        // después del golpe acompaña y se va apagando, no se corta de golpe
         const salePaleta = suave(seg(t, 0.44, 0.62))
-        paleta.visible = salePaleta < 0.99
-        paleta.traverse(o => {
+        codo.position.x -= 1.4 * salePaleta
+        codo.position.y += 1.1 * salePaleta
+        codo.visible = salePaleta < 0.99
+        codo.traverse(o => {
           if (o.isMesh && o.material) {
             o.material.transparent = true
             o.material.opacity = 1 - salePaleta
@@ -489,36 +522,45 @@ export default function ScrollLab() {
         })
 
         // ── Pelota ──
-        // Ya NO se oculta en ningún momento: es esta misma malla la que termina
-        // siendo la caja, así que tiene que estar siempre en pantalla.
+        // Nunca se oculta: es esta misma malla la que termina siendo la caja.
         pelota.visible = aEntra > 0.01
+
+        // Cuánto se transformó y cuánto se alineó. Va acá arriba porque de esto
+        // depende dónde está el piso para esta forma.
+        const cambio = suave(seg(t, 0.68, 0.95))
+        const alinea = suave(seg(t, 0.68, 0.90))
+        // Una esfera apoya a R del centro mire como mire, pero un CUBO ROTADO
+        // apoya sobre una esquina, que está hasta 1.73·R del centro. Sin esto la
+        // caja se hunde en el piso justo mientras se transforma.
+        const RADIO_ABAJO = R_BOLA * (1 + 0.732 * cambio * (1 - alinea))
+        const PISO_FORMA = SUELO_Y + RADIO_ABAJO
 
         // Física del tiro. El tiempo avanza LINEAL con el scroll (sin suavizado):
         // si no, la pelota parece frenar y acelerar sola.
-        const G = 15, SUELO = SUELO_Y + R_BOLA, REBOTE = 0.55
-        // Velocidades calculadas para que PASE la red de 5.67 de alto: al llegar
-        // a la red va por 3.8 de altura, bien por encima del borde (2.67).
-        const VZ = 10, VX = 1.6, V0Y = 11.5
-        const T_PIQUE = 1.77                     // cuándo toca el piso (calculado)
+        const G = 15, REBOTE = 0.55
+        const VZ = 10, VX = 1.6, V0Y = 9
+        const T_PIQUE = 1.66                     // cuándo toca el piso (calculado)
         let bx, by, bz
         if (aGolpe <= 0) {
-          const te = seg(t, 0.18, 0.30)          // entra desde el frente, cayendo
-          bx = mix(-3.2, 0, te)
-          bz = mix(15, PAL_Z, te)
-          by = balistica(te * 0.62, 5.5, 0.4, G, 0.5, 0)
+          // ENTRADA: viene desde el frente y termina EXACTAMENTE en el punto de
+          // impacto — el mismo del que sale después. Antes cada tramo tenía su
+          // propia altura y la pelota daba un salto al golpear.
+          const te = suave(seg(t, 0.16, 0.30))
+          bx = mix(-3.4, IMPACTO.x, te)
+          bz = mix(16, IMPACTO.z, te)
+          by = mix(7.6, IMPACTO.y, te) - Math.sin(te * Math.PI) * 1.1   // cae en curva
         } else {
           const tv = seg(t, 0.30, 0.92) * 2.30   // segundos de vuelo: da para UN pique
-          // al picar pierde parte del avance, como una pelota de verdad
+          // el suelo sube con la forma: el cubo rotado baja más que la esfera
           const rec = tv < T_PIQUE ? tv : T_PIQUE + (tv - T_PIQUE) * 0.42
-          bx = VX * rec
-          bz = PAL_Z + VZ * rec                  // cruza la red y pica del otro lado
-          by = balistica(tv, 0.5, V0Y, G, SUELO, REBOTE)
+          bx = IMPACTO.x + VX * rec
+          bz = IMPACTO.z + VZ * rec              // cruza la red y pica del otro lado
+          by = balistica(tv, IMPACTO.y, V0Y, G, PISO_FORMA, REBOTE)
         }
-        // Al final se apoya en el piso: con la física pura quedaría flotando.
-        // Al volverse cubo la cara de abajo queda a R_BOLA del centro, así que
-        // apoyarla pide esa altura exacta más un pelín para que no se funda con
-        // el piso ni lo atraviese.
-        by = mix(by, SUELO_Y + R_BOLA + 0.04, suave(seg(t, 0.86, 1.00)))
+        // Al final se apoya: la cara de abajo del cubo ya alineado queda a R del
+        // centro, más un pelín para que no se funda con el piso.
+        by = Math.max(by, PISO_FORMA)
+        by = mix(by, SUELO_Y + R_BOLA + 0.03, suave(seg(t, 0.86, 1.00)))
         pelota.position.set(bx, by, bz)
 
         // ── Cámara: un giro continuo de 90° alrededor de la pelota ──
@@ -526,12 +568,16 @@ export default function ScrollLab() {
         // enfrentando a la cámara para que el logo se lea.
         const sigue = suave(seg(t, 0.24, 0.46))          // suelta la paleta, toma la pelota
         const giro = suave(seg(t, 0.42, 0.90)) * (Math.PI / 2)
-        const foco = new THREE.Vector3(0, 0.9, PAL_Z).lerp(pelota.position, sigue)
+        const foco = new THREE.Vector3(IMPACTO.x, IMPACTO.y, IMPACTO.z).lerp(pelota.position, sigue)
         // Arranca cerca para que la paleta se lea como protagonista, y termina
         // un poco más lejos y más alta: pegada al piso, la red entraba de canto
         // cortando la pantalla en diagonal.
-        const dist = mix(8.5, 12, suave(seg(t, 0.40, 0.92)))
-        const alto = mix(1.6, 3.6, suave(seg(t, 0.45, 0.92)))
+        // Calibrado para FOV 34: a 7.5 la paleta ocupa el 63% del alto, igual que
+        // en el hero de la página pública. Al final se acerca a 6.5 para que la
+        // caja se lea, y desde esa altura la red queda fuera del cuadro en vez
+        // de cruzarlo en diagonal.
+        const dist = mix(7.5, 6.5, suave(seg(t, 0.40, 0.92)))
+        const alto = mix(1.2, 2.4, suave(seg(t, 0.45, 0.92)))
         camera.position.set(
           foco.x + Math.sin(giro) * dist,
           foco.y + alto,
@@ -542,13 +588,12 @@ export default function ScrollLab() {
         // ── DE PELOTA A ENVÍO ──
         // La misma malla cambia de forma y de color. No se achica ni desaparece
         // para dejarle lugar a otra: es la pelota la que se vuelve caja.
-        transformar(suave(seg(t, 0.68, 0.95)))
+        transformar(cambio)
 
         // Gira mientras es pelota; al volverse caja se alinea y queda QUIETA, con
         // la cara del logo enfrentando a la cámara. Se calcula en función del
         // scroll (no acumulando) para que ir y volver den lo mismo.
         const vueltas = seg(t, 0.30, 0.72) * 9
-        const alinea = suave(seg(t, 0.68, 0.90))
         pelota.rotation.x = vueltas * (1 - alinea)
         pelota.rotation.z = vueltas * 0.4 * (1 - alinea)
         pelota.rotation.y = mix(vueltas * 0.3, giro, alinea)
