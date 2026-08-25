@@ -29,6 +29,9 @@ const ACTOS = [
   { at: 0.86, lado: 'izq', k: 'Tu pedido', t: 'Armalo en 2 minutos',             d: 'Elegís y cerramos por WhatsApp.' },
 ]
 
+// Tramo del scroll en el que transcurre el golpe completo (para la animación mocap)
+const GOLPE = { desde: 0.14, hasta: 0.52 }
+
 // Ajuste fino del jugador: escala, dónde se para y cómo sostiene la paleta.
 const JUGADOR = {
   altura: 11.5,          // alto en unidades de escena (la paleta mide ~2.9)
@@ -229,7 +232,12 @@ export default function ScrollLab() {
         j.position.set(JUGADOR.pos[0], JUGADOR.pos[1] - bb2.min.y, JUGADOR.pos[2])
         j.rotation.y = JUGADOR.giro
         j.traverse(o => {
-          if (o.isBone) huesos[o.name] = o
+          // Mixamo antepone "mixamorig:" a cada hueso; se guarda con y sin prefijo
+          if (o.isBone) {
+            huesos[o.name] = o
+            const limpio = o.name.replace(/^mixamorig:?/i, '')
+            if (limpio !== o.name) huesos[limpio] = o
+          }
           if (o.isMesh) o.frustumCulled = false   // el skinning mueve la malla
         })
         // guardar la rotación de reposo de cada hueso que vamos a animar
@@ -252,6 +260,18 @@ export default function ScrollLab() {
             if (mayor > 0) paleta.scale.setScalar(JUGADOR.paletaEnMano.largo / mayor)
           }
           paleta.position.set(...JUGADOR.paletaEnMano.pos)
+        }
+        // Si el .glb trae una animación de verdad (mocap de Mixamo), se la recorre
+        // con el scroll en vez de rotar los huesos a mano: el movimiento es humano.
+        if (gltf.animations?.length) {
+          const clip = gltf.animations.reduce((a, b) => (b.duration > a.duration ? b : a))
+          const mixer = new THREE.AnimationMixer(j)
+          const accion = mixer.clipAction(clip)
+          accion.play()
+          accion.paused = true
+          jugadorRef.mixer = mixer
+          jugadorRef.accion = accion
+          jugadorRef.duracion = clip.duration
         }
         scene.add(j)
         jugadorRef.obj = j
@@ -469,26 +489,34 @@ export default function ScrollLab() {
           const impacto = suave(seg(t, 0.36, 0.44))   // suelta el golpe
           const baja    = suave(seg(t, 0.50, 0.75))   // vuelve a la guardia
 
-          const b = huesos.RightArm, c = huesos.RightForeArm
-          const m = huesos.RightHand, sp = huesos.Spine01 || huesos.Spine
-          // Ejes verificados sobre el modelo real: el hombro sube/baja girando en
-          // Y, y el codo dobla en X. (Rotar en Z sólo torcía el brazo sobre sí
-          // mismo, por eso antes la pose no cambiaba.)
-          if (b?.userData.base) {
-            const REPOSO = -1.30   // sale de la T-pose y deja el brazo al costado
-            b.rotation.y = b.userData.base.y + REPOSO
-              + 0.55 * estira - 0.30 * carga + 0.95 * impacto - 0.55 * baja
-          }
-          if (c?.userData.base) {
-            c.rotation.x = c.userData.base.x
-              - 0.30 * estira - 1.35 * carga + 1.50 * impacto - 0.35 * baja
-          }
-          if (m?.userData.base) {
-            m.rotation.x = m.userData.base.x - 0.35 * carga + 0.60 * impacto
-          }
-          if (sp?.userData.base) {
-            // el torso acompaña el swing: sin esto se ve un golpe de brazo suelto
-            sp.rotation.y = sp.userData.base.y + 0.28 * carga - 0.50 * impacto + 0.22 * baja
+          // ── Camino A: animación real (mocap de Mixamo), recorrida por el scroll ──
+          if (jugadorRef.mixer) {
+            const fase = suave(seg(t, GOLPE.desde, GOLPE.hasta))
+            jugadorRef.accion.time = fase * jugadorRef.duracion
+            jugadorRef.mixer.update(0)
+          } else {
+            // ── Camino B (respaldo): rotar las articulaciones a mano ──
+            const b = huesos.RightArm, c = huesos.RightForeArm
+            const m = huesos.RightHand, sp = huesos.Spine01 || huesos.Spine
+            // Ejes verificados sobre el modelo real: el hombro sube/baja girando en
+            // Y, y el codo dobla en X. (Rotar en Z sólo torcía el brazo sobre sí
+            // mismo, por eso antes la pose no cambiaba.)
+            if (b?.userData.base) {
+              const REPOSO = -1.30   // sale de la T-pose y deja el brazo al costado
+              b.rotation.y = b.userData.base.y + REPOSO
+                + 0.55 * estira - 0.30 * carga + 0.95 * impacto - 0.55 * baja
+            }
+            if (c?.userData.base) {
+              c.rotation.x = c.userData.base.x
+                - 0.30 * estira - 1.35 * carga + 1.50 * impacto - 0.35 * baja
+            }
+            if (m?.userData.base) {
+              m.rotation.x = m.userData.base.x - 0.35 * carga + 0.60 * impacto
+            }
+            if (sp?.userData.base) {
+              // el torso acompaña el swing: sin esto se ve un golpe de brazo suelto
+              sp.rotation.y = sp.userData.base.y + 0.28 * carga - 0.50 * impacto + 0.22 * baja
+            }
           }
         }
 
