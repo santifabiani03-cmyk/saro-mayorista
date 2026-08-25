@@ -30,24 +30,6 @@ const ACTOS = [
 ]
 
 // Tramo del scroll en el que transcurre el golpe completo (para la animación mocap)
-// Tramos del guion. El jugador primero ESTIRA el brazo y toma la paleta, y
-// recién después arranca el golpe.
-const AGARRE = { desde: 0.10, hasta: 0.28 }
-const GOLPE  = { desde: 0.28, hasta: 0.62, cual: 'goalie-throw', impacto: 0.44 }
-
-// La animación de Mixamo no mueve la muñeca (medido: 0° en todo el clip), así
-// que el latigazo final se agrega por código encima del mocap.
-const MUNECA = { fuerza: 0.55, ancho: 3.0 }
-
-// Ajuste fino del jugador: escala, dónde se para y cómo sostiene la paleta.
-const JUGADOR = {
-  altura: 11.5,          // alto en unidades de escena (la paleta mide ~2.9)
-  pos: [-1.2, -3, 0.4],  // parado sobre el piso (y = -3)
-  giro: 0,               // mira hacia la cámara (el modelo ya viene de frente)
-  // la paleta cuelga de la mano derecha:
-  // 'largo' = cuánto mide la paleta dentro de la escena (el jugador mide 11.5)
-  paletaEnMano: { pos: [0, 0, 0], rot: [0, 0, 0], largo: 2.9 },
-}
 
 // Ajuste fino de la mano 3D: como el modelo viene con su propia orientación,
 // estos valores son los que hay que tocar si el agarre no queda bien.
@@ -189,24 +171,7 @@ export default function ScrollLab() {
       lineas.add(central)
       scene.add(lineas)
 
-      // Placeholders: brazo, paleta, pelota y paquete
-      // Mano + antebrazo. Se arma como grupo para poder moverlo junto con la paleta.
-      const piel = new THREE.MeshStandardMaterial({ color: '#dda87d', roughness: 0.85, metalness: 0 })
-      const brazo = new THREE.Group()
-      const antebrazo = new THREE.Mesh(new THREE.CapsuleGeometry(0.36, 2.1, 8, 18), piel)
-      antebrazo.rotation.z = 0.5
-      antebrazo.position.set(-1.05, -1.15, 0.15)
-      const palma = new THREE.Mesh(new THREE.SphereGeometry(0.45, 24, 18), piel)
-      palma.scale.set(1, 1.25, 0.72)
-      const dedos = new THREE.Mesh(new THREE.CapsuleGeometry(0.17, 0.66, 7, 14), piel)
-      dedos.rotation.x = Math.PI / 2
-      dedos.position.set(0.06, 0.16, 0.34)
-      const pulgar = new THREE.Mesh(new THREE.CapsuleGeometry(0.145, 0.46, 7, 14), piel)
-      pulgar.rotation.set(Math.PI / 2, 0, 0.5)
-      pulgar.position.set(-0.05, -0.18, 0.3)
-      brazo.add(antebrazo, palma, dedos, pulgar)
-      // La paleta real del sitio. Mientras carga se muestra una silueta simple,
-      // así el guion se puede seguir aunque el .glb tarde.
+      // Placeholders: paleta, pelota y paquete
       const paleta = new THREE.Group()
       const cara = new THREE.Mesh(
         new THREE.CylinderGeometry(1.15, 1.15, 0.16, 26),
@@ -222,94 +187,6 @@ export default function ScrollLab() {
 
       const loader = new GLTFLoader()
       loader.setMeshoptDecoder(MeshoptDecoder)
-      // ── JUGADOR con esqueleto (Meshy, riggeado) ──
-      // Se guardan los huesos del brazo para animarlos según el scroll, y la
-      // paleta se cuelga de la mano derecha para que la siga sola.
-      const jugadorRef = {}
-      const huesos = {}
-      loader.load('/models/jugador.glb', gltf => {
-        if (disposed) return
-        const j = gltf.scene
-        const bb = new THREE.Box3().setFromObject(j)
-        const sz = new THREE.Vector3(); bb.getSize(sz)
-        const escalaJug = JUGADOR.altura / sz.y
-        j.scale.setScalar(escalaJug)
-        // apoyarlo sobre el piso
-        const bb2 = new THREE.Box3().setFromObject(j)
-        j.position.set(JUGADOR.pos[0], JUGADOR.pos[1] - bb2.min.y, JUGADOR.pos[2])
-        j.rotation.y = JUGADOR.giro
-        j.traverse(o => {
-          // Mixamo antepone "mixamorig:" a cada hueso; se guarda con y sin prefijo
-          if (o.isBone) {
-            huesos[o.name] = o
-            const limpio = o.name.replace(/^mixamorig:?/i, '')
-            if (limpio !== o.name) huesos[limpio] = o
-          }
-          if (o.isMesh) o.frustumCulled = false   // el skinning mueve la malla
-        })
-        // guardar la rotación de reposo de cada hueso que vamos a animar
-        ;['RightArm', 'RightForeArm', 'RightHand', 'Spine', 'Spine01'].forEach(n => {
-          if (huesos[n]) huesos[n].userData.base = huesos[n].rotation.clone()
-        })
-        // La paleta NO se cuelga de la mano: queda suelta en la escena para que
-        // al principio se la vea sola, y recién cuando el jugador la toma pasa a
-        // seguirla. En la mano se deja un "ancla" invisible que marca dónde y con
-        // qué inclinación debe quedar el mango.
-        if (huesos.RightHand) {
-          const ancla = new THREE.Object3D()
-          huesos.RightHand.add(ancla)
-          j.updateMatrixWorld(true)
-          // el hueso trae su propia escala: se divide para que el offset se pueda
-          // escribir en unidades de la escena y no en las del esqueleto
-          const eh = ancla.getWorldScale(new THREE.Vector3()).x || 1
-          const [ox, oy, oz] = JUGADOR.paletaEnMano.pos
-          ancla.position.set(ox / eh, oy / eh, oz / eh)
-          ancla.rotation.set(...JUGADOR.paletaEnMano.rot)
-          jugadorRef.ancla = ancla
-
-          // ¿Dónde queda la mano con el brazo estirado? La paleta espera JUSTO
-          // ahí. Si no, tendría que volar varias unidades para meterse sola en la
-          // mano, y el agarre se ve falso.
-          const bb = huesos.RightArm, cc = huesos.RightForeArm
-          const guardaB = bb?.rotation.clone(), guardaC = cc?.rotation.clone()
-          if (bb) { bb.rotation.y -= 0.95; bb.rotation.x += 0.30 }
-          if (cc) cc.rotation.x += 0.55
-          j.updateMatrixWorld(true)
-          jugadorRef.espera = ancla.getWorldPosition(new THREE.Vector3())
-          if (bb && guardaB) bb.rotation.copy(guardaB)
-          if (cc && guardaC) cc.rotation.copy(guardaC)
-          j.updateMatrixWorld(true)
-        }
-        // El golpe sale de una animación de captura de movimiento (Mixamo). Se
-        // carga aparte, como pistas sueltas de 61 KB, y se aplica sobre este
-        // esqueleto: mucho más liviano que traer otra malla de 10 MB.
-        const usarClip = (clip) => {
-          const mixer = new THREE.AnimationMixer(j)
-          const accion = mixer.clipAction(clip)
-          accion.play()
-          accion.paused = true
-          accion.clampWhenFinished = true
-          jugadorRef.mixer = mixer
-          jugadorRef.accion = accion
-          jugadorRef.duracion = clip.duration
-        }
-        if (gltf.animations?.length) {
-          usarClip(gltf.animations.reduce((a, b) => (b.duration > a.duration ? b : a)))
-        }
-        fetch('/models/golpes.json')
-          .then(r => r.json())
-          .then(golpes => {
-            const elegido = golpes[GOLPE.cual] || Object.values(golpes)[0]
-            if (elegido) usarClip(THREE.AnimationClip.parse(elegido))
-          })
-          .catch(() => { /* sin el clip queda la animación por código */ })
-        scene.add(j)
-        jugadorRef.obj = j
-        // con el jugador completo ya no hace falta la mano suelta
-        brazo.visible = false
-        brazo.userData.oculto = true
-      }, undefined, () => { /* sin jugador, queda la mano suelta */ })
-
       // Paquete real (Meshy, 79 KB) con el logo de la marca pegado en la cara.
       loader.load('/models/paquete.glb', gltf => {
         if (disposed) return
@@ -341,21 +218,6 @@ export default function ScrollLab() {
 
       // Mano generada con Meshy (101 KB ya optimizada). Si carga, reemplaza a la
       // mano de cápsulas; si falla, queda la simple y el guion sigue igual.
-      loader.load('/models/mano.glb', gltf => {
-        if (disposed) return
-        const m = gltf.scene
-        const bb = new THREE.Box3().setFromObject(m)
-        const sz = new THREE.Vector3(); bb.getSize(sz)
-        const ct = new THREE.Vector3(); bb.getCenter(ct)
-        m.position.sub(ct)
-        const cont = new THREE.Group()
-        cont.add(m)
-        cont.scale.setScalar(MANO.escala / Math.max(sz.x, sz.y, sz.z))
-        cont.rotation.set(...MANO.rot)
-        cont.position.set(...MANO.offset)
-        brazo.add(cont)
-        ;[antebrazo, palma, dedos, pulgar].forEach(o => { o.visible = false })
-      }, undefined, () => { /* si falla, quedan las cápsulas */ })
 
       loader.load('/models/paleta-opt.glb', gltf => {
         if (disposed) return
@@ -373,8 +235,31 @@ export default function ScrollLab() {
       }, undefined, () => { /* si falla, queda la silueta simple */ })
 
       // Pelota de pádel: fieltro (nada de brillo) y las costuras blancas curvas
+      // ── LA PELOTA QUE SE VUELVE ENVÍO ──
+      // No hay dos objetos que se intercambian: es UNA sola malla cuyos vértices
+      // viajan de la esfera al cubo. Cada vértice se mueve por su propia dirección
+      // hasta la cara del cubo (d / mayor componente), así la forma cambia de a
+      // poco y sin saltos. Como las esquinas del cubo quedan MÁS lejos del centro
+      // que la superficie de la esfera, la pelota nunca se achica: se expande
+      // hacia las esquinas hasta volverse caja.
+      const R_BOLA = 0.4
+      const geoBola = new THREE.SphereGeometry(R_BOLA, 40, 30)
+      const vertEsfera = Float32Array.from(geoBola.attributes.position.array)
+      const vertCubo = new Float32Array(vertEsfera.length)
+      for (let i = 0; i < vertEsfera.length; i += 3) {
+        const x = vertEsfera[i], y = vertEsfera[i + 1], z = vertEsfera[i + 2]
+        const L = Math.hypot(x, y, z) || 1
+        const dx = x / L, dy = y / L, dz = z / L
+        const may = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz)) || 1
+        vertCubo[i] = (dx / may) * R_BOLA
+        vertCubo[i + 1] = (dy / may) * R_BOLA
+        vertCubo[i + 2] = (dz / may) * R_BOLA
+      }
+      // colores entre los que viaja la superficie: fieltro → cartón
+      const COLOR_FIELTRO = new THREE.Color('#d8e83c')
+      const COLOR_CARTON = new THREE.Color('#c69a6b')
+
       const pelota = new THREE.Group()
-      const geoBola = new THREE.SphereGeometry(0.4, 32, 24)
       const matFieltro = new THREE.MeshStandardMaterial({
         color: '#d8e83c', roughness: 0.95, metalness: 0,
       })
@@ -390,22 +275,55 @@ export default function ScrollLab() {
       costuraB.position.y = -0.12
       costuraB.scale.set(0.93, 0.93, 1)
       pelota.add(bola, costuraA, costuraB)
-      // Paquete: caja de cartón con cinta cruzada, para que se lea como un envío
+
+      // k = 0 pelota · k = 1 caja. Mueve los vértices y el color a la vez.
+      const posBola = geoBola.attributes.position
+      let kAnterior = -1
+      const transformar = (k) => {
+        if (Math.abs(k - kAnterior) < 0.002) return
+        kAnterior = k
+        const a = posBola.array
+        for (let i = 0; i < a.length; i++) a[i] = vertEsfera[i] + (vertCubo[i] - vertEsfera[i]) * k
+        posBola.needsUpdate = true
+        geoBola.computeVertexNormals()
+        matFieltro.color.copy(COLOR_FIELTRO).lerp(COLOR_CARTON, k)
+        matFieltro.roughness = mix(0.95, 0.92, k)
+        // las costuras se borran en la primera mitad: son de la pelota, no de la caja
+        const vc = Math.max(0, 1 - k * 2)
+        matCostura.opacity = vc
+        costuraA.visible = costuraB.visible = vc > 0.02
+      }
+      matCostura.transparent = true
+      // Los detalles del envío (cintas + etiqueta) NO son otra caja: se apoyan
+      // sobre la misma malla que antes era pelota, y aparecen recién cuando la
+      // forma ya es cúbica. Así nunca hay dos objetos pisándose.
       const paquete = new THREE.Group()
-      const geoCaja = new THREE.BoxGeometry(1.5, 1.2, 1.2)
-      const matCarton = new THREE.MeshStandardMaterial({ color: '#c69a6b', roughness: 0.92 })
-      const caja = new THREE.Mesh(geoCaja, matCarton)
-      const matCinta = new THREE.MeshStandardMaterial({ color: '#e8d9bd', roughness: 0.7 })
-      const geoCintaH = new THREE.BoxGeometry(1.53, 0.26, 1.23)
+      const L = R_BOLA * 2                       // la caja mide esto de cara a cara
+      const matCinta = new THREE.MeshStandardMaterial({
+        color: '#e8d9bd', roughness: 0.7, transparent: true, opacity: 0,
+      })
+      const geoCintaH = new THREE.BoxGeometry(L * 1.02, L * 0.17, L * 1.02)
       const cintaH = new THREE.Mesh(geoCintaH, matCinta)
-      const geoCintaV = new THREE.BoxGeometry(0.26, 1.23, 1.23)
+      const geoCintaV = new THREE.BoxGeometry(L * 0.17, L * 1.02, L * 1.02)
       const cintaV = new THREE.Mesh(geoCintaV, matCinta)
-      // línea de la tapa, para que se note que es una caja cerrada
-      const geoTapa = new THREE.BoxGeometry(1.52, 0.03, 1.22)
-      const tapa = new THREE.Mesh(geoTapa, new THREE.MeshStandardMaterial({ color: '#a97f52' }))
-      tapa.position.y = 0.6
-      paquete.add(caja, cintaH, cintaV, tapa)
-      scene.add(brazo, paleta, pelota, paquete)
+      // etiqueta con el logo, en una cara
+      const matEtiqueta = new THREE.MeshStandardMaterial({
+        color: '#f3efe6', roughness: 0.9, transparent: true, opacity: 0,
+      })
+      const caja = new THREE.Mesh(new THREE.PlaneGeometry(L * 0.44, L * 0.3), matEtiqueta)
+      caja.position.z = L * 0.51
+      const tapa = new THREE.Mesh(new THREE.PlaneGeometry(L * 0.44, L * 0.3), matEtiqueta)
+      tapa.position.z = -L * 0.51
+      tapa.rotation.y = Math.PI
+      new THREE.TextureLoader().load('/assets/logo-caja.png', tx => {
+        if (disposed) return
+        tx.colorSpace = THREE.SRGBColorSpace
+        matEtiqueta.map = tx
+        matEtiqueta.needsUpdate = true
+      })
+      paquete.add(cintaH, cintaV, caja, tapa)
+
+      scene.add(paleta, pelota, paquete)
 
       const onResize = () => {
         renderer.setSize(W(), H())
@@ -421,16 +339,13 @@ export default function ScrollLab() {
       if (typeof window !== 'undefined') {
         window.__lab = {
           ver(t) { progRef.current.t = t; dibujar(t); return renderer.domElement.toDataURL('image/webp', 0.7) },
-          huesos: () => Object.keys(huesos),
-          // encuadra TODA la escena: sirve para ver si hay geometría y dónde quedó
+          // encuadra toda la escena: sirve para comprobar que hay geometría
           vistaGeneral(t = 0.05) {
             progRef.current.t = t
             dibujar(t)
             const caja = new THREE.Box3()
             let mallas = 0
-            scene.traverse(o => {
-              if (o.isMesh && o.visible) { mallas++; caja.expandByObject(o) }
-            })
+            scene.traverse(o => { if (o.isMesh && o.visible) { mallas++; caja.expandByObject(o) } })
             if (caja.isEmpty()) return { mallas, caja: 'vacia' }
             const c = new THREE.Vector3(), sz = new THREE.Vector3()
             caja.getCenter(c); caja.getSize(sz)
@@ -438,42 +353,7 @@ export default function ScrollLab() {
             camera.position.set(c.x, c.y + sz.y * 0.1, c.z + d)
             camera.lookAt(c)
             renderer.render(scene, camera)
-            return {
-              mallas,
-              centro: c.toArray().map(n => +n.toFixed(1)),
-              tam: sz.toArray().map(n => +n.toFixed(1)),
-              img: renderer.domElement.toDataURL('image/webp', 0.7),
-            }
-          },
-          // prueba: fija una rotación en un hueso y dibuja, para descubrir qué eje sirve
-          probar(nombre, eje, rad, t = 0.05) {
-            progRef.current.t = t
-            dibujar(t)
-            const h = huesos[nombre]
-            if (!h) return 'sin hueso ' + nombre
-            h.rotation[eje] = (h.userData.base ? h.userData.base[eje] : 0) + rad
-            renderer.render(scene, camera)
-            return renderer.domElement.toDataURL('image/webp', 0.7)
-          },
-          info() {
-            const j = jugadorRef.obj
-            if (!j) return { jugador: 'no cargó' }
-            const h = huesos.RightHand
-            const v = new THREE.Vector3()
-            return {
-              jugador: 'ok',
-              paletaVisible: paleta.visible,
-              paletaPadre: paleta.parent?.name || 'escena',
-              manoEnMundo: h ? h.getWorldPosition(v).toArray().map(n => +n.toFixed(2)) : null,
-              paletaEnMundo: paleta.getWorldPosition(new THREE.Vector3()).toArray().map(n => +n.toFixed(2)),
-              camara: camera.position.toArray().map(n => +n.toFixed(1)),
-              paletaHijos: paleta.children.length,
-              paletaEscalaMundo: paleta.getWorldScale(new THREE.Vector3()).toArray().map(n => +n.toFixed(3)),
-              paletaTam: (() => {
-                const b = new THREE.Box3().setFromObject(paleta), v = new THREE.Vector3()
-                return b.isEmpty() ? 'vacia' : b.getSize(v).toArray().map(n => +n.toFixed(2))
-              })(),
-            }
+            return { mallas, centro: c.toArray().map(n => +n.toFixed(1)), img: renderer.domElement.toDataURL('image/webp', 0.7) }
           },
         }
       }
@@ -484,185 +364,94 @@ export default function ScrollLab() {
       const dibujar = (t) => {
 
         // ── El guion, escrito en función del progreso ──
-        // 0.00–0.16 · la paleta espera quieta, de frente
-        // 0.16–0.26 · entra la mano y la agarra
-        // 0.26–0.36 · la pelota INGRESA desde la pared del fondo
-        // 0.36–0.44 · el golpe
-        // 0.44–0.62 · la pelota viene HACIA la cámara y la cámara retrocede
-        // 0.62–0.74 · pique y rebote
-        // 0.74–0.86 · se transforma en paquete (mismo lugar, transición limpia)
-        // 0.86–1.00 · el paquete se acomoda al costado
-        const aMano   = suave(seg(t, 0.20, 0.30))
-        const aEntra  = suave(seg(t, 0.26, 0.36))
-        const aGolpe  = suave(seg(t, 0.36, 0.44))
-        const aVuelo  = suave(seg(t, 0.44, 0.62))
-        const aPique  = suave(seg(t, 0.62, 0.74))
-        const aMorph  = suave(seg(t, 0.74, 0.86))
-        const aFinal  = suave(seg(t, 0.86, 1.00))
+        // 0.00–0.18 · la paleta espera quieta, de frente
+        // 0.18–0.30 · la pelota ENTRA desde el frente, cayendo hacia la paleta
+        // 0.30–0.38 · el golpe
+        // 0.30–0.68 · vuelo: cruza la red y pica del otro lado
+        // 0.42–0.90 · la cámara gira 90° alrededor de la pelota, sin cortes
+        // 0.68–0.95 · la pelota cambia de forma y color hasta ser el envío
+        // 0.92–1.00 · la caja se asienta y queda quieta
+        const aMano   = suave(seg(t, 0.10, 0.22))
+        const aEntra  = suave(seg(t, 0.18, 0.30))
+        const aGolpe  = suave(seg(t, 0.30, 0.38))
+        const aVuelo  = suave(seg(t, 0.38, 0.64))
 
-        // ── Paleta (posición libre; si la agarran, más abajo pasa a la mano) ──
-        if (jugadorRef.espera) {
-          // espera flotando al alcance del brazo, con un cabeceo apenas visible
-          const e = jugadorRef.espera
-          paleta.position.set(e.x, e.y + Math.sin(t * 40) * 0.05, e.z)
-        } else {
-          paleta.position.set(mix(0, -0.6, aMano) - 4.5 * aVuelo, 0.4, 0)
-        }
+        // ── Paleta: espera, amaga y golpea. Después sale de cuadro. ──
+        paleta.position.set(mix(0, -0.6, aMano) - 4.5 * aVuelo, 0.4, 0)
         paleta.rotation.y = mix(0, -0.35, aMano)
         paleta.rotation.z = mix(mix(0, 0.8, aMano), -1.0, aGolpe)
         paleta.visible = aVuelo < 0.9
 
-        // ── ARTICULACIONES DEL JUGADOR ──
-        // El brazo se estira para tomar la paleta, se contrae para cargar el
-        // golpe y se extiende de nuevo al impactar. El torso acompaña.
-        if (jugadorRef.obj) {
-          const estira  = suave(seg(t, 0.14, 0.28))   // extiende el brazo
-          const carga   = suave(seg(t, 0.28, 0.36))   // contrae el codo (amague)
-          const impacto = suave(seg(t, 0.36, 0.44))   // suelta el golpe
-          const baja    = suave(seg(t, 0.50, 0.75))   // vuelve a la guardia
-
-          // ── Camino A: animación real (mocap de Mixamo), recorrida por el scroll ──
-          if (jugadorRef.mixer) {
-            const fase = suave(seg(t, GOLPE.desde, GOLPE.hasta))
-            jugadorRef.accion.time = fase * jugadorRef.duracion
-            jugadorRef.mixer.update(0)
-
-            // ── Estirar el brazo a buscar la paleta ──
-            // El mocap arranca ya en posición de golpe, así que antes del agarre
-            // se le resta esa pose para que el brazo salga de abajo, se estire
-            // hacia la paleta, y recién ahí empalme con la animación.
-            const busca = 1 - suave(seg(t, AGARRE.desde, AGARRE.hasta))
-            if (busca > 0.001) {
-              const b = huesos.RightArm, c = huesos.RightForeArm
-              if (b) { b.rotation.y -= 0.95 * busca; b.rotation.x += 0.30 * busca }
-              if (c) c.rotation.x += 0.55 * busca
-            }
-
-            // ── Latigazo de muñeca ──
-            // Se atrasa mientras carga y se suelta justo pasado el impacto: es lo
-            // que hace que el golpe se lea como un golpe y no como un empujón.
-            const mn = huesos.RightHand
-            if (mn) {
-              const d = fase - GOLPE.impacto
-              const pulso = Math.sin(d * Math.PI * 2.2) * Math.exp(-((d * MUNECA.ancho) ** 2))
-              mn.rotation.x += pulso * MUNECA.fuerza
-              mn.rotation.z += pulso * MUNECA.fuerza * 0.4
-            }
-          } else {
-            // ── Camino B (respaldo): rotar las articulaciones a mano ──
-            const b = huesos.RightArm, c = huesos.RightForeArm
-            const m = huesos.RightHand, sp = huesos.Spine01 || huesos.Spine
-            // Ejes verificados sobre el modelo real: el hombro sube/baja girando en
-            // Y, y el codo dobla en X. (Rotar en Z sólo torcía el brazo sobre sí
-            // mismo, por eso antes la pose no cambiaba.)
-            if (b?.userData.base) {
-              const REPOSO = -1.30   // sale de la T-pose y deja el brazo al costado
-              b.rotation.y = b.userData.base.y + REPOSO
-                + 0.55 * estira - 0.30 * carga + 0.95 * impacto - 0.55 * baja
-            }
-            if (c?.userData.base) {
-              c.rotation.x = c.userData.base.x
-                - 0.30 * estira - 1.35 * carga + 1.50 * impacto - 0.35 * baja
-            }
-            if (m?.userData.base) {
-              m.rotation.x = m.userData.base.x - 0.35 * carga + 0.60 * impacto
-            }
-            if (sp?.userData.base) {
-              // el torso acompaña el swing: sin esto se ve un golpe de brazo suelto
-              sp.rotation.y = sp.userData.base.y + 0.28 * carga - 0.50 * impacto + 0.22 * baja
-            }
-          }
-        }
-
-        // ── El agarre: la paleta pasa de estar suelta a seguir la mano ──
-        // Se hace mezclando posición y giro, no colgándola del hueso, así se ve
-        // el momento en que la toma en vez de aparecer ya agarrada.
-        if (jugadorRef.ancla && jugadorRef.obj) {
-          const toma = suave(seg(t, AGARRE.desde, AGARRE.hasta))
-          if (toma > 0.001) {
-            jugadorRef.obj.updateMatrixWorld(true)
-            const pm = jugadorRef.ancla.getWorldPosition(new THREE.Vector3())
-            const qm = jugadorRef.ancla.getWorldQuaternion(new THREE.Quaternion())
-            paleta.position.lerp(pm, toma)
-            paleta.quaternion.slerp(qm, toma)
-          }
-        }
-
-        // ── Mano: entra desde abajo, toma el mango y de ahí acompaña a la paleta ──
-        // La mano recién aparece cuando va a tomar la paleta, y se desvanece al salir
-        const visMano = seg(t, 0.19, 0.24)
-        brazo.visible = !brazo.userData.oculto && visMano > 0.01 && aVuelo < 0.9
-        brazo.traverse(o => {
-          if (o.isMesh && o.material) {
-            o.material.transparent = true
-            o.material.opacity = visMano * (1 - suave(seg(t, 0.62, 0.9)))
-          }
-        })
-        // el mango de la paleta cae ~1.1 abajo de su centro
-        const mangoX = paleta.position.x + Math.sin(paleta.rotation.z) * 1.1
-        const mangoY = paleta.position.y - Math.cos(paleta.rotation.z) * 1.1
-        brazo.position.set(
-          mix(mangoX - 3.2, mangoX, aMano),
-          mix(mangoY - 3.4, mangoY, aMano),
-          0.35                                   // apenas adelante, para que no la tape la paleta
-        )
-        brazo.rotation.z = paleta.rotation.z     // gira con la paleta: se ve que la sostiene
-
         // ── Pelota ──
-        // Llega desde el frente cayendo, la golpean, y sale en parábola real:
-        // sube, cae por gravedad y pica perdiendo altura en cada rebote.
-        const yaEntro = aEntra > 0.01
-        pelota.visible = yaEntro && aMorph < 0.55
+        // Llega desde el frente cayendo, la golpean, y sale en parábola real.
+        // Ya NO se oculta en ningún momento: es esta misma malla la que termina
+        // siendo la caja, así que tiene que estar siempre en pantalla.
+        pelota.visible = aEntra > 0.01
 
         // Física del tiro. El tiempo avanza LINEAL con el scroll (sin suavizado):
-        // si no, la pelota parece frenar y acelerar sola. En el plano viaja a
-        // velocidad constante y la altura sigue la parábola con rebotes.
+        // si no, la pelota parece frenar y acelerar sola.
         const G = 15, SUELO = -2.6, REBOTE = 0.55
         const VZ = 6.5, VX = 2.6, V0Y = 6.2      // velocidades al salir del golpe
+        const T_PIQUE = 1.18                     // cuándo toca el piso (calculado)
         let bx, by, bz
         if (aGolpe <= 0) {
           // Entrada: llega desde el frente cayendo hacia la paleta
-          const te = seg(t, 0.26, 0.36)
+          const te = seg(t, 0.18, 0.30)
           bx = mix(-3.8, 0, te)
           bz = mix(4.5, 0, te)
           by = balistica(te * 0.62, 3.4, 0.4, G, 0.5, 0)
         } else {
-          const tv = seg(t, 0.36, 0.88) * 1.62    // segundos de vuelo: alcanza para UN pique
-          bx = VX * tv
-          bz = VZ * tv                            // cruza la red y sigue de largo
+          const tv = seg(t, 0.30, 0.92) * 1.90   // segundos de vuelo: da para UN pique
+          // al picar pierde parte del avance horizontal, como una pelota de verdad
+          const rec = tv < T_PIQUE ? tv : T_PIQUE + (tv - T_PIQUE) * 0.45
+          bx = VX * rec
+          bz = VZ * rec                          // cruza la red y sigue de largo
           by = balistica(tv, 0.5, V0Y, G, SUELO, REBOTE)
         }
+        // Al final la caja se apoya en el piso y queda quieta: si siguiera la
+        // física pura terminaría flotando a media parábola.
+        const asienta = suave(seg(t, 0.86, 1.00))
+        by = mix(by, SUELO + R_BOLA, asienta)
         pelota.position.set(bx, by, bz)
-        // gira acompañando el movimiento (más rápido cuanto más rápido va)
-        pelota.rotation.x += 0.12 + 0.3 * (aGolpe - aPique * 0.6)
-        pelota.rotation.z += 0.05
+        // gira acompañando el movimiento, y se va frenando al volverse caja
+        const giroBola = (0.12 + 0.3 * aGolpe) * (1 - suave(seg(t, 0.70, 0.94)))
+        pelota.rotation.x += giroBola
+        pelota.rotation.z += giroBola * 0.4
 
-        // ── Paquete: aparece exactamente donde está la pelota ──
-        // La pelota se achica y el paquete crece en el MISMO tramo: la transición
-        // queda limpia porque comparten lugar y no se pisan con otros movimientos.
-        const cambio = suave(seg(t, 0.76, 0.84))
-        pelota.scale.setScalar(1 - cambio)
-        paquete.visible = cambio > 0.01
-        paquete.scale.setScalar(cambio)
-        paquete.position.set(
-          mix(pelota.position.x, 9.5, aFinal),
-          mix(pelota.position.y, 0.6, aFinal),
-          mix(pelota.position.z, 10.5, aFinal)
-        )
-        paquete.rotation.set(0.18 * cambio, mix(0, 0.7, cambio) + 0.4 * aFinal, 0)
+        // ── DE PELOTA A ENVÍO ──
+        // La misma malla cambia de forma y de color. No se achica ni desaparece
+        // para dejarle lugar a otra: es la pelota la que se vuelve caja.
+        const cambio = suave(seg(t, 0.68, 0.95))
+        transformar(cambio)
+
+        // Los detalles del envío se apoyan encima, y sólo cuando la forma ya es
+        // cúbica: si aparecieran antes se verían flotando alrededor de una esfera.
+        const detalle = suave(seg(t, 0.82, 0.99))
+        paquete.visible = detalle > 0.01
+        matCinta.opacity = detalle
+        matEtiqueta.opacity = detalle * 0.95
+        paquete.position.copy(pelota.position)
+        paquete.rotation.copy(pelota.rotation)
+        paquete.scale.setScalar(1)
 
         // ── Cámara ──
-        // Arranca lo bastante lejos para que entre el jugador completo (necesita
-        // ~15 unidades), se acerca en el golpe y después acompaña a la pelota.
-        const acerca = suave(seg(t, 0.28, 0.44))
+        // Un solo movimiento continuo: empieza mirando la paleta de frente y va
+        // rotando 90° alrededor de la pelota mientras se acerca. El giro usa el
+        // progreso suavizado, así arranca y termina sin tirón.
+        const FOCO_INICIAL = new THREE.Vector3(0, 0.6, 0)
+        const sigue = suave(seg(t, 0.24, 0.46))       // deja la paleta, toma la pelota
+        const foco = FOCO_INICIAL.clone().lerp(pelota.position, sigue)
+
+        const giro = suave(seg(t, 0.42, 0.90)) * (Math.PI / 2)   // los 90°
+        const dist = mix(11, 5.2, suave(seg(t, 0.40, 0.90)))     // se va acercando
+        const alto = mix(2.4, 1.1, suave(seg(t, 0.45, 0.92)))
+
         camera.position.set(
-          mix(0.5, 2.2, acerca) + mix(0, 3.5, aVuelo) + 2 * aFinal,
-          mix(3.2, 2.2, acerca) + 1.2 * aVuelo - 0.6 * aPique,
-          mix(17, 11.5, acerca) + mix(0, 8, aVuelo) + 2.5 * aPique - 2 * aFinal
+          foco.x + Math.sin(giro) * dist,
+          foco.y + alto,
+          foco.z + Math.cos(giro) * dist
         )
-        const mira = paquete.visible ? paquete.position
-          : (pelota.visible ? pelota.position : new THREE.Vector3(-1, mix(2.6, 0.8, acerca), 0))
-        camera.lookAt(mira.x * 0.8, mix(mix(2.6, 0.8, acerca), mira.y, pelota.visible ? 0.7 : 0), mira.z * 0.5)
+        camera.lookAt(foco)
 
         renderer.render(scene, camera)
       }
@@ -674,7 +463,7 @@ export default function ScrollLab() {
       cleanup = () => {
         cancelAnimationFrame(raf)
         ro.disconnect()
-        ;[piso, pared, linea, malla, cinta, posteIzq, posteDer, central, cara, mango, bola, costuraA, costuraB, caja, cintaH, cintaV, tapa, antebrazo, palma, dedos, pulgar].forEach(m => {
+        ;[piso, pared, linea, malla, cinta, posteIzq, posteDer, central, cara, mango, bola, costuraA, costuraB, caja, cintaH, cintaV, tapa].forEach(m => {
           m.geometry?.dispose(); m.material?.dispose()
         })
         pmrem.dispose()
