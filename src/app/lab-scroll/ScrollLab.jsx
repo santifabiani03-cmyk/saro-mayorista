@@ -30,7 +30,7 @@ const ACTOS = [
 ]
 
 // Tramo del scroll en el que transcurre el golpe completo (para la animación mocap)
-const GOLPE = { desde: 0.14, hasta: 0.52 }
+const GOLPE = { desde: 0.14, hasta: 0.52, cual: 'goalie-throw' }
 
 // Ajuste fino del jugador: escala, dónde se para y cómo sostiene la paleta.
 const JUGADOR = {
@@ -261,18 +261,29 @@ export default function ScrollLab() {
           }
           paleta.position.set(...JUGADOR.paletaEnMano.pos)
         }
-        // Si el .glb trae una animación de verdad (mocap de Mixamo), se la recorre
-        // con el scroll en vez de rotar los huesos a mano: el movimiento es humano.
-        if (gltf.animations?.length) {
-          const clip = gltf.animations.reduce((a, b) => (b.duration > a.duration ? b : a))
+        // El golpe sale de una animación de captura de movimiento (Mixamo). Se
+        // carga aparte, como pistas sueltas de 61 KB, y se aplica sobre este
+        // esqueleto: mucho más liviano que traer otra malla de 10 MB.
+        const usarClip = (clip) => {
           const mixer = new THREE.AnimationMixer(j)
           const accion = mixer.clipAction(clip)
           accion.play()
           accion.paused = true
+          accion.clampWhenFinished = true
           jugadorRef.mixer = mixer
           jugadorRef.accion = accion
           jugadorRef.duracion = clip.duration
         }
+        if (gltf.animations?.length) {
+          usarClip(gltf.animations.reduce((a, b) => (b.duration > a.duration ? b : a)))
+        }
+        fetch('/models/golpes.json')
+          .then(r => r.json())
+          .then(golpes => {
+            const elegido = golpes[GOLPE.cual] || Object.values(golpes)[0]
+            if (elegido) usarClip(THREE.AnimationClip.parse(elegido))
+          })
+          .catch(() => { /* sin el clip queda la animación por código */ })
         scene.add(j)
         jugadorRef.obj = j
         // con el jugador completo ya no hace falta la mano suelta
