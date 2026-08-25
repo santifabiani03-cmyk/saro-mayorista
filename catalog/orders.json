@@ -334,5 +334,21 @@
     ],
     "total": 204400,
     "totalItems": 25
+  },
+  {
+    "id": "o1787695985100",
+    "fecha": "2026-08-25T22:13:05.100Z",
+    "items": [
+      {
+        "productId": "p1779916282248",
+        "nombre": "Saro MAX Carbono 12 k",
+        "precio": 180000,
+        "color": "Negro/Rojo",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 180000,
+    "totalItems": 1
   }
 ]
