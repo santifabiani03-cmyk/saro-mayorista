@@ -416,17 +416,20 @@ export default function ScrollLab() {
       })
       const geoCintaH = new THREE.BoxGeometry(L * 1.02, L * 0.17, L * 1.02)
       const cintaH = new THREE.Mesh(geoCintaH, matCinta)
+      // Una sola cinta, la horizontal. La vertical cruzaba justo por encima del
+      // logo y lo dejaba ilegible, azul sobre azul.
       const geoCintaV = new THREE.BoxGeometry(L * 0.17, L * 1.02, L * 1.02)
       const cintaV = new THREE.Mesh(geoCintaV, matCinta)
+      cintaV.visible = false
       // etiqueta con el logo, en una cara
       const matEtiqueta = new THREE.MeshStandardMaterial({
         color: '#f3efe6', roughness: 0.9, transparent: true, opacity: 0,
       })
       // proporción 3:1, la del logo: antes el cartel era casi cuadrado y lo estiraba
-      const caja = new THREE.Mesh(new THREE.PlaneGeometry(L * 0.66, L * 0.22), matEtiqueta)
-      caja.position.z = L * 0.51
-      const tapa = new THREE.Mesh(new THREE.PlaneGeometry(L * 0.66, L * 0.22), matEtiqueta)
-      tapa.position.z = -L * 0.51
+      const caja = new THREE.Mesh(new THREE.PlaneGeometry(L * 0.72, L * 0.24), matEtiqueta)
+      caja.position.set(0, L * 0.26, L * 0.51)   // arriba de la cinta, no encima
+      const tapa = new THREE.Mesh(new THREE.PlaneGeometry(L * 0.72, L * 0.24), matEtiqueta)
+      tapa.position.set(0, L * 0.26, -L * 0.51)
       tapa.rotation.y = Math.PI
       new THREE.TextureLoader().load('/assets/logo-caja.png', tx => {
         if (disposed) return
@@ -514,7 +517,9 @@ export default function ScrollLab() {
 
         codo.rotation.z = 0.42 * w - 1.10 * sw + 0.70 * rec
         codo.rotation.x = -0.30 * w * (1 - sw)
-        codo.rotation.y = -0.95 * suave(seg(prog, 0, 0.3)) * (1 - suave(seg(prog, 0.62, 1)))
+        // Giro de cara acotado: con -0.95 la paleta mostraba el canto casi de
+        // perfil, que es justo la zona con la textura más floja del modelo.
+        codo.rotation.y = -0.42 * suave(seg(prog, 0, 0.3)) * (1 - suave(seg(prog, 0.62, 1)))
         // profundidad: carga hacia atrás y empuja al impactar, como allá
         const empuje = 1.4 * (-0.4 * w * (1 - sw) + pico)
 
@@ -611,8 +616,13 @@ export default function ScrollLab() {
         paquete.visible = detalle > 0.01
         matCinta.opacity = detalle
         matEtiqueta.opacity = detalle
+        // La caja CRECE al formarse: la pelota nunca se achica, pero el envío
+        // termina con más presencia que una pelota de pádel.
+        const crece = 1 + 0.55 * cambio
+        pelota.scale.setScalar(crece)
         paquete.position.copy(pelota.position)
         paquete.rotation.copy(pelota.rotation)
+        paquete.scale.setScalar(crece)
 
         // La sombra sigue a la pelota por el piso: se agranda y se aclara cuanto
         // más alto va, como una sombra de verdad.
