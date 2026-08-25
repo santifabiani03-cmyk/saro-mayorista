@@ -112,9 +112,8 @@ export default function ScrollLab() {
 
       const scene = new THREE.Scene()
       scene.background = new THREE.Color('#eef2f8')
-      // Niebla suave y lejana: antes cerraba a 52 unidades y borraba la cancha
-      // entera, dejando una franja blanca a media pantalla.
-      scene.fog = new THREE.Fog('#e8f1fa', 70, 210)
+      // Sin niebla. Lavaba el fondo y aplanaba la cancha; con el domo de cielo
+      // detrás ya no hace falta nada que disimule el borde del mundo.
 
       // FOV 34 como el hero de la página pública: menos distorsión de
       // perspectiva y la paleta se lee del mismo modo.
@@ -132,6 +131,10 @@ export default function ScrollLab() {
       const sol = new THREE.DirectionalLight('#ffffff', 1.5)
       sol.position.set(4, 8, 6)
       scene.add(sol)
+      // Luz de relleno del lado opuesto: sin ella la cara en sombra queda plana
+      const relleno = new THREE.DirectionalLight('#dceafc', 0.5)
+      relleno.position.set(-7, 4, -5)
+      scene.add(relleno)
 
       // ───────────────────────── LA CANCHA ─────────────────────────
       // Todo geometría real, no una foto de fondo: la cámara gira 90° durante el
@@ -182,6 +185,44 @@ export default function ScrollLab() {
       texCesped.colorSpace = THREE.SRGBColorSpace
       texCesped.wrapS = texCesped.wrapT = THREE.RepeatWrapping
       texCesped.repeat.set(40, 40)
+      // ── AFUERA DE LA CANCHA ──
+      // El césped solo no alcanzaba: sin nada que mida contra qué, el exterior
+      // se leía como un plano verde vacío. Se agregan árboles y una segunda
+      // cancha a lo lejos, que dan escala y profundidad a través del vidrio.
+      const afuera = new THREE.Group()
+      const matHoja = new THREE.MeshStandardMaterial({ color: '#5f8f56', roughness: 1 })
+      const matTronco = new THREE.MeshStandardMaterial({ color: '#6b5744', roughness: 1 })
+      const geoHoja = new THREE.SphereGeometry(1, 10, 8)
+      const geoTronco = new THREE.CylinderGeometry(0.34, 0.46, 5, 7)
+      // sembrados con una fórmula fija: siempre caen igual, sin sorpresas al recargar
+      for (let i = 0; i < 26; i++) {
+        const ang = i * 2.399                       // ángulo áureo: reparte sin agrupar
+        const rad = 62 + (i % 5) * 15
+        const x = Math.cos(ang) * rad
+        const z = RED_Z + Math.sin(ang) * rad
+        if (Math.abs(x) < 44 && Math.abs(z - RED_Z) < 52) continue   // no dentro de la cancha
+        const alto = 7 + (i % 4) * 2.4
+        const arbol = new THREE.Group()
+        const tr = new THREE.Mesh(geoTronco, matTronco)
+        tr.scale.y = alto / 5
+        tr.position.y = -3 + alto / 2
+        const copa = new THREE.Mesh(geoHoja, matHoja)
+        copa.scale.setScalar(alto * 0.42)
+        copa.position.y = -3 + alto * 1.05
+        arbol.add(tr, copa)
+        arbol.position.set(x, 0, z)
+        afuera.add(arbol)
+      }
+      // otra cancha a lo lejos, apenas insinuada: da idea de club, no de cancha suelta
+      const vecina = new THREE.Mesh(
+        new THREE.PlaneGeometry(58, 26),
+        new THREE.MeshStandardMaterial({ color: '#8fc0e8', roughness: 0.95 })
+      )
+      vecina.rotation.x = -Math.PI / 2
+      vecina.position.set(0, -2.98, RED_Z - 96)
+      afuera.add(vecina)
+      scene.add(afuera)
+
       const explanada = new THREE.Mesh(
         new THREE.PlaneGeometry(420, 420),
         new THREE.MeshStandardMaterial({ map: texCesped, roughness: 1 })
@@ -202,7 +243,7 @@ export default function ScrollLab() {
       // rugosidad, no con transmisión real (cara y acá no se notaría).
       const matVidrio = new THREE.MeshStandardMaterial({
         color: '#dff0fb', roughness: 0.08, metalness: 0.1,
-        transparent: true, opacity: 0.2, side: THREE.DoubleSide,
+        transparent: true, opacity: 0.14, side: THREE.DoubleSide,   // más limpio: deja ver el afuera
       })
       const matMarco = new THREE.MeshStandardMaterial({ color: '#2f4257', roughness: 0.5, metalness: 0.35 })
       const VIDRIO_ALTO = 26
@@ -361,6 +402,40 @@ export default function ScrollLab() {
         cont.add(modelo)
         cont.scale.setScalar(ALTO_PALETA / size.y)
         paleta.add(cont)
+
+        // ── CORDAJE ──
+        // La textura del modelo trae el damero gris que usan los editores para
+        // dibujar "transparente": quedó horneado y se ve como un ajedrez. Se le
+        // superpone un cordaje de verdad — agujeros redondos en grilla — a cada
+        // lado de la cara, sin tocar el modelo.
+        const cor = document.createElement('canvas')
+        cor.width = cor.height = 256
+        const cc = cor.getContext('2d')
+        cc.fillStyle = '#1c1c1e'
+        cc.fillRect(0, 0, 256, 256)
+        cc.globalCompositeOperation = 'destination-out'
+        const PASO = 256 / 7
+        for (let fx = 0; fx < 7; fx++)
+          for (let fy = 0; fy < 7; fy++) {
+            cc.beginPath()
+            cc.arc((fx + 0.5) * PASO, (fy + 0.5) * PASO, PASO * 0.31, 0, Math.PI * 2)
+            cc.fill()
+          }
+        const texCordaje = new THREE.CanvasTexture(cor)
+        texCordaje.wrapS = texCordaje.wrapT = THREE.RepeatWrapping
+        texCordaje.repeat.set(2.4, 2.4)
+        const matCordaje = new THREE.MeshStandardMaterial({
+          color: '#26262a', roughness: 0.85, metalness: 0.05,
+          alphaMap: texCordaje, transparent: true, side: THREE.DoubleSide,
+        })
+        // el disco cubre la zona ancha de la cara, medida más arriba
+        const rCara = (anchoMax * (ALTO_PALETA / size.y)) * 0.86
+        for (const lado of [1, -1]) {
+          const disco = new THREE.Mesh(new THREE.CircleGeometry(rCara, 48), matCordaje)
+          disco.position.set(0, ALTO_PALETA * 0.055, lado * ALTO_PALETA * 0.028)
+          disco.rotation.y = lado > 0 ? 0 : Math.PI
+          paleta.add(disco)
+        }
         cara.visible = false                  // se van los placeholders
         mango.visible = false
       }, undefined, () => { /* si falla, queda la silueta simple */ })
@@ -443,6 +518,16 @@ export default function ScrollLab() {
       const sombra = new THREE.Mesh(new THREE.CircleGeometry(R_BOLA * 1.9, 28), matSombra)
       sombra.rotation.x = -Math.PI / 2
       scene.add(sombra)
+
+      // La paleta también proyecta: sin sombra propia se ve flotando sobre la
+      // cancha por más que esté bien ubicada en el espacio.
+      const matSombraPal = new THREE.MeshBasicMaterial({
+        color: '#3f5d7d', transparent: true, opacity: 0, depthWrite: false,
+      })
+      const sombraPal = new THREE.Mesh(new THREE.CircleGeometry(1, 32), matSombraPal)
+      sombraPal.rotation.x = -Math.PI / 2
+      sombraPal.scale.set(ALTO_PALETA * 0.20, 1, ALTO_PALETA * 0.34)
+      scene.add(sombraPal)
 
       const paquete = new THREE.Group()
       const L = R_BOLA * 2                       // la caja mide esto de cara a cara
@@ -632,6 +717,11 @@ export default function ScrollLab() {
         )
         camera.lookAt(foco)
 
+        // El sol gira despacio con el guion: con la luz clavada, el tramo largo
+        // del vuelo quedaba plano porque nada cambiaba de tono.
+        sol.position.set(4 + 9 * suave(t), 8 + 3 * suave(t), 6 - 11 * suave(t))
+        sol.intensity = mix(1.5, 1.15, suave(seg(t, 0.3, 0.95)))
+
         // ── DE PELOTA A ENVÍO ──
         // La misma malla cambia de forma y de color. No se achica ni desaparece
         // para dejarle lugar a otra: es la pelota la que se vuelve caja.
@@ -661,6 +751,13 @@ export default function ScrollLab() {
 
         // La sombra sigue a la pelota por el piso: se agranda y se aclara cuanto
         // más alto va, como una sombra de verdad.
+        // La sombra de la paleta la sigue por el piso: se agranda y se aclara
+        // cuanto más alto está, igual que la de la pelota.
+        const altPal = Math.max(0, codo.position.y + BRAZO - SUELO_Y)
+        sombraPal.position.set(IMPACTO.x, SUELO_Y + 0.02, IMPACTO.z + 0.4)
+        sombraPal.scale.set(ALTO_PALETA * 0.20 * (1 + altPal * 0.03), 1, ALTO_PALETA * 0.34 * (1 + altPal * 0.03))
+        matSombraPal.opacity = codo.visible ? Math.max(0, 0.22 - altPal * 0.012) : 0
+
         const altura = Math.max(0, pelota.position.y - SUELO_Y)
         sombra.position.set(pelota.position.x, SUELO_Y + 0.03, pelota.position.z)
         sombra.scale.setScalar(1 + altura * 0.16)
