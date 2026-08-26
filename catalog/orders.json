@@ -350,5 +350,173 @@
     ],
     "total": 180000,
     "totalItems": 1
+  },
+  {
+    "id": "o1787768051441",
+    "fecha": "2026-08-26T18:14:11.441Z",
+    "items": [
+      {
+        "productId": "p1779452463276",
+        "nombre": "CARAMELERA NOAC PERFORADOS X60u. ",
+        "precio": 60000,
+        "color": "Multicolor",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 3
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 3
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Gris",
+        "talle": "Única",
+        "cantidad": 3
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Rosa",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Azul",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Naranja",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Gris",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Short Azul AERO",
+        "talle": "L",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Azul",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Gris",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Rojo",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715980257",
+        "nombre": "REMERA DRY ELAST. FULLPRINT CAB.",
+        "precio": 15500,
+        "color": "Celeste",
+        "talle": "M",
+        "cantidad": 1
+      }
+    ],
+    "total": 252500,
+    "totalItems": 27
   }
 ]
