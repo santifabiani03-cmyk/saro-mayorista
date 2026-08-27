@@ -5,7 +5,7 @@
 > chats viejos ni preguntar nada. Prioriza ser exhaustivo. Si algo cambia, actualizá este
 > archivo y `docs/ESTETICA.md`.
 
-Última actualización: 2026-08-07.
+Última actualización: 2026-08-26.
 
 > ⚠️ **Cambio importante (agosto 2026): el sitio pasó de MAYORISTA a MINORISTA.**
 > La compra mínima está **oculta** (con un interruptor en el admin para volver a mostrarla) y
@@ -463,6 +463,67 @@ Existen en la carpeta local pero **no** están en git / no van a producción:
 `npm run dev` (Next.js dev en el puerto que asigne). **Nota:** en la máquina de smfab el build
 local y el dev server a veces se cuelgan (crashes de los workers de Next por memoria) — **no es
 un problema del código**; Vercel buildea sin problemas. Si el dev local se traba, reiniciarlo.
+
+---
+
+## 5.6 El hero de scroll (`/lab-scroll`) — maqueta en curso
+
+Una segunda versión del hero, **todavía en maqueta**, en la ruta interna
+`/lab-scroll` (no indexada, no enlazada). El hero que está en producción sigue
+siendo el de `Paleta3D.jsx`; este NO lo reemplazó todavía.
+
+**El guion**, todo atado al scroll con GSAP ScrollTrigger (`scrub`):
+la paleta espera → la pelota entra de costado → el golpe → la pelota cruza la
+red y pica del otro lado → la cámara gira 90° siguiéndola → la pelota **se
+transforma en una caja de envío** → la caja se apoya.
+
+**Cómo está armado** (`src/app/lab-scroll/ScrollLab.jsx`):
+
+- **Un solo número une todo.** GSAP anima `progRef.current.t` de 0 a 1 y Three
+  lo lee en cada cuadro. Nada más se comunica entre las dos librerías.
+- **El tiempo de vuelo avanza LINEAL con el scroll.** Con suavizado, la pelota
+  parece frenar y acelerar sola.
+- **La transformación es geométrica, no un cruce entre dos objetos.** Los
+  vértices de la esfera viajan hasta la cara del cubo (`d / mayor componente`).
+  Como las esquinas del cubo quedan más lejos del centro que la superficie de la
+  esfera, la pelota **nunca se achica**: se expande hasta volverse caja.
+- **Escala real.** 1 unidad ≈ 15,5 cm. La cancha mide 129 × 65 (20 × 10 m) y la
+  red 5,67 (88 cm). Cuando la red medía 1,5 el pique no se leía como pádel.
+
+**Trampas que ya costaron caro** (no repetirlas):
+
+| Síntoma | Causa |
+|---|---|
+| La pelota atraviesa la paleta | Viajaba al **centro** del modelo; debe frenar en la **cara** (medio grosor + radio de la pelota) |
+| Le pega con el borde | El modelo se centra por su caja, que incluye el mango. El código busca la cara midiendo dónde es más **ancho** |
+| La paleta no llega a tiempo | La cara pasa por el impacto en un instante exacto; la pelota tiene que usar **ese mismo** momento |
+| La caja se hunde en el piso | Una esfera apoya a R mire como mire, pero un **cubo rotado** apoya en una esquina, hasta 1,73·R |
+| El césped no se veía | El piso celeste medía 240×240 (37 m): siete veces una cancha. Tapaba todo el terreno |
+
+**Assets 3D y Meshy.** Patrón confirmado con seis modelos: Meshy **rinde en
+objetos compactos y orgánicos** (mano, caja y árbol funcionaron, con reducciones
+de 41×, 58× y 30×) y **no rinde en escenarios grandes** — reconstruye la escena
+como una sola malla con UVs fragmentadas en miles de retazos, y ahí la textura
+**no se puede reducir sin destruirla**. La cancha (2 M de caras, textura de
+8192px) y la red (280 k caras) se descartaron por eso. La paleta nueva llegó
+**sin texturas**, así que tampoco reemplazó a la actual.
+
+Antes de adoptar un modelo conviene mirar **la textura**: si es un atlas de
+retazos sin estructura, no se va a poder optimizar.
+
+**Cómo verificar la escena.** El componente expone `window.__lab` en desarrollo:
+`ver(t)` dibuja un cuadro puntual del guion sin depender del scroll, y
+`vistaGeneral(t)` encuadra toda la escena y cuenta mallas. El renderer usa
+`preserveDrawingBuffer: true` para poder leer el cuadro dibujado. Con eso
+aparecieron en minutos errores que a ciegas costaron horas.
+
+⚠️ La pestaña que maneja la extensión de Chrome a veces **no tiene viewport**
+(`window.innerWidth` en 0 y `document.hidden` en true). Ahí el lienzo queda en
+1×1 y toda captura falla — no es un problema del sitio.
+
+**Qué falta para llevarlo a producción:** criterio visual sobre el resultado
+final, la cancha 3D que está haciendo smfab, y la decisión de reemplazar el hero
+actual (§5.3: eso requiere confirmación del dueño).
 
 ---
 
