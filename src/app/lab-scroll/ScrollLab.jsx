@@ -338,15 +338,27 @@ export default function ScrollLab() {
         })
       })
 
-      // Maceteros contra la vereda, del lado que se ve
+      // Maceteros contra la vereda, cada uno con su planta adentro
+      const LUGARES_MACETA = [0.14, 0.3, 0.58, 0.74]
       ponerModelo('/models/macetero.glb', (base) => {
-        [0.14, 0.3, 0.58, 0.74].forEach(f => {
+        LUGARES_MACETA.forEach(f => {
           const [x, z] = enArco(f, 62)
           const m = base.clone()
           m.scale.multiplyScalar(5.2)                 // ~0.8 m
           m.position.set(x, SUELO_Y, z)
           m.rotation.y = Math.atan2(-x, RED_Z - z)
           afuera.add(m)
+        })
+      })
+      // La planta va aparte: el macetero viene vacío, es sólo el cajón
+      ponerModelo('/models/planta.glb', (base) => {
+        LUGARES_MACETA.forEach((f, i) => {
+          const [x, z] = enArco(f, 62)
+          const pl = base.clone()
+          pl.scale.multiplyScalar(4.4 + (i % 2) * 0.8)
+          pl.position.set(x, SUELO_Y + 3.4, z)        // apoyada sobre el borde del cajón
+          pl.rotation.y = i * 1.9
+          afuera.add(pl)
         })
       })
 
@@ -603,17 +615,19 @@ export default function ScrollLab() {
         // El hilo se dibuja en BLANCO (para que sea sólido) y el color negro lo
         // pone el material. Antes lo dibujaba en negro, así que su alpha era 0 y
         // la reja entera desaparecía — y cuanto más oscura, más invisible.
+        // Lienzo más grande con la misma línea = hilo proporcionalmente más
+        // fino. Antes el hilo ocupaba el 16% del cuadro; ahora el 5%.
         const c = document.createElement('canvas')
-        c.width = c.height = 32
+        c.width = c.height = 64
         const g2 = c.getContext('2d')
         g2.fillStyle = '#000000'
-        g2.fillRect(0, 0, 32, 32)          // fondo negro = hueco del tejido
+        g2.fillRect(0, 0, 64, 64)          // fondo negro = hueco del tejido
         g2.strokeStyle = '#ffffff'
-        g2.lineWidth = 5
-        g2.strokeRect(0, 0, 32, 32)        // hilo blanco = opaco
+        g2.lineWidth = 3
+        g2.strokeRect(0, 0, 64, 64)        // hilo blanco = opaco
         const t = new THREE.CanvasTexture(c)
         t.wrapS = t.wrapT = THREE.RepeatWrapping
-        t.repeat.set(Math.max(1, repX), Math.max(1, alto / 1.25))
+        t.repeat.set(Math.max(1, repX), Math.max(1, alto / 0.7))   // cuadros más chicos
         t.anisotropy = 4
         const m = new THREE.MeshStandardMaterial({
           alphaMap: t, transparent: true, color: '#0a0a0a',   // el negro va acá
@@ -635,7 +649,7 @@ export default function ScrollLab() {
           const v = new THREE.Mesh(new THREE.PlaneGeometry(ancho, VIDRIO_H), matVidrio)
           v.position.y = SUELO_Y + VIDRIO_H / 2
           g.add(v)
-          const r = hacerReja(ancho, REJA_H, ancho / 1.6)
+          const r = hacerReja(ancho, REJA_H, ancho / 0.85)
           r.position.y = SUELO_Y + VIDRIO_H + REJA_H / 2
           g.add(r)
           // montantes cada pieza de vidrio (1.996 m)
@@ -650,19 +664,19 @@ export default function ScrollLab() {
             const v = new THREE.Mesh(new THREE.PlaneGeometry(VIDRIO_PUNTA, VIDRIO_H), matVidrio)
             v.position.set(lado * (ancho / 2 - VIDRIO_PUNTA / 2), SUELO_Y + VIDRIO_H / 2, 0)
             g.add(v)
-            const r = hacerReja(VIDRIO_PUNTA, REJA_H, VIDRIO_PUNTA / 1.6)
+            const r = hacerReja(VIDRIO_PUNTA, REJA_H, VIDRIO_PUNTA / 0.85)
             r.position.set(lado * (ancho / 2 - VIDRIO_PUNTA / 2), SUELO_Y + VIDRIO_H + REJA_H / 2, 0)
             g.add(r)
           })
           // el tramo de reja del centro, partido por la puerta
           const pano = (medio - PUERTA_A) / 2
           ;[-1, 1].forEach(lado => {
-            const r = hacerReja(pano, VIDRIO_H + REJA_H, pano / 1.6)
+            const r = hacerReja(pano, VIDRIO_H + REJA_H, pano / 0.85)
             r.position.set(lado * (PUERTA_A / 2 + pano / 2), SUELO_Y + (VIDRIO_H + REJA_H) / 2, 0)
             g.add(r)
           })
           // encima de la puerta
-          const arriba = hacerReja(PUERTA_A, VIDRIO_H + REJA_H - PUERTA_H, PUERTA_A / 1.6)
+          const arriba = hacerReja(PUERTA_A, VIDRIO_H + REJA_H - PUERTA_H, PUERTA_A / 0.85)
           arriba.position.set(0, SUELO_Y + PUERTA_H + (VIDRIO_H + REJA_H - PUERTA_H) / 2, 0)
           g.add(arriba)
           // marco de la puerta
@@ -724,7 +738,7 @@ export default function ScrollLab() {
       ctx.fillStyle = '#000000'
       ctx.fillRect(0, 0, 64, 64)
       ctx.strokeStyle = '#ffffff'
-      ctx.lineWidth = 15
+      ctx.lineWidth = 6    // hilo más fino
       ctx.strokeRect(0, 0, 64, 64)
       const texRed = new THREE.CanvasTexture(cnv)
       texRed.wrapS = texRed.wrapT = THREE.RepeatWrapping
