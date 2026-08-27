@@ -258,6 +258,63 @@ export default function ScrollLab() {
         scene.add(lona)
       })
 
+      // ── MOBILIARIO DEL CLUB ──
+      // Modelos CC0 de Poly Haven (uso comercial libre, sin atribución). Se
+      // eligieron sobre generarlos con IA: están modelados por artistas, vienen
+      // con texturas coherentes y pesan una fracción. El alambrado es además lo
+      // que rodea una cancha de pádel de verdad.
+      const ponerModelo = (ruta, colocar) => {
+        loader.load(ruta, gltf => {
+          if (disposed) return
+          const o = gltf.scene
+          o.updateMatrixWorld(true)
+          const caja = new THREE.Box3().setFromObject(o)
+          const t = new THREE.Vector3(); caja.getSize(t)
+          const c = new THREE.Vector3(); caja.getCenter(c)
+          // centrado en planta y apoyado en su base, normalizado a 1 de alto
+          o.position.set(-c.x, -caja.min.y, -c.z)
+          const cont = new THREE.Group()
+          cont.add(o)
+          cont.scale.setScalar(1 / (t.y || 1))
+          cont.traverse(m => { if (m.isMesh) { m.castShadow = true; m.receiveShadow = true } })
+          colocar(cont, t)
+        }, undefined, () => { /* si no carga, la escena sigue igual */ })
+      }
+
+      // Bancos contra las paredes largas, mirando a la cancha
+      ponerModelo('/models/banco.glb', (base) => {
+        ;[[-1, -26], [-1, 30], [1, 2]].forEach(([lado, z]) => {
+          const b = base.clone()
+          b.scale.multiplyScalar(5.6)                 // ~0.87 m de alto
+          b.position.set(lado * (CANCHA_ANCHO / 2 + 11), SUELO_Y, RED_Z + z)
+          b.rotation.y = lado > 0 ? -Math.PI / 2 : Math.PI / 2
+          afuera.add(b)
+        })
+      })
+
+      // Alambrado perimetral, por fuera de la vereda
+      ponerModelo('/models/alambrado.glb', (base) => {
+        const ALTO = 13                                // ~2 m
+        const LARGO = CANCHA_LARGO + 46
+        const ANCHO = CANCHA_ANCHO + 46
+        const paso = 16
+        const poner = (x, z, giro) => {
+          const t = base.clone()
+          t.scale.multiplyScalar(ALTO)
+          t.position.set(x, SUELO_Y, z)
+          t.rotation.y = giro
+          afuera.add(t)
+        }
+        for (let z = -LARGO / 2; z <= LARGO / 2; z += paso) {
+          poner(-ANCHO / 2, RED_Z + z, Math.PI / 2)
+          poner(ANCHO / 2, RED_Z + z, Math.PI / 2)
+        }
+        for (let x = -ANCHO / 2; x <= ANCHO / 2; x += paso) {
+          poner(x, RED_Z - LARGO / 2, 0)
+          poner(x, RED_Z + LARGO / 2, 0)
+        }
+      })
+
       // ── CARTELERÍA DE PRODUCTOS ──
       // Fotos reales del catálogo, montadas en carteles fuera de la cancha. Son
       // planos con la imagen y nada más: no hay que modelar cada producto en 3D,
@@ -286,10 +343,12 @@ export default function ScrollLab() {
       PRODUCTOS.forEach((ruta, i) => {
         // Los primeros van sobre el arco que recorre la cámara; el último cruza
         // al otro lado, para que también haya cartelería a la derecha.
-        const alOtroLado = i === PRODUCTOS.length - 1
-        const t0 = i / Math.max(1, PRODUCTOS.length - 2)
-        const ang = alOtroLado ? -Math.PI / 3 : Math.PI + Math.min(1, t0) * (Math.PI / 2)
-        const rad = 86
+        // Uno queda a la vista desde el arranque (la cámara empieza mirando al
+        // fondo), otro cruza a la derecha, y el resto se reparte sobre el arco
+        // que la cámara recorre al girar.
+        const ANGULOS = [-Math.PI / 2 - 0.5, -Math.PI / 2 + 0.6, Math.PI - 0.35, -Math.PI / 3 - 0.2]
+        const ang = ANGULOS[i % ANGULOS.length]
+        const rad = 84
         const x = Math.cos(ang) * rad
         const z = RED_Z + Math.sin(ang) * rad
 
@@ -461,14 +520,50 @@ export default function ScrollLab() {
       const matMarco = new THREE.MeshStandardMaterial({ color: '#2f4257', roughness: 0.5, metalness: 0.35 })
       const VIDRIO_ALTO = 26
       const paredes = new THREE.Group()
-      const ponerPared = (ancho, x, z, giro) => {
+      // Los montantes se reparten en paneles iguales: antes iban de 8 en 8 desde
+      // un borde y el último caía a 1 unidad del otro, así que la pared no era
+      // simétrica. Ahora el ancho se divide en partes iguales.
+      const ponerPared = (ancho, x, z, giro, conPuerta = false) => {
         const g = new THREE.Group()
-        const v = new THREE.Mesh(new THREE.PlaneGeometry(ancho, VIDRIO_ALTO), matVidrio)
-        v.position.y = SUELO_Y + VIDRIO_ALTO / 2
-        g.add(v)
-        for (let k = -ancho / 2; k <= ancho / 2 + 0.01; k += 8) {
+        const PUERTA_ANCHO = 4.6      // 0.72 m, la medida de una puerta de cancha
+        const PUERTA_ALTO = 12.9      // 2 m
+
+        if (conPuerta) {
+          // el vidrio se parte en dos: un paño a cada lado del hueco
+          const pano = (ancho - PUERTA_ANCHO) / 2
+          ;[-1, 1].forEach(lado => {
+            const v = new THREE.Mesh(new THREE.PlaneGeometry(pano, VIDRIO_ALTO), matVidrio)
+            v.position.set(lado * (PUERTA_ANCHO / 2 + pano / 2), SUELO_Y + VIDRIO_ALTO / 2, 0)
+            g.add(v)
+          })
+          // y sobre el hueco queda un paño alto, como en las canchas de verdad
+          const alto = new THREE.Mesh(
+            new THREE.PlaneGeometry(PUERTA_ANCHO, VIDRIO_ALTO - PUERTA_ALTO), matVidrio
+          )
+          alto.position.set(0, SUELO_Y + PUERTA_ALTO + (VIDRIO_ALTO - PUERTA_ALTO) / 2, 0)
+          g.add(alto)
+          // marco de la puerta
+          ;[-1, 1].forEach(lado => {
+            const jamba = new THREE.Mesh(new THREE.BoxGeometry(0.3, PUERTA_ALTO, 0.3), matMarco)
+            jamba.position.set(lado * PUERTA_ANCHO / 2, SUELO_Y + PUERTA_ALTO / 2, 0)
+            g.add(jamba)
+          })
+          const dintel = new THREE.Mesh(new THREE.BoxGeometry(PUERTA_ANCHO + 0.3, 0.3, 0.3), matMarco)
+          dintel.position.set(0, SUELO_Y + PUERTA_ALTO, 0)
+          g.add(dintel)
+        } else {
+          const v = new THREE.Mesh(new THREE.PlaneGeometry(ancho, VIDRIO_ALTO), matVidrio)
+          v.position.y = SUELO_Y + VIDRIO_ALTO / 2
+          g.add(v)
+        }
+
+        // montantes repartidos en paneles iguales, de borde a borde
+        const paneles = Math.max(2, Math.round(ancho / 8))
+        for (let k = 0; k <= paneles; k++) {
+          const px = -ancho / 2 + (ancho / paneles) * k
+          if (conPuerta && Math.abs(px) < PUERTA_ANCHO / 2 + 0.2) continue   // no en el hueco
           const m = new THREE.Mesh(new THREE.BoxGeometry(0.22, VIDRIO_ALTO, 0.22), matMarco)
-          m.position.set(k, SUELO_Y + VIDRIO_ALTO / 2, 0)
+          m.position.set(px, SUELO_Y + VIDRIO_ALTO / 2, 0)
           g.add(m)
         }
         ;[SUELO_Y + 0.15, SUELO_Y + VIDRIO_ALTO].forEach(y => {
@@ -479,12 +574,13 @@ export default function ScrollLab() {
         g.position.set(x, 0, z)
         g.rotation.y = giro
         paredes.add(g)
-        return v
+        return g
       }
       const pared = ponerPared(CANCHA_ANCHO, 0, RED_Z - CANCHA_LARGO / 2, 0)
       ponerPared(CANCHA_ANCHO, 0, RED_Z + CANCHA_LARGO / 2, 0)
-      ponerPared(CANCHA_LARGO, -CANCHA_ANCHO / 2, RED_Z, Math.PI / 2)
-      ponerPared(CANCHA_LARGO, CANCHA_ANCHO / 2, RED_Z, Math.PI / 2)
+      // Los laterales llevan puerta al medio, pegada a la red, como una cancha real
+      ponerPared(CANCHA_LARGO, -CANCHA_ANCHO / 2, RED_Z, Math.PI / 2, true)
+      ponerPared(CANCHA_LARGO, CANCHA_ANCHO / 2, RED_Z, Math.PI / 2, true)
       scene.add(paredes)
 
       // Techo: vigas cruzadas bien altas. Cierran la escena por arriba, que era
@@ -987,9 +1083,9 @@ export default function ScrollLab() {
         matSombraPal.opacity = 0   // ya hay sombra real proyectada por el sol
 
         const altura = Math.max(0, pelota.position.y - SUELO_Y)
-        sombra.position.set(pelota.position.x, SUELO_Y + 0.03, pelota.position.z)
-        sombra.scale.setScalar(1 + altura * 0.16)
-        matSombra.opacity = pelota.visible ? Math.max(0, 0.34 - altura * 0.035) : 0
+        // La sombra ahora la proyecta el sol. La mancha pintada quedaba siempre
+        // del mismo tamaño y no seguía la distancia: se apaga.
+        sombra.visible = false
 
         renderer.render(scene, camera)
       }
