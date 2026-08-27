@@ -185,6 +185,12 @@ export default function ScrollLab() {
       texCesped.colorSpace = THREE.SRGBColorSpace
       texCesped.wrapS = texCesped.wrapT = THREE.RepeatWrapping
       texCesped.repeat.set(40, 40)
+      // El cargador se declara ACÁ, antes del primer uso. Estaba más abajo y el
+      // árbol lo usaba antes de existir: eso lanza ReferenceError y tumbaba la
+      // inicialización entera de la escena — la pantalla quedaba en blanco.
+      const loader = new GLTFLoader()
+      loader.setMeshoptDecoder(MeshoptDecoder)
+
       // ── AFUERA DE LA CANCHA ──
       // El césped solo no alcanzaba: sin nada que mida contra qué, el exterior
       // se leía como un plano verde vacío. Se agregan árboles y una segunda
@@ -389,8 +395,6 @@ export default function ScrollLab() {
       mango.position.y = -1.5
       paleta.add(cara, mango)
 
-      const loader = new GLTFLoader()
-      loader.setMeshoptDecoder(MeshoptDecoder)
       // Paquete real (Meshy, 79 KB) con el logo de la marca pegado en la cara.
 
       // Mano generada con Meshy (101 KB ya optimizada). Si carga, reemplaza a la
