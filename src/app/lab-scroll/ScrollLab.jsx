@@ -199,9 +199,9 @@ export default function ScrollLab() {
       // Posiciones fijas, repartidas con el ángulo áureo: separa sin agrupar y
       // siempre caen igual, así el fondo no cambia entre recargas.
       const lugares = []
-      for (let i = 0; i < 26; i++) {
+      for (let i = 0; i < 64; i++) {          // más densidad: con 26 el fondo quedaba pelado
         const ang = i * 2.399
-        const rad = 52 + (i % 5) * 16
+        const rad = 52 + (i % 9) * 15
         const x = Math.cos(ang) * rad
         const z = RED_Z + Math.sin(ang) * rad
         if (Math.abs(x) < 44 && Math.abs(z - RED_Z) < 76) continue   // ni cancha ni vereda
@@ -214,6 +214,7 @@ export default function ScrollLab() {
       // de árboles cuestan lo mismo que uno solo para la placa de video.
       loader.load('/models/arbol.glb', gltf => {
         if (disposed) return
+        gltf.scene.updateMatrixWorld(true)
         const base = new THREE.Box3().setFromObject(gltf.scene)
         const tam = new THREE.Vector3(); base.getSize(tam)
         const cen = new THREE.Vector3(); base.getCenter(cen)
@@ -221,6 +222,10 @@ export default function ScrollLab() {
         gltf.scene.traverse(o => {
           if (!o.isMesh) return
           const geo = o.geometry.clone()
+          // Sin esto las partes del árbol quedan desplazadas y se ve cortado: la
+          // caja se mide sobre el modelo ya colocado, pero la geometría cruda
+          // está en su propio sistema hasta que se le aplica la matriz del nodo.
+          geo.applyMatrix4(o.matrixWorld)
           geo.translate(-cen.x, -base.min.y, -cen.z)   // apoyado en su base
           geo.scale(unidad, unidad, unidad)
           // Las hojas son superficies finas: sin doble cara desaparecen la mitad
@@ -243,6 +248,54 @@ export default function ScrollLab() {
           afuera.add(inst)
         })
       }, undefined, () => { /* sin árboles queda el césped solo */ })
+
+      // ── EL CLUB ──
+      // Un edificio bajo detrás de la cancha. Hecho por código y no con un
+      // modelo generado: los edificios de Meshy vienen con la textura repartida
+      // en miles de retazos y no se pueden achicar sin romperlos.
+      const club = new THREE.Group()
+      const matPared = new THREE.MeshStandardMaterial({ color: '#f2f5f8', roughness: 0.9 })
+      const matTecho = new THREE.MeshStandardMaterial({ color: '#2f4257', roughness: 0.7 })
+      const matVentana = new THREE.MeshStandardMaterial({
+        color: '#25384d', roughness: 0.15, metalness: 0.5,
+      })
+      const CL_ANCHO = 78, CL_ALTO = 26, CL_FONDO = 34
+      const cuerpo = new THREE.Mesh(new THREE.BoxGeometry(CL_ANCHO, CL_ALTO, CL_FONDO), matPared)
+      cuerpo.position.y = SUELO_Y + CL_ALTO / 2
+      club.add(cuerpo)
+      // alero que sobresale, para que no sea una caja pelada
+      const alero = new THREE.Mesh(new THREE.BoxGeometry(CL_ANCHO + 6, 2.4, CL_FONDO + 6), matTecho)
+      alero.position.y = SUELO_Y + CL_ALTO + 1.2
+      club.add(alero)
+      // ventanal corrido al frente
+      const ventanal = new THREE.Mesh(new THREE.BoxGeometry(CL_ANCHO * 0.82, CL_ALTO * 0.42, 0.6), matVentana)
+      ventanal.position.set(0, SUELO_Y + CL_ALTO * 0.55, CL_FONDO / 2 + 0.2)
+      club.add(ventanal)
+      // cartel con el logo sobre el ventanal
+      const matCartel = new THREE.MeshStandardMaterial({
+        color: '#ffffff', roughness: 0.85, transparent: true,
+      })
+      const cartel = new THREE.Mesh(new THREE.PlaneGeometry(CL_ANCHO * 0.34, CL_ANCHO * 0.34 / 3), matCartel)
+      cartel.position.set(0, SUELO_Y + CL_ALTO * 0.85, CL_FONDO / 2 + 0.4)
+      new THREE.TextureLoader().load('/assets/logo-caja.png', tx => {
+        if (disposed) return
+        tx.colorSpace = THREE.SRGBColorSpace
+        matCartel.map = tx
+        matCartel.needsUpdate = true
+      })
+      club.add(cartel)
+      club.position.set(-34, 0, RED_Z - 132)
+      afuera.add(club)
+
+      // ── EL LÍMITE DEL TERRENO ──
+      // Sin esto el césped se corta de golpe contra el cielo y se ve el borde
+      // del mundo. Un seto perimetral cierra la vista a lo lejos.
+      const matSeto = new THREE.MeshStandardMaterial({ color: '#4e7a48', roughness: 1 })
+      const seto = new THREE.Mesh(new THREE.TorusGeometry(180, 7, 6, 40), matSeto)
+      seto.rotation.x = Math.PI / 2
+      seto.position.set(0, SUELO_Y + 1, RED_Z)
+      seto.scale.y = 0.55
+      afuera.add(seto)
 
       // otra cancha a lo lejos, apenas insinuada: da idea de club, no de cancha suelta
       const vecina = new THREE.Mesh(
