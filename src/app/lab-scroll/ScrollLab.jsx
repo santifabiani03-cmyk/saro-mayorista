@@ -147,6 +147,9 @@ export default function ScrollLab() {
       const RED_ALTO = 5.67        // 0.88 m: la altura real de una red de pádel
       const RED_Z = 5.5
       const MEDIA = 32.5   // media cancha a lo ancho (65 / 2)
+      // Medidas reales: una cancha de pádel es de 20 x 10 m, que con esta escala
+      // son 129 x 65 unidades. Van acá arriba porque las usa todo lo demás.
+      const CANCHA_LARGO = 129, CANCHA_ANCHO = 65
 
       // Domo de cielo: un degradé suave alrededor de todo, para que fuera de la
       // cancha no quede el vacío blanco. Va por dentro de una esfera enorme, así
@@ -191,7 +194,6 @@ export default function ScrollLab() {
 
       // ── AFUERA DE LA CANCHA ──
       const afuera = new THREE.Group()
-      scene.add(afuera)
 
       // ── LONAS DE FONDO ──
       // En una cancha de verdad las paredes del fondo llevan lonas publicitarias.
@@ -292,11 +294,6 @@ export default function ScrollLab() {
       explanada.position.y = -3.06
       scene.add(explanada)
 
-      // Medidas reales: una cancha de pádel es de 20 x 10 m, que con esta escala
-      // son 129 x 65 unidades. Antes el piso medía 240 x 240 — casi siete veces
-      // el área — y por eso nunca se veía dónde terminaba la cancha ni el césped
-      // que hay alrededor.
-      const CANCHA_LARGO = 129, CANCHA_ANCHO = 65
       // Césped sintético: fibras verticales finas con variación, no un celeste
       // plano. Se dibuja al vuelo y se repite, así no pesa nada.
       const cesCnv2 = document.createElement('canvas')
