@@ -398,7 +398,7 @@ export default function ScrollLab() {
         // que la cámara recorre al girar.
         // Posiciones fijas: uno CENTRADO al fondo (el que se ve al abrir la
         // página), dos abriéndose a los costados y uno que entra al girar.
-        const ANGULOS = [-Math.PI / 2, -Math.PI / 2 - 0.62, -Math.PI / 2 + 0.62, Math.PI - 0.3]
+        const ANGULOS = [-Math.PI / 2, -Math.PI / 2 - 0.38, -Math.PI / 2 + 0.38, Math.PI - 0.3]
         const ang = ANGULOS[i % ANGULOS.length]
         const rad = 84
         const x = Math.cos(ang) * rad
@@ -599,18 +599,24 @@ export default function ScrollLab() {
         // Cada paño lleva su propia textura dibujada de cero. Clonar una
         // CanvasTexture no copia su imagen, así que los paños salían vacíos: por
         // eso el alambrado había desaparecido.
+        // El alphaMap se guía por el BRILLO: blanco = opaco, negro = invisible.
+        // El hilo se dibuja en BLANCO (para que sea sólido) y el color negro lo
+        // pone el material. Antes lo dibujaba en negro, así que su alpha era 0 y
+        // la reja entera desaparecía — y cuanto más oscura, más invisible.
         const c = document.createElement('canvas')
         c.width = c.height = 32
         const g2 = c.getContext('2d')
-        g2.strokeStyle = '#000000'
+        g2.fillStyle = '#000000'
+        g2.fillRect(0, 0, 32, 32)          // fondo negro = hueco del tejido
+        g2.strokeStyle = '#ffffff'
         g2.lineWidth = 5
-        g2.strokeRect(0, 0, 32, 32)
+        g2.strokeRect(0, 0, 32, 32)        // hilo blanco = opaco
         const t = new THREE.CanvasTexture(c)
         t.wrapS = t.wrapT = THREE.RepeatWrapping
         t.repeat.set(Math.max(1, repX), Math.max(1, alto / 1.25))
         t.anisotropy = 4
         const m = new THREE.MeshStandardMaterial({
-          map: t, alphaMap: t, transparent: true,
+          alphaMap: t, transparent: true, color: '#0a0a0a',   // el negro va acá
           roughness: 0.75, metalness: 0.15, side: THREE.DoubleSide, depthWrite: false,
         })
         return new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), m)
@@ -713,14 +719,18 @@ export default function ScrollLab() {
       cnv.width = cnv.height = 64
       const ctx = cnv.getContext('2d')
       // Tejido más cerrado y oscuro: antes se veía como un velo transparente
-      ctx.strokeStyle = '#1a2330'   // oscura, pero un escalón por encima del alambre negro
+      // Mismo criterio que la reja: el hilo va en blanco para que el alphaMap lo
+      // tome como opaco, y el tono lo da el color del material.
+      ctx.fillStyle = '#000000'
+      ctx.fillRect(0, 0, 64, 64)
+      ctx.strokeStyle = '#ffffff'
       ctx.lineWidth = 15
       ctx.strokeRect(0, 0, 64, 64)
       const texRed = new THREE.CanvasTexture(cnv)
       texRed.wrapS = texRed.wrapT = THREE.RepeatWrapping
       texRed.repeat.set(100, 9)
       const matMalla = new THREE.MeshStandardMaterial({
-        map: texRed, alphaMap: texRed, transparent: true, opacity: 1, color: '#c8d2dd',
+        alphaMap: texRed, transparent: true, opacity: 1, color: '#2b3a4d',   // gris oscuro, más claro que el alambre
         roughness: 0.95, side: THREE.DoubleSide, depthWrite: false,
       })
       const malla = new THREE.Mesh(new THREE.PlaneGeometry(MEDIA * 2, RED_ALTO), matMalla)
