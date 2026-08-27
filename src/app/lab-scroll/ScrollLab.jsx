@@ -205,7 +205,9 @@ export default function ScrollLab() {
         const x = Math.cos(ang) * rad
         const z = RED_Z + Math.sin(ang) * rad
         if (Math.abs(x) < 44 && Math.abs(z - RED_Z) < 76) continue   // ni cancha ni vereda
-        lugares.push({ x, z, escala: 3.4 + (i % 4) * 1.1, giro: ang })
+        // 39 unidades = 6 m; 65 = 10 m. Antes iban de 3.4 a 6.7, o sea medio
+        // metro: al lado de una cancha de 20 m se leían como manchas en el piso.
+        lugares.push({ x, z, escala: 39 + (i % 4) * 9, giro: ang })
       }
 
       // Árbol real (Meshy, 227 KB). Se dibuja con InstancedMesh: los 20 y pico
@@ -221,7 +223,11 @@ export default function ScrollLab() {
           const geo = o.geometry.clone()
           geo.translate(-cen.x, -base.min.y, -cen.z)   // apoyado en su base
           geo.scale(unidad, unidad, unidad)
-          const inst = new THREE.InstancedMesh(geo, o.material, lugares.length)
+          // Las hojas son superficies finas: sin doble cara desaparecen la mitad
+          // de las veces según desde dónde se las mire.
+          const mat = o.material.clone()
+          mat.side = THREE.DoubleSide
+          const inst = new THREE.InstancedMesh(geo, mat, lugares.length)
           const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler()
           lugares.forEach((l, i) => {
             e.set(0, l.giro, 0)
@@ -692,7 +698,11 @@ export default function ScrollLab() {
         // Una esfera apoya a R del centro mire como mire, pero un CUBO ROTADO
         // apoya sobre una esquina, hasta 1.73·R. Sin esto la caja se hunde en el
         // piso justo mientras se transforma.
-        const PISO_FORMA = SUELO_Y + R_BOLA * (1 + 0.732 * cambio * (1 - alinea))
+        // La caja crece mientras se forma, así que el radio que toca el piso
+        // también crece. Antes se usaba el radio sin escalar y la caja terminaba
+        // 0.13 unidades hundida.
+        const escalaForma = 1 + 0.55 * cambio
+        const PISO_FORMA = SUELO_Y + R_BOLA * escalaForma * (1 + 0.732 * cambio * (1 - alinea))
 
         // Física del tiro. El tiempo avanza LINEAL con el scroll (sin suavizado):
         // si no, la pelota parece frenar y acelerar sola.
@@ -719,7 +729,7 @@ export default function ScrollLab() {
           by = balistica(tv, CONTACTO.y, V0Y, G, PISO_FORMA, REBOTE)
         }
         by = Math.max(by, PISO_FORMA)
-        by = mix(by, SUELO_Y + R_BOLA + 0.03, suave(seg(t, 0.86, 1.00)))
+        by = mix(by, SUELO_Y + R_BOLA * escalaForma + 0.02, suave(seg(t, 0.86, 1.00)))
         pelota.position.set(bx, by, bz)
 
         // ── Cámara: un giro continuo de 90° alrededor de la pelota ──
@@ -770,11 +780,10 @@ export default function ScrollLab() {
         matEtiqueta.opacity = detalle
         // La caja CRECE al formarse: la pelota nunca se achica, pero el envío
         // termina con más presencia que una pelota de pádel.
-        const crece = 1 + 0.55 * cambio
-        pelota.scale.setScalar(crece)
+        pelota.scale.setScalar(escalaForma)
         paquete.position.copy(pelota.position)
         paquete.rotation.copy(pelota.rotation)
-        paquete.scale.setScalar(crece)
+        paquete.scale.setScalar(escalaForma)
 
         // La sombra sigue a la pelota por el piso: se agranda y se aclara cuanto
         // más alto va, como una sombra de verdad.
