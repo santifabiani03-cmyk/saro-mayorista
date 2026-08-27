@@ -293,17 +293,55 @@ export default function ScrollLab() {
         }, undefined, () => { /* si no carga, la escena sigue igual */ })
       }
 
-      // Bancos contra las paredes largas, mirando a la cancha
-      ponerModelo('/models/banco.glb', (base) => {
-        ;[[-1, -26], [-1, 30], [1, 2]].forEach(([lado, z]) => {
-          const b = base.clone()
-          b.scale.multiplyScalar(5.6)                 // ~0.87 m de alto
-          b.position.set(lado * (CANCHA_ANCHO / 2 + 11), SUELO_Y, RED_Z + z)
-          b.rotation.y = lado > 0 ? -Math.PI / 2 : Math.PI / 2
-          afuera.add(b)
+      // ── BANCOS ──
+      // Hechos por código. El modelo del kit se descartó después de tres
+      // intentos: viene como piezas sueltas y, mires como lo mires, alguna
+      // quedaba desprendida. Un banco son cuatro formas simples y así queda
+      // limpio, pesa cero y se ajusta con números.
+      const matListón = new THREE.MeshStandardMaterial({ color: '#b07a4a', roughness: 0.85 })
+      const matHierro = new THREE.MeshStandardMaterial({ color: '#243447', roughness: 0.5, metalness: 0.4 })
+      const hacerBanco = () => {
+        const b2 = new THREE.Group()
+        const LARGO = 11.6, ALTO = 5.6, FONDO = 4.2
+        // patas: dos marcos en U invertida
+        ;[-1, 1].forEach(lado => {
+          const x = lado * (LARGO / 2 - 0.9)
+          ;[-1, 1].forEach(d => {
+            const pata = new THREE.Mesh(new THREE.BoxGeometry(0.34, ALTO * 0.52, 0.34), matHierro)
+            pata.position.set(x, ALTO * 0.26, d * FONDO * 0.32)
+            b2.add(pata)
+          })
+          const trav = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.3, FONDO * 0.7), matHierro)
+          trav.position.set(x, ALTO * 0.52, 0)
+          b2.add(trav)
+          // respaldo inclinado
+          const sop = new THREE.Mesh(new THREE.BoxGeometry(0.3, ALTO * 0.55, 0.3), matHierro)
+          sop.position.set(x, ALTO * 0.78, -FONDO * 0.3)
+          sop.rotation.x = -0.18
+          b2.add(sop)
         })
-      }, ['seat', 'seat_back', 'legs_double', 'legs_single',
-          'back_support_r', 'back_support_l', 'arm_rest_01', 'arm_rest_02'])
+        // listones del asiento
+        for (let i = 0; i < 4; i++) {
+          const l = new THREE.Mesh(new THREE.BoxGeometry(LARGO, 0.26, 0.82), matListón)
+          l.position.set(0, ALTO * 0.55, -FONDO * 0.28 + i * 0.98)
+          b2.add(l)
+        }
+        // listones del respaldo
+        for (let i = 0; i < 3; i++) {
+          const l = new THREE.Mesh(new THREE.BoxGeometry(LARGO, 0.72, 0.24), matListón)
+          l.position.set(0, ALTO * 0.66 + i * 0.86, -FONDO * 0.33 - i * 0.16)
+          l.rotation.x = -0.18
+          b2.add(l)
+        }
+        b2.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true } })
+        return b2
+      }
+      ;[[-1, -26], [-1, 30], [1, 2]].forEach(([lado, z]) => {
+        const b2 = hacerBanco()
+        b2.position.set(lado * (CANCHA_ANCHO / 2 + 11), SUELO_Y, RED_Z + z)
+        b2.rotation.y = lado > 0 ? -Math.PI / 2 : Math.PI / 2
+        afuera.add(b2)
+      })
 
       // Todo lo de afuera va SÓLO sobre el arco que recorre la cámara: entre
       // mirar al fondo y mirar al costado. Poner cosas donde nunca se miran es
@@ -362,15 +400,21 @@ export default function ScrollLab() {
         })
       })
 
-      // Arbustos sueltos sobre el césped, para que no sea un verde liso
-      ponerModelo('/models/arbusto.glb', (base) => {
-        [0.02, 0.2, 0.36, 0.5, 0.66, 0.84, 0.96].forEach((f, i) => {
-          const [x, z] = enArco(f, 78 + (i % 3) * 26, (i % 2 ? 0.1 : -0.1))
-          const a2 = base.clone()
-          a2.scale.multiplyScalar(7 + (i % 3) * 2.5)  // 1 a 1.8 m
-          a2.position.set(x, SUELO_Y, z)
-          a2.rotation.y = i * 1.3
-          afuera.add(a2)
+      // Arbustos de tres portes, para que el verde no sea liso ni repetido
+      ;[
+        ['/models/arbusto3.glb', [0.04, 0.34, 0.68, 0.92], 9, 96],    // los grandes, al fondo
+        ['/models/arbusto.glb',  [0.16, 0.46, 0.8], 6, 74],           // medianos
+        ['/models/mata.glb',     [0.1, 0.26, 0.4, 0.56, 0.72, 0.88], 3.4, 62],  // chicos, cerca
+      ].forEach(([ruta, lugares, escala, radio]) => {
+        ponerModelo(ruta, (base) => {
+          lugares.forEach((f, i) => {
+            const [x, z] = enArco(f, radio + (i % 3) * 14, (i % 2 ? 0.09 : -0.09))
+            const a2 = base.clone()
+            a2.scale.multiplyScalar(escala * (0.82 + (i % 3) * 0.16))
+            a2.position.set(x, SUELO_Y, z)
+            a2.rotation.y = i * 1.7
+            afuera.add(a2)
+          })
         })
       })
 
