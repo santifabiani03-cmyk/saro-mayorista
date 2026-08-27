@@ -202,19 +202,31 @@ export default function ScrollLab() {
       const lonaCnv = document.createElement('canvas')
       lonaCnv.width = 1024; lonaCnv.height = 128
       const lx = lonaCnv.getContext('2d')
-      lx.fillStyle = '#0F172A'                        // navy de la marca
+      lx.fillStyle = '#2563EB'                        // azul de la marca, no el navy
       lx.fillRect(0, 0, 1024, 128)
       const texLona = new THREE.CanvasTexture(lonaCnv)
       texLona.colorSpace = THREE.SRGBColorSpace
       const matLona = new THREE.MeshStandardMaterial({ map: texLona, roughness: 0.85 })
-      // el logo se dibuja sobre la lona cuando termina de cargar
+      // El logo va en blanco y con separación calculada, no a ojo: antes se
+      // dibujaba cada 232 px con anchos variables y terminaba encimándose.
       const imgLogo = new Image()
       imgLogo.crossOrigin = 'anonymous'
       imgLogo.onload = () => {
         if (disposed) return
-        const alto = 62, ancho = alto * (imgLogo.width / imgLogo.height || 3)
-        for (let k = 0; k < 4; k++) {
-          lx.drawImage(imgLogo, 128 + k * 232 - ancho / 2, 64 - alto / 2, ancho, alto)
+        const alto = 46
+        const ancho = alto * (imgLogo.width / imgLogo.height || 3)
+        const veces = 3
+        const paso = 1024 / veces
+        // se pinta en blanco usando el logo como recorte
+        const aux = document.createElement('canvas')
+        aux.width = Math.ceil(ancho); aux.height = Math.ceil(alto)
+        const ax = aux.getContext('2d')
+        ax.drawImage(imgLogo, 0, 0, ancho, alto)
+        ax.globalCompositeOperation = 'source-in'
+        ax.fillStyle = '#ffffff'
+        ax.fillRect(0, 0, ancho, alto)
+        for (let k = 0; k < veces; k++) {
+          lx.drawImage(aux, paso * (k + 0.5) - ancho / 2, 64 - alto / 2)
         }
         texLona.needsUpdate = true
       }
@@ -227,6 +239,59 @@ export default function ScrollLab() {
         lona.rotation.y = lado > 0 ? Math.PI : 0
         scene.add(lona)
       })
+
+      // ── CARTELERÍA DE PRODUCTOS ──
+      // Fotos reales del catálogo, montadas en carteles fuera de la cancha. Son
+      // planos con la imagen y nada más: no hay que modelar cada producto en 3D,
+      // pesan lo que pesa un WebP y muestran el producto tal cual se vende.
+      const PRODUCTOS = [
+        '/assets/imagen-1779451998087.webp',
+        '/assets/imagen-1779452173589.webp',
+        '/assets/imagen-1779452345276.webp',
+      ]
+      const CARTEL_ALTO = 22
+      const carteles = new THREE.Group()
+      const matPoste2 = new THREE.MeshStandardMaterial({ color: '#2f4257', roughness: 0.6, metalness: 0.3 })
+      PRODUCTOS.forEach((ruta, i) => {
+        const lado = i % 2 === 0 ? -1 : 1
+        const z = RED_Z - 30 + Math.floor(i / 2) * 46
+        const x = lado * (CANCHA_ANCHO / 2 + 26)
+
+        // fondo blanco del cartel, para que la foto sin fondo se lea
+        const fondo = new THREE.Mesh(
+          new THREE.PlaneGeometry(CARTEL_ALTO * 0.82, CARTEL_ALTO),
+          new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.9, side: THREE.DoubleSide })
+        )
+        fondo.position.set(x, SUELO_Y + CARTEL_ALTO / 2 + 9, z)
+        fondo.rotation.y = lado > 0 ? -Math.PI / 2 : Math.PI / 2
+        carteles.add(fondo)
+
+        // la foto del producto, apenas adelante del fondo
+        const matFoto = new THREE.MeshStandardMaterial({
+          roughness: 0.9, transparent: true, side: THREE.DoubleSide,
+        })
+        const foto = new THREE.Mesh(
+          new THREE.PlaneGeometry(CARTEL_ALTO * 0.7, CARTEL_ALTO * 0.7),
+          matFoto
+        )
+        foto.position.set(x - lado * 0.3, SUELO_Y + CARTEL_ALTO / 2 + 9, z)
+        foto.rotation.y = lado > 0 ? -Math.PI / 2 : Math.PI / 2
+        new THREE.TextureLoader().load(ruta, tx => {
+          if (disposed) return
+          tx.colorSpace = THREE.SRGBColorSpace
+          matFoto.map = tx
+          matFoto.needsUpdate = true
+        }, undefined, () => { foto.visible = false })
+        carteles.add(foto)
+
+        // dos patas
+        ;[-0.32, 0.32].forEach(d => {
+          const pata = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 9, 8), matPoste2)
+          pata.position.set(x, SUELO_Y + 4.5, z + d * CARTEL_ALTO * 0.82)
+          carteles.add(pata)
+        })
+      })
+      afuera.add(carteles)
 
       // ── EL CLUB ──
       // Un edificio bajo detrás de la cancha. Hecho por código y no con un
@@ -312,6 +377,9 @@ export default function ScrollLab() {
         cx2.stroke()
       }
       const texPiso = new THREE.CanvasTexture(cesCnv2)
+      // Sin esto Three la toma como lineal y la muestra lavada: el piso se veía
+      // blanco. Era la única textura del archivo a la que le faltaba.
+      texPiso.colorSpace = THREE.SRGBColorSpace
       texPiso.wrapS = texPiso.wrapT = THREE.RepeatWrapping
       texPiso.repeat.set(26, 52)
       texPiso.anisotropy = 8

@@ -8,7 +8,7 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "check:orden": "eslint --config scripts/eslint-orden.mjs src"
+    "check:orden": "npx --yes eslint@10 --config scripts/eslint-orden.mjs src"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
