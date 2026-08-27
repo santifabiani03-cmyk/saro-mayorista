@@ -625,26 +625,12 @@ export default function ScrollLab() {
           },
         }
       }
-      // Three dibuja 60 veces por segundo. Sin esto seguía haciéndolo con la
-      // sección fuera de pantalla, gastando batería para nada.
-      let aLaVista = true
-      const centinela = new IntersectionObserver(
-        ([e]) => {
-          aLaVista = e.isIntersecting
-          if (aLaVista && !raf) frame()
-        },
-        { rootMargin: '200px' }
-      )
-      centinela.observe(mount)
-
       const frame = () => {
-        if (!aLaVista) { raf = 0; return }
         raf = requestAnimationFrame(frame)
-        // Red de contención: si el contenedor medía 0 cuando se creó el lienzo,
-        // este queda en 1x1 y el ResizeObserver puede no volver a dispararse.
-        // Comparando cada cuadro se recupera solo en cuanto haya lugar.
-        const cw = Math.round(W() * renderer.getPixelRatio())
-        if (renderer.domElement.width !== cw && W() > 1) onResize()
+        // Con la pestaña de fondo el navegador ya frena requestAnimationFrame
+        // solo, así que no hace falta nada más para no gastar batería. La versión
+        // anterior usaba un IntersectionObserver y, si marcaba "no visible", el
+        // bucle se cortaba y la pantalla quedaba en blanco.
         dibujar(progRef.current.t)
       }
       const dibujar = (t) => {
@@ -809,7 +795,6 @@ export default function ScrollLab() {
 
       cleanup = () => {
         cancelAnimationFrame(raf)
-        centinela.disconnect()
         ro.disconnect()
         ;scene.traverse(o => {
           o.geometry?.dispose()
