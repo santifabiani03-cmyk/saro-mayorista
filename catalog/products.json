@@ -1541,5 +1541,61 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787356252259.webp"
     ],
     "fechaPublicacion": "2026-08-21T23:52:07.295Z"
+  },
+  {
+    "nombre": "REMERON DRY ELAS. DAMA",
+    "precio": 12000,
+    "precioMinorista": 21000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro",
+      "Azul"
+    ],
+    "talles": [
+      "S/M",
+      "L/XL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1787835496022",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835427436.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835429219.webp"
+    ],
+    "fechaPublicacion": "2026-08-27T12:58:16.022Z"
+  },
+  {
+    "nombre": "JOGGER SEMIRECTO C/ELASTICO REGULABLE y REFLEX CAB. ",
+    "precio": 17000,
+    "precioMinorista": 28000,
+    "descripcion": "Jogger sin friza, semirecto elastizado con elastico regulable y reflex. Material Scuba. ",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "_aiLoading": false,
+    "id": "p1787835733397",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835519612.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835548097.webp"
+    ],
+    "fechaPublicacion": "2026-08-27T13:02:13.397Z"
   }
 ]
