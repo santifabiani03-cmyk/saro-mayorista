@@ -201,13 +201,15 @@ export default function ScrollLab() {
       const lugares = []
       for (let i = 0; i < 64; i++) {          // más densidad: con 26 el fondo quedaba pelado
         const ang = i * 2.399
-        const rad = 52 + (i % 9) * 15
+        // A 52 unidades (8 m) quedaban pegados a la pared: un árbol de 10 m
+        // parado ahí ocupa toda la pantalla y tapa la cancha. Se van al fondo.
+        const rad = 135 + (i % 9) * 22
         const x = Math.cos(ang) * rad
         const z = RED_Z + Math.sin(ang) * rad
         if (Math.abs(x) < 44 && Math.abs(z - RED_Z) < 76) continue   // ni cancha ni vereda
         // 39 unidades = 6 m; 65 = 10 m. Antes iban de 3.4 a 6.7, o sea medio
         // metro: al lado de una cancha de 20 m se leían como manchas en el piso.
-        lugares.push({ x, z, escala: 39 + (i % 4) * 9, giro: ang })
+        lugares.push({ x, z, escala: 34 + (i % 4) * 8, giro: ang })
       }
 
       // Árbol real (Meshy, 227 KB). Se dibuja con InstancedMesh: los 20 y pico
