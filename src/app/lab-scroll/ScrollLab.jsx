@@ -120,6 +120,14 @@ export default function ScrollLab() {
       const camera = new THREE.PerspectiveCamera(34, W() / H(), 0.1, 400)
       // preserveDrawingBuffer permite leer el cuadro ya dibujado (para inspeccionarlo)
       const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true })
+      // Sin curva de exposición, las zonas claras se van a blanco puro y todo
+      // queda plano y quemado — es buena parte de lo que se lee como "barato".
+      // ACES comprime las altas luces como lo hace una cámara de verdad.
+      renderer.toneMapping = THREE.ACESFilmicToneMapping
+      renderer.toneMappingExposure = 0.92
+      // Sombras reales: apoyan los objetos en el piso mejor que cualquier truco.
+      renderer.shadowMap.enabled = true
+      renderer.shadowMap.type = THREE.PCFSoftShadowMap
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
       renderer.setSize(W(), H())
       mount.appendChild(renderer.domElement)
@@ -127,12 +135,20 @@ export default function ScrollLab() {
       // Iluminación de entorno: el modelo real necesita reflejos para verse bien
       const pmrem = new THREE.PMREMGenerator(renderer)
       scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
-      scene.add(new THREE.HemisphereLight('#ffffff', '#c3d1e5', 0.9))
-      const sol = new THREE.DirectionalLight('#ffffff', 1.5)
+      scene.environmentIntensity = 0.6      // el reflejo del ambiente aclaraba de más
+      scene.add(new THREE.HemisphereLight('#ffffff', '#c3d1e5', 0.55))
+      const sol = new THREE.DirectionalLight('#fff6e8', 1.15)   // apenas cálido, como el sol
       sol.position.set(4, 8, 6)
+      sol.castShadow = true
+      sol.shadow.mapSize.set(1024, 1024)
+      sol.shadow.camera.near = 1
+      sol.shadow.camera.far = 260
+      // el área que cubre la sombra: la cancha entera
+      Object.assign(sol.shadow.camera, { left: -90, right: 90, top: 90, bottom: -90 })
+      sol.shadow.bias = -0.0012
       scene.add(sol)
       // Luz de relleno del lado opuesto: sin ella la cara en sombra queda plana
-      const relleno = new THREE.DirectionalLight('#dceafc', 0.5)
+      const relleno = new THREE.DirectionalLight('#dceafc', 0.32)
       relleno.position.set(-7, 4, -5)
       scene.add(relleno)
 
@@ -236,7 +252,8 @@ export default function ScrollLab() {
       const LONA_ALTO = 7
       ;[-1, 1].forEach(lado => {
         const lona = new THREE.Mesh(new THREE.PlaneGeometry(CANCHA_ANCHO, LONA_ALTO), matLona)
-        lona.position.set(0, SUELO_Y + LONA_ALTO / 2 + 0.4, RED_Z + lado * (CANCHA_LARGO / 2 - 0.35))
+        // Del lado de AFUERA del cristal, como en las canchas de verdad
+        lona.position.set(0, SUELO_Y + LONA_ALTO / 2 + 0.4, RED_Z + lado * (CANCHA_LARGO / 2 + 0.6))
         lona.rotation.y = lado > 0 ? Math.PI : 0
         scene.add(lona)
       })
@@ -245,12 +262,19 @@ export default function ScrollLab() {
       // Fotos reales del catálogo, montadas en carteles fuera de la cancha. Son
       // planos con la imagen y nada más: no hay que modelar cada producto en 3D,
       // pesan lo que pesa un WebP y muestran el producto tal cual se vende.
-      const PRODUCTOS = [
+      const CATALOGO = [
         '/assets/imagen-1779451998087.webp',   // medias
         '/assets/imagen-1779452173589.webp',   // canasto
         '/assets/imagen-1779452345276.webp',   // caramelera
         '/assets/imagen-1779452499007.webp',   // toalla
       ]
+      // Orden distinto en cada carga: quien vuelve al sitio no ve siempre lo
+      // mismo. Se mezcla una copia para no tocar la lista original.
+      const PRODUCTOS = [...CATALOGO]
+      for (let i = PRODUCTOS.length - 1; i > 0; i--) {
+        const j = Math.floor(Math.random() * (i + 1))
+        ;[PRODUCTOS[i], PRODUCTOS[j]] = [PRODUCTOS[j], PRODUCTOS[i]]
+      }
       const CARTEL_ALTO = 20
       const carteles = new THREE.Group()
       const rotables = []
@@ -260,8 +284,11 @@ export default function ScrollLab() {
       // carteles se reparten sobre ESE arco, así van entrando en cuadro a medida
       // que gira, en vez de quedar detrás.
       PRODUCTOS.forEach((ruta, i) => {
-        const t0 = i / (PRODUCTOS.length - 1 || 1)          // 0 = al fondo, 1 = al costado
-        const ang = Math.PI + t0 * (Math.PI / 2)            // el arco que recorre la cámara
+        // Los primeros van sobre el arco que recorre la cámara; el último cruza
+        // al otro lado, para que también haya cartelería a la derecha.
+        const alOtroLado = i === PRODUCTOS.length - 1
+        const t0 = i / Math.max(1, PRODUCTOS.length - 2)
+        const ang = alOtroLado ? -Math.PI / 3 : Math.PI + Math.min(1, t0) * (Math.PI / 2)
         const rad = 86
         const x = Math.cos(ang) * rad
         const z = RED_Z + Math.sin(ang) * rad
@@ -275,8 +302,10 @@ export default function ScrollLab() {
         fondo.position.y = SUELO_Y + CARTEL_ALTO / 2 + 10
         grupo.add(fondo)
 
-        const matFoto = new THREE.MeshStandardMaterial({
-          roughness: 0.9, transparent: true, side: THREE.DoubleSide,
+        // Material sin iluminación: la foto se ve con sus colores propios. Con
+        // MeshStandard recibía sol + ambiente + relleno y salía quemada.
+        const matFoto = new THREE.MeshBasicMaterial({
+          transparent: true, side: THREE.DoubleSide, toneMapped: false,
         })
         const foto = new THREE.Mesh(
           new THREE.PlaneGeometry(CARTEL_ALTO * 0.72, CARTEL_ALTO * 0.72), matFoto
@@ -304,6 +333,7 @@ export default function ScrollLab() {
           grupo.add(pata)
         })
 
+        grupo.traverse(o => { if (o.isMesh) o.castShadow = true })
         grupo.position.set(x, 0, z)
         grupo.lookAt(0, SUELO_Y + 16, RED_Z)        // todos miran hacia la cancha
         carteles.add(grupo)
@@ -407,10 +437,11 @@ export default function ScrollLab() {
       texPiso.anisotropy = 8
       const piso = new THREE.Mesh(
         new THREE.PlaneGeometry(CANCHA_ANCHO, CANCHA_LARGO),
-        new THREE.MeshStandardMaterial({ map: texPiso, roughness: 0.98 })
+        new THREE.MeshStandardMaterial({ map: texPiso, roughness: 1, metalness: 0, color: '#cfe0ee' })
       )
       piso.rotation.x = -Math.PI / 2
       piso.position.set(0, SUELO_Y, RED_Z)
+      piso.receiveShadow = true
       scene.add(piso)
       // vereda perimetral: el borde de cemento que rodea la cancha
       const vereda = new THREE.Mesh(
@@ -629,6 +660,7 @@ export default function ScrollLab() {
           disco.rotation.y = lado > 0 ? 0 : Math.PI
           paleta.add(disco)
         }
+        cont.traverse(o => { if (o.isMesh) o.castShadow = true })
         cara.visible = false                  // se van los placeholders
         mango.visible = false
       }, undefined, () => { /* si falla, queda la silueta simple */ })
@@ -681,6 +713,7 @@ export default function ScrollLab() {
       const costuraB = new THREE.Mesh(geoCostura, matCostura)
       costuraB.visible = false
       pelota.add(bola, costuraA, costuraB)
+      bola.castShadow = true
 
       // k = 0 pelota · k = 1 caja. Mueve los vértices y el color a la vez.
       const posBola = geoBola.attributes.position
@@ -951,7 +984,7 @@ export default function ScrollLab() {
         const altPal = Math.max(0, codo.position.y + BRAZO - SUELO_Y)
         sombraPal.position.set(IMPACTO.x, SUELO_Y + 0.02, IMPACTO.z + 0.4)
         sombraPal.scale.set(ALTO_PALETA * 0.20 * (1 + altPal * 0.03), 1, ALTO_PALETA * 0.34 * (1 + altPal * 0.03))
-        matSombraPal.opacity = codo.visible ? Math.max(0, 0.22 - altPal * 0.012) : 0
+        matSombraPal.opacity = 0   // ya hay sombra real proyectada por el sol
 
         const altura = Math.max(0, pelota.position.y - SUELO_Y)
         sombra.position.set(pelota.position.x, SUELO_Y + 0.03, pelota.position.z)
