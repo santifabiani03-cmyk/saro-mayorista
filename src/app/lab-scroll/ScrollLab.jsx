@@ -194,6 +194,7 @@ export default function ScrollLab() {
 
       // ── AFUERA DE LA CANCHA ──
       const afuera = new THREE.Group()
+      const cartelesRef = {}
 
       // ── LONAS DE FONDO ──
       // En una cancha de verdad las paredes del fondo llevan lonas publicitarias.
@@ -245,52 +246,71 @@ export default function ScrollLab() {
       // planos con la imagen y nada más: no hay que modelar cada producto en 3D,
       // pesan lo que pesa un WebP y muestran el producto tal cual se vende.
       const PRODUCTOS = [
-        '/assets/imagen-1779451998087.webp',
-        '/assets/imagen-1779452173589.webp',
-        '/assets/imagen-1779452345276.webp',
+        '/assets/imagen-1779451998087.webp',   // medias
+        '/assets/imagen-1779452173589.webp',   // canasto
+        '/assets/imagen-1779452345276.webp',   // caramelera
+        '/assets/imagen-1779452499007.webp',   // toalla
       ]
-      const CARTEL_ALTO = 22
+      const CARTEL_ALTO = 20
       const carteles = new THREE.Group()
+      const rotables = []
       const matPoste2 = new THREE.MeshStandardMaterial({ color: '#2f4257', roughness: 0.6, metalness: 0.3 })
+
+      // La cámara arranca mirando al fondo y gira 90° hacia un costado. Los
+      // carteles se reparten sobre ESE arco, así van entrando en cuadro a medida
+      // que gira, en vez de quedar detrás.
       PRODUCTOS.forEach((ruta, i) => {
-        const lado = i % 2 === 0 ? -1 : 1
-        const z = RED_Z - 30 + Math.floor(i / 2) * 46
-        const x = lado * (CANCHA_ANCHO / 2 + 26)
+        const t0 = i / (PRODUCTOS.length - 1 || 1)          // 0 = al fondo, 1 = al costado
+        const ang = Math.PI + t0 * (Math.PI / 2)            // el arco que recorre la cámara
+        const rad = 86
+        const x = Math.cos(ang) * rad
+        const z = RED_Z + Math.sin(ang) * rad
 
-        // fondo blanco del cartel, para que la foto sin fondo se lea
+        const grupo = new THREE.Group()
+        // fondo blanco: las fotos del catálogo vienen sobre blanco, no recortadas
         const fondo = new THREE.Mesh(
-          new THREE.PlaneGeometry(CARTEL_ALTO * 0.82, CARTEL_ALTO),
-          new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.9, side: THREE.DoubleSide })
+          new THREE.PlaneGeometry(CARTEL_ALTO * 0.84, CARTEL_ALTO),
+          new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.92, side: THREE.DoubleSide })
         )
-        fondo.position.set(x, SUELO_Y + CARTEL_ALTO / 2 + 9, z)
-        fondo.rotation.y = lado > 0 ? -Math.PI / 2 : Math.PI / 2
-        carteles.add(fondo)
+        fondo.position.y = SUELO_Y + CARTEL_ALTO / 2 + 10
+        grupo.add(fondo)
 
-        // la foto del producto, apenas adelante del fondo
         const matFoto = new THREE.MeshStandardMaterial({
           roughness: 0.9, transparent: true, side: THREE.DoubleSide,
         })
         const foto = new THREE.Mesh(
-          new THREE.PlaneGeometry(CARTEL_ALTO * 0.7, CARTEL_ALTO * 0.7),
-          matFoto
+          new THREE.PlaneGeometry(CARTEL_ALTO * 0.72, CARTEL_ALTO * 0.72), matFoto
         )
-        foto.position.set(x - lado * 0.3, SUELO_Y + CARTEL_ALTO / 2 + 9, z)
-        foto.rotation.y = lado > 0 ? -Math.PI / 2 : Math.PI / 2
+        foto.position.set(0, SUELO_Y + CARTEL_ALTO / 2 + 10, 0.25)
+        grupo.add(foto)
         new THREE.TextureLoader().load(ruta, tx => {
           if (disposed) return
           tx.colorSpace = THREE.SRGBColorSpace
           matFoto.map = tx
           matFoto.needsUpdate = true
         }, undefined, () => { foto.visible = false })
-        carteles.add(foto)
 
-        // dos patas
-        ;[-0.32, 0.32].forEach(d => {
-          const pata = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 9, 8), matPoste2)
-          pata.position.set(x, SUELO_Y + 4.5, z + d * CARTEL_ALTO * 0.82)
-          carteles.add(pata)
+        // marco de la marca abajo, para que se lea como cartelería y no como foto pegada
+        const zocalo = new THREE.Mesh(
+          new THREE.BoxGeometry(CARTEL_ALTO * 0.86, CARTEL_ALTO * 0.1, 0.4),
+          new THREE.MeshStandardMaterial({ color: '#2563EB', roughness: 0.7 })
+        )
+        zocalo.position.set(0, SUELO_Y + 10 + CARTEL_ALTO * 0.05, 0)
+        grupo.add(zocalo)
+
+        ;[-0.34, 0.34].forEach(d => {
+          const pata = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 10, 8), matPoste2)
+          pata.position.set(d * CARTEL_ALTO * 0.84, SUELO_Y + 5, 0)
+          grupo.add(pata)
         })
+
+        grupo.position.set(x, 0, z)
+        grupo.lookAt(0, SUELO_Y + 16, RED_Z)        // todos miran hacia la cancha
+        carteles.add(grupo)
+        rotables.push({ grupo, base: grupo.rotation.y, fase: i * 1.7 })
       })
+      cartelesRef.lista = rotables
+
       afuera.add(carteles)
 
       // ── EL CLUB ──
@@ -301,9 +321,9 @@ export default function ScrollLab() {
       const matPared = new THREE.MeshStandardMaterial({ color: '#f2f5f8', roughness: 0.9 })
       const matTecho = new THREE.MeshStandardMaterial({ color: '#2f4257', roughness: 0.7 })
       const matVentana = new THREE.MeshStandardMaterial({
-        color: '#25384d', roughness: 0.15, metalness: 0.5,
+        color: '#7d99b5', roughness: 0.2, metalness: 0.4,   // vidrio claro: en oscuro se robaba el cuadro
       })
-      const CL_ANCHO = 78, CL_ALTO = 26, CL_FONDO = 34
+      const CL_ANCHO = 58, CL_ALTO = 20, CL_FONDO = 28
       const cuerpo = new THREE.Mesh(new THREE.BoxGeometry(CL_ANCHO, CL_ALTO, CL_FONDO), matPared)
       cuerpo.position.y = SUELO_Y + CL_ALTO / 2
       club.add(cuerpo)
@@ -328,7 +348,9 @@ export default function ScrollLab() {
         matCartel.needsUpdate = true
       })
       club.add(cartel)
-      club.position.set(-34, 0, RED_Z - 132)
+      // A 132 el club ocupaba el 97% del cuadro a lo ancho y tapaba el fondo
+      // entero. A 260 se lee como un edificio a lo lejos, que es lo que es.
+      club.position.set(-52, 0, RED_Z - 260)
       afuera.add(club)
 
       // ── EL LÍMITE DEL TERRENO ──
@@ -913,6 +935,14 @@ export default function ScrollLab() {
         paquete.position.copy(pelota.position)
         paquete.rotation.copy(pelota.rotation)
         paquete.scale.setScalar(escalaForma)
+
+        // Los carteles de producto basculan apenas, cada uno con su desfase: da
+        // sensación de carrusel sin que ninguno llegue a darse vuelta.
+        if (cartelesRef.lista) {
+          for (const c of cartelesRef.lista) {
+            c.grupo.rotation.y = c.base + Math.sin(t * 5 + c.fase) * 0.20
+          }
+        }
 
         // La sombra sigue a la pelota por el piso: se agranda y se aclara cuanto
         // más alto va, como una sombra de verdad.
