@@ -272,8 +272,11 @@ export default function ScrollLab() {
           // separado). Si se cargan todas juntas se ven amontonadas, así que se
           // deja sólo lo que arma la pieza.
           if (soloEstas) {
+            // Coincidencia EXACTA, no parcial: buscar "seat" dentro del nombre
+            // también dejaba pasar "seat_bench", que es otro asiento suelto del
+            // kit y aparecía como una tabla flotando al costado del banco.
             o.traverse(m => {
-              if (m.isMesh) m.visible = soloEstas.some(n => (m.name || '').includes(n))
+              if (m.isMesh) m.visible = soloEstas.includes(m.name)
             })
           }
           o.updateMatrixWorld(true)
@@ -299,14 +302,28 @@ export default function ScrollLab() {
           b.rotation.y = lado > 0 ? -Math.PI / 2 : Math.PI / 2
           afuera.add(b)
         })
-      }, ['seat', 'legs', 'back_support', 'arm_rest', 'crossbar', 'suspended_support'])
+      }, ['seat', 'seat_back', 'legs_double', 'legs_single',
+          'back_support_r', 'back_support_l', 'arm_rest_01', 'arm_rest_02'])
 
       // Todo lo de afuera va SÓLO sobre el arco que recorre la cámara: entre
       // mirar al fondo y mirar al costado. Poner cosas donde nunca se miran es
       // peso que se descarga para nada.
       const enArco = (frac, radio, desvio = 0) => {
         const ang = -Math.PI / 2 - 0.75 + frac * 1.9 + desvio
-        return [Math.cos(ang) * radio, RED_Z + Math.sin(ang) * radio]
+        // Un radio fijo no alcanza: la cancha es rectangular, así que el mismo
+        // radio cae afuera por los lados y ADENTRO por las puntas. Se empuja
+        // hasta salir del rectángulo (más el ancho de la vereda).
+        const MARGEN = 14
+        let r = radio
+        for (let i = 0; i < 60; i++) {
+          const x = Math.cos(ang) * r
+          const z = RED_Z + Math.sin(ang) * r
+          const dentro = Math.abs(x) < CANCHA_ANCHO / 2 + MARGEN &&
+                         Math.abs(z - RED_Z) < CANCHA_LARGO / 2 + MARGEN
+          if (!dentro) return [x, z]
+          r += 5
+        }
+        return [Math.cos(ang) * r, RED_Z + Math.sin(ang) * r]
       }
 
       // Farolas: dan altura y marcan el perímetro
@@ -579,12 +596,23 @@ export default function ScrollLab() {
         roughness: 0.75, metalness: 0.15, side: THREE.DoubleSide, depthWrite: false, opacity: 1,
       })
       const hacerReja = (ancho, alto, repX) => {
-        const t = texReja.clone()
+        // Cada paño lleva su propia textura dibujada de cero. Clonar una
+        // CanvasTexture no copia su imagen, así que los paños salían vacíos: por
+        // eso el alambrado había desaparecido.
+        const c = document.createElement('canvas')
+        c.width = c.height = 32
+        const g2 = c.getContext('2d')
+        g2.strokeStyle = '#000000'
+        g2.lineWidth = 5
+        g2.strokeRect(0, 0, 32, 32)
+        const t = new THREE.CanvasTexture(c)
         t.wrapS = t.wrapT = THREE.RepeatWrapping
-        t.repeat.set(repX, alto / 1.25)
-        t.needsUpdate = true
-        const m = matReja.clone()
-        m.map = t; m.alphaMap = t
+        t.repeat.set(Math.max(1, repX), Math.max(1, alto / 1.25))
+        t.anisotropy = 4
+        const m = new THREE.MeshStandardMaterial({
+          map: t, alphaMap: t, transparent: true,
+          roughness: 0.75, metalness: 0.15, side: THREE.DoubleSide, depthWrite: false,
+        })
         return new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), m)
       }
       const montante = (x, alto, y0) => {
