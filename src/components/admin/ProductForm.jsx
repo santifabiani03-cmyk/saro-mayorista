@@ -104,7 +104,14 @@ async function removeAndStandardize(imageUrl, onProgress, bgType = 'gradient', i
   const drawY = isPaleta
     ? canvasH - bounds.h - padding   // paleta: pegada abajo con margen mínimo
     : (canvasH - bounds.h) / 2       // ropa/padel: centrado vertical
+  // El producto se dibuja con una corrección suave de brillo y contraste.
+  // Sin esto queda más claro de lo que es: al quitar el fondo, los píxeles del
+  // borde quedan semitransparentes y se mezclan con el fondo casi blanco, así
+  // que el producto se lava. Bajar un 5% el brillo y subir el contraste lo
+  // devuelve a su tono real sin que se note el ajuste.
+  ctx.filter = 'brightness(0.95) contrast(1.06) saturate(1.04)'
   ctx.drawImage(img, bounds.x, bounds.y, bounds.w, bounds.h, drawX, drawY, bounds.w, bounds.h)
+  ctx.filter = 'none'
   URL.revokeObjectURL(img.src)
 
   return new Promise(resolve => { canvas.toBlob(b => resolve(b), 'image/webp', 0.95) })

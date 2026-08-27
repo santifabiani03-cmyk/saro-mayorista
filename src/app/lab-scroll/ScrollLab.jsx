@@ -135,8 +135,8 @@ export default function ScrollLab() {
       // Iluminación de entorno: el modelo real necesita reflejos para verse bien
       const pmrem = new THREE.PMREMGenerator(renderer)
       scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
-      scene.environmentIntensity = 0.6      // el reflejo del ambiente aclaraba de más
-      scene.add(new THREE.HemisphereLight('#ffffff', '#c3d1e5', 0.55))
+      scene.environmentIntensity = 0.38     // el ambiente aclaraba las sombras
+      scene.add(new THREE.HemisphereLight('#ffffff', '#c3d1e5', 0.34))   // menos relleno = sombra más marcada
       const sol = new THREE.DirectionalLight('#fff6e8', 1.15)   // apenas cálido, como el sol
       sol.position.set(4, 8, 6)
       sol.castShadow = true
@@ -148,7 +148,7 @@ export default function ScrollLab() {
       sol.shadow.bias = -0.0012
       scene.add(sol)
       // Luz de relleno del lado opuesto: sin ella la cara en sombra queda plana
-      const relleno = new THREE.DirectionalLight('#dceafc', 0.32)
+      const relleno = new THREE.DirectionalLight('#dceafc', 0.16)
       relleno.position.set(-7, 4, -5)
       scene.add(relleno)
 
@@ -292,28 +292,8 @@ export default function ScrollLab() {
         })
       })
 
-      // Alambrado perimetral, por fuera de la vereda
-      ponerModelo('/models/alambrado.glb', (base) => {
-        const ALTO = 13                                // ~2 m
-        const LARGO = CANCHA_LARGO + 46
-        const ANCHO = CANCHA_ANCHO + 46
-        const paso = 16
-        const poner = (x, z, giro) => {
-          const t = base.clone()
-          t.scale.multiplyScalar(ALTO)
-          t.position.set(x, SUELO_Y, z)
-          t.rotation.y = giro
-          afuera.add(t)
-        }
-        for (let z = -LARGO / 2; z <= LARGO / 2; z += paso) {
-          poner(-ANCHO / 2, RED_Z + z, Math.PI / 2)
-          poner(ANCHO / 2, RED_Z + z, Math.PI / 2)
-        }
-        for (let x = -ANCHO / 2; x <= ANCHO / 2; x += paso) {
-          poner(x, RED_Z - LARGO / 2, 0)
-          poner(x, RED_Z + LARGO / 2, 0)
-        }
-      })
+      // El alambrado perimetral se saca: competía con el cerramiento de la
+      // cancha, que ahora ya tiene su propia reja.
 
       // ── CARTELERÍA DE PRODUCTOS ──
       // Fotos reales del catálogo, montadas en carteles fuera de la cancha. Son
@@ -346,7 +326,9 @@ export default function ScrollLab() {
         // Uno queda a la vista desde el arranque (la cámara empieza mirando al
         // fondo), otro cruza a la derecha, y el resto se reparte sobre el arco
         // que la cámara recorre al girar.
-        const ANGULOS = [-Math.PI / 2 - 0.5, -Math.PI / 2 + 0.6, Math.PI - 0.35, -Math.PI / 3 - 0.2]
+        // Posiciones fijas: uno CENTRADO al fondo (el que se ve al abrir la
+        // página), dos abriéndose a los costados y uno que entra al girar.
+        const ANGULOS = [-Math.PI / 2, -Math.PI / 2 - 0.62, -Math.PI / 2 + 0.62, Math.PI - 0.3]
         const ang = ANGULOS[i % ANGULOS.length]
         const rad = 84
         const x = Math.cos(ang) * rad
@@ -520,54 +502,97 @@ export default function ScrollLab() {
       const matMarco = new THREE.MeshStandardMaterial({ color: '#2f4257', roughness: 0.5, metalness: 0.35 })
       const VIDRIO_ALTO = 26
       const paredes = new THREE.Group()
-      // Los montantes se reparten en paneles iguales: antes iban de 8 en 8 desde
-      // un borde y el último caía a 1 unidad del otro, así que la pared no era
-      // simétrica. Ahora el ancho se divide en partes iguales.
-      const ponerPared = (ancho, x, z, giro, conPuerta = false) => {
+      // ── CERRAMIENTO, con la estructura de una cancha real ──
+      // Vidrio templado de 3 m con 1 m de reja por encima. Los fondos son todo
+      // vidrio; los laterales llevan vidrio sólo en las puntas y reja en los
+      // 12 m del medio, con la puerta de 2 x 2 m junto a la red.
+      const VIDRIO_H = 3 / 0.155          // 19.4 — los 3 m de vidrio
+      const REJA_H = 1 / 0.155            // 6.5  — el metro de reja de arriba
+      const PUERTA_A = 2 / 0.155          // 12.9 — 2 m de ancho
+      const PUERTA_H = 2 / 0.155          // 12.9 — 2 m de alto
+      const VIDRIO_PUNTA = 4 / 0.155      // 25.8 — vidrio en cada punta del lateral
+
+      // rejilla metálica, dibujada al vuelo
+      const rejCnv = document.createElement('canvas')
+      rejCnv.width = rejCnv.height = 32
+      const rx = rejCnv.getContext('2d')
+      rx.strokeStyle = '#243447'
+      rx.lineWidth = 4
+      rx.strokeRect(0, 0, 32, 32)
+      const texReja = new THREE.CanvasTexture(rejCnv)
+      texReja.wrapS = texReja.wrapT = THREE.RepeatWrapping
+      const matReja = new THREE.MeshStandardMaterial({
+        map: texReja, alphaMap: texReja, transparent: true,
+        roughness: 0.8, metalness: 0.2, side: THREE.DoubleSide, depthWrite: false,
+      })
+      const hacerReja = (ancho, alto, repX) => {
+        const t = texReja.clone()
+        t.wrapS = t.wrapT = THREE.RepeatWrapping
+        t.repeat.set(repX, alto / 2)
+        t.needsUpdate = true
+        const m = matReja.clone()
+        m.map = t; m.alphaMap = t
+        return new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), m)
+      }
+      const montante = (x, alto, y0) => {
+        const m = new THREE.Mesh(new THREE.BoxGeometry(0.26, alto, 0.26), matMarco)
+        m.position.set(x, y0 + alto / 2, 0)
+        return m
+      }
+
+      const ponerPared = (ancho, x, z, giro, tipo) => {
         const g = new THREE.Group()
-        const PUERTA_ANCHO = 4.6      // 0.72 m, la medida de una puerta de cancha
-        const PUERTA_ALTO = 12.9      // 2 m
 
-        if (conPuerta) {
-          // el vidrio se parte en dos: un paño a cada lado del hueco
-          const pano = (ancho - PUERTA_ANCHO) / 2
-          ;[-1, 1].forEach(lado => {
-            const v = new THREE.Mesh(new THREE.PlaneGeometry(pano, VIDRIO_ALTO), matVidrio)
-            v.position.set(lado * (PUERTA_ANCHO / 2 + pano / 2), SUELO_Y + VIDRIO_ALTO / 2, 0)
-            g.add(v)
-          })
-          // y sobre el hueco queda un paño alto, como en las canchas de verdad
-          const alto = new THREE.Mesh(
-            new THREE.PlaneGeometry(PUERTA_ANCHO, VIDRIO_ALTO - PUERTA_ALTO), matVidrio
-          )
-          alto.position.set(0, SUELO_Y + PUERTA_ALTO + (VIDRIO_ALTO - PUERTA_ALTO) / 2, 0)
-          g.add(alto)
-          // marco de la puerta
-          ;[-1, 1].forEach(lado => {
-            const jamba = new THREE.Mesh(new THREE.BoxGeometry(0.3, PUERTA_ALTO, 0.3), matMarco)
-            jamba.position.set(lado * PUERTA_ANCHO / 2, SUELO_Y + PUERTA_ALTO / 2, 0)
-            g.add(jamba)
-          })
-          const dintel = new THREE.Mesh(new THREE.BoxGeometry(PUERTA_ANCHO + 0.3, 0.3, 0.3), matMarco)
-          dintel.position.set(0, SUELO_Y + PUERTA_ALTO, 0)
-          g.add(dintel)
-        } else {
-          const v = new THREE.Mesh(new THREE.PlaneGeometry(ancho, VIDRIO_ALTO), matVidrio)
-          v.position.y = SUELO_Y + VIDRIO_ALTO / 2
+        if (tipo === 'fondo') {
+          // todo vidrio abajo, reja arriba
+          const v = new THREE.Mesh(new THREE.PlaneGeometry(ancho, VIDRIO_H), matVidrio)
+          v.position.y = SUELO_Y + VIDRIO_H / 2
           g.add(v)
+          const r = hacerReja(ancho, REJA_H, ancho / 4)
+          r.position.y = SUELO_Y + VIDRIO_H + REJA_H / 2
+          g.add(r)
+          // montantes cada pieza de vidrio (1.996 m)
+          const piezas = Math.round(ancho / (1.996 / 0.155))
+          for (let k = 0; k <= piezas; k++) {
+            g.add(montante(-ancho / 2 + (ancho / piezas) * k, VIDRIO_H + REJA_H, SUELO_Y))
+          }
+        } else {
+          // lateral: vidrio en las puntas, reja en el medio, puerta junto a la red
+          const medio = ancho - VIDRIO_PUNTA * 2
+          ;[-1, 1].forEach(lado => {
+            const v = new THREE.Mesh(new THREE.PlaneGeometry(VIDRIO_PUNTA, VIDRIO_H), matVidrio)
+            v.position.set(lado * (ancho / 2 - VIDRIO_PUNTA / 2), SUELO_Y + VIDRIO_H / 2, 0)
+            g.add(v)
+            const r = hacerReja(VIDRIO_PUNTA, REJA_H, VIDRIO_PUNTA / 4)
+            r.position.set(lado * (ancho / 2 - VIDRIO_PUNTA / 2), SUELO_Y + VIDRIO_H + REJA_H / 2, 0)
+            g.add(r)
+          })
+          // el tramo de reja del centro, partido por la puerta
+          const pano = (medio - PUERTA_A) / 2
+          ;[-1, 1].forEach(lado => {
+            const r = hacerReja(pano, VIDRIO_H + REJA_H, pano / 4)
+            r.position.set(lado * (PUERTA_A / 2 + pano / 2), SUELO_Y + (VIDRIO_H + REJA_H) / 2, 0)
+            g.add(r)
+          })
+          // encima de la puerta
+          const arriba = hacerReja(PUERTA_A, VIDRIO_H + REJA_H - PUERTA_H, PUERTA_A / 4)
+          arriba.position.set(0, SUELO_Y + PUERTA_H + (VIDRIO_H + REJA_H - PUERTA_H) / 2, 0)
+          g.add(arriba)
+          // marco de la puerta
+          ;[-1, 1].forEach(lado => g.add(montante(lado * PUERTA_A / 2, PUERTA_H, SUELO_Y)))
+          const dintel = new THREE.Mesh(new THREE.BoxGeometry(PUERTA_A + 0.3, 0.3, 0.3), matMarco)
+          dintel.position.set(0, SUELO_Y + PUERTA_H, 0)
+          g.add(dintel)
+          // montantes de los paños de vidrio de las puntas
+          ;[-1, 1].forEach(lado => {
+            g.add(montante(lado * ancho / 2, VIDRIO_H + REJA_H, SUELO_Y))
+            g.add(montante(lado * (ancho / 2 - VIDRIO_PUNTA), VIDRIO_H + REJA_H, SUELO_Y))
+          })
         }
 
-        // montantes repartidos en paneles iguales, de borde a borde
-        const paneles = Math.max(2, Math.round(ancho / 8))
-        for (let k = 0; k <= paneles; k++) {
-          const px = -ancho / 2 + (ancho / paneles) * k
-          if (conPuerta && Math.abs(px) < PUERTA_ANCHO / 2 + 0.2) continue   // no en el hueco
-          const m = new THREE.Mesh(new THREE.BoxGeometry(0.22, VIDRIO_ALTO, 0.22), matMarco)
-          m.position.set(px, SUELO_Y + VIDRIO_ALTO / 2, 0)
-          g.add(m)
-        }
-        ;[SUELO_Y + 0.15, SUELO_Y + VIDRIO_ALTO].forEach(y => {
-          const h = new THREE.Mesh(new THREE.BoxGeometry(ancho, 0.26, 0.26), matMarco)
+        // remates horizontal de arriba y zócalo
+        ;[SUELO_Y + 0.15, SUELO_Y + VIDRIO_H + REJA_H].forEach(y => {
+          const h = new THREE.Mesh(new THREE.BoxGeometry(ancho, 0.28, 0.28), matMarco)
           h.position.set(0, y, 0)
           g.add(h)
         })
@@ -576,11 +601,10 @@ export default function ScrollLab() {
         paredes.add(g)
         return g
       }
-      const pared = ponerPared(CANCHA_ANCHO, 0, RED_Z - CANCHA_LARGO / 2, 0)
-      ponerPared(CANCHA_ANCHO, 0, RED_Z + CANCHA_LARGO / 2, 0)
-      // Los laterales llevan puerta al medio, pegada a la red, como una cancha real
-      ponerPared(CANCHA_LARGO, -CANCHA_ANCHO / 2, RED_Z, Math.PI / 2, true)
-      ponerPared(CANCHA_LARGO, CANCHA_ANCHO / 2, RED_Z, Math.PI / 2, true)
+      const pared = ponerPared(CANCHA_ANCHO, 0, RED_Z - CANCHA_LARGO / 2, 0, 'fondo')
+      ponerPared(CANCHA_ANCHO, 0, RED_Z + CANCHA_LARGO / 2, 0, 'fondo')
+      ponerPared(CANCHA_LARGO, -CANCHA_ANCHO / 2, RED_Z, Math.PI / 2, 'lateral')
+      ponerPared(CANCHA_LARGO, CANCHA_ANCHO / 2, RED_Z, Math.PI / 2, 'lateral')
       scene.add(paredes)
 
       // Techo: vigas cruzadas bien altas. Cierran la escena por arriba, que era
@@ -608,14 +632,14 @@ export default function ScrollLab() {
       cnv.width = cnv.height = 64
       const ctx = cnv.getContext('2d')
       // Tejido más cerrado y oscuro: antes se veía como un velo transparente
-      ctx.strokeStyle = '#0d1622'
+      ctx.strokeStyle = '#05090f'   // casi negro: se leía clara contra el fondo
       ctx.lineWidth = 15
       ctx.strokeRect(0, 0, 64, 64)
       const texRed = new THREE.CanvasTexture(cnv)
       texRed.wrapS = texRed.wrapT = THREE.RepeatWrapping
       texRed.repeat.set(100, 9)
       const matMalla = new THREE.MeshStandardMaterial({
-        map: texRed, alphaMap: texRed, transparent: true, opacity: 1,
+        map: texRed, alphaMap: texRed, transparent: true, opacity: 1, color: '#8fa0b4',
         roughness: 0.95, side: THREE.DoubleSide, depthWrite: false,
       })
       const malla = new THREE.Mesh(new THREE.PlaneGeometry(MEDIA * 2, RED_ALTO), matMalla)
@@ -1037,7 +1061,7 @@ export default function ScrollLab() {
         // El sol gira despacio con el guion: con la luz clavada, el tramo largo
         // del vuelo quedaba plano porque nada cambiaba de tono.
         sol.position.set(4 + 9 * suave(t), 8 + 3 * suave(t), 6 - 11 * suave(t))
-        sol.intensity = mix(1.5, 1.15, suave(seg(t, 0.3, 0.95)))
+          sol.intensity = mix(1.6, 1.3, suave(seg(t, 0.3, 0.95)))   // más directa, sombra más definida
 
         // ── DE PELOTA A ENVÍO ──
         // La misma malla cambia de forma y de color. No se achica ni desaparece
