@@ -640,6 +640,11 @@ export default function ScrollLab() {
       const frame = () => {
         if (!aLaVista) { raf = 0; return }
         raf = requestAnimationFrame(frame)
+        // Si la página se abre en una pestaña de fondo, el contenedor mide 0 al
+        // arrancar y el lienzo quedaba clavado en 1x1 aunque después hubiera
+        // lugar: no se veía nada. Se compara contra el contenedor y se corrige.
+        const cw = Math.round(W() * renderer.getPixelRatio())
+        if (renderer.domElement.width !== cw && W() > 1) onResize()
         dibujar(progRef.current.t)
       }
       const dibujar = (t) => {
