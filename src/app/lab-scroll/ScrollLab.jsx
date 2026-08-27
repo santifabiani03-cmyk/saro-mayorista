@@ -263,10 +263,19 @@ export default function ScrollLab() {
       // eligieron sobre generarlos con IA: están modelados por artistas, vienen
       // con texturas coherentes y pesan una fracción. El alambrado es además lo
       // que rodea una cancha de pádel de verdad.
-      const ponerModelo = (ruta, colocar) => {
+      const ponerModelo = (ruta, colocar, soloEstas = null) => {
         loader.load(ruta, gltf => {
           if (disposed) return
           const o = gltf.scene
+          // Algunos modelos vienen como KIT de piezas sueltas repartidas por el
+          // archivo (el banco trae patas, asiento, respaldo y conectores por
+          // separado). Si se cargan todas juntas se ven amontonadas, así que se
+          // deja sólo lo que arma la pieza.
+          if (soloEstas) {
+            o.traverse(m => {
+              if (m.isMesh) m.visible = soloEstas.some(n => (m.name || '').includes(n))
+            })
+          }
           o.updateMatrixWorld(true)
           const caja = new THREE.Box3().setFromObject(o)
           const t = new THREE.Vector3(); caja.getSize(t)
@@ -289,6 +298,50 @@ export default function ScrollLab() {
           b.position.set(lado * (CANCHA_ANCHO / 2 + 11), SUELO_Y, RED_Z + z)
           b.rotation.y = lado > 0 ? -Math.PI / 2 : Math.PI / 2
           afuera.add(b)
+        })
+      }, ['seat', 'legs', 'back_support', 'arm_rest', 'crossbar', 'suspended_support'])
+
+      // Todo lo de afuera va SÓLO sobre el arco que recorre la cámara: entre
+      // mirar al fondo y mirar al costado. Poner cosas donde nunca se miran es
+      // peso que se descarga para nada.
+      const enArco = (frac, radio, desvio = 0) => {
+        const ang = -Math.PI / 2 - 0.75 + frac * 1.9 + desvio
+        return [Math.cos(ang) * radio, RED_Z + Math.sin(ang) * radio]
+      }
+
+      // Farolas: dan altura y marcan el perímetro
+      ponerModelo('/models/farola.glb', (base) => {
+        [0.06, 0.42, 0.78].forEach((f, i) => {
+          const [x, z] = enArco(f, 106)
+          const l = base.clone()
+          l.scale.multiplyScalar(38)                  // ~5.9 m
+          l.position.set(x, SUELO_Y, z)
+          l.rotation.y = Math.atan2(-x, RED_Z - z)
+          afuera.add(l)
+        })
+      })
+
+      // Maceteros contra la vereda, del lado que se ve
+      ponerModelo('/models/macetero.glb', (base) => {
+        [0.14, 0.3, 0.58, 0.74].forEach(f => {
+          const [x, z] = enArco(f, 62)
+          const m = base.clone()
+          m.scale.multiplyScalar(5.2)                 // ~0.8 m
+          m.position.set(x, SUELO_Y, z)
+          m.rotation.y = Math.atan2(-x, RED_Z - z)
+          afuera.add(m)
+        })
+      })
+
+      // Arbustos sueltos sobre el césped, para que no sea un verde liso
+      ponerModelo('/models/arbusto.glb', (base) => {
+        [0.02, 0.2, 0.36, 0.5, 0.66, 0.84, 0.96].forEach((f, i) => {
+          const [x, z] = enArco(f, 78 + (i % 3) * 26, (i % 2 ? 0.1 : -0.1))
+          const a2 = base.clone()
+          a2.scale.multiplyScalar(7 + (i % 3) * 2.5)  // 1 a 1.8 m
+          a2.position.set(x, SUELO_Y, z)
+          a2.rotation.y = i * 1.3
+          afuera.add(a2)
         })
       })
 
@@ -516,19 +569,19 @@ export default function ScrollLab() {
       const rejCnv = document.createElement('canvas')
       rejCnv.width = rejCnv.height = 32
       const rx = rejCnv.getContext('2d')
-      rx.strokeStyle = '#243447'
-      rx.lineWidth = 4
+      rx.strokeStyle = '#000000'      // negro sólido, como pediste
+      rx.lineWidth = 5
       rx.strokeRect(0, 0, 32, 32)
       const texReja = new THREE.CanvasTexture(rejCnv)
       texReja.wrapS = texReja.wrapT = THREE.RepeatWrapping
       const matReja = new THREE.MeshStandardMaterial({
         map: texReja, alphaMap: texReja, transparent: true,
-        roughness: 0.8, metalness: 0.2, side: THREE.DoubleSide, depthWrite: false,
+        roughness: 0.75, metalness: 0.15, side: THREE.DoubleSide, depthWrite: false, opacity: 1,
       })
       const hacerReja = (ancho, alto, repX) => {
         const t = texReja.clone()
         t.wrapS = t.wrapT = THREE.RepeatWrapping
-        t.repeat.set(repX, alto / 2)
+        t.repeat.set(repX, alto / 1.25)
         t.needsUpdate = true
         const m = matReja.clone()
         m.map = t; m.alphaMap = t
@@ -548,7 +601,7 @@ export default function ScrollLab() {
           const v = new THREE.Mesh(new THREE.PlaneGeometry(ancho, VIDRIO_H), matVidrio)
           v.position.y = SUELO_Y + VIDRIO_H / 2
           g.add(v)
-          const r = hacerReja(ancho, REJA_H, ancho / 4)
+          const r = hacerReja(ancho, REJA_H, ancho / 1.6)
           r.position.y = SUELO_Y + VIDRIO_H + REJA_H / 2
           g.add(r)
           // montantes cada pieza de vidrio (1.996 m)
@@ -563,19 +616,19 @@ export default function ScrollLab() {
             const v = new THREE.Mesh(new THREE.PlaneGeometry(VIDRIO_PUNTA, VIDRIO_H), matVidrio)
             v.position.set(lado * (ancho / 2 - VIDRIO_PUNTA / 2), SUELO_Y + VIDRIO_H / 2, 0)
             g.add(v)
-            const r = hacerReja(VIDRIO_PUNTA, REJA_H, VIDRIO_PUNTA / 4)
+            const r = hacerReja(VIDRIO_PUNTA, REJA_H, VIDRIO_PUNTA / 1.6)
             r.position.set(lado * (ancho / 2 - VIDRIO_PUNTA / 2), SUELO_Y + VIDRIO_H + REJA_H / 2, 0)
             g.add(r)
           })
           // el tramo de reja del centro, partido por la puerta
           const pano = (medio - PUERTA_A) / 2
           ;[-1, 1].forEach(lado => {
-            const r = hacerReja(pano, VIDRIO_H + REJA_H, pano / 4)
+            const r = hacerReja(pano, VIDRIO_H + REJA_H, pano / 1.6)
             r.position.set(lado * (PUERTA_A / 2 + pano / 2), SUELO_Y + (VIDRIO_H + REJA_H) / 2, 0)
             g.add(r)
           })
           // encima de la puerta
-          const arriba = hacerReja(PUERTA_A, VIDRIO_H + REJA_H - PUERTA_H, PUERTA_A / 4)
+          const arriba = hacerReja(PUERTA_A, VIDRIO_H + REJA_H - PUERTA_H, PUERTA_A / 1.6)
           arriba.position.set(0, SUELO_Y + PUERTA_H + (VIDRIO_H + REJA_H - PUERTA_H) / 2, 0)
           g.add(arriba)
           // marco de la puerta
@@ -632,14 +685,14 @@ export default function ScrollLab() {
       cnv.width = cnv.height = 64
       const ctx = cnv.getContext('2d')
       // Tejido más cerrado y oscuro: antes se veía como un velo transparente
-      ctx.strokeStyle = '#05090f'   // casi negro: se leía clara contra el fondo
+      ctx.strokeStyle = '#1a2330'   // oscura, pero un escalón por encima del alambre negro
       ctx.lineWidth = 15
       ctx.strokeRect(0, 0, 64, 64)
       const texRed = new THREE.CanvasTexture(cnv)
       texRed.wrapS = texRed.wrapT = THREE.RepeatWrapping
       texRed.repeat.set(100, 9)
       const matMalla = new THREE.MeshStandardMaterial({
-        map: texRed, alphaMap: texRed, transparent: true, opacity: 1, color: '#8fa0b4',
+        map: texRed, alphaMap: texRed, transparent: true, opacity: 1, color: '#c8d2dd',
         roughness: 0.95, side: THREE.DoubleSide, depthWrite: false,
       })
       const malla = new THREE.Mesh(new THREE.PlaneGeometry(MEDIA * 2, RED_ALTO), matMalla)
