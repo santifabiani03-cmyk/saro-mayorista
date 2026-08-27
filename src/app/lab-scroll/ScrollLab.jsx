@@ -185,71 +185,46 @@ export default function ScrollLab() {
       texCesped.colorSpace = THREE.SRGBColorSpace
       texCesped.wrapS = texCesped.wrapT = THREE.RepeatWrapping
       texCesped.repeat.set(40, 40)
-      // El cargador se declara ACÁ, antes del primer uso. Estaba más abajo y el
-      // árbol lo usaba antes de existir: eso lanza ReferenceError y tumbaba la
-      // inicialización entera de la escena — la pantalla quedaba en blanco.
+      // El cargador se declara ACÁ, antes del primer uso.
       const loader = new GLTFLoader()
       loader.setMeshoptDecoder(MeshoptDecoder)
 
       // ── AFUERA DE LA CANCHA ──
-      // El césped solo no alcanzaba: sin nada que mida contra qué, el exterior
-      // se leía como un plano verde vacío. Se agregan árboles y una segunda
-      // cancha a lo lejos, que dan escala y profundidad a través del vidrio.
       const afuera = new THREE.Group()
-      // Posiciones fijas, repartidas con el ángulo áureo: separa sin agrupar y
-      // siempre caen igual, así el fondo no cambia entre recargas.
-      const lugares = []
-      for (let i = 0; i < 64; i++) {          // más densidad: con 26 el fondo quedaba pelado
-        const ang = i * 2.399
-        // A 52 unidades (8 m) quedaban pegados a la pared: un árbol de 10 m
-        // parado ahí ocupa toda la pantalla y tapa la cancha. Se van al fondo.
-        const rad = 135 + (i % 9) * 22
-        const x = Math.cos(ang) * rad
-        const z = RED_Z + Math.sin(ang) * rad
-        if (Math.abs(x) < 44 && Math.abs(z - RED_Z) < 76) continue   // ni cancha ni vereda
-        // 39 unidades = 6 m; 65 = 10 m. Antes iban de 3.4 a 6.7, o sea medio
-        // metro: al lado de una cancha de 20 m se leían como manchas en el piso.
-        lugares.push({ x, z, escala: 34 + (i % 4) * 8, giro: ang })
-      }
+      scene.add(afuera)
 
-      // Árbol real (Meshy, 227 KB). Se dibuja con InstancedMesh: los 20 y pico
-      // de árboles cuestan lo mismo que uno solo para la placa de video.
-      loader.load('/models/arbol.glb', gltf => {
+      // ── LONAS DE FONDO ──
+      // En una cancha de verdad las paredes del fondo llevan lonas publicitarias.
+      // Acá cumplen doble función: tapan el fondo, que era el problema, y ponen
+      // la marca donde el ojo ya está mirando.
+      const lonaCnv = document.createElement('canvas')
+      lonaCnv.width = 1024; lonaCnv.height = 128
+      const lx = lonaCnv.getContext('2d')
+      lx.fillStyle = '#0F172A'                        // navy de la marca
+      lx.fillRect(0, 0, 1024, 128)
+      const texLona = new THREE.CanvasTexture(lonaCnv)
+      texLona.colorSpace = THREE.SRGBColorSpace
+      const matLona = new THREE.MeshStandardMaterial({ map: texLona, roughness: 0.85 })
+      // el logo se dibuja sobre la lona cuando termina de cargar
+      const imgLogo = new Image()
+      imgLogo.crossOrigin = 'anonymous'
+      imgLogo.onload = () => {
         if (disposed) return
-        gltf.scene.updateMatrixWorld(true)
-        const base = new THREE.Box3().setFromObject(gltf.scene)
-        const tam = new THREE.Vector3(); base.getSize(tam)
-        const cen = new THREE.Vector3(); base.getCenter(cen)
-        const unidad = 1 / (tam.y || 1)            // normalizado a 1 de alto
-        gltf.scene.traverse(o => {
-          if (!o.isMesh) return
-          const geo = o.geometry.clone()
-          // Sin esto las partes del árbol quedan desplazadas y se ve cortado: la
-          // caja se mide sobre el modelo ya colocado, pero la geometría cruda
-          // está en su propio sistema hasta que se le aplica la matriz del nodo.
-          geo.applyMatrix4(o.matrixWorld)
-          geo.translate(-cen.x, -base.min.y, -cen.z)   // apoyado en su base
-          geo.scale(unidad, unidad, unidad)
-          // Las hojas son superficies finas: sin doble cara desaparecen la mitad
-          // de las veces según desde dónde se las mire.
-          const mat = o.material.clone()
-          mat.side = THREE.DoubleSide
-          const inst = new THREE.InstancedMesh(geo, mat, lugares.length)
-          const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler()
-          lugares.forEach((l, i) => {
-            e.set(0, l.giro, 0)
-            m.compose(
-              new THREE.Vector3(l.x, SUELO_Y, l.z),
-              q.setFromEuler(e),
-              new THREE.Vector3(l.escala, l.escala, l.escala)
-            )
-            inst.setMatrixAt(i, m)
-          })
-          inst.instanceMatrix.needsUpdate = true
-          inst.frustumCulled = false
-          afuera.add(inst)
-        })
-      }, undefined, () => { /* sin árboles queda el césped solo */ })
+        const alto = 62, ancho = alto * (imgLogo.width / imgLogo.height || 3)
+        for (let k = 0; k < 4; k++) {
+          lx.drawImage(imgLogo, 128 + k * 232 - ancho / 2, 64 - alto / 2, ancho, alto)
+        }
+        texLona.needsUpdate = true
+      }
+      imgLogo.src = '/assets/logo-horizontal.png'
+
+      const LONA_ALTO = 7
+      ;[-1, 1].forEach(lado => {
+        const lona = new THREE.Mesh(new THREE.PlaneGeometry(CANCHA_ANCHO, LONA_ALTO), matLona)
+        lona.position.set(0, SUELO_Y + LONA_ALTO / 2 + 0.4, RED_Z + lado * (CANCHA_LARGO / 2 - 0.35))
+        lona.rotation.y = lado > 0 ? Math.PI : 0
+        scene.add(lona)
+      })
 
       // ── EL CLUB ──
       // Un edificio bajo detrás de la cancha. Hecho por código y no con un
@@ -322,9 +297,30 @@ export default function ScrollLab() {
       // el área — y por eso nunca se veía dónde terminaba la cancha ni el césped
       // que hay alrededor.
       const CANCHA_LARGO = 129, CANCHA_ANCHO = 65
+      // Césped sintético: fibras verticales finas con variación, no un celeste
+      // plano. Se dibuja al vuelo y se repite, así no pesa nada.
+      const cesCnv2 = document.createElement('canvas')
+      cesCnv2.width = cesCnv2.height = 128
+      const cx2 = cesCnv2.getContext('2d')
+      cx2.fillStyle = '#7fb3e3'
+      cx2.fillRect(0, 0, 128, 128)
+      for (let i = 0; i < 2600; i++) {
+        const x = Math.random() * 128, y = Math.random() * 128
+        const claro = Math.random() > 0.5
+        cx2.strokeStyle = claro ? 'rgba(255,255,255,0.16)' : 'rgba(40,90,140,0.14)'
+        cx2.lineWidth = 1
+        cx2.beginPath()
+        cx2.moveTo(x, y)
+        cx2.lineTo(x + (Math.random() - 0.5) * 1.5, y + 2.5 + Math.random() * 2)
+        cx2.stroke()
+      }
+      const texPiso = new THREE.CanvasTexture(cesCnv2)
+      texPiso.wrapS = texPiso.wrapT = THREE.RepeatWrapping
+      texPiso.repeat.set(26, 52)
+      texPiso.anisotropy = 8
       const piso = new THREE.Mesh(
         new THREE.PlaneGeometry(CANCHA_ANCHO, CANCHA_LARGO),
-        new THREE.MeshStandardMaterial({ color: '#7fb3e3', roughness: 0.95 })
+        new THREE.MeshStandardMaterial({ map: texPiso, roughness: 0.98 })
       )
       piso.rotation.x = -Math.PI / 2
       piso.position.set(0, SUELO_Y, RED_Z)
@@ -397,14 +393,15 @@ export default function ScrollLab() {
       const cnv = document.createElement('canvas')
       cnv.width = cnv.height = 64
       const ctx = cnv.getContext('2d')
-      ctx.strokeStyle = '#16283c'
-      ctx.lineWidth = 8
+      // Tejido más cerrado y oscuro: antes se veía como un velo transparente
+      ctx.strokeStyle = '#0d1622'
+      ctx.lineWidth = 15
       ctx.strokeRect(0, 0, 64, 64)
       const texRed = new THREE.CanvasTexture(cnv)
       texRed.wrapS = texRed.wrapT = THREE.RepeatWrapping
       texRed.repeat.set(100, 9)
       const matMalla = new THREE.MeshStandardMaterial({
-        map: texRed, alphaMap: texRed, transparent: true, opacity: 0.92,
+        map: texRed, alphaMap: texRed, transparent: true, opacity: 1,
         roughness: 0.95, side: THREE.DoubleSide, depthWrite: false,
       })
       const malla = new THREE.Mesh(new THREE.PlaneGeometry(MEDIA * 2, RED_ALTO), matMalla)
@@ -423,17 +420,29 @@ export default function ScrollLab() {
       red.position.z = RED_Z
       scene.add(red)
 
-      // Líneas de la cancha: dan la referencia de profundidad del vuelo
-      const matLinea = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.6 })
+      // ── LÍNEAS ──
+      // Las de reglamento y nada más. Antes había cuatro líneas paralelas, dos
+      // de ellas a 1.6 m de la red: en una cancha de pádel no existen.
+      const matLinea = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.9 })
       const lineas = new THREE.Group()
-      ;[-22, -10, 10, 22].forEach(z => {
-        const l = new THREE.Mesh(new THREE.BoxGeometry(MEDIA * 2, 0.02, 0.2), matLinea)
+      const SAQUE = 6.95 / 0.155        // 44.8 — la línea de saque va a 6.95 m de la red
+      // una línea de saque de cada lado
+      ;[-SAQUE, SAQUE].forEach(z => {
+        const l = new THREE.Mesh(new THREE.BoxGeometry(CANCHA_ANCHO, 0.02, 0.3), matLinea)
         l.position.set(0, SUELO_Y + 0.02, RED_Z + z)
         lineas.add(l)
       })
-      const linea = new THREE.Mesh(new THREE.BoxGeometry(0.2, 0.02, 44), matLinea)
-      linea.position.set(0, SUELO_Y + 0.02, RED_Z)
-      lineas.add(linea)
+      // la central sólo cruza el área de saque, de una línea de saque a la otra
+      const central = new THREE.Mesh(new THREE.BoxGeometry(0.3, 0.02, SAQUE * 2), matLinea)
+      central.position.set(0, SUELO_Y + 0.02, RED_Z)
+      lineas.add(central)
+      // líneas de fondo, en el borde de la cancha
+      ;[-CANCHA_LARGO / 2, CANCHA_LARGO / 2].forEach(z => {
+        const l = new THREE.Mesh(new THREE.BoxGeometry(CANCHA_ANCHO, 0.02, 0.3), matLinea)
+        l.position.set(0, SUELO_Y + 0.02, RED_Z + z)
+        lineas.add(l)
+      })
+      const linea = central
       scene.add(lineas)
 
       // Placeholders: paleta, pelota y paquete
