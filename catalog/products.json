@@ -382,7 +382,7 @@
   },
   {
     "nombre": "Muñequera x par ",
-    "precio": 5000,
+    "precio": 5500,
     "descripcion": "Muñequeras x par - Algodon \nSuper elastizadas ",
     "tags": [],
     "categoria": "",
@@ -393,7 +393,6 @@
       "Blanco",
       "Negro",
       "Azul",
-      "Naranja",
       "Gris"
     ],
     "talles": [
@@ -404,10 +403,10 @@
     "promos": [],
     "id": "p1779968140080",
     "fechaPublicacion": "2026-05-28T11:35:40.080Z",
+    "fechaActualizacion": "2026-08-27T13:13:41.064Z",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1779968065148.webp"
-    ],
-    "fechaActualizacion": "2026-08-13T13:00:19.211Z"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mu-equera-x-par-1787836390834.webp"
+    ]
   },
   {
     "nombre": "Saro Nexus woman ",
