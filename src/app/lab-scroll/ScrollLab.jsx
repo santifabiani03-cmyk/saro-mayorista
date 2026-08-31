@@ -346,8 +346,12 @@ export default function ScrollLab() {
       // Todo lo de afuera va SÓLO sobre el arco que recorre la cámara: entre
       // mirar al fondo y mirar al costado. Poner cosas donde nunca se miran es
       // peso que se descarga para nada.
+      // El arco tiene que cubrir TODO lo que la cámara llega a mirar. Arranca
+      // mirando al fondo (-Z) y termina mirando al costado (-X), así que el
+      // fondo visible barre de -Z hasta -X. Antes iba de -Z a +Z y dejaba la
+      // zona del final completamente vacía: ahí estaba el fondo pelado.
       const enArco = (frac, radio, desvio = 0) => {
-        const ang = -Math.PI / 2 - 0.75 + frac * 1.9 + desvio
+        const ang = -Math.PI / 2 - 0.55 - frac * 2.15 + desvio
         // Un radio fijo no alcanza: la cancha es rectangular, así que el mismo
         // radio cae afuera por los lados y ADENTRO por las puntas. Se empuja
         // hasta salir del rectángulo (más el ancho de la vereda).
@@ -417,6 +421,48 @@ export default function ScrollLab() {
           })
         })
       })
+
+      // ── ZONA DE DESCANSO ──
+      // Entre las dos canchas, justo donde la cámara termina mirando. Mesas con
+      // sombrilla, hechas por código: son cilindros y conos, no vale traer un
+      // modelo para esto.
+      const matMesa = new THREE.MeshStandardMaterial({ color: '#e8edf2', roughness: 0.75 })
+      const matCano = new THREE.MeshStandardMaterial({ color: '#4a5c70', roughness: 0.5, metalness: 0.35 })
+      const matTela = new THREE.MeshStandardMaterial({ color: '#2563EB', roughness: 0.9, side: THREE.DoubleSide })
+      const hacerMesa = (x, z, giro) => {
+        const g = new THREE.Group()
+        const tapa = new THREE.Mesh(new THREE.CylinderGeometry(4.4, 4.4, 0.34, 20), matMesa)
+        tapa.position.y = 4.6
+        g.add(tapa)
+        const pie = new THREE.Mesh(new THREE.CylinderGeometry(0.42, 0.42, 4.6, 10), matCano)
+        pie.position.y = 2.3
+        g.add(pie)
+        const base = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.8, 0.3, 12), matCano)
+        base.position.y = 0.15
+        g.add(base)
+        // sombrilla
+        const mastil = new THREE.Mesh(new THREE.CylinderGeometry(0.22, 0.22, 15, 8), matCano)
+        mastil.position.y = 7.5
+        g.add(mastil)
+        const paraguas = new THREE.Mesh(new THREE.ConeGeometry(7.6, 3.4, 16, 1, true), matTela)
+        paraguas.position.y = 15
+        g.add(paraguas)
+        // banquetas alrededor
+        for (let i = 0; i < 4; i++) {
+          const ang = (i / 4) * Math.PI * 2
+          const b2 = new THREE.Mesh(new THREE.CylinderGeometry(1.5, 1.5, 0.3, 12), matMesa)
+          b2.position.set(Math.cos(ang) * 7.4, 3.2, Math.sin(ang) * 7.4)
+          g.add(b2)
+          const p2 = new THREE.Mesh(new THREE.CylinderGeometry(0.28, 0.28, 3.2, 8), matCano)
+          p2.position.set(Math.cos(ang) * 7.4, 1.6, Math.sin(ang) * 7.4)
+          g.add(p2)
+        }
+        g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true } })
+        g.position.set(x, SUELO_Y, z)
+        g.rotation.y = giro
+        afuera.add(g)
+      }
+      ;[[-58, 34, 0.4], [-58, 8, -0.3], [-92, 52, 0.9]].forEach(([x, z, r]) => hacerMesa(x, z, r))
 
       // El alambrado perimetral se saca: competía con el cerramiento de la
       // cancha, que ahora ya tiene su propia reja.
@@ -751,6 +797,60 @@ export default function ScrollLab() {
       ponerPared(CANCHA_LARGO, -CANCHA_ANCHO / 2, RED_Z, Math.PI / 2, 'lateral')
       ponerPared(CANCHA_LARGO, CANCHA_ANCHO / 2, RED_Z, Math.PI / 2, 'lateral')
       scene.add(paredes)
+
+      // ── LA CANCHA DE AL LADO ──
+      // Un club no tiene una cancha suelta en un campo: tiene varias en fila.
+      // Esta va justo donde la cámara termina mirando, que hasta ahora era el
+      // sector más vacío del recorrido. Versión simplificada — piso, vereda y
+      // cerramiento — porque se ve de lejos y de costado.
+      const hacerVecina = (x, z) => {
+        const g = new THREE.Group()
+        const piso2 = new THREE.Mesh(
+          new THREE.PlaneGeometry(CANCHA_ANCHO, CANCHA_LARGO),
+          new THREE.MeshStandardMaterial({ color: '#7fb3e3', roughness: 1 })
+        )
+        piso2.rotation.x = -Math.PI / 2
+        piso2.position.y = 0.02
+        piso2.receiveShadow = true
+        g.add(piso2)
+        const vereda2 = new THREE.Mesh(
+          new THREE.PlaneGeometry(CANCHA_ANCHO + 16, CANCHA_LARGO + 16),
+          new THREE.MeshStandardMaterial({ color: '#c9d4dd', roughness: 1 })
+        )
+        vereda2.rotation.x = -Math.PI / 2
+        g.add(vereda2)
+        // cerramiento simplificado: vidrio abajo, reja arriba, sin puertas
+        const alto = VIDRIO_H + REJA_H
+        ;[[CANCHA_ANCHO, 0, -CANCHA_LARGO / 2, 0], [CANCHA_ANCHO, 0, CANCHA_LARGO / 2, 0],
+          [CANCHA_LARGO, -CANCHA_ANCHO / 2, 0, Math.PI / 2], [CANCHA_LARGO, CANCHA_ANCHO / 2, 0, Math.PI / 2]
+        ].forEach(([ancho, px, pz, giro]) => {
+          const par = new THREE.Group()
+          const v = new THREE.Mesh(new THREE.PlaneGeometry(ancho, VIDRIO_H), matVidrio)
+          v.position.y = VIDRIO_H / 2
+          par.add(v)
+          const r = hacerReja(ancho, REJA_H, ancho / 0.85)
+          r.position.y = VIDRIO_H + REJA_H / 2
+          par.add(r)
+          const piezas = Math.round(ancho / (1.996 / 0.155))
+          for (let k = 0; k <= piezas; k++) {
+            const m = new THREE.Mesh(new THREE.BoxGeometry(0.22, alto, 0.22), matMarco)
+            m.position.set(-ancho / 2 + (ancho / piezas) * k, alto / 2, 0)
+            par.add(m)
+          }
+          const rem = new THREE.Mesh(new THREE.BoxGeometry(ancho, 0.26, 0.26), matMarco)
+          rem.position.y = alto
+          par.add(rem)
+          par.position.set(px, 0, pz)
+          par.rotation.y = giro
+          g.add(par)
+        })
+        g.position.set(x, SUELO_Y, z)
+        afuera.add(g)
+      }
+      // dos canchas más, en la fila que mira la cámara al final
+      hacerVecina(-(CANCHA_ANCHO + 26), RED_Z)
+      hacerVecina(-(CANCHA_ANCHO + 26) * 2, RED_Z)
+
 
       // Techo: vigas cruzadas bien altas. Cierran la escena por arriba, que era
       // lo que quedaba más vacío, sin taparle el cielo al fondo.
