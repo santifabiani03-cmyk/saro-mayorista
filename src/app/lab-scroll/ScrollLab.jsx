@@ -621,7 +621,14 @@ export default function ScrollLab() {
         const t = new THREE.Vector3(); caja.getSize(t)
         const c = new THREE.Vector3(); caja.getCenter(c)
         const unidad = 1 / (t.y || 1)
-        const CUANTOS = 70
+        // Dos filas desfasadas: con una sola se veía el fondo entre planta y
+        // planta. Y se ensanchan más de lo que se estiran, porque el modelo es
+        // más alto que ancho y así tapa de verdad.
+        const FILAS = [
+          { radio: 172, cuantos: 110, desfase: 0 },
+          { radio: 186, cuantos: 110, desfase: Math.PI / 110 },
+        ]
+        const TOTAL = FILAS.reduce((n, f) => n + f.cuantos, 0)
         gltf.scene.traverse(o => {
           if (!o.isMesh) return
           const geo = o.geometry.clone()
@@ -630,23 +637,37 @@ export default function ScrollLab() {
           geo.scale(unidad, unidad, unidad)
           const mat = o.material.clone()
           mat.side = THREE.DoubleSide
-          const inst = new THREE.InstancedMesh(geo, mat, CUANTOS)
+          const inst = new THREE.InstancedMesh(geo, mat, TOTAL)
           inst.castShadow = true
           inst.receiveShadow = true
           const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler()
-          for (let i = 0; i < CUANTOS; i++) {
-            // repartidos en el anillo, con radio y tamaño variables para que la
-            // hilera no se lea como una fila de clones
-            const ang = (i / CUANTOS) * Math.PI * 2
-            const rad = 176 + ((i * 7) % 5) * 4
-            const alto = 26 + ((i * 3) % 4) * 7
-            e.set(0, i * 1.31, 0)
-            m.compose(
-              new THREE.Vector3(Math.cos(ang) * rad, SUELO_Y, RED_Z + Math.sin(ang) * rad),
-              q.setFromEuler(e),
-              new THREE.Vector3(alto, alto, alto)
-            )
-            inst.setMatrixAt(i, m)
+          // el anillo cruza por encima de las canchas vecinas: los que caerían
+          // adentro se empujan hacia afuera hasta salir
+          const CANCHAS = [0, -(CANCHA_ANCHO + 26), -(CANCHA_ANCHO + 26) * 2]
+          let n = 0
+          for (const fila of FILAS) {
+            for (let i = 0; i < fila.cuantos; i++) {
+              const ang = (i / fila.cuantos) * Math.PI * 2 + fila.desfase
+              let rad = fila.radio + ((i * 7) % 5) * 3
+              for (let intento = 0; intento < 24; intento++) {
+                const px = Math.cos(ang) * rad
+                const pz = RED_Z + Math.sin(ang) * rad
+                const choca = CANCHAS.some(cx =>
+                  Math.abs(px - cx) < CANCHA_ANCHO / 2 + 12 &&
+                  Math.abs(pz - RED_Z) < CANCHA_LARGO / 2 + 12)
+                if (!choca) break
+                rad += 10
+              }
+              const alto = 22 + ((i * 3) % 4) * 6
+              const ancho = alto * (1.5 + ((i * 5) % 3) * 0.25)   // más ancho que alto
+              e.set(0, i * 1.31, 0)
+              m.compose(
+                new THREE.Vector3(Math.cos(ang) * rad, SUELO_Y, RED_Z + Math.sin(ang) * rad),
+                q.setFromEuler(e),
+                new THREE.Vector3(ancho, alto, ancho)
+              )
+              inst.setMatrixAt(n++, m)
+            }
           }
           inst.instanceMatrix.needsUpdate = true
           inst.frustumCulled = false

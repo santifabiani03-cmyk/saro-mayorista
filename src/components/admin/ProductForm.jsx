@@ -1564,11 +1564,6 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }))
 
-  const handleImageFile = (file) => {
-    setImageFile(file)
-    setPreview(URL.createObjectURL(file))
-  }
-
   const validate = () => {
     const e = {}
     if (!form.nombre.trim())         e.nombre   = 'Requerido'
