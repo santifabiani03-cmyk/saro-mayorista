@@ -65,6 +65,17 @@ const CONTACTO = { x: 0, y: 3.2, z: -6 + 0.42 + 0.45 }
 // de golpe del swing). La pelota tiene que cambiar de rumbo JUSTO acá.
 const T_IMPACTO = 0.291
 
+// Los cinco tipos de golpe, con los valores exactos del hero de la página
+// pública: amplitud del swing lateral (zAmp), sesgo arriba/abajo (xBias), giro
+// de cara (yAmp) y empuje en profundidad (thrust).
+const SHOTS = {
+  drive:  { zAmp: 0.9,  xBias:  0.0,  yAmp: -0.95, thrust: 1.4 },
+  volea:  { zAmp: 0.42, xBias:  0.18, yAmp: -0.45, thrust: 1.9 },
+  globo:  { zAmp: 0.55, xBias: -0.32, yAmp: -0.5,  thrust: 0.8 },
+  remate: { zAmp: 0.6,  xBias:  0.34, yAmp: -0.32, thrust: 1.4 },
+  reves:  { zAmp: 0.6,  xBias:  0.05, yAmp: -0.5,  thrust: 1.2, flip: true },
+}
+
 function balistica(t, y0, v0, g, suelo, e) {
   let y = y0, v = v0, resto = t
   for (let i = 0; i < 6; i++) {
