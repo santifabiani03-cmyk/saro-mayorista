@@ -1072,7 +1072,13 @@ export default function ScrollLab() {
         scene.add(m)
         banco.push({ malla: m, viva: false, t: 0, dur: 1, o: new THREE.Vector3(), v: new THREE.Vector3() })
       }
-      const juego = { ultimo: -99, golpeEn: -99, dur: 0.6, activo: true }
+      const juego = { ultimo: -99, activo: true }
+      // Reloj propio del golpe por clic, igual que en el hero público: avanza con
+      // el tiempo y se apaga solo al completarse. Nunca se mezcla con el del
+      // scroll — mezclarlos era lo que cortaba y repetía el golpe.
+      const clic = { activo: false, t: 0, dur: 0.6, lado: 1, tiro: SHOTS.drive }
+      let golpesDesdeReves = 0
+      let proximoReves = 4 + Math.floor(Math.random() * 3)
       const puntero = new THREE.Vector2(0, 0)
 
       const lanzar = () => {
@@ -1084,8 +1090,6 @@ export default function ScrollLab() {
         // cuanto más rápido se clickea, más rápido va y más corto es el swing
         const ritmo = Math.min(1, (ahora - juego.ultimo) / 1.6)
         juego.ultimo = ahora
-        juego.golpeEn = ahora
-        juego.dur = 0.34 + ritmo * 0.5
 
         // origen: el punto del mundo que está bajo el cursor
         b.o.set(puntero.x, puntero.y, 0.5).unproject(camera)
@@ -1095,11 +1099,35 @@ export default function ScrollLab() {
         b.malla.visible = true
         b.viva = true
         b.t = 0
-        b.dur = juego.dur
+        // b.dur lo fija el tipo de golpe, unas líneas más abajo
         // sale hacia una dirección cualquiera, siempre alejándose de la paleta
         const ang = Math.random() * Math.PI * 2
         const vel = 13 + (1 - ritmo) * 7
         b.v.set(Math.cos(ang) * 0.72, Math.sin(ang) * 0.72, 0.62).normalize().multiplyScalar(vel)
+
+        // El tipo de golpe sale de hacia dónde se va la pelota, con un revés cada
+        // 4 a 6: el mismo criterio del hero público. Sube -> globo, baja ->
+        // remate, clics rápidos -> volea.
+        golpesDesdeReves++
+        const saleArriba = Math.sin(ang) > 0.45
+        const saleAbajo = Math.sin(ang) < -0.4
+        let dur = 0.34 + ritmo * 0.66
+        if (golpesDesdeReves >= proximoReves) {
+          clic.tiro = SHOTS.reves
+          golpesDesdeReves = 0
+          proximoReves = 4 + Math.floor(Math.random() * 3)
+          dur = Math.max(dur, 1.15)         // el revés va más lento, para verlo
+        } else {
+          clic.tiro = saleAbajo ? SHOTS.remate
+            : saleArriba ? SHOTS.globo
+            : (ritmo < 0.3 ? SHOTS.volea
+              : [SHOTS.drive, SHOTS.volea, SHOTS.globo][Math.floor(Math.random() * 3)])
+        }
+        clic.activo = true
+        clic.t = 0
+        clic.dur = dur
+        clic.lado = b.o.x <= CONTACTO.x ? 1 : -1     // de qué lado entra la pelota
+        b.dur = dur                                   // la pelota llega justo al golpe
       }
 
       renderer.domElement.style.cursor = 'pointer'
@@ -1191,6 +1219,10 @@ export default function ScrollLab() {
         const jugando = progRef.current.t <= JUEGO_HASTA
         if (pistaJuego) pistaJuego.style.opacity = jugando ? '1' : '0'
         juego.activo = jugando
+        // El clic corre su propio reloj y se apaga solo al completarse: eso es lo
+        // que evita que el swing se corte a mitad o se repita.
+        if (clic.activo) { clic.t += dt / clic.dur; if (clic.t >= 1) clic.activo = false }
+        if (!jugando) clic.activo = false
         moverJuego(dt, jugando)
         // Con la pestaña de fondo el navegador ya frena requestAnimationFrame
         // solo, así que no hace falta nada más para no gastar batería. La versión
@@ -1217,25 +1249,33 @@ export default function ScrollLab() {
         // Tres fases sobre un único progreso, como en Paleta3D: carga (w), golpe
         // (sw) y vuelta (rec). El swing sale del codo, así el mango acompaña el
         // arco. Los números son los del golpe "drive" de allá.
-        // Mientras se juega, el swing lo dispara el clic y no el scroll. Se usa
-        // la misma curva de tres fases, medida desde el momento del golpe.
-        const desdeGolpe = performance.now() / 1000 - juego.golpeEn
-        const jugandoAhora = t <= JUEGO_HASTA && desdeGolpe < juego.dur * 2.2
-        const prog = jugandoAhora
-          ? Math.min(1, desdeGolpe / (juego.dur * 2.2))
-          : seg(t, 0.12, 0.48)
-        const w   = suave(seg(prog, 0, 0.35))     // carga hacia atrás
-        const sw  = suave(seg(prog, 0.35, 0.60))  // suelta el golpe
-        const rec = suave(seg(prog, 0.60, 1))     // acompaña y vuelve
-        const pico = sw * (1 - rec)               // pico justo en el impacto
+        // ── EL SWING ──
+        // Portado tal cual de Paleta3D: mismas tres fases, mismos coeficientes y
+        // los mismos cinco tipos de golpe. Lo que faltaba acá era la PRIORIDAD y
+        // el REPOSO explícito: antes se mezclaba el reloj del clic con el del
+        // scroll, y al terminar el clic saltaba de una pose a otra — de ahí los
+        // cortes y el golpe repetido.
+        //   1º el guion (scroll)   2º el clic   3º reposo
+        let prog = 0, lado = 1, tiro = SHOTS.drive
+        if (t > JUEGO_HASTA) {
+          prog = seg(t, 0.12, 0.48)
+        } else if (clic.activo) {
+          prog = clic.t
+          lado = clic.lado
+          tiro = clic.tiro
+        }
 
-        codo.rotation.z = 0.42 * w - 1.10 * sw + 0.70 * rec
-        codo.rotation.x = -0.30 * w * (1 - sw)
-        // Giro de cara acotado: con -0.95 la paleta mostraba el canto casi de
-        // perfil, que es justo la zona con la textura más floja del modelo.
-        codo.rotation.y = -0.42 * suave(seg(prog, 0, 0.3)) * (1 - suave(seg(prog, 0.62, 1)))
-        // profundidad: carga hacia atrás y empuja al impactar, como allá
-        const empuje = 1.4 * (-0.4 * w * (1 - sw) + pico)
+        const w   = suave(seg(prog, 0, 0.35))     // carga
+        const sw  = suave(seg(prog, 0.35, 0.60))  // golpe
+        const rec = suave(seg(prog, 0.60, 1))     // vuelta
+        const pico = sw * (1 - rec)
+
+        codo.rotation.z = (0.42 * w - 1.10 * sw + 0.70 * rec) * lado * tiro.zAmp
+        codo.rotation.x = -0.30 * w * (1 - sw) + tiro.xBias * (0.35 * w + pico)
+        codo.rotation.y = tiro.yAmp * lado * suave(seg(prog, 0, 0.3)) * (1 - suave(seg(prog, 0.62, 1)))
+        const empuje = (tiro.thrust || 0) * (-0.4 * w * (1 - sw) + pico)
+        // el revés muestra la otra cara y vuelve
+        if (tiro.flip) codo.rotation.y += Math.PI * 2 * lado * suave(seg(prog, 0.1, 0.9))
 
         // El codo corrige su posición según el ángulo para que la CARA quede en
         // el punto de impacto: si no, el arco la aleja justo cuando llega la pelota.
