@@ -1056,6 +1056,99 @@ export default function ScrollLab() {
 
       scene.add(codo, pelota, paquete)
 
+      // ── LANZADOR DE PELOTAS (el 0% del scroll) ──
+      // Antes de que arranque el guion, la paleta se puede jugar: cada clic manda
+      // una pelota desde donde está el cursor, la paleta la devuelve y sale de
+      // cuadro. Es la misma idea del hero que ya está en la página pública.
+      const JUEGO_HASTA = 0.055          // a partir de acá manda el guion
+      const ESPERA = 0.42                // segundos mínimos entre pelota y pelota
+      const geoJuego = new THREE.SphereGeometry(R_BOLA, 20, 14)
+      const matJuego = new THREE.MeshStandardMaterial({ color: '#d8e83c', roughness: 0.95 })
+      const banco = []
+      for (let i = 0; i < 5; i++) {
+        const m = new THREE.Mesh(geoJuego, matJuego)
+        m.visible = false
+        m.castShadow = true
+        scene.add(m)
+        banco.push({ malla: m, viva: false, t: 0, dur: 1, o: new THREE.Vector3(), v: new THREE.Vector3() })
+      }
+      const juego = { ultimo: -99, golpeEn: -99, dur: 0.6, activo: true }
+      const puntero = new THREE.Vector2(0, 0)
+
+      const lanzar = () => {
+        if (!juego.activo || progRef.current.t > JUEGO_HASTA) return
+        const ahora = performance.now() / 1000
+        if (ahora - juego.ultimo < ESPERA) return      // no se acumulan clics
+        const b = banco.find(x => !x.viva)
+        if (!b) return
+        // cuanto más rápido se clickea, más rápido va y más corto es el swing
+        const ritmo = Math.min(1, (ahora - juego.ultimo) / 1.6)
+        juego.ultimo = ahora
+        juego.golpeEn = ahora
+        juego.dur = 0.34 + ritmo * 0.5
+
+        // origen: el punto del mundo que está bajo el cursor
+        b.o.set(puntero.x, puntero.y, 0.5).unproject(camera)
+        // que venga de un costado, no de la nariz de la cámara
+        if (Math.abs(b.o.x - CONTACTO.x) < 3) b.o.x = CONTACTO.x + (b.o.x < CONTACTO.x ? -3.4 : 3.4)
+        b.malla.position.copy(b.o)
+        b.malla.visible = true
+        b.viva = true
+        b.t = 0
+        b.dur = juego.dur
+        // sale hacia una dirección cualquiera, siempre alejándose de la paleta
+        const ang = Math.random() * Math.PI * 2
+        const vel = 13 + (1 - ritmo) * 7
+        b.v.set(Math.cos(ang) * 0.72, Math.sin(ang) * 0.72, 0.62).normalize().multiplyScalar(vel)
+      }
+
+      renderer.domElement.style.cursor = 'pointer'
+      const alClic = (e) => {
+        const r = renderer.domElement.getBoundingClientRect()
+        puntero.x = ((e.clientX - r.left) / r.width) * 2 - 1
+        puntero.y = -((e.clientY - r.top) / r.height) * 2 + 1
+        lanzar()
+      }
+      const alMover = (e) => {
+        const r = renderer.domElement.getBoundingClientRect()
+        puntero.x = ((e.clientX - r.left) / r.width) * 2 - 1
+        puntero.y = -((e.clientY - r.top) / r.height) * 2 + 1
+      }
+      if (!window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
+        renderer.domElement.addEventListener('pointerdown', alClic)
+        renderer.domElement.addEventListener('pointermove', alMover)
+      }
+
+      // Avanza las pelotas del juego. Van del cursor a la cara de la paleta y de
+      // ahí salen de cuadro; el swing se dispara con el mismo reloj.
+      const moverJuego = (dt, jugando) => {
+        for (const b of banco) {
+          if (!b.viva) continue
+          b.t += dt
+          const k = b.t / b.dur
+          if (k < 1) {
+            // viaje hacia la cara: en arco, no en línea recta
+            const f = k * k * (3 - 2 * k)
+            b.malla.position.set(
+              b.o.x + (CONTACTO.x - b.o.x) * f,
+              b.o.y + (CONTACTO.y - b.o.y) * f + Math.sin(f * Math.PI) * 1.2,
+              b.o.z + (CONTACTO.z - b.o.z) * f
+            )
+          } else {
+            // devuelta: recta y con gravedad suave hasta salir de cuadro
+            const s = b.t - b.dur
+            b.malla.position.set(
+              CONTACTO.x + b.v.x * s,
+              CONTACTO.y + b.v.y * s - 4 * s * s,
+              CONTACTO.z + b.v.z * s
+            )
+            if (s > 1.5 || b.malla.position.y < SUELO_Y) { b.viva = false; b.malla.visible = false }
+          }
+          b.malla.rotation.x += dt * 9
+          if (!jugando) { b.viva = false; b.malla.visible = false }
+        }
+      }
+
       const onResize = () => {
         renderer.setSize(W(), H())
         camera.aspect = W() / H()
@@ -1088,8 +1181,17 @@ export default function ScrollLab() {
           },
         }
       }
+      const pistaJuego = document.querySelector('.pista-juego')
+      let ultimoCuadro = performance.now() / 1000
       const frame = () => {
         raf = requestAnimationFrame(frame)
+        const ahora = performance.now() / 1000
+        const dt = Math.min(0.05, ahora - ultimoCuadro)   // topado: si la pestaña
+        ultimoCuadro = ahora                              // vuelve de fondo, no salta
+        const jugando = progRef.current.t <= JUEGO_HASTA
+        if (pistaJuego) pistaJuego.style.opacity = jugando ? '1' : '0'
+        juego.activo = jugando
+        moverJuego(dt, jugando)
         // Con la pestaña de fondo el navegador ya frena requestAnimationFrame
         // solo, así que no hace falta nada más para no gastar batería. La versión
         // anterior usaba un IntersectionObserver y, si marcaba "no visible", el
@@ -1115,7 +1217,13 @@ export default function ScrollLab() {
         // Tres fases sobre un único progreso, como en Paleta3D: carga (w), golpe
         // (sw) y vuelta (rec). El swing sale del codo, así el mango acompaña el
         // arco. Los números son los del golpe "drive" de allá.
-        const prog = seg(t, 0.12, 0.48)
+        // Mientras se juega, el swing lo dispara el clic y no el scroll. Se usa
+        // la misma curva de tres fases, medida desde el momento del golpe.
+        const desdeGolpe = performance.now() / 1000 - juego.golpeEn
+        const jugandoAhora = t <= JUEGO_HASTA && desdeGolpe < juego.dur * 2.2
+        const prog = jugandoAhora
+          ? Math.min(1, desdeGolpe / (juego.dur * 2.2))
+          : seg(t, 0.12, 0.48)
         const w   = suave(seg(prog, 0, 0.35))     // carga hacia atrás
         const sw  = suave(seg(prog, 0.35, 0.60))  // suelta el golpe
         const rec = suave(seg(prog, 0.60, 1))     // acompaña y vuelve
@@ -1269,6 +1377,9 @@ export default function ScrollLab() {
 
       cleanup = () => {
         cancelAnimationFrame(raf)
+        renderer.domElement.removeEventListener('pointerdown', alClic)
+        renderer.domElement.removeEventListener('pointermove', alMover)
+        geoJuego.dispose(); matJuego.dispose()
         ro.disconnect()
         ;scene.traverse(o => {
           o.geometry?.dispose()
@@ -1353,8 +1464,13 @@ export default function ScrollLab() {
           </div>
         ))}
 
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 text-slate-400 text-[10px] font-semibold uppercase tracking-widest">
-          Scrolleá
+        {/* Dos pistas al pie: que se puede jugar y que se puede scrollear. La
+            primera se desvanece en cuanto arranca el guion. */}
+        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-5 text-[10px] font-semibold uppercase tracking-widest">
+          <span className="pista-juego text-saro-blue transition-opacity duration-300">
+            Tocá para jugar
+          </span>
+          <span className="text-slate-400">Scrolleá</span>
         </div>
       </section>
 

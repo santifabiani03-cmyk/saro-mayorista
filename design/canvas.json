@@ -1,0 +1,12 @@
+{
+  "artboards": [
+    { "file": "Main.dc.html", "x": 0, "y": 0, "w": 1440, "h": 2960, "title": "Landing · escritorio" },
+    { "file": "Movil.dc.html", "x": 1560, "y": 0, "w": 390, "h": 1740, "title": "Landing · celular" },
+    { "file": "Diagnostico.dc.html", "x": 2060, "y": 0, "w": 900, "h": 800, "title": "Qué cambia y por qué" }
+  ],
+  "annotations": [
+    { "id": "nota-catalogos", "x": 0, "y": -150, "w": 460, "text": "Dos catálogos en vez de tres tarjetas iguales.\nEl mayorista pasa a una línea: sigue estando, deja de competir con lo que sí se puede comprar hoy." },
+    { "id": "nota-marca", "x": 2060, "y": 860, "w": 420, "text": "Paleta, tipografía y sombras salen del tailwind.config del proyecto: #2563EB, #1E40AF, #0F172A, #EFF6FF, #F59E0B e Inter. No se inventó nada." }
+  ],
+  "launch": { "view": "canvas" }
+}
