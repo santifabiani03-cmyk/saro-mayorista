@@ -610,12 +610,49 @@ export default function ScrollLab() {
       // ── EL LÍMITE DEL TERRENO ──
       // Sin esto el césped se corta de golpe contra el cielo y se ve el borde
       // del mundo. Un seto perimetral cierra la vista a lo lejos.
-      const matSeto = new THREE.MeshStandardMaterial({ color: '#4e7a48', roughness: 1 })
-      const seto = new THREE.Mesh(new THREE.TorusGeometry(180, 7, 6, 40), matSeto)
-      seto.rotation.x = Math.PI / 2
-      seto.position.set(0, SUELO_Y + 1, RED_Z)
-      seto.scale.y = 0.55
-      afuera.add(seto)
+      // Una hilera de arbustos de verdad, no un tubo pintado de verde. El anillo
+      // liso que había antes se leía como un rectángulo de color plano porque no
+      // tenía ni textura ni volumen. Van con InstancedMesh: setenta arbustos
+      // cuestan lo mismo que uno para la placa de video.
+      loader.load('/models/arbusto3.glb', gltf => {
+        if (disposed) return
+        gltf.scene.updateMatrixWorld(true)
+        const caja = new THREE.Box3().setFromObject(gltf.scene)
+        const t = new THREE.Vector3(); caja.getSize(t)
+        const c = new THREE.Vector3(); caja.getCenter(c)
+        const unidad = 1 / (t.y || 1)
+        const CUANTOS = 70
+        gltf.scene.traverse(o => {
+          if (!o.isMesh) return
+          const geo = o.geometry.clone()
+          geo.applyMatrix4(o.matrixWorld)
+          geo.translate(-c.x, -caja.min.y, -c.z)
+          geo.scale(unidad, unidad, unidad)
+          const mat = o.material.clone()
+          mat.side = THREE.DoubleSide
+          const inst = new THREE.InstancedMesh(geo, mat, CUANTOS)
+          inst.castShadow = true
+          inst.receiveShadow = true
+          const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler()
+          for (let i = 0; i < CUANTOS; i++) {
+            // repartidos en el anillo, con radio y tamaño variables para que la
+            // hilera no se lea como una fila de clones
+            const ang = (i / CUANTOS) * Math.PI * 2
+            const rad = 176 + ((i * 7) % 5) * 4
+            const alto = 26 + ((i * 3) % 4) * 7
+            e.set(0, i * 1.31, 0)
+            m.compose(
+              new THREE.Vector3(Math.cos(ang) * rad, SUELO_Y, RED_Z + Math.sin(ang) * rad),
+              q.setFromEuler(e),
+              new THREE.Vector3(alto, alto, alto)
+            )
+            inst.setMatrixAt(i, m)
+          }
+          inst.instanceMatrix.needsUpdate = true
+          inst.frustumCulled = false
+          afuera.add(inst)
+        })
+      }, undefined, () => { /* sin arbustos, el horizonte queda al cielo */ })
 
       // otra cancha a lo lejos, apenas insinuada: da idea de club, no de cancha suelta
       const vecina = new THREE.Mesh(
