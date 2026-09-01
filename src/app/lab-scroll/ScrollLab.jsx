@@ -131,13 +131,16 @@ export default function ScrollLab() {
       import('three'),
       import('three/examples/jsm/loaders/GLTFLoader.js'),
       import('three/examples/jsm/libs/meshopt_decoder.module.js'),
-      import('three/examples/jsm/environments/RoomEnvironment.js'),
       import('three/examples/jsm/postprocessing/EffectComposer.js'),
       import('three/examples/jsm/postprocessing/RenderPass.js'),
       import('three/examples/jsm/postprocessing/GTAOPass.js'),
       import('three/examples/jsm/postprocessing/OutputPass.js'),
-    ]).then(([THREE, { GLTFLoader }, { MeshoptDecoder }, { RoomEnvironment },
-              { EffectComposer }, { RenderPass }, { GTAOPass }, { OutputPass }]) => {
+      import('three/examples/jsm/postprocessing/UnrealBloomPass.js'),
+      import('three/examples/jsm/postprocessing/ShaderPass.js'),
+      import('three/examples/jsm/shaders/VignetteShader.js'),
+    ]).then(([THREE, { GLTFLoader }, { MeshoptDecoder },
+              { EffectComposer }, { RenderPass }, { GTAOPass }, { OutputPass },
+              { UnrealBloomPass }, { ShaderPass }, { VignetteShader }]) => {
       if (disposed) return
       const mount = mountRef.current
       if (!mount) return
@@ -147,8 +150,17 @@ export default function ScrollLab() {
 
       const scene = new THREE.Scene()
       scene.background = new THREE.Color('#eef2f8')
-      // Sin niebla. Lavaba el fondo y aplanaba la cancha; con el domo de cielo
-      // detrás ya no hace falta nada que disimule el borde del mundo.
+      // Niebla atmosférica. Es LA clave de profundidad que faltaba: sin ella
+      // un arbusto a 10 metros y uno a 150 llegan al ojo con el mismo contraste
+      // y el mismo color, así que el cerebro los lee a la misma distancia y la
+      // escena se aplana. El color es la banda media del degradé del cielo (el
+      // stop 0.55 de más abajo), para que lo lejano se disuelva en el horizonte
+      // en vez de recortarse contra él.
+      // OJO: el domo de cielo tiene radio 170. `far` TIENE que quedar por
+      // debajo o la niebla no llega a cerrar y se ve el corte del domo.
+      scene.fog = new THREE.Fog('#eaf4fd', 45, 160)
+      // (Hubo una niebla antes que lavaba el fondo: era densa y arrancaba
+      // demasiado cerca. La de arriba empieza recién pasada la cancha.)
 
       // FOV 34 como el hero de la página pública: menos distorsión de
       // perspectiva y la paleta se lee del mismo modo.
@@ -188,17 +200,75 @@ export default function ScrollLab() {
       const equipoFlojo = (navigator.hardwareConcurrency || 4) <= 4
       gtao.enabled = W() >= 900 && !equipoFlojo
       composer.addPass(gtao)
+      // Bloom muy contenido: el umbral alto hace que sólo florezca lo que ya
+      // está casi blanco (el reflejo del sol en el dorado de la paleta, el
+      // brillo del vidrio). Esto es una marca deportiva: si se nota que hay
+      // bloom, está de más.
+      // A resolución completa este pase costaba 8,2 ms — más que la oclusión
+      // ambiental, para un efecto que casi no se ve. A la mitad cuesta un
+      // cuarto y, siendo un halo difuso, no se distingue. Se apaga con el mismo
+      // criterio que el AO.
+      const bloom = new UnrealBloomPass(new THREE.Vector2(W() / 2, H() / 2), 0.13, 0.5, 0.92)
+      bloom.enabled = gtao.enabled
+      composer.addPass(bloom)
       composer.addPass(new OutputPass())           // tonemapping va al final
+      // Viñeta apenas marcada, DESPUÉS del tonemapping para que el valor sea
+      // predecible. Baja la luminancia de las esquinas sin cambiarles el tono,
+      // así el ojo cae al centro del cuadro. Con `darkness` alto se ensucia de
+      // gris y rompe el blanco de la marca: 0.85 es el techo acá.
+      const vineta = new ShaderPass(VignetteShader)
+      vineta.uniforms.offset.value = 1.15
+      vineta.uniforms.darkness.value = 0.85
+      composer.addPass(vineta)
       composer.setSize(W(), H())
       composer.setPixelRatio(Math.min(devicePixelRatio, 2))
 
       // Iluminación de entorno: el modelo real necesita reflejos para verse bien
       const pmrem = new THREE.PMREMGenerator(renderer)
-      scene.environment = pmrem.fromScene(new RoomEnvironment(), 0.04).texture
-      scene.environmentIntensity = 0.38     // el ambiente aclaraba las sombras
+      // Sonda de entorno EXTERIOR, dibujada acá mismo. Antes se usaba
+      // RoomEnvironment, que es un cuarto cerrado: todos los materiales
+      // recibían el rebote de cuatro paredes y un techo, y por eso el metal y
+      // el vidrio devolvían reflejos de interior en una cancha al aire libre.
+      // Es un equirectangular: la horizontal recorre los 360° alrededor y la
+      // vertical va del cenit al nadir. Mismo degradé que el domo de cielo,
+      // más el sol en la MISMA dirección que la DirectionalLight de abajo, para
+      // que el reflejo caiga donde cae la luz.
+      const SOL_DIR = [4, 8, 6]
+      const ibl = document.createElement('canvas')
+      ibl.width = 512; ibl.height = 256
+      {
+        const c = ibl.getContext('2d')
+        const g = c.createLinearGradient(0, 0, 0, 256)
+        g.addColorStop(0, '#bcd8f4')      // cenit
+        g.addColorStop(0.42, '#dceaf8')
+        g.addColorStop(0.5, '#eaf4fd')    // horizonte: el mismo de la niebla
+        g.addColorStop(0.58, '#dfe7ec')   // ya es suelo, apenas más gris
+        g.addColorStop(1, '#c9d4dc')      // nadir: rebote del piso, claro
+        c.fillStyle = g
+        c.fillRect(0, 0, 512, 256)
+        // el sol, en la dirección exacta de la luz principal
+        const [sx, sy, sz] = SOL_DIR
+        const len = Math.hypot(sx, sy, sz)
+        const u = (Math.atan2(sz / len, sx / len) / (Math.PI * 2)) * 512
+        const vv = (Math.acos(sy / len) / Math.PI) * 256
+        const halo = c.createRadialGradient(u, vv, 0, u, vv, 62)
+        halo.addColorStop(0, '#fffdf6')
+        halo.addColorStop(0.18, '#fff8e9')
+        halo.addColorStop(1, 'rgba(255,248,233,0)')
+        c.fillStyle = halo
+        c.fillRect(u - 62, vv - 62, 124, 124)
+      }
+      const texIbl = new THREE.CanvasTexture(ibl)
+      texIbl.mapping = THREE.EquirectangularReflectionMapping
+      texIbl.colorSpace = THREE.SRGBColorSpace
+      scene.environment = pmrem.fromEquirectangular(texIbl).texture
+      texIbl.dispose()
+      // Sube de 0.38 a 0.55: este entorno es más parejo y más claro que el
+      // cuarto, así que con el valor viejo las sombras quedaban muertas.
+      scene.environmentIntensity = 0.55
       scene.add(new THREE.HemisphereLight('#ffffff', '#c3d1e5', 0.34))   // menos relleno = sombra más marcada
       const sol = new THREE.DirectionalLight('#fff6e8', 1.15)   // apenas cálido, como el sol
-      sol.position.set(4, 8, 6)
+      sol.position.set(...SOL_DIR)   // el mismo vector que el sol del entorno
       sol.castShadow = true
       sol.shadow.mapSize.set(1024, 1024)
       sol.shadow.camera.near = 1
@@ -237,7 +307,9 @@ export default function ScrollLab() {
       const CANCHAS = [
         { x: 0, z: RED_Z, principal: true },
         { x: -(CANCHA_ANCHO + SEPARACION), z: RED_Z },                 // la de al lado
-        { x: 0, z: RED_Z - (CANCHA_LARGO + SEPARACION) },              // la del fondo
+        // NO agregar una cancha al fondo: empuja el seto perimetral fuera del
+        // domo de cielo (radio 170) y el horizonte queda pelado. El club se
+        // lee igual con dos canchas.
       ]
       // ¿Este punto está fuera de TODAS las canchas, con su vereda incluida?
       const libre = (x, z, margen = 12) => CANCHAS.every(c =>
@@ -529,6 +601,63 @@ export default function ScrollLab() {
         })
       })
 
+      // ── PRIMER PLANO ──
+      // No había NADA cerca de cámara en todo el guion: la escena entera pasaba
+      // a media y larga distancia, y sin algo cercano que se superponga a lo
+      // lejano el ojo se queda sin una de las señales más fuertes de
+      // profundidad. Dos cestos de pelotas, que es lo que hay de verdad tirado
+      // en una cancha de club. Van al BORDE del cuadro, nunca al centro: la
+      // idea es que enmarquen, no que tapen la paleta ni la caja.
+      const hacerCesto = () => {
+        const g = new THREE.Group()
+        // Gris azulado y translúcido: tiene que leerse como cesto de alambre,
+        // no como un tacho macizo, y en primer plano un bulto oscuro se come
+        // el cuadro entero.
+        const rejilla = new THREE.MeshStandardMaterial({
+          color: '#5B7285', roughness: 0.55, metalness: 0.3,
+          side: THREE.DoubleSide, transparent: true, opacity: 0.62,
+        })
+        const canasto = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 2.6, 5.6, 14, 1, true), rejilla)
+        canasto.position.y = 3.4
+        g.add(canasto)
+        const aro = new THREE.Mesh(new THREE.TorusGeometry(3.2, 0.16, 6, 16), rejilla)
+        aro.rotation.x = Math.PI / 2
+        aro.position.y = 6.2
+        g.add(aro)
+        // pelotas asomando, con el mismo verde amarillento de la del juego
+        const matPel = new THREE.MeshStandardMaterial({ color: '#d8e83c', roughness: 0.95 })
+        const geoPel = new THREE.SphereGeometry(0.85, 12, 9)
+        for (let i = 0; i < 7; i++) {
+          const b = new THREE.Mesh(geoPel, matPel)
+          b.position.set(Math.cos(i * 2.1) * 1.7, 5.2 + (i % 3) * 0.7, Math.sin(i * 2.1) * 1.7)
+          b.castShadow = true
+          g.add(b)
+        }
+        ;[-1, 1].forEach(d => {
+          const pata = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.22, 0.22, 3.4, 6),
+            new THREE.MeshStandardMaterial({ color: '#33485f', roughness: 0.6, metalness: 0.35 })
+          )
+          pata.position.set(d * 2, 1.7, 0)
+          g.add(pata)
+        })
+        g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true } })
+        return g
+      }
+      // Dónde va sale de la cuenta del encuadre, no del ojo: con FOV 34 y esta
+      // pantalla el borde del cuadro cae a 0.54 x la distancia, así que a 14
+      // unidades el borde está en x≈7.6. Ahí va, entrando apenas por la
+      // izquierda durante todo el arranque.
+      // Va UNO SOLO, y en el arranque. Hubo un segundo sobre el recorrido
+      // final y tapaba la caja SARO entera: el tramo del envío tiene que
+      // quedar limpio, que es el remate de todo el guion.
+      {
+        const c = hacerCesto()
+        c.position.set(-7.6, SUELO_Y, -13)
+        c.rotation.y = -1.4
+        scene.add(c)
+      }
+
       // ── ZONA DE DESCANSO ──
       // Entre las dos canchas, justo donde la cámara termina mirando. Mesas con
       // sombrilla, hechas por código: son cilindros y conos, no vale traer un
@@ -592,6 +721,10 @@ export default function ScrollLab() {
         ;[PRODUCTOS[i], PRODUCTOS[j]] = [PRODUCTOS[j], PRODUCTOS[i]]
       }
       const CARTEL_ALTO = 20
+      // Altura del pie. Con 10 los carteles quedaban entre 15 y 32 px POR ENCIMA
+      // del borde de arriba en todo el tramo del hero: existían, tenían la foto
+      // cargada y no se veían nunca. Medido proyectándolos a pantalla.
+      const CARTEL_PIE = 5
       const carteles = new THREE.Group()
       const rotables = []
       const matPoste2 = new THREE.MeshStandardMaterial({ color: '#2f4257', roughness: 0.6, metalness: 0.3 })
@@ -619,18 +752,21 @@ export default function ScrollLab() {
           new THREE.PlaneGeometry(CARTEL_ALTO * 0.84, CARTEL_ALTO),
           new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.92, side: THREE.DoubleSide })
         )
-        fondo.position.y = SUELO_Y + CARTEL_ALTO / 2 + 10
+        fondo.position.y = SUELO_Y + CARTEL_ALTO / 2 + CARTEL_PIE
         grupo.add(fondo)
 
         // Material sin iluminación: la foto se ve con sus colores propios. Con
         // MeshStandard recibía sol + ambiente + relleno y salía quemada.
+        // fog:false por el mismo motivo que toneMapped:false — la foto del
+        // producto tiene que llegar con su color. A 86 unidades la niebla le
+        // comía el 36% y los productos son lo único que la escena vende.
         const matFoto = new THREE.MeshBasicMaterial({
-          transparent: true, side: THREE.DoubleSide, toneMapped: false,
+          transparent: true, side: THREE.DoubleSide, toneMapped: false, fog: false,
         })
         const foto = new THREE.Mesh(
           new THREE.PlaneGeometry(CARTEL_ALTO * 0.72, CARTEL_ALTO * 0.72), matFoto
         )
-        foto.position.set(0, SUELO_Y + CARTEL_ALTO / 2 + 10, 0.25)
+        foto.position.set(0, SUELO_Y + CARTEL_ALTO / 2 + CARTEL_PIE, 0.25)
         grupo.add(foto)
         new THREE.TextureLoader().load(ruta, tx => {
           if (disposed) return
@@ -644,12 +780,12 @@ export default function ScrollLab() {
           new THREE.BoxGeometry(CARTEL_ALTO * 0.86, CARTEL_ALTO * 0.1, 0.4),
           new THREE.MeshStandardMaterial({ color: '#2563EB', roughness: 0.7 })
         )
-        zocalo.position.set(0, SUELO_Y + 10 + CARTEL_ALTO * 0.05, 0)
+        zocalo.position.set(0, SUELO_Y + CARTEL_PIE + CARTEL_ALTO * 0.05, 0)
         grupo.add(zocalo)
 
         ;[-0.34, 0.34].forEach(d => {
-          const pata = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, 10, 8), matPoste2)
-          pata.position.set(d * CARTEL_ALTO * 0.84, SUELO_Y + 5, 0)
+          const pata = new THREE.Mesh(new THREE.CylinderGeometry(0.5, 0.5, CARTEL_PIE, 8), matPoste2)
+          pata.position.set(d * CARTEL_ALTO * 0.84, SUELO_Y + CARTEL_PIE / 2, 0)
           grupo.add(pata)
         })
 
@@ -699,8 +835,18 @@ export default function ScrollLab() {
       })
       club.add(cartel)
       // A 132 el club ocupaba el 97% del cuadro a lo ancho y tapaba el fondo
-      // entero. A 260 se lee como un edificio a lo lejos, que es lo que es.
-      club.position.set(-52, 0, RED_Z - 260)
+      // entero, así que se lo mandó a 260 para que se leyera como un edificio a
+      // lo lejos. Pero a 260 quedaba FUERA del domo de cielo (radio 170) y no
+      // se veía nada: comprobado ocultándolo, la imagen no cambiaba un byte.
+      // Ahora se acerca a 130 y se achica en la misma proporción, así ocupa en
+      // pantalla exactamente lo mismo que antes — pero entra en el domo y, de
+      // paso, en el rango de la niebla, que lo deja como una silueta tenue en
+      // el horizonte. Si cambiás la distancia, cambiá la escala con la misma
+      // cuenta o el encuadre se rompe.
+      const CLUB_LEJOS = 130
+      const kClub = CLUB_LEJOS / Math.hypot(52, 260)
+      club.position.set(-52 * kClub, 0, RED_Z - 260 * kClub)
+      club.scale.setScalar(kClub)
       afuera.add(club)
 
       // ── EL LÍMITE DEL TERRENO ──
@@ -713,9 +859,13 @@ export default function ScrollLab() {
       // El seto es el mismo follaje facetado, repetido con InstancedMesh: 220
       // arbustos cuestan lo mismo que uno para la placa de video. Dos filas
       // desfasadas, porque con una sola se veía el fondo entre planta y planta.
+      // Los radios TIENEN que caer dentro del domo de cielo (170) y dentro del
+      // `far` de la niebla: a 172 y 186 el seto entero quedaba detrás del cielo
+      // y no se veía ninguno de los 220. Acá se disuelven en el horizonte, que
+      // es justo lo que tiene que hacer un fondo.
       const FILAS = [
-        { radio: 172, cuantos: 110, desfase: 0 },
-        { radio: 186, cuantos: 110, desfase: Math.PI / 110 },
+        { radio: 118, cuantos: 110, desfase: 0 },
+        { radio: 132, cuantos: 110, desfase: Math.PI / 110 },
       ]
       const TOTAL = FILAS.reduce((n, f) => n + f.cuantos, 0)
       const seto = new THREE.InstancedMesh(
@@ -1442,6 +1592,7 @@ export default function ScrollLab() {
         renderer.setSize(W(), H())
         composer.setSize(W(), H())
         gtao.setSize(W(), H())
+        bloom.setSize(W() / 2, H() / 2)   // igual que al crearlo: media resolución
         camera.aspect = W() / H()
         camera.updateProjectionMatrix()
       }
@@ -1458,6 +1609,7 @@ export default function ScrollLab() {
       if (typeof window !== 'undefined') {
         window.__lab = {
           escena: scene, camara: camera,
+          bloom, vineta,   // para comparar valores sin recompilar
           ao: gtao,   // para prender/apagar la oclusión y comparar el costo
           // Cuánto cuesta dibujar un cuadro, en milisegundos. No usa
           // requestAnimationFrame a propósito: con la pestaña en segundo plano
