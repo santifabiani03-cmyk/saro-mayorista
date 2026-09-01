@@ -347,12 +347,6 @@ export default function ScrollLab() {
         b2.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true } })
         return b2
       }
-      ;[[-1, -26], [-1, 30], [1, 2]].forEach(([lado, z]) => {
-        const b2 = hacerBanco()
-        b2.position.set(lado * (CANCHA_ANCHO / 2 + 11), SUELO_Y, RED_Z + z)
-        b2.rotation.y = lado > 0 ? -Math.PI / 2 : Math.PI / 2
-        afuera.add(b2)
-      })
 
       // Todo lo de afuera va SÓLO sobre el arco que recorre la cámara: entre
       // mirar al fondo y mirar al costado. Poner cosas donde nunca se miran es
@@ -413,6 +407,19 @@ export default function ScrollLab() {
           pl.rotation.y = i * 1.9
           afuera.add(pl)
         })
+      })
+
+      // Los bancos van sobre el mismo arco que el resto. Antes tenían su
+      // posición escrita a mano, 3 unidades MÁS CERCA que el borde de la
+      // vereda: eran lo único adelantado de la escena, y con la cámara casi a
+      // ras del piso el encuadre los cortaba al medio. Eso era el "banco
+      // bugeado" — el modelo siempre estuvo bien, estaba mal ubicado.
+      ;[0.22, 0.5, 0.86].forEach(f => {
+        const [x, z] = enArco(f, 74)
+        const b2 = hacerBanco()
+        b2.position.set(x, SUELO_Y, z)
+        b2.rotation.y = Math.atan2(-x, RED_Z - z)   // mirando a la cancha
+        afuera.add(b2)
       })
 
       // Arbustos de tres portes, para que el verde no sea liso ni repetido
@@ -1355,10 +1362,15 @@ export default function ScrollLab() {
       ro.observe(mount)
 
       let raf = 0
+      /* eslint-disable no-use-before-define -- `dibujar` se declara unas lineas
+         mas abajo, pero acá sólo se la nombra dentro de funciones (window.__lab
+         y frame) que recién corren después. Si alguna vez se la llama suelta
+         acá arriba, sacá este disable: la página se va a ver en blanco. */
       // Permite pedir un cuadro concreto del guion sin depender del scroll ni de
       // requestAnimationFrame. Sirve para inspeccionar la escena cuadro a cuadro.
       if (typeof window !== 'undefined') {
         window.__lab = {
+          escena: scene, camara: camera,
           ver(t) { progRef.current.t = t; dibujar(t); return renderer.domElement.toDataURL('image/webp', 0.7) },
           // encuadra toda la escena: sirve para comprobar que hay geometría
           vistaGeneral(t = 0.05) {
@@ -1399,6 +1411,7 @@ export default function ScrollLab() {
         // bucle se cortaba y la pantalla quedaba en blanco.
         dibujar(progRef.current.t)
       }
+      /* eslint-enable no-use-before-define */
       const dibujar = (t) => {
 
         // ── El guion, escrito en función del progreso ──

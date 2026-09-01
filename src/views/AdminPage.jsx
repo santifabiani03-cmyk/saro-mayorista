@@ -129,6 +129,11 @@ export default function AdminPage() {
     setListo(true)
   }, [])
 
+  const showToast = (msg, type = 'ok', duration = 3500) => {
+    setToast({ msg, type })
+    setTimeout(() => setToast(null), duration)
+  }
+
   const changeTab = (t) => { try { sessionStorage.setItem('saro_admin_tab', t) } catch {}; setTab(t) }
 
   // Sincronizado = el estado actual coincide con lo que está publicado
@@ -146,10 +151,6 @@ export default function AdminPage() {
       .catch(() => showToast('No se pudo cargar el catálogo.', 'error'))
   }, [])
 
-  const showToast = (msg, type = 'ok', duration = 3500) => {
-    setToast({ msg, type })
-    setTimeout(() => setToast(null), duration)
-  }
 
   const persistProducts = async (newList) => {
     setSaving(true)

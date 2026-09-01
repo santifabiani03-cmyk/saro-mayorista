@@ -21,6 +21,8 @@ export default [
         'requestIdleCallback', 'matchMedia', 'getComputedStyle', 'crypto',
         'confirm', 'prompt', 'atob', 'btoa', 'DOMParser', 'XMLHttpRequest',
         'WebSocket', 'Worker', 'CanvasRenderingContext2D', 'ImageData', 'Path2D',
+        'File', 'Response', 'Request', 'Headers', 'OffscreenCanvas', 'TextEncoder',
+        'TextDecoder', 'ReadableStream', 'queueMicrotask', 'DragEvent', 'Notification',
       ].map(g => [g, 'readonly'])),
     },
     rules: {
