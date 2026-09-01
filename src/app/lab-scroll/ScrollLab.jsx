@@ -156,9 +156,13 @@ export default function ScrollLab() {
       // escena se aplana. El color es la banda media del degradé del cielo (el
       // stop 0.55 de más abajo), para que lo lejano se disuelva en el horizonte
       // en vez de recortarse contra él.
+      // Arranca RECIÉN a 105, o sea pasada toda la cancha y el mobiliario: a 45
+      // teñía de gris cosas de media distancia y apagaba el celeste de la
+      // marca. Ahora sólo toca el seto y el club, que es lo único que tiene que
+      // fundirse con el horizonte.
       // OJO: el domo de cielo tiene radio 170. `far` TIENE que quedar por
       // debajo o la niebla no llega a cerrar y se ve el corte del domo.
-      scene.fog = new THREE.Fog('#eaf4fd', 45, 160)
+      scene.fog = new THREE.Fog('#f0f7fe', 105, 165)
       // (Hubo una niebla antes que lavaba el fondo: era densa y arrancaba
       // demasiado cerca. La de arriba empieza recién pasada la cancha.)
 
@@ -610,14 +614,31 @@ export default function ScrollLab() {
       // idea es que enmarquen, no que tapen la paleta ni la caja.
       const hacerCesto = () => {
         const g = new THREE.Group()
-        // Gris azulado y translúcido: tiene que leerse como cesto de alambre,
-        // no como un tacho macizo, y en primer plano un bulto oscuro se come
-        // el cuadro entero.
+        // Rejilla de verdad, no un cilindro translúcido: se dibuja la trama en
+        // un canvas y se usa de alphaMap, que es lo mismo que hace el alambrado
+        // de la cancha. Un cesto de pelotas es agujeros con alambre entre
+        // medio; pintarlo como vidrio esmerilado era lo que lo hacía de mentira.
+        // El alambre va en BLANCO porque el alphaMap se lee por BRILLO: blanco
+        // es opaco, negro es transparente. El color sale del material.
+        const tramaCnv = document.createElement('canvas')
+        tramaCnv.width = 64; tramaCnv.height = 64
+        {
+          const c = tramaCnv.getContext('2d')
+          c.fillStyle = '#000'; c.fillRect(0, 0, 64, 64)
+          c.strokeStyle = '#fff'; c.lineWidth = 5
+          for (let i = 0; i <= 64; i += 16) {
+            c.beginPath(); c.moveTo(i, 0); c.lineTo(i, 64); c.stroke()
+            c.beginPath(); c.moveTo(0, i); c.lineTo(64, i); c.stroke()
+          }
+        }
+        const texTrama = new THREE.CanvasTexture(tramaCnv)
+        texTrama.wrapS = texTrama.wrapT = THREE.RepeatWrapping
+        texTrama.repeat.set(9, 4)
         const rejilla = new THREE.MeshStandardMaterial({
-          color: '#5B7285', roughness: 0.55, metalness: 0.3,
-          side: THREE.DoubleSide, transparent: true, opacity: 0.62,
+          color: '#5B7285', roughness: 0.6, metalness: 0.3,
+          side: THREE.DoubleSide, transparent: true, alphaMap: texTrama,
         })
-        const canasto = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 2.6, 5.6, 14, 1, true), rejilla)
+        const canasto = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 2.6, 5.6, 20, 1, true), rejilla)
         canasto.position.y = 3.4
         g.add(canasto)
         const aro = new THREE.Mesh(new THREE.TorusGeometry(3.2, 0.16, 6, 16), rejilla)
@@ -652,11 +673,56 @@ export default function ScrollLab() {
       // final y tapaba la caja SARO entera: el tramo del envío tiene que
       // quedar limpio, que es el remate de todo el guion.
       {
+        // Corrido a la izquierda y un poco más lejos: antes entraba casi un
+        // tercio del cuadro y tapaba la lona. Ahora asoma por el borde, que es
+        // todo lo que tiene que hacer un elemento de primer plano.
         const c = hacerCesto()
-        c.position.set(-7.6, SUELO_Y, -13)
+        c.position.set(-9.4, SUELO_Y, -15.5)
         c.rotation.y = -1.4
         scene.add(c)
       }
+
+      // ── EL LOCAL ──
+      // Del modelo de Meshy se usan SOLO las piezas del local (fachada, vidrio,
+      // puerta, techo, cartel, mostrador y estantes): la cancha y los árboles
+      // que traía ya los tenemos hechos. Quedó en 11 KB.
+      // Viene sin materiales, que en este caso es una ventaja: se pinta con la
+      // paleta de la marca en vez de pelear contra una textura ajena.
+      const PINTURA = {
+        ShopFloor:   { color: '#dfe7ee', roughness: 0.95 },
+        ShopBody:    { color: '#f4f8fb', roughness: 0.9 },
+        ShopFacade:  { color: '#ffffff', roughness: 0.85 },
+        // El vidrio va CASI opaco a propósito. Con opacidad baja se veía el
+        // interior del local, que no tiene luz propia, y quedaba un rectángulo
+        // negro enorme en pantalla — justo lo que la marca no admite. Así se
+        // lee como vidrio con reflejo de cielo, que es como se ve de día.
+        ShopGlass:   { color: '#d8e9f5', roughness: 0.12, metalness: 0.3,
+                       transparent: true, opacity: 0.94 },
+        ShopDoor:    { color: '#2E9BD6', roughness: 0.6 },
+        ShopRoof:    { color: '#2E9BD6', roughness: 0.75 },
+        ShopSign:    { color: '#12719F', roughness: 0.6 },
+        ShopCounter: { color: '#e4ebf1', roughness: 0.85 },
+      }
+      const matEstante = new THREE.MeshStandardMaterial({ color: '#cdd9e3', roughness: 0.85 })
+      ponerModelo('/models/shop.glb', (base) => {
+        base.traverse(o => {
+          if (!o.isMesh) return
+          const receta = PINTURA[o.name] || (o.name.startsWith('Shelf_') ? null : null)
+          o.material = receta ? new THREE.MeshStandardMaterial(receta) : matEstante
+          o.castShadow = true
+          o.receiveShadow = true
+        })
+        // ponerModelo deja todo normalizado a 1 de alto, así que la escala real
+        // va acá: 26 unidades son unos 4 m, la altura de un local.
+        base.scale.multiplyScalar(26)
+        // Va en el pasillo entre las dos canchas, del lado al que la cámara
+        // termina mirando: así entra en cuadro sobre el final del scroll.
+        // Pegado al fondo del pasillo y corrido: a -46 quedaba tan cerca que
+        // ocupaba la franja superior entera del cuadro final.
+        base.position.set(-52, SUELO_Y, 40)
+        base.rotation.y = Math.PI / 2      // el frente mira a la cancha
+        afuera.add(base)
+      })
 
       // ── ZONA DE DESCANSO ──
       // Entre las dos canchas, justo donde la cámara termina mirando. Mesas con
@@ -698,7 +764,10 @@ export default function ScrollLab() {
         g.rotation.y = giro
         afuera.add(g)
       }
-      ;[[-58, 34, 0.4], [-58, 8, -0.3], [-92, 52, 0.9]].forEach(([x, z, r]) => hacerMesa(x, z, r))
+      // Van en el pasillo ENTRE las dos canchas (de -32.5 a -54.5, o sea
+      // centrado en -43.5). Antes estaban en -58 y -92: las tres adentro de la
+      // cancha de al lado, que es lo que se veía mal.
+      ;[[-43.5, 30, 0.4], [-43.5, 2, -0.3], [-43.5, -30, 0.9]].forEach(([x, z, r]) => hacerMesa(x, z, r))
 
       // El alambrado perimetral se saca: competía con el cerramiento de la
       // cancha, que ahora ya tiene su propia reja.
@@ -864,8 +933,9 @@ export default function ScrollLab() {
       // y no se veía ninguno de los 220. Acá se disuelven en el horizonte, que
       // es justo lo que tiene que hacer un fondo.
       const FILAS = [
-        { radio: 118, cuantos: 110, desfase: 0 },
-        { radio: 132, cuantos: 110, desfase: Math.PI / 110 },
+        { radio: 116, cuantos: 165, desfase: 0 },
+        { radio: 128, cuantos: 165, desfase: Math.PI / 165 },
+        { radio: 140, cuantos: 165, desfase: Math.PI / 82 },
       ]
       const TOTAL = FILAS.reduce((n, f) => n + f.cuantos, 0)
       const seto = new THREE.InstancedMesh(
@@ -888,7 +958,7 @@ export default function ScrollLab() {
               if (libre(Math.cos(ang) * rad, RED_Z + Math.sin(ang) * rad)) break
               rad += 10
             }
-            const alto = 13 + ((i * 3) % 4) * 4
+            const alto = 7 + ((i * 3) % 4) * 2.4      // más chicos y más juntos
             const ancho = alto * (1.5 + ((i * 5) % 3) * 0.25)   // más ancho que alto
             e.set(0, i * 1.31, 0)
             m.compose(
