@@ -82,7 +82,12 @@ const empujeDe = (prog, thrust = 0) => {
 // — cuanto más fuerte el golpe, peor (la volea se hundía un cuarto de unidad).
 const P_GOLPE = 0.6
 
-const T_IMPACTO = 0.291
+// El guion mueve el swing con `prog = seg(t, 0.12, 0.48)`, así que el golpe
+// cae en el t donde ese prog vale P_GOLPE. Estaba clavado en 0.291, que da
+// prog 0.475: la pelota salía disparada cuando la paleta todavía venía en
+// camino, y se veía atravesarla. Sale de la cuenta para que no puedan volver a
+// separarse si se toca alguno de los dos.
+const T_IMPACTO = 0.12 + P_GOLPE * (0.48 - 0.12)
 
 // Los cinco tipos de golpe, con los valores exactos del hero de la página
 // pública: amplitud del swing lateral (zAmp), sesgo arriba/abajo (xBias), giro
@@ -93,6 +98,15 @@ const SHOTS = {
   globo:  { zAmp: 0.55, xBias: -0.32, yAmp: -0.5,  thrust: 0.8 },
   remate: { zAmp: 0.6,  xBias:  0.34, yAmp: -0.32, thrust: 1.4 },
   reves:  { zAmp: 0.6,  xBias:  0.05, yAmp: -0.5,  thrust: 1.2, flip: true },
+}
+
+// Dónde está la CARA en ese instante: adelantada por el empuje del drive, que
+// es el tiro que usa el guion. La pelota del guion tiene que salir de ahí, no
+// del contacto en reposo.
+const CONTACTO_GUION = {
+  x: CONTACTO.x,
+  y: CONTACTO.y,
+  z: CONTACTO.z + empujeDe(P_GOLPE, SHOTS.drive.thrust),
 }
 
 function balistica(t, y0, v0, g, suelo, e) {
@@ -162,7 +176,7 @@ export default function ScrollLab() {
       // fundirse con el horizonte.
       // OJO: el domo de cielo tiene radio 170. `far` TIENE que quedar por
       // debajo o la niebla no llega a cerrar y se ve el corte del domo.
-      scene.fog = new THREE.Fog('#f0f7fe', 105, 165)
+      scene.fog = new THREE.Fog('#f4f9fe', 125, 168)
       // (Hubo una niebla antes que lavaba el fondo: era densa y arrancaba
       // demasiado cerca. La de arriba empieza recién pasada la cancha.)
 
@@ -270,8 +284,12 @@ export default function ScrollLab() {
       // Sube de 0.38 a 0.55: este entorno es más parejo y más claro que el
       // cuarto, así que con el valor viejo las sombras quedaban muertas.
       scene.environmentIntensity = 0.55
-      scene.add(new THREE.HemisphereLight('#ffffff', '#c3d1e5', 0.34))   // menos relleno = sombra más marcada
-      const sol = new THREE.DirectionalLight('#fff6e8', 1.15)   // apenas cálido, como el sol
+      scene.add(new THREE.HemisphereLight('#ffffff', '#c3d1e5', 0.30))   // menos relleno = sombra más marcada
+      // Sube de 1.15 a 1.6 y se entibia: el pedido era que el día se vea
+      // SOLEADO. Con el relleno un poco más bajo, la diferencia entre la cara
+      // iluminada y la sombra crece, que es lo que hace leer un mediodía y no
+      // un día nublado.
+      const sol = new THREE.DirectionalLight('#fff4e0', 1.6)
       sol.position.set(...SOL_DIR)   // el mismo vector que el sol del entorno
       sol.castShadow = true
       sol.shadow.mapSize.set(1024, 1024)
@@ -323,15 +341,41 @@ export default function ScrollLab() {
       // Domo de cielo: un degradé suave alrededor de todo, para que fuera de la
       // cancha no quede el vacío blanco. Va por dentro de una esfera enorme, así
       // acompaña el giro de la cámara (un fondo plano se delataría al rotar).
+      // El canvas pasa de 4 px de ancho a 1024 porque ahora lleva nubes, y una
+      // tira de 4 px sólo puede tener degradé vertical.
       const cieloCnv = document.createElement('canvas')
-      cieloCnv.width = 4; cieloCnv.height = 256
+      cieloCnv.width = 1024; cieloCnv.height = 512
       const cieloCtx = cieloCnv.getContext('2d')
-      const grad = cieloCtx.createLinearGradient(0, 0, 0, 256)
-      grad.addColorStop(0, '#cfe3f7')      // arriba, cielo
-      grad.addColorStop(0.55, '#eaf4fd')
+      const grad = cieloCtx.createLinearGradient(0, 0, 0, 512)
+      grad.addColorStop(0, '#8fc4ee')      // arriba: celeste de día despejado
+      grad.addColorStop(0.34, '#b8daf5')
+      grad.addColorStop(0.62, '#e4f1fd')
       grad.addColorStop(1, '#f7fbff')      // abajo, casi blanco
       cieloCtx.fillStyle = grad
-      cieloCtx.fillRect(0, 0, 4, 256)
+      cieloCtx.fillRect(0, 0, 1024, 512)
+      // Nubes: cada una son varios óvalos difusos superpuestos, que es lo que
+      // hace que se lea como nube y no como una mancha. Las posiciones salen de
+      // una cuenta fija y no de Math.random, para que el cielo sea siempre el
+      // mismo y no cambie de una recarga a otra.
+      for (let n = 0; n < 9; n++) {
+        const cx = ((n * 137) % 100) / 100 * 1024
+        const cy = 70 + ((n * 53) % 100) / 100 * 110
+        const esc = 0.7 + ((n * 31) % 60) / 100
+        cieloCtx.save()
+        cieloCtx.globalAlpha = 0.5 + ((n * 17) % 30) / 100
+        for (let b = 0; b < 5; b++) {
+          const bx = cx + (b - 2) * 34 * esc
+          const by = cy + ((b % 2) ? -9 : 6) * esc
+          const r = (30 + (b === 2 ? 16 : 0)) * esc
+          const gr = cieloCtx.createRadialGradient(bx, by, 0, bx, by, r)
+          gr.addColorStop(0, 'rgba(255,255,255,0.95)')
+          gr.addColorStop(0.55, 'rgba(255,255,255,0.55)')
+          gr.addColorStop(1, 'rgba(255,255,255,0)')
+          cieloCtx.fillStyle = gr
+          cieloCtx.beginPath(); cieloCtx.ellipse(bx, by, r * 1.5, r, 0, 0, Math.PI * 2); cieloCtx.fill()
+        }
+        cieloCtx.restore()
+      }
       const texCielo = new THREE.CanvasTexture(cieloCnv)
       texCielo.colorSpace = THREE.SRGBColorSpace
       const cielo = new THREE.Mesh(
@@ -605,83 +649,6 @@ export default function ScrollLab() {
         })
       })
 
-      // ── PRIMER PLANO ──
-      // No había NADA cerca de cámara en todo el guion: la escena entera pasaba
-      // a media y larga distancia, y sin algo cercano que se superponga a lo
-      // lejano el ojo se queda sin una de las señales más fuertes de
-      // profundidad. Dos cestos de pelotas, que es lo que hay de verdad tirado
-      // en una cancha de club. Van al BORDE del cuadro, nunca al centro: la
-      // idea es que enmarquen, no que tapen la paleta ni la caja.
-      const hacerCesto = () => {
-        const g = new THREE.Group()
-        // Rejilla de verdad, no un cilindro translúcido: se dibuja la trama en
-        // un canvas y se usa de alphaMap, que es lo mismo que hace el alambrado
-        // de la cancha. Un cesto de pelotas es agujeros con alambre entre
-        // medio; pintarlo como vidrio esmerilado era lo que lo hacía de mentira.
-        // El alambre va en BLANCO porque el alphaMap se lee por BRILLO: blanco
-        // es opaco, negro es transparente. El color sale del material.
-        const tramaCnv = document.createElement('canvas')
-        tramaCnv.width = 64; tramaCnv.height = 64
-        {
-          const c = tramaCnv.getContext('2d')
-          c.fillStyle = '#000'; c.fillRect(0, 0, 64, 64)
-          c.strokeStyle = '#fff'; c.lineWidth = 5
-          for (let i = 0; i <= 64; i += 16) {
-            c.beginPath(); c.moveTo(i, 0); c.lineTo(i, 64); c.stroke()
-            c.beginPath(); c.moveTo(0, i); c.lineTo(64, i); c.stroke()
-          }
-        }
-        const texTrama = new THREE.CanvasTexture(tramaCnv)
-        texTrama.wrapS = texTrama.wrapT = THREE.RepeatWrapping
-        texTrama.repeat.set(9, 4)
-        const rejilla = new THREE.MeshStandardMaterial({
-          color: '#5B7285', roughness: 0.6, metalness: 0.3,
-          side: THREE.DoubleSide, transparent: true, alphaMap: texTrama,
-        })
-        const canasto = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 2.6, 5.6, 20, 1, true), rejilla)
-        canasto.position.y = 3.4
-        g.add(canasto)
-        const aro = new THREE.Mesh(new THREE.TorusGeometry(3.2, 0.16, 6, 16), rejilla)
-        aro.rotation.x = Math.PI / 2
-        aro.position.y = 6.2
-        g.add(aro)
-        // pelotas asomando, con el mismo verde amarillento de la del juego
-        const matPel = new THREE.MeshStandardMaterial({ color: '#d8e83c', roughness: 0.95 })
-        const geoPel = new THREE.SphereGeometry(0.85, 12, 9)
-        for (let i = 0; i < 7; i++) {
-          const b = new THREE.Mesh(geoPel, matPel)
-          b.position.set(Math.cos(i * 2.1) * 1.7, 5.2 + (i % 3) * 0.7, Math.sin(i * 2.1) * 1.7)
-          b.castShadow = true
-          g.add(b)
-        }
-        ;[-1, 1].forEach(d => {
-          const pata = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.22, 0.22, 3.4, 6),
-            new THREE.MeshStandardMaterial({ color: '#33485f', roughness: 0.6, metalness: 0.35 })
-          )
-          pata.position.set(d * 2, 1.7, 0)
-          g.add(pata)
-        })
-        g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true } })
-        return g
-      }
-      // Dónde va sale de la cuenta del encuadre, no del ojo: con FOV 34 y esta
-      // pantalla el borde del cuadro cae a 0.54 x la distancia, así que a 14
-      // unidades el borde está en x≈7.6. Ahí va, entrando apenas por la
-      // izquierda durante todo el arranque.
-      // Va UNO SOLO, y en el arranque. Hubo un segundo sobre el recorrido
-      // final y tapaba la caja SARO entera: el tramo del envío tiene que
-      // quedar limpio, que es el remate de todo el guion.
-      {
-        // Corrido a la izquierda y un poco más lejos: antes entraba casi un
-        // tercio del cuadro y tapaba la lona. Ahora asoma por el borde, que es
-        // todo lo que tiene que hacer un elemento de primer plano.
-        const c = hacerCesto()
-        c.position.set(-9.4, SUELO_Y, -15.5)
-        c.rotation.y = -1.4
-        scene.add(c)
-      }
-
       // ── EL LOCAL ──
       // Del modelo de Meshy se usan SOLO las piezas del local (fachada, vidrio,
       // puerta, techo, cartel, mostrador y estantes): la cancha y los árboles
@@ -767,7 +734,11 @@ export default function ScrollLab() {
       // Van en el pasillo ENTRE las dos canchas (de -32.5 a -54.5, o sea
       // centrado en -43.5). Antes estaban en -58 y -92: las tres adentro de la
       // cancha de al lado, que es lo que se veía mal.
-      ;[[-43.5, 30, 0.4], [-43.5, 2, -0.3], [-43.5, -30, 0.9]].forEach(([x, z, r]) => hacerMesa(x, z, r))
+      // El local está rotado 90°, así que su ancho (8 m) va sobre Z: ocupa de
+      // z=14 a z=66. La primera mesa caía en 22-38, o sea adentro — se veía
+      // atravesarlo. Las tres se corren al tramo del pasillo que queda libre,
+      // con la sombrilla (radio 8) entrando entera.
+      ;[[-43.5, 2, 0.4], [-43.5, -26, -0.3], [-43.5, -54, 0.9]].forEach(([x, z, r]) => hacerMesa(x, z, r))
 
       // El alambrado perimetral se saca: competía con el cerramiento de la
       // cancha, que ahora ya tiene su propia reja.
@@ -1462,6 +1433,120 @@ export default function ScrollLab() {
       pelota.add(bola, costuraA, costuraB)
       bola.castShadow = true
 
+      // El cesto se arma ACA y no mas arriba porque usa la geometria y el
+      // material de la pelota del guion, que se definen unas lineas antes.
+      // ── PRIMER PLANO ──
+      // No había NADA cerca de cámara en todo el guion: la escena entera pasaba
+      // a media y larga distancia, y sin algo cercano que se superponga a lo
+      // lejano el ojo se queda sin una de las señales más fuertes de
+      // profundidad. Dos cestos de pelotas, que es lo que hay de verdad tirado
+      // en una cancha de club. Van al BORDE del cuadro, nunca al centro: la
+      // idea es que enmarquen, no que tapen la paleta ni la caja.
+      const hacerCesto = () => {
+        const g = new THREE.Group()
+        // Rejilla de verdad, no un cilindro translúcido: se dibuja la trama en
+        // un canvas y se usa de alphaMap, que es lo mismo que hace el alambrado
+        // de la cancha. Un cesto de pelotas es agujeros con alambre entre
+        // medio; pintarlo como vidrio esmerilado era lo que lo hacía de mentira.
+        // El alambre va en BLANCO porque el alphaMap se lee por BRILLO: blanco
+        // es opaco, negro es transparente. El color sale del material.
+        const tramaCnv = document.createElement('canvas')
+        tramaCnv.width = 64; tramaCnv.height = 64
+        {
+          const c = tramaCnv.getContext('2d')
+          c.fillStyle = '#000'; c.fillRect(0, 0, 64, 64)
+          c.strokeStyle = '#fff'; c.lineWidth = 5
+          for (let i = 0; i <= 64; i += 16) {
+            c.beginPath(); c.moveTo(i, 0); c.lineTo(i, 64); c.stroke()
+            c.beginPath(); c.moveTo(0, i); c.lineTo(64, i); c.stroke()
+          }
+        }
+        const texTrama = new THREE.CanvasTexture(tramaCnv)
+        texTrama.wrapS = texTrama.wrapT = THREE.RepeatWrapping
+        texTrama.repeat.set(9, 4)
+        const rejilla = new THREE.MeshStandardMaterial({
+          color: '#5B7285', roughness: 0.6, metalness: 0.3,
+          side: THREE.DoubleSide, transparent: true, alphaMap: texTrama,
+        })
+        const canasto = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 2.6, 5.6, 20, 1, true), rejilla)
+        canasto.position.y = 3.4
+        g.add(canasto)
+        const aro = new THREE.Mesh(new THREE.TorusGeometry(3.2, 0.16, 6, 16), rejilla)
+        aro.rotation.x = Math.PI / 2
+        aro.position.y = 6.2
+        g.add(aro)
+        // fondo, para que las pelotas no se vean caer por abajo
+        const fondoCesto = new THREE.Mesh(new THREE.CircleGeometry(2.6, 20), rejilla)
+        fondoCesto.rotation.x = -Math.PI / 2
+        fondoCesto.position.y = 0.6
+        g.add(fondoCesto)
+
+        // Lleno de pelotas, y las MISMAS que las del guion: la esfera y la
+        // costura van en dos InstancedMesh que comparten las matrices, así 34
+        // pelotas cuestan lo que dos objetos y no 68.
+        const LLENO = 34
+        const bolasInst = new THREE.InstancedMesh(geoBola, matFieltro, LLENO)
+        const costInst = new THREE.InstancedMesh(geoCostura, matCostura, LLENO)
+        bolasInst.castShadow = true
+        {
+          const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler()
+          const ESC = 0.85 / R_BOLA            // del tamaño real al del cesto
+          let n = 0
+          // apiladas en capas, cada una girada: se acomodan solas sin calcularlo
+          for (let capa = 0; capa < 5 && n < LLENO; capa++) {
+            const enCapa = capa < 4 ? 8 : 2
+            const radio = capa < 4 ? 1.55 : 0.6
+            for (let i = 0; i < enCapa && n < LLENO; i++) {
+              const a = (i / enCapa) * Math.PI * 2 + capa * 0.7
+              e.set(n * 1.1, n * 0.7, n * 0.4)
+              m.compose(
+                new THREE.Vector3(Math.cos(a) * radio, 1.5 + capa * 0.95, Math.sin(a) * radio),
+                q.setFromEuler(e),
+                new THREE.Vector3(ESC, ESC, ESC)
+              )
+              bolasInst.setMatrixAt(n, m)
+              costInst.setMatrixAt(n, m)
+              n++
+            }
+          }
+          bolasInst.count = costInst.count = n
+          bolasInst.instanceMatrix.needsUpdate = true
+          costInst.instanceMatrix.needsUpdate = true
+        }
+        g.add(bolasInst, costInst)
+
+        // Las patas van DEBAJO del fondo. Antes salían del piso hasta media
+        // altura y en x=±2, o sea por dentro del canasto (que abajo tiene radio
+        // 2.6): se veían cruzándolo por adentro.
+        ;[-1, 1].forEach(d => {
+          const pata = new THREE.Mesh(
+            new THREE.CylinderGeometry(0.22, 0.22, 0.7, 6),
+            new THREE.MeshStandardMaterial({ color: '#33485f', roughness: 0.6, metalness: 0.35 })
+          )
+          pata.position.set(d * 1.9, 0.3, 0)
+          g.add(pata)
+        })
+        g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true } })
+        return g
+      }
+      // Dónde va sale de la cuenta del encuadre, no del ojo: con FOV 34 y esta
+      // pantalla el borde del cuadro cae a 0.54 x la distancia, así que a 14
+      // unidades el borde está en x≈7.6. Ahí va, entrando apenas por la
+      // izquierda durante todo el arranque.
+      // Va UNO SOLO, y en el arranque. Hubo un segundo sobre el recorrido
+      // final y tapaba la caja SARO entera: el tramo del envío tiene que
+      // quedar limpio, que es el remate de todo el guion.
+      {
+        // Corrido a la izquierda y un poco más lejos: antes entraba casi un
+        // tercio del cuadro y tapaba la lona. Ahora asoma por el borde, que es
+        // todo lo que tiene que hacer un elemento de primer plano.
+        const c = hacerCesto()
+        c.position.set(-9.4, SUELO_Y, -15.5)
+        c.rotation.y = -1.4
+        scene.add(c)
+      }
+
+
       // k = 0 pelota · k = 1 caja. Mueve los vértices y el color a la vez.
       const posBola = geoBola.attributes.position
       let kAnterior = -1
@@ -1540,13 +1625,18 @@ export default function ScrollLab() {
       // cuadro. Es la misma idea del hero que ya está en la página pública.
       const JUEGO_HASTA = 0.055          // a partir de acá manda el guion
       const ESPERA = 0.42                // segundos mínimos entre pelota y pelota
-      const geoJuego = new THREE.SphereGeometry(R_BOLA, 20, 14)
-      const matJuego = new THREE.MeshStandardMaterial({ color: '#d8e83c', roughness: 0.95 })
+      // Las del lanzador son las MISMAS que la del guion: misma esfera, mismo
+      // fieltro y la misma costura. Antes eran una esfera lisa aparte y se
+      // notaba que eran otra pelota.
+      const geoJuego = geoBola
+      const matJuego = matFieltro
       const banco = []
       for (let i = 0; i < 5; i++) {
-        const m = new THREE.Mesh(geoJuego, matJuego)
+        const m = new THREE.Group()
+        const cuerpo = new THREE.Mesh(geoJuego, matJuego)
+        cuerpo.castShadow = true
+        m.add(cuerpo, new THREE.Mesh(geoCostura, matCostura))
         m.visible = false
-        m.castShadow = true
         scene.add(m)
         banco.push({ malla: m, viva: false, t: 0, dur: 1, zGolpe: CONTACTO.z, o: new THREE.Vector3(), v: new THREE.Vector3() })
       }
@@ -1873,15 +1963,15 @@ export default function ScrollLab() {
           // ENTRADA por el costado, no de frente a la cámara: antes venía casi
           // pegada al lente y no se leía la trayectoria.
           const te = suave(seg(t, 0.02, T_IMPACTO))
-          bx = mix(-17, CONTACTO.x, te)
-          bz = mix(3.5, CONTACTO.z, te)
-          by = mix(8.2, CONTACTO.y, te) - Math.sin(te * Math.PI) * 1.4
+          bx = mix(-17, CONTACTO_GUION.x, te)
+          bz = mix(3.5, CONTACTO_GUION.z, te)
+          by = mix(8.2, CONTACTO_GUION.y, te) - Math.sin(te * Math.PI) * 1.4
         } else {
           const tv = seg(t, T_IMPACTO, 0.92) * 2.60   // segundos de vuelo: da para UN pique
           const rz = tv < T_PIQUE ? tv : T_PIQUE + (tv - T_PIQUE) * 0.42
-          bx = CONTACTO.x + VX * rz
-          bz = CONTACTO.z + VZ * rz               // cruza la red y pica del otro lado
-          by = balistica(tv, CONTACTO.y, V0Y, G, PISO_FORMA, REBOTE)
+          bx = CONTACTO_GUION.x + VX * rz
+          bz = CONTACTO_GUION.z + VZ * rz         // cruza la red y pica del otro lado
+          by = balistica(tv, CONTACTO_GUION.y, V0Y, G, PISO_FORMA, REBOTE)
         }
         by = Math.max(by, PISO_FORMA)
         by = mix(by, SUELO_Y + R_BOLA * escalaForma + 0.02, suave(seg(t, 0.86, 1.00)))
@@ -1973,7 +2063,7 @@ export default function ScrollLab() {
         cancelAnimationFrame(raf)
         renderer.domElement.removeEventListener('pointerdown', alClic)
         renderer.domElement.removeEventListener('pointermove', alMover)
-        geoJuego.dispose(); matJuego.dispose()
+        // geoJuego/matJuego son los de la pelota del guion: los libera aquel bloque
         ro.disconnect()
         ;scene.traverse(o => {
           o.geometry?.dispose()
