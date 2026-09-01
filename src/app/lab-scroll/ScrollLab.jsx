@@ -21,12 +21,20 @@ import { ScrollTrigger } from 'gsap/ScrollTrigger'
 gsap.registerPlugin(useGSAP, ScrollTrigger)
 
 // `at` = punto del guion (0 a 1) donde entra cada texto; `lado` deja libre el otro.
+// El texto sale del que ya está en la landing pública, no inventado acá: si
+// la web dice "Control, potencia y polivalentes", el hero tiene que decir lo
+// mismo. Cuando cambie el copy de la landing, hay que actualizar esto.
 const ACTOS = [
-  { at: 0.01, lado: 'izq', k: 'La marca',  t: 'Paletas que se sienten distinto', d: '15 años fabricando en Argentina.' },
-  { at: 0.30, lado: 'der', k: 'El golpe',  t: 'Potencia que responde',           d: 'Carbono 12K: cada golpe vuelve.' },
-  { at: 0.48, lado: 'izq', k: 'En vuelo',  t: 'De la cancha a tu casa',          d: 'Seguimos la pelota hasta tu pedido.' },
-  { at: 0.68, lado: 'der', k: 'El envío',  t: 'Llega a todo el país',            d: 'Correo Argentino y vía Cargo.' },
-  { at: 0.86, lado: 'izq', k: 'Tu pedido', t: 'Armalo en 2 minutos',             d: 'Elegís y cerramos por WhatsApp.' },
+  { at: 0.01, lado: 'izq', k: 'Fábrica argentina', t: 'Paletas de pádel',
+    d: '15 años fabricando. Control, potencia y polivalentes.' },
+  { at: 0.30, lado: 'der', k: 'Tecnología',        t: 'Carbono para cada nivel',
+    d: 'Elegís el modelo según cómo jugás.' },
+  { at: 0.48, lado: 'izq', k: 'Tu pedido',         t: 'Armalo en dos minutos',
+    d: 'Colores, talles y cantidades. Las promos se aplican solas.' },
+  { at: 0.68, lado: 'der', k: 'El envío',          t: 'Envíos a todo el país',
+    d: 'Directo de fábrica, a donde estés.' },
+  { at: 0.86, lado: 'izq', k: 'Cerrás vos',        t: 'Cerrá por WhatsApp',
+    d: 'Te llega el pedido redactado para coordinar todo.' },
 ]
 
 // Tramo del scroll en el que transcurre el golpe completo (para la animación mocap)
@@ -55,12 +63,19 @@ const ALTO_PALETA = 3.9
 const CODO = 1.5              // cuánto por debajo del mango está el pivote del swing
 // Punto exacto donde la pelota toca el centro de la cara. Lo comparten la
 // entrada, el golpe y la salida: si cada tramo usa el suyo, la pelota salta.
-const IMPACTO = { x: 0, y: 3.2, z: -6 }
+// La paleta se aleja para que ocupe en pantalla LO MISMO que en el hero
+// público. Allá mide 5.2 de alto con la cámara a 11.5, o sea 0.452 de alto por
+// unidad de distancia. Acá mide 3.9 y la cámara está en (0, 4.4, 1.5): para dar
+// el mismo 0.452 tiene que quedar a 8.63, y de ahí sale este z.
+// Si cambiás ALTO_PALETA o la cámara del arranque, rehacé la cuenta.
+const IMPACTO = { x: 0, y: 3.2, z: -7.05 }
 // La pelota NO debe llegar al centro de la paleta sino a su CARA: la paleta
 // tiene 0.33 de grosor y la pelota 0.29 de radio, así que el contacto ocurre
 // 0.45 antes. Y en el instante del golpe el swing adelanta la paleta 0.42.
 // Sin esto la pelota entraba media unidad dentro del modelo: la atravesaba.
-const CONTACTO = { x: 0, y: 3.2, z: -6 + 0.42 + 0.45 }
+// Sale de IMPACTO y no de un -6 repetido a mano: si se mueve la paleta, el
+// punto de contacto la sigue solo.
+const CONTACTO = { x: IMPACTO.x, y: IMPACTO.y, z: IMPACTO.z + 0.42 + 0.45 }
 // Momento exacto en que la cara pasa por el punto de impacto (mitad del tramo
 // de golpe del swing). La pelota tiene que cambiar de rumbo JUSTO acá.
 // Mientras golpea, la paleta NO está en CONTACTO: el swing la adelanta con
@@ -176,7 +191,10 @@ export default function ScrollLab() {
       // fundirse con el horizonte.
       // OJO: el domo de cielo tiene radio 170. `far` TIENE que quedar por
       // debajo o la niebla no llega a cerrar y se ve el corte del domo.
-      scene.fog = new THREE.Fog('#f4f9fe', 125, 168)
+      // El gris que quedaba no venía tanto de la densidad como del COLOR: un
+      // celeste desaturado tiñe de gris todo lo que toca. Este tiene el celeste
+      // de la marca adentro, así que lo lejano se va a celeste, no a gris.
+      scene.fog = new THREE.Fog('#dcecfa', 130, 168)
       // (Hubo una niebla antes que lavaba el fondo: era densa y arrancaba
       // demasiado cerca. La de arriba empieza recién pasada la cancha.)
 
@@ -283,7 +301,10 @@ export default function ScrollLab() {
       texIbl.dispose()
       // Sube de 0.38 a 0.55: este entorno es más parejo y más claro que el
       // cuarto, así que con el valor viejo las sombras quedaban muertas.
-      scene.environmentIntensity = 0.55
+      // Baja de 0.55 a 0.42: el ambiente ilumina TODO por igual y, pasado
+      // cierto punto, aplana los colores y los empuja al gris. Con el sol más
+      // fuerte ya no hace falta tanto relleno.
+      scene.environmentIntensity = 0.42
       scene.add(new THREE.HemisphereLight('#ffffff', '#c3d1e5', 0.30))   // menos relleno = sombra más marcada
       // Sube de 1.15 a 1.6 y se entibia: el pedido era que el día se vea
       // SOLEADO. Con el relleno un poco más bajo, la diferencia entre la cara
@@ -929,8 +950,12 @@ export default function ScrollLab() {
               if (libre(Math.cos(ang) * rad, RED_Z + Math.sin(ang) * rad)) break
               rad += 10
             }
-            const alto = 7 + ((i * 3) % 4) * 2.4      // más chicos y más juntos
-            const ancho = alto * (1.5 + ((i * 5) % 3) * 0.25)   // más ancho que alto
+            // Antes salían de ((i*3)%4), que da sólo CUATRO alturas y se repiten
+            // en un patrón visible. Con dos ciclos de largos distintos (7 y 5,
+            // que no comparten divisores) la combinación tarda 35 arbustos en
+            // repetirse, así que se lee como variado y no como una guarda.
+            const alto = 5.5 + ((i * 3) % 7) * 1.15 + ((i * 5) % 5) * 0.75
+            const ancho = alto * (1.35 + ((i * 11) % 7) * 0.11)   // más ancho que alto
             e.set(0, i * 1.31, 0)
             m.compose(
               new THREE.Vector3(Math.cos(ang) * rad, SUELO_Y + alto * 0.72, RED_Z + Math.sin(ang) * rad),
@@ -1769,6 +1794,27 @@ export default function ScrollLab() {
       if (typeof window !== 'undefined') {
         window.__lab = {
           escena: scene, camara: camera,
+          codo, pelota, THREE,   // para medir choques de verdad, no por aproximación
+          // Igual que probarGolpe pero para el GUION (el golpe que dispara el
+          // scroll, no el clic). Son dos caminos distintos y hasta ahora sólo
+          // se medía el del clic: por eso el del guion se desincronizó sin que
+          // nadie lo notara. Recorre el tramo del golpe y devuelve el punto de
+          // MÁXIMO acercamiento entre la pelota y la cara de la paleta.
+          probarGuion() {
+            let sep = Infinity, cuando = 0, dentro = 0
+            for (let t = 0.16; t <= 0.46; t += 0.0025) {
+              dibujar(t)
+              const prog = seg(t, 0.12, 0.48)
+              const caraZ = IMPACTO.z + empujeDe(prog, SHOTS.drive.thrust) + 0.42
+              const d = pelota.position.z - caraZ
+              if (Math.abs(d) < Math.abs(sep)) { sep = d; cuando = t }
+              if (d < -0.02) dentro++          // cuadros con la pelota DETRÁS de la cara
+            }
+            return { separacion: +sep.toFixed(3), radioPelota: 0.45,
+                     enT: +cuando.toFixed(3), cuadrosAtravesando: dentro,
+                     veredicto: dentro > 0 ? 'LA ATRAVIESA'
+                       : Math.abs(sep - 0.45) < 0.10 ? 'toca la cara' : 'pasa de largo' }
+          },
           bloom, vineta,   // para comparar valores sin recompilar
           ao: gtao,   // para prender/apagar la oclusión y comparar el costo
           // Cuánto cuesta dibujar un cuadro, en milisegundos. No usa
@@ -1962,9 +2008,18 @@ export default function ScrollLab() {
         if (t < T_IMPACTO) {
           // ENTRADA por el costado, no de frente a la cámara: antes venía casi
           // pegada al lente y no se leía la trayectoria.
-          const te = suave(seg(t, 0.02, T_IMPACTO))
+          // Acelera al llegar, no desacelera. `suave` (smoothstep) frena la
+          // pelota justo antes del impacto, y ahí se quedaba flotando en la
+          // zona que barre la paleta: por eso la alcanzaba. Una pelota en
+          // vuelo no frena, así que al cuadrado además de real es lo que
+          // resuelve el cruce.
+          const te = Math.pow(seg(t, 0.02, T_IMPACTO), 2)
+          // Y en Z entra todavía un poco más tarde: durante el swing la paleta
+          // rota en Y, queda de canto y su borde barre hacia adelante casi un
+          // ancho de paleta.
+          const tz = te * te
           bx = mix(-17, CONTACTO_GUION.x, te)
-          bz = mix(3.5, CONTACTO_GUION.z, te)
+          bz = mix(3.5, CONTACTO_GUION.z, tz)
           by = mix(8.2, CONTACTO_GUION.y, te) - Math.sin(te * Math.PI) * 1.4
         } else {
           const tv = seg(t, T_IMPACTO, 0.92) * 2.60   // segundos de vuelo: da para UN pique
@@ -1986,11 +2041,18 @@ export default function ScrollLab() {
         // Arranca cerca para que la paleta se lea como protagonista, y termina
         // un poco más lejos y más alta: pegada al piso, la red entraba de canto
         // cortando la pantalla en diagonal.
-        // Calibrado para FOV 34: a 7.5 la paleta ocupa el 63% del alto, igual que
-        // en el hero de la página pública. Al final se acerca a 6.5 para que la
-        // caja se lea, y desde esa altura la red queda fuera del cuadro en vez
-        // de cruzarlo en diagonal.
-        const dist = mix(7.5, 6.5, suave(seg(t, 0.40, 0.92)))
+        // La cámara ORBITA alrededor de la paleta, así que alejar la paleta no
+        // sirve de nada: la cámara la sigue. El tamaño en pantalla lo fija este
+        // radio y nada más.
+        // En el hero público la paleta mide 5.2 con la cámara a 11.5, o sea
+        // 0.452 de alto por unidad de distancia. Acá mide 3.9, así que para dar
+        // lo mismo la cámara tiene que estar a 8.63 (contando el 1.2 de altura,
+        // el radio es 8.55). Al final se acerca para que la caja se lea.
+        const RADIO_INICIO = 8.55
+        // Pantalla angosta (celular vertical): con el FOV vertical fijo, la
+        // paleta llenaba el alto entero. Se aleja igual que en el hero público.
+        const angosto = Math.max(1, 0.58 / (camera.aspect || 1))
+        const dist = mix(RADIO_INICIO, 7.4, suave(seg(t, 0.40, 0.92))) * angosto
         const alto = mix(1.2, 2.4, suave(seg(t, 0.45, 0.92)))
         camera.position.set(
           foco.x + Math.sin(giro) * dist,
@@ -2135,8 +2197,16 @@ export default function ScrollLab() {
                 // el mismo punto absoluto y, sin la animación que los turna,
                 // quedarían encimados e ilegibles
                 ? 'acto relative mx-auto w-[min(90vw,560px)] text-left bg-white/85 backdrop-blur rounded-2xl px-5 py-4 mb-3 shadow-card'
-                : `acto acto-${i} absolute top-1/2 -translate-y-1/2 w-[min(86vw,380px)] ${
-                    a.lado === 'izq' ? 'left-5 sm:left-16 text-left' : 'right-5 sm:right-16 text-right'
+                // En el celular NO van al costado ni al medio: la pantalla es
+                // angosta y quedaban encima de la paleta, ilegibles. Van abajo,
+                // a lo ancho y sobre un panel claro. Recién en sm: vuelven a
+                // los costados, que es donde hay lugar de sobra.
+                : `acto acto-${i} absolute w-[calc(100%-2rem)] left-4 right-4 bottom-8 text-left
+                   bg-white/85 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-card
+                   sm:w-[min(86vw,380px)] sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2
+                   sm:bg-transparent sm:backdrop-blur-none sm:rounded-none sm:px-0 sm:py-0 sm:shadow-none ${
+                    a.lado === 'izq' ? 'sm:left-16 sm:right-auto sm:text-left'
+                                     : 'sm:right-16 sm:left-auto sm:text-right'
                   }`
             }
           >
