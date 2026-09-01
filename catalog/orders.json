@@ -1086,5 +1086,21 @@
     ],
     "total": 191000,
     "totalItems": 26
+  },
+  {
+    "id": "o1788277948138",
+    "fecha": "2026-09-01T15:52:28.138Z",
+    "items": [
+      {
+        "productId": "p1779990539906",
+        "nombre": "Saro Nexus woman ",
+        "precio": 140000,
+        "color": "Rosa claro",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 140000,
+    "totalItems": 1
   }
 ]
