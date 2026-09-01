@@ -63,6 +63,25 @@ const IMPACTO = { x: 0, y: 3.2, z: -6 }
 const CONTACTO = { x: 0, y: 3.2, z: -6 + 0.42 + 0.45 }
 // Momento exacto en que la cara pasa por el punto de impacto (mitad del tramo
 // de golpe del swing). La pelota tiene que cambiar de rumbo JUSTO acá.
+// Mientras golpea, la paleta NO está en CONTACTO: el swing la adelanta con
+// `empuje`, así que la cara queda esa distancia más adelante. Esta función es la
+// ÚNICA fuente de ese número, y la usan los dos lados: el swing para mover la
+// paleta y la pelota para saber a dónde tiene que llegar. Cuando cada uno lo
+// calculaba por su cuenta, la pelota apuntaba a la cara en reposo y llegaba con
+// el swing ya terminado — por eso la atravesaba.
+const empujeDe = (prog, thrust = 0) => {
+  const w   = suave(seg(prog, 0, 0.35))
+  const sw  = suave(seg(prog, 0.35, 0.60))
+  const rec = suave(seg(prog, 0.60, 1))
+  return thrust * (-0.4 * w * (1 - sw) + sw * (1 - rec))
+}
+// Instante del swing en el que la pelota se encuentra con la cara. Es el PICO
+// del empuje: el punto más adelantado del swing, donde la paleta deja de ir
+// hacia adelante y empieza a volver. Antes estaba en 0.5 y la paleta seguía
+// avanzando después del encuentro, así que alcanzaba a la pelota y se la comía
+// — cuanto más fuerte el golpe, peor (la volea se hundía un cuarto de unidad).
+const P_GOLPE = 0.6
+
 const T_IMPACTO = 0.291
 
 // Los cinco tipos de golpe, con los valores exactos del hero de la página
@@ -113,7 +132,12 @@ export default function ScrollLab() {
       import('three/examples/jsm/loaders/GLTFLoader.js'),
       import('three/examples/jsm/libs/meshopt_decoder.module.js'),
       import('three/examples/jsm/environments/RoomEnvironment.js'),
-    ]).then(([THREE, { GLTFLoader }, { MeshoptDecoder }, { RoomEnvironment }]) => {
+      import('three/examples/jsm/postprocessing/EffectComposer.js'),
+      import('three/examples/jsm/postprocessing/RenderPass.js'),
+      import('three/examples/jsm/postprocessing/GTAOPass.js'),
+      import('three/examples/jsm/postprocessing/OutputPass.js'),
+    ]).then(([THREE, { GLTFLoader }, { MeshoptDecoder }, { RoomEnvironment },
+              { EffectComposer }, { RenderPass }, { GTAOPass }, { OutputPass }]) => {
       if (disposed) return
       const mount = mountRef.current
       if (!mount) return
@@ -142,6 +166,31 @@ export default function ScrollLab() {
       renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
       renderer.setSize(W(), H())
       mount.appendChild(renderer.domElement)
+
+      // ── OCLUSIÓN AMBIENTAL ──
+      // Las sombras proyectadas dicen dónde pega el sol, pero no oscurecen los
+      // rincones: donde el alambrado toca el piso, debajo del banco, entre los
+      // bollos de un arbusto. Sin eso los objetos parecen apoyados encima de la
+      // escena en vez de estar adentro, y es buena parte de lo que se lee como
+      // "barato". GTAO calcula ese oscurecimiento por geometría, cada cuadro.
+      const composer = new EffectComposer(renderer)
+      composer.addPass(new RenderPass(scene, camera))
+      const gtao = new GTAOPass(scene, camera, W(), H())
+      gtao.output = GTAOPass.OUTPUT.Default        // AO mezclado, no el AO solo
+      // Radio en unidades de la escena: 1 unidad ~ 15,5 cm, así que 6 son unos
+      // 90 cm — el tamaño de los recovecos que queremos marcar.
+      gtao.updateGtaoMaterial({ radius: 6, distanceExponent: 1.2, thickness: 1.4,
+                                scale: 1.1, samples: 8 })
+      // El AO es un pase entero de pantalla y cuesta. En un celular ese costo
+      // sale del mismo presupuesto que la animación, y un hero que se traba es
+      // peor que un hero sin oclusión: se apaga solo en pantallas chicas y en
+      // equipos de pocos núcleos. En desktop queda prendido.
+      const equipoFlojo = (navigator.hardwareConcurrency || 4) <= 4
+      gtao.enabled = W() >= 900 && !equipoFlojo
+      composer.addPass(gtao)
+      composer.addPass(new OutputPass())           // tonemapping va al final
+      composer.setSize(W(), H())
+      composer.setPixelRatio(Math.min(devicePixelRatio, 2))
 
       // Iluminación de entorno: el modelo real necesita reflejos para verse bien
       const pmrem = new THREE.PMREMGenerator(renderer)
@@ -177,6 +226,23 @@ export default function ScrollLab() {
       // Medidas reales: una cancha de pádel es de 20 x 10 m, que con esta escala
       // son 129 x 65 unidades. Van acá arriba porque las usa todo lo demás.
       const CANCHA_LARGO = 129, CANCHA_ANCHO = 65
+
+      // Dónde está cada cancha del club. UNA sola lista, y de acá salen las dos
+      // cosas: qué canchas se dibujan y de dónde hay que sacar los objetos del
+      // entorno. Antes había dos versiones que no se hablaban — los arbustos
+      // esquivaban tres canchas puestas a lo ancho que no existían, y la única
+      // cancha que se dibujaba estaba al fondo, así que nadie la esquivaba. Ese
+      // era el desorden: plantas creciendo adentro de la cancha de al lado.
+      const SEPARACION = 22            // el pasillo entre cancha y cancha
+      const CANCHAS = [
+        { x: 0, z: RED_Z, principal: true },
+        { x: -(CANCHA_ANCHO + SEPARACION), z: RED_Z },                 // la de al lado
+        { x: 0, z: RED_Z - (CANCHA_LARGO + SEPARACION) },              // la del fondo
+      ]
+      // ¿Este punto está fuera de TODAS las canchas, con su vereda incluida?
+      const libre = (x, z, margen = 12) => CANCHAS.every(c =>
+        Math.abs(x - c.x) > CANCHA_ANCHO / 2 + margen ||
+        Math.abs(z - c.z) > CANCHA_LARGO / 2 + margen)
 
       // Domo de cielo: un degradé suave alrededor de todo, para que fuera de la
       // cancha no quede el vacío blanco. Va por dentro de una esfera enorme, así
@@ -365,9 +431,7 @@ export default function ScrollLab() {
         for (let i = 0; i < 60; i++) {
           const x = Math.cos(ang) * r
           const z = RED_Z + Math.sin(ang) * r
-          const dentro = Math.abs(x) < CANCHA_ANCHO / 2 + MARGEN &&
-                         Math.abs(z - RED_Z) < CANCHA_LARGO / 2 + MARGEN
-          if (!dentro) return [x, z]
+          if (libre(x, z, MARGEN)) return [x, z]
           r += 5
         }
         return [Math.cos(ang) * r, RED_Z + Math.sin(ang) * r]
@@ -422,21 +486,46 @@ export default function ScrollLab() {
         afuera.add(b2)
       })
 
-      // Arbustos de tres portes, para que el verde no sea liso ni repetido
+      // ── ARBUSTOS ──
+      // Hechos por código, igual que el banco y la red. Los modelos descargados
+      // traían las hojas una por una y textura fotográfica: al lado de una
+      // cancha de color liso y una red de líneas desentonaban, y aplanarles la
+      // textura no alcanzó. El problema no era el color, era el NIVEL DE
+      // DETALLE — un objeto fotográfico entre objetos esquemáticos canta.
+      // Un icosaedro de pocas caras con flatShading da una masa de follaje
+      // facetada, que habla el mismo idioma que todo lo demás.
+      const geoFollaje = new THREE.IcosahedronGeometry(1, 1)
+      const VERDES = ['#5f8f4e', '#6d9b55', '#4e7a42', '#78a561']
+      const matFollaje = VERDES.map(c => new THREE.MeshStandardMaterial({
+        color: c, roughness: 1, flatShading: true,
+      }))
+      // Un arbusto son dos o tres bollos pegados: así no es una bola perfecta
+      const hacerArbusto = (alto, semilla) => {
+        const g = new THREE.Group()
+        const bollos = 2 + (semilla % 2)
+        for (let i = 0; i < bollos; i++) {
+          const b = new THREE.Mesh(geoFollaje, matFollaje[(semilla + i) % VERDES.length])
+          const r = alto * (0.52 - i * 0.09)
+          b.scale.set(r * 1.25, r, r * 1.25)              // achatado, como un arbusto
+          b.position.set((i - 0.5) * alto * 0.38, r * 0.86, ((semilla + i) % 3 - 1) * alto * 0.2)
+          b.castShadow = true
+          b.receiveShadow = true
+          g.add(b)
+        }
+        return g
+      }
+      // Tres portes, para que el verde no sea liso ni repetido
       ;[
-        ['/models/arbusto3.glb', [0.04, 0.34, 0.68, 0.92], 9, 96],    // los grandes, al fondo
-        ['/models/arbusto.glb',  [0.16, 0.46, 0.8], 6, 74],           // medianos
-        ['/models/mata.glb',     [0.1, 0.26, 0.4, 0.56, 0.72, 0.88], 3.4, 62],  // chicos, cerca
-      ].forEach(([ruta, lugares, escala, radio]) => {
-        ponerModelo(ruta, (base) => {
-          lugares.forEach((f, i) => {
-            const [x, z] = enArco(f, radio + (i % 3) * 14, (i % 2 ? 0.09 : -0.09))
-            const a2 = base.clone()
-            a2.scale.multiplyScalar(escala * (0.82 + (i % 3) * 0.16))
-            a2.position.set(x, SUELO_Y, z)
-            a2.rotation.y = i * 1.7
-            afuera.add(a2)
-          })
+        [[0.04, 0.34, 0.68, 0.92], 15, 96],                       // grandes, al fondo
+        [[0.16, 0.46, 0.8], 10, 74],                              // medianos
+        [[0.1, 0.26, 0.4, 0.56, 0.72, 0.88], 6, 62],              // chicos, cerca
+      ].forEach(([lugares, alto, radio], fila) => {
+        lugares.forEach((f, i) => {
+          const [x, z] = enArco(f, radio + (i % 3) * 14, (i % 2 ? 0.09 : -0.09))
+          const a2 = hacerArbusto(alto * (0.82 + (i % 3) * 0.16), fila * 3 + i)
+          a2.position.set(x, SUELO_Y, z)
+          a2.rotation.y = i * 1.7
+          afuera.add(a2)
         })
       })
 
@@ -621,75 +710,68 @@ export default function ScrollLab() {
       // liso que había antes se leía como un rectángulo de color plano porque no
       // tenía ni textura ni volumen. Van con InstancedMesh: setenta arbustos
       // cuestan lo mismo que uno para la placa de video.
-      loader.load('/models/arbusto3.glb', gltf => {
-        if (disposed) return
-        gltf.scene.updateMatrixWorld(true)
-        const caja = new THREE.Box3().setFromObject(gltf.scene)
-        const t = new THREE.Vector3(); caja.getSize(t)
-        const c = new THREE.Vector3(); caja.getCenter(c)
-        const unidad = 1 / (t.y || 1)
-        // Dos filas desfasadas: con una sola se veía el fondo entre planta y
-        // planta. Y se ensanchan más de lo que se estiran, porque el modelo es
-        // más alto que ancho y así tapa de verdad.
-        const FILAS = [
-          { radio: 172, cuantos: 110, desfase: 0 },
-          { radio: 186, cuantos: 110, desfase: Math.PI / 110 },
-        ]
-        const TOTAL = FILAS.reduce((n, f) => n + f.cuantos, 0)
-        gltf.scene.traverse(o => {
-          if (!o.isMesh) return
-          const geo = o.geometry.clone()
-          geo.applyMatrix4(o.matrixWorld)
-          geo.translate(-c.x, -caja.min.y, -c.z)
-          geo.scale(unidad, unidad, unidad)
-          const mat = o.material.clone()
-          mat.side = THREE.DoubleSide
-          const inst = new THREE.InstancedMesh(geo, mat, TOTAL)
-          inst.castShadow = true
-          inst.receiveShadow = true
-          const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler()
-          // el anillo cruza por encima de las canchas vecinas: los que caerían
-          // adentro se empujan hacia afuera hasta salir
-          const CANCHAS = [0, -(CANCHA_ANCHO + 26), -(CANCHA_ANCHO + 26) * 2]
-          let n = 0
-          for (const fila of FILAS) {
-            for (let i = 0; i < fila.cuantos; i++) {
-              const ang = (i / fila.cuantos) * Math.PI * 2 + fila.desfase
-              let rad = fila.radio + ((i * 7) % 5) * 3
-              for (let intento = 0; intento < 24; intento++) {
-                const px = Math.cos(ang) * rad
-                const pz = RED_Z + Math.sin(ang) * rad
-                const choca = CANCHAS.some(cx =>
-                  Math.abs(px - cx) < CANCHA_ANCHO / 2 + 12 &&
-                  Math.abs(pz - RED_Z) < CANCHA_LARGO / 2 + 12)
-                if (!choca) break
-                rad += 10
-              }
-              const alto = 22 + ((i * 3) % 4) * 6
-              const ancho = alto * (1.5 + ((i * 5) % 3) * 0.25)   // más ancho que alto
-              e.set(0, i * 1.31, 0)
-              m.compose(
-                new THREE.Vector3(Math.cos(ang) * rad, SUELO_Y, RED_Z + Math.sin(ang) * rad),
-                q.setFromEuler(e),
-                new THREE.Vector3(ancho, alto, ancho)
-              )
-              inst.setMatrixAt(n++, m)
-            }
-          }
-          inst.instanceMatrix.needsUpdate = true
-          inst.frustumCulled = false
-          afuera.add(inst)
-        })
-      }, undefined, () => { /* sin arbustos, el horizonte queda al cielo */ })
-
-      // otra cancha a lo lejos, apenas insinuada: da idea de club, no de cancha suelta
-      const vecina = new THREE.Mesh(
-        new THREE.PlaneGeometry(58, 26),
-        new THREE.MeshStandardMaterial({ color: '#8fc0e8', roughness: 0.95 })
+      // El seto es el mismo follaje facetado, repetido con InstancedMesh: 220
+      // arbustos cuestan lo mismo que uno para la placa de video. Dos filas
+      // desfasadas, porque con una sola se veía el fondo entre planta y planta.
+      const FILAS = [
+        { radio: 172, cuantos: 110, desfase: 0 },
+        { radio: 186, cuantos: 110, desfase: Math.PI / 110 },
+      ]
+      const TOTAL = FILAS.reduce((n, f) => n + f.cuantos, 0)
+      const seto = new THREE.InstancedMesh(
+        geoFollaje,
+        new THREE.MeshStandardMaterial({ roughness: 1, flatShading: true }),
+        TOTAL
       )
-      vecina.rotation.x = -Math.PI / 2
-      vecina.position.set(0, -2.98, RED_Z - 96)
-      afuera.add(vecina)
+      seto.castShadow = true
+      seto.receiveShadow = true
+      {
+        const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler()
+        const col = new THREE.Color()
+        let n = 0
+        for (const fila of FILAS) {
+          for (let i = 0; i < fila.cuantos; i++) {
+            const ang = (i / fila.cuantos) * Math.PI * 2 + fila.desfase
+            let rad = fila.radio + ((i * 7) % 5) * 3
+            // si cae adentro de una cancha se empuja hacia afuera hasta salir
+            for (let intento = 0; intento < 24; intento++) {
+              if (libre(Math.cos(ang) * rad, RED_Z + Math.sin(ang) * rad)) break
+              rad += 10
+            }
+            const alto = 13 + ((i * 3) % 4) * 4
+            const ancho = alto * (1.5 + ((i * 5) % 3) * 0.25)   // más ancho que alto
+            e.set(0, i * 1.31, 0)
+            m.compose(
+              new THREE.Vector3(Math.cos(ang) * rad, SUELO_Y + alto * 0.72, RED_Z + Math.sin(ang) * rad),
+              q.setFromEuler(e),
+              new THREE.Vector3(ancho, alto, ancho)
+            )
+            seto.setMatrixAt(n, m)
+            seto.setColorAt(n, col.set(VERDES[i % VERDES.length]))
+            n++
+          }
+        }
+        seto.instanceMatrix.needsUpdate = true
+        if (seto.instanceColor) seto.instanceColor.needsUpdate = true
+      }
+      seto.frustumCulled = false
+      afuera.add(seto)
+
+      // Las canchas vecinas, insinuadas: dan idea de club y no de cancha suelta.
+      // Salen de la misma lista y con la MISMA medida que la principal — antes
+      // era un rectángulo de 58 x 26 puesto a mano, que a esta escala no era
+      // una cancha de pádel sino un rectángulo cualquiera.
+      for (const c of CANCHAS) {
+        if (c.principal) continue
+        const v2 = new THREE.Mesh(
+          new THREE.PlaneGeometry(CANCHA_ANCHO, CANCHA_LARGO),
+          new THREE.MeshStandardMaterial({ color: '#8fc0e8', roughness: 0.95 })
+        )
+        v2.rotation.x = -Math.PI / 2
+        v2.position.set(c.x, -2.98, c.z)
+        v2.receiveShadow = true
+        afuera.add(v2)
+      }
       scene.add(afuera)
 
       const explanada = new THREE.Mesh(
@@ -1246,7 +1328,7 @@ export default function ScrollLab() {
         m.visible = false
         m.castShadow = true
         scene.add(m)
-        banco.push({ malla: m, viva: false, t: 0, dur: 1, o: new THREE.Vector3(), v: new THREE.Vector3() })
+        banco.push({ malla: m, viva: false, t: 0, dur: 1, zGolpe: CONTACTO.z, o: new THREE.Vector3(), v: new THREE.Vector3() })
       }
       const juego = { ultimo: -99, activo: true }
       // Reloj propio del golpe por clic, igual que en el hero público: avanza con
@@ -1303,7 +1385,10 @@ export default function ScrollLab() {
         clic.t = 0
         clic.dur = dur
         clic.lado = b.o.x <= CONTACTO.x ? 1 : -1     // de qué lado entra la pelota
-        b.dur = dur                                   // la pelota llega justo al golpe
+        // La pelota tiene que llegar EN el golpe (P_GOLPE del swing), no al
+        // final: si viaja el swing entero, la paleta ya volvió al reposo.
+        b.dur = dur * P_GOLPE
+        b.zGolpe = CONTACTO.z + empujeDe(P_GOLPE, clic.tiro.thrust || 0)
       }
 
       renderer.domElement.style.cursor = 'pointer'
@@ -1336,7 +1421,7 @@ export default function ScrollLab() {
             b.malla.position.set(
               b.o.x + (CONTACTO.x - b.o.x) * f,
               b.o.y + (CONTACTO.y - b.o.y) * f + Math.sin(f * Math.PI) * 1.2,
-              b.o.z + (CONTACTO.z - b.o.z) * f
+              b.o.z + (b.zGolpe - b.o.z) * f
             )
           } else {
             // devuelta: recta y con gravedad suave hasta salir de cuadro
@@ -1344,7 +1429,7 @@ export default function ScrollLab() {
             b.malla.position.set(
               CONTACTO.x + b.v.x * s,
               CONTACTO.y + b.v.y * s - 4 * s * s,
-              CONTACTO.z + b.v.z * s
+              b.zGolpe + b.v.z * s
             )
             if (s > 1.5 || b.malla.position.y < SUELO_Y) { b.viva = false; b.malla.visible = false }
           }
@@ -1355,6 +1440,8 @@ export default function ScrollLab() {
 
       const onResize = () => {
         renderer.setSize(W(), H())
+        composer.setSize(W(), H())
+        gtao.setSize(W(), H())
         camera.aspect = W() / H()
         camera.updateProjectionMatrix()
       }
@@ -1371,6 +1458,69 @@ export default function ScrollLab() {
       if (typeof window !== 'undefined') {
         window.__lab = {
           escena: scene, camara: camera,
+          ao: gtao,   // para prender/apagar la oclusión y comparar el costo
+          // Cuánto cuesta dibujar un cuadro, en milisegundos. No usa
+          // requestAnimationFrame a propósito: con la pestaña en segundo plano
+          // el navegador lo pausa y la medición nunca termina.
+          // OJO: encadena renders sin esperar al monitor, así que satura la
+          // placa y da un número peor que el real. Sirve para COMPARAR dos
+          // variantes entre sí, no para decir a cuántos cuadros va la página.
+          medirCuadro(veces = 40, t = 0.5) {
+            progRef.current.t = t
+            dibujar(t); composer.render()              // el primero calienta
+            const t0 = performance.now()
+            for (let i = 0; i < veces; i++) { dibujar(t); composer.render() }
+            const ms = (performance.now() - t0) / veces
+            return { msPorCuadro: +ms.toFixed(2), fpsTecho: Math.round(1000 / ms),
+                     tam: [renderer.domElement.width, renderer.domElement.height] }
+          },
+          // Vista desde arriba de todo el club. Es la forma directa de ver si
+          // quedó algo plantado adentro de una cancha: se miran los rectángulos
+          // y lo que tienen encima, sin depender de contar objetos a mano.
+          desdeArriba(alto = 420) {
+            progRef.current.t = 0.5
+            dibujar(0.5)
+            const p = camera.position.clone(), q = camera.quaternion.clone(), f = camera.fov
+            const cx = -(CANCHA_ANCHO + SEPARACION) / 2
+            camera.position.set(cx, alto, RED_Z - CANCHA_LARGO / 2)
+            camera.fov = 55
+            camera.updateProjectionMatrix()
+            camera.lookAt(cx, SUELO_Y, RED_Z - CANCHA_LARGO / 2)
+            composer.render()
+            const img = renderer.domElement.toDataURL('image/webp', 0.75)
+            camera.position.copy(p); camera.quaternion.copy(q)
+            camera.fov = f; camera.updateProjectionMatrix()
+            return img
+          },
+          // Mide de verdad si la pelota y la paleta se encuentran: simula un
+          // golpe cuadro a cuadro y devuelve la separación MÍNIMA entre la
+          // pelota y la cara. Si da más que el radio de la pelota, pasó de
+          // largo; si da muy negativo, la atravesó.
+          probarGolpe(tipo = 'drive') {
+            progRef.current.t = 0
+            puntero.set(-0.35, 0.1)
+            juego.ultimo = -99
+            lanzar()
+            if (!clic.activo) return 'no salio ninguna pelota'
+            clic.tiro = SHOTS[tipo] || SHOTS.drive
+            const b = banco.find(x => x.viva)
+            b.zGolpe = CONTACTO.z + empujeDe(P_GOLPE, clic.tiro.thrust || 0)
+            let sep = Infinity, cuando = 0
+            const PASO = 1 / 240
+            for (let i = 0; i < 480 && b.viva; i++) {
+              moverJuego(PASO, true)
+              clic.t += PASO / clic.dur
+              if (clic.t >= 1) clic.activo = false
+              const caraZ = IMPACTO.z + empujeDe(Math.min(1, clic.t), clic.tiro.thrust || 0) + 0.42
+              const d = b.malla.position.z - caraZ      // separación al plano de la cara
+              if (Math.abs(d) < Math.abs(sep)) { sep = d; cuando = clic.t }
+            }
+            b.viva = false; b.malla.visible = false; clic.activo = false
+            return { tipo, separacion: +sep.toFixed(3), radioPelota: 0.45,
+                     enProg: +cuando.toFixed(3),
+                     veredicto: Math.abs(sep - 0.45) < 0.08 ? 'toca la cara'
+                       : sep < 0 ? 'LA ATRAVIESA' : 'pasa de largo' }
+          },
           ver(t) { progRef.current.t = t; dibujar(t); return renderer.domElement.toDataURL('image/webp', 0.7) },
           // encuadra toda la escena: sirve para comprobar que hay geometría
           vistaGeneral(t = 0.05) {
@@ -1385,7 +1535,7 @@ export default function ScrollLab() {
             const d = Math.max(sz.x, sz.y, sz.z) * 1.4
             camera.position.set(c.x, c.y + sz.y * 0.1, c.z + d)
             camera.lookAt(c)
-            renderer.render(scene, camera)
+            composer.render()
             return { mallas, centro: c.toArray().map(n => +n.toFixed(1)), img: renderer.domElement.toDataURL('image/webp', 0.7) }
           },
         }
@@ -1455,7 +1605,7 @@ export default function ScrollLab() {
         codo.rotation.z = (0.42 * w - 1.10 * sw + 0.70 * rec) * lado * tiro.zAmp
         codo.rotation.x = -0.30 * w * (1 - sw) + tiro.xBias * (0.35 * w + pico)
         codo.rotation.y = tiro.yAmp * lado * suave(seg(prog, 0, 0.3)) * (1 - suave(seg(prog, 0.62, 1)))
-        const empuje = (tiro.thrust || 0) * (-0.4 * w * (1 - sw) + pico)
+        const empuje = empujeDe(prog, tiro.thrust || 0)
         // el revés muestra la otra cara y vuelve
         if (tiro.flip) codo.rotation.y += Math.PI * 2 * lado * suave(seg(prog, 0.1, 0.9))
 
@@ -1590,7 +1740,7 @@ export default function ScrollLab() {
         // del mismo tamaño y no seguía la distancia: se apaga.
         sombra.visible = false
 
-        renderer.render(scene, camera)
+        composer.render()
       }
       frame()
 
