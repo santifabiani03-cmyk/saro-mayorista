@@ -1524,8 +1524,7 @@
     "genero": "",
     "parteCuerpo": "",
     "colores": [
-      "Negro",
-      "Rojo"
+      "Rojo/Negro"
     ],
     "talles": [
       "Única"
@@ -1536,10 +1535,17 @@
     "_aiLoading": false,
     "_aiCount": 11,
     "id": "p1787356327294",
+    "fechaPublicacion": "2026-08-21T23:52:07.295Z",
+    "fechaActualizacion": "2026-09-02T16:36:26.915Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787356252259.webp"
     ],
-    "fechaPublicacion": "2026-08-21T23:52:07.295Z"
+    "colorDefs": {
+      "Rojo/Negro": [
+        "Negro",
+        "Rojo"
+      ]
+    }
   },
   {
     "nombre": "REMERON DRY ELAS. DAMA",
