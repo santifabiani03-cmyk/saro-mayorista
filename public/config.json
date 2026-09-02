@@ -1,10 +1,10 @@
 {
   "storeName": "SARO Mayorista",
-  "whatsappNumber": "5491123208058",
+  "whatsappNumber": "5491159669379",
   "minPurchase": 10,
   "suggestedMinPurchase": 200,
   "currency": "ARS",
   "mostrarCompraMinima": true,
   "minPurchaseNuevo": 180,
-  "minPurchaseCliente": 10
+  "minPurchaseCliente": 0
 }
