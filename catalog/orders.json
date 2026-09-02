@@ -1102,5 +1102,149 @@
     ],
     "total": 140000,
     "totalItems": 1
+  },
+  {
+    "id": "o1788354294344",
+    "fecha": "2026-09-02T13:04:54.344Z",
+    "items": [
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 4
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "XL",
+        "cantidad": 4
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "LILA",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "LILA",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Azul",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Azul",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "S",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715433764",
+        "nombre": "CAMPERA ROMPEVIENTOS BASICA ESTAMPADA DAMA ",
+        "precio": 19500,
+        "color": "Blanco",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715433764",
+        "nombre": "CAMPERA ROMPEVIENTOS BASICA ESTAMPADA DAMA ",
+        "precio": 19500,
+        "color": "Blanco",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715433764",
+        "nombre": "CAMPERA ROMPEVIENTOS BASICA ESTAMPADA DAMA ",
+        "precio": 19500,
+        "color": "Blanco",
+        "talle": "XL",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715378297",
+        "nombre": "BUZO ENTRENAMIENTO LIVIANO DAMA ",
+        "precio": 16000,
+        "color": "Negro",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715378297",
+        "nombre": "BUZO ENTRENAMIENTO LIVIANO DAMA ",
+        "precio": 16000,
+        "color": "Naranja",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715378297",
+        "nombre": "BUZO ENTRENAMIENTO LIVIANO DAMA ",
+        "precio": 16000,
+        "color": "Naranja",
+        "talle": "M",
+        "cantidad": 1
+      }
+    ],
+    "total": 273000,
+    "totalItems": 26
   }
 ]
