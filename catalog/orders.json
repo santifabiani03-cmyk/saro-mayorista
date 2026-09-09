@@ -1246,5 +1246,21 @@
     ],
     "total": 273000,
     "totalItems": 26
+  },
+  {
+    "id": "o1788927749806",
+    "fecha": "2026-09-09T04:22:29.806Z",
+    "items": [
+      {
+        "productId": "p1787355012462",
+        "nombre": "Flash Carbono 3k",
+        "precio": 150000,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 150000,
+    "totalItems": 1
   }
 ]
