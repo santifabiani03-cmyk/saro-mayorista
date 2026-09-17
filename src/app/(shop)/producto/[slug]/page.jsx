@@ -1,6 +1,6 @@
 import fs from 'node:fs'
 import path from 'node:path'
-import { notFound } from 'next/navigation'
+import { notFound, redirect } from 'next/navigation'
 import { findBySlug } from '../../../../utils/slug'
 import ProductClient from './ProductClient'
 
@@ -38,7 +38,9 @@ export async function generateMetadata({ params }) {
 
   const description = product.descripcion
     ? `${product.nombre} — ${catLabel} al por mayor. ${product.descripcion.slice(0, 120)}`
-    : `${product.nombre} — ${catLabel} al por mayor en SARO Mayorista. Precio mayorista: $${product.precio.toLocaleString('es-AR')}. Envios a toda Argentina.`
+    : product.categoria === 'paleta'
+      ? `${product.nombre} — ${catLabel} SARO. Envios a toda Argentina.`
+      : `${product.nombre} — ${catLabel} al por mayor en SARO Mayorista. Precio mayorista: $${product.precio.toLocaleString('es-AR')}. Envios a toda Argentina.`
 
   const imgUrl = imgs[0]
     ? (imgs[0].startsWith('http') ? imgs[0] : `https://saro.com.ar${imgs[0]}`)
@@ -69,9 +71,17 @@ export async function generateMetadata({ params }) {
 export default async function ProductoPage({ params }) {
   const { slug } = await params
   const products = getProducts()
-  const product = findBySlug(products, slug)
+  const found = findBySlug(products, slug)
 
-  if (!product) notFound()
+  if (!found) notFound()
+
+  // Las paletas se venden al público: la ficha muestra el precio minorista.
+  // Sin precio minorista cargado no se publican (igual que en /paletas).
+  let product = found
+  if (found.categoria === 'paleta') {
+    if (!(Number(found.precioMinorista) > 0)) redirect('/paletas')
+    product = { ...found, precio: Number(found.precioMinorista), promos: [], modo: 'minorista' }
+  }
 
   const imgs = getImages(product)
 

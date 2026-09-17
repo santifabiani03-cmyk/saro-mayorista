@@ -27,5 +27,6 @@ export const metadata = {
 export default function PaletasPage() {
   const all = JSON.parse(fs.readFileSync(CATALOG_FILE, 'utf-8'))
   const products = all.filter(p => p.categoria === 'paleta')
-  return <CatalogView products={products} kind="paletas" />
+  // Público general: precio minorista, sin compra mínima.
+  return <CatalogView products={products} kind="paletas" modo="minorista" />
 }

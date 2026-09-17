@@ -13,8 +13,8 @@ export default function Header({ config }) {
   // En la landing el header flota transparente sobre el hero (sin barra de
   // compra mínima ni carrito). En el resto de las páginas es la barra sólida.
   const isLanding = pathname === '/'
-  // El catálogo minorista no tiene compra mínima, así que ahí no se muestra el badge
-  const esMinorista = pathname === '/ropa-y-accesorios'
+  // Los catálogos minoristas no tienen compra mínima, así que ahí no se muestra el badge
+  const esMinorista = pathname === '/ropa-y-accesorios' || pathname === '/paletas'
   const verCompraMinima = config.mostrarCompraMinima && !esMinorista
 
   return (

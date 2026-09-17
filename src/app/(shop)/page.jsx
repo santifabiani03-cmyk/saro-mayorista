@@ -21,7 +21,8 @@ export default function HomePage() {
   const config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'))
   const visible = products.filter(p => p.visible !== false)
 
-  const paletas = visible.filter(p => p.categoria === 'paleta').length
+  // /paletas es minorista: sólo cuentan las que tienen precio minorista cargado.
+  const paletas = visible.filter(p => p.categoria === 'paleta' && Number(p.precioMinorista) > 0).length
   const noPaleta = visible.filter(p => p.categoria !== 'paleta')
   const stats = {
     total: visible.length,
