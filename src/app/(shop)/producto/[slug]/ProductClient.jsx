@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { useCart } from '../../../../context/CartContext'
@@ -29,7 +29,14 @@ function buildMatrix(colores, talles) {
 
 export default function ProductClient({ product }) {
   const router = useRouter()
-  const { addItems } = useCart()
+  const { addItems, setFichaMinorista } = useCart()
+
+  // Ficha minorista: ocultar la compra mínima del header mientras está abierta
+  useEffect(() => {
+    if (product.modo !== 'minorista') return
+    setFichaMinorista(true)
+    return () => setFichaMinorista(false)
+  }, [product.modo, setFichaMinorista])
 
   // Volver al catálogo que corresponde según la categoría del producto.
   const backHref = product.categoria === 'paleta' ? '/paletas' : '/ropa-y-accesorios'

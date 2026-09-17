@@ -13,6 +13,9 @@ export function CartProvider({ children }) {
   // y React se quejaba de que no coincidían (los errores de hidratación).
   const [items, setItems] = useState([])
   const [isOpen, setIsOpen] = useState(false)
+  // La ficha de un producto minorista (paletas) lo activa para que el header
+  // no muestre la compra mínima (el header no sabe de qué producto es la ficha).
+  const [fichaMinorista, setFichaMinorista] = useState(false)
   // Hasta no haber leído lo guardado no se escribe nada: si no, el primer
   // guardado pisaría el carrito real con la lista vacía del arranque.
   const [leido, setLeido] = useState(false)
@@ -108,7 +111,7 @@ export function CartProvider({ children }) {
 
   return (
     <CartContext.Provider
-      value={{ items, addItems, removeItem, updateQty, clearCart, total, totalItems, isOpen, setIsOpen }}
+      value={{ items, addItems, removeItem, updateQty, clearCart, total, totalItems, isOpen, setIsOpen, fichaMinorista, setFichaMinorista }}
     >
       {children}
     </CartContext.Provider>
