@@ -29,14 +29,13 @@ function buildMatrix(colores, talles) {
 
 export default function ProductClient({ product }) {
   const router = useRouter()
-  const { addItems, setFichaMinorista } = useCart()
+  const { addItems, setFichaModo } = useCart()
 
-  // Ficha minorista: ocultar la compra mínima del header mientras está abierta
+  // Avisarle al header de qué catálogo es la ficha (define si muestra la compra mínima)
   useEffect(() => {
-    if (product.modo !== 'minorista') return
-    setFichaMinorista(true)
-    return () => setFichaMinorista(false)
-  }, [product.modo, setFichaMinorista])
+    setFichaModo(product.modo ?? 'mayorista')
+    return () => setFichaModo(null)
+  }, [product.modo, setFichaModo])
 
   // Volver al catálogo que corresponde según la categoría del producto.
   const backHref = product.categoria === 'paleta' ? '/paletas' : '/ropa-y-accesorios'

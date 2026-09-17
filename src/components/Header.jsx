@@ -7,7 +7,7 @@ import { useCart } from '../context/CartContext'
 import HowToBuyModal from './HowToBuyModal'
 
 export default function Header({ config }) {
-  const { totalItems, isOpen, setIsOpen, fichaMinorista } = useCart()
+  const { totalItems, isOpen, setIsOpen, fichaModo } = useCart()
   const [showHowTo, setShowHowTo] = useState(false)
   const pathname = usePathname()
   // En la landing el header flota transparente sobre el hero (sin barra de
@@ -15,7 +15,11 @@ export default function Header({ config }) {
   const isLanding = pathname === '/'
   // Los catálogos minoristas no tienen compra mínima, así que ahí no se muestra el badge
   const esMinorista = pathname === '/ropa-y-accesorios' || pathname === '/paletas'
-  const verCompraMinima = config.mostrarCompraMinima && !esMinorista && !fichaMinorista
+  // En las fichas queda oculto hasta saber que el producto es mayorista (así las
+  // paletas no muestran el aviso ni por un instante al cargar).
+  const esFicha = pathname?.startsWith('/producto/')
+  const verCompraMinima = config.mostrarCompraMinima && !esMinorista
+    && (!esFicha || fichaModo === 'mayorista')
 
   return (
     <>

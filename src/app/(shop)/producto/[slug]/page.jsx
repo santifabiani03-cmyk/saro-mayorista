@@ -53,7 +53,7 @@ export async function generateMetadata({ params }) {
       title: `${product.nombre} | ${catLabel} al por Mayor`,
       description,
       images: imgUrl ? [imgUrl] : [],
-      type: 'product',
+      type: 'website',
     },
     twitter: {
       card: 'summary_large_image',
