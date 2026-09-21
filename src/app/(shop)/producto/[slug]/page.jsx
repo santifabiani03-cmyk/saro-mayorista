@@ -38,7 +38,9 @@ export async function generateMetadata({ params }) {
 
   const description = product.descripcion
     ? `${product.nombre} — ${catLabel} al por mayor. ${product.descripcion.slice(0, 120)}`
-    : product.categoria === 'paleta'
+    // Con precio minorista no se anuncia el mayorista: es lo que muestran Google y
+    // la vista previa del link, y tiene que coincidir con la ficha y los anuncios.
+    : product.categoria === 'paleta' || Number(product.precioMinorista) > 0
       ? `${product.nombre} — ${catLabel} SARO. Envios a toda Argentina.`
       : `${product.nombre} — ${catLabel} al por mayor en SARO Mayorista. Precio mayorista: $${product.precio.toLocaleString('es-AR')}. Envios a toda Argentina.`
 

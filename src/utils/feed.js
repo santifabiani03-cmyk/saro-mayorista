@@ -15,6 +15,9 @@ export const SITE = 'https://saro.com.ar'
 
 const imagenes = p => (p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : [])
 const absUrl = u => (u.startsWith('http') ? u : `${SITE}${u.startsWith('/') ? '' : '/'}${u}`)
+// Las fotos pasan por /feed-img, que las entrega en JPG cuadrado con fondo blanco
+// (el catálogo de Meta no toma bien WebP ni fondos transparentes).
+const fotoFeed = u => `${SITE}/feed-img?u=${encodeURIComponent(absUrl(u))}`
 
 /**
  * Por qué un producto NO sale en los anuncios (null = sí sale).
@@ -40,14 +43,21 @@ export function avisosFeed(p) {
 }
 
 // "REMERON DRY ELAS. DAMA" → "Remeron Dry Elas. Dama". Los anuncios en mayúsculas
-// sostenidas los penalizan. Las palabras con números ("12K", "3/4") quedan igual.
+// sostenidas los penalizan. Cuenta como "gritado" si casi todo está en mayúscula
+// (hay nombres como "JOGGER ... y REFLEX" con alguna minúscula suelta).
+// Las palabras con números ("12K", "3/4") quedan igual.
+const CONECTORES = new Set(['y', 'de', 'del', 'con', 'para', 'a', 'x'])
 function sinMayusculasSostenidas(s) {
   const letras = s.replace(/[^A-Za-zÁÉÍÓÚÑáéíóúñ]/g, '')
-  if (!letras || letras !== letras.toUpperCase()) return s
+  const mayus = letras.replace(/[^A-ZÁÉÍÓÚÑ]/g, '').length
+  if (letras.length < 4 || mayus / letras.length < 0.8) return s
   return s
     .toLowerCase()
     .split(' ')
-    .map(w => (/\d/.test(w) ? w.toUpperCase() : w.charAt(0).toUpperCase() + w.slice(1)))
+    .map((w, i) =>
+      /\d/.test(w) ? w.toUpperCase()
+        : i > 0 && CONECTORES.has(w) ? w
+        : w.charAt(0).toUpperCase() + w.slice(1))
     .join(' ')
 }
 
@@ -84,7 +94,7 @@ function rangoPrecio(precio) {
 
 /** Arma el item del feed (sólo para productos que pasan motivoFueraDelFeed). */
 export function itemFeed(p) {
-  const imgs = imagenes(p).map(absUrl)
+  const imgs = imagenes(p).map(fotoFeed)
   const precio = Number(p.precioMinorista)
   const esKids = /kids|junior|niñ/i.test(p.nombre)
   const colores = (p.colores ?? []).filter(Boolean)
