@@ -1,3 +1,5 @@
+import fs from 'node:fs'
+import path from 'node:path'
 import ScrollLab from './ScrollLab'
 
 // Maqueta interna para validar el guion del scroll antes de producir los assets 3D.
@@ -8,5 +10,7 @@ export const metadata = {
 }
 
 export default function LabScrollPage() {
-  return <ScrollLab />
+  // El botón de WhatsApp del cierre usa el mismo número que el resto del sitio.
+  const config = JSON.parse(fs.readFileSync(path.resolve('public/config.json'), 'utf-8'))
+  return <ScrollLab whatsappNumber={config.whatsappNumber} />
 }

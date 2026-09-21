@@ -14,6 +14,7 @@
  */
 
 import { useRef, useEffect, useState } from 'react'
+import Link from 'next/link'
 import { useGSAP } from '@gsap/react'
 import gsap from 'gsap'
 import { ScrollTrigger } from 'gsap/ScrollTrigger'
@@ -24,18 +25,32 @@ gsap.registerPlugin(useGSAP, ScrollTrigger)
 // El texto sale del que ya está en la landing pública, no inventado acá: si
 // la web dice "Control, potencia y polivalentes", el hero tiene que decir lo
 // mismo. Cuando cambie el copy de la landing, hay que actualizar esto.
+// Cada texto acompaña lo que se VE en ese momento: el golpe con la tecnología,
+// la pelota cruzando la cancha con el envío, la caja que aparece con el pedido.
+// Antes "Armalo en dos minutos" salía con la pelota en el aire y no tenía nada
+// que ver con la imagen. `fin: true` = no se va: es el cierre y lleva los botones.
 const ACTOS = [
   { at: 0.01, lado: 'izq', k: 'Fábrica argentina', t: 'Paletas de pádel',
     d: '15 años fabricando. Control, potencia y polivalentes.' },
-  { at: 0.30, lado: 'der', k: 'Tecnología',        t: 'Carbono para cada nivel',
+  { at: 0.27, lado: 'der', k: 'Tecnología',        t: 'Carbono para cada nivel',
     d: 'Elegís el modelo según cómo jugás.' },
-  { at: 0.48, lado: 'izq', k: 'Tu pedido',         t: 'Armalo en dos minutos',
-    d: 'Colores, talles y cantidades. Las promos se aplican solas.' },
-  { at: 0.68, lado: 'der', k: 'El envío',          t: 'Envíos a todo el país',
+  { at: 0.44, lado: 'izq', k: 'El envío',          t: 'Envíos a todo el país',
     d: 'Directo de fábrica, a donde estés.' },
+  { at: 0.70, lado: 'der', k: 'Tu pedido',         t: 'Armalo en dos minutos',
+    d: 'Colores, talles y cantidades. Las promos se aplican solas.' },
   { at: 0.86, lado: 'izq', k: 'Cerrás vos',        t: 'Cerrá por WhatsApp',
-    d: 'Te llega el pedido redactado para coordinar todo.' },
+    d: 'Te llega el pedido redactado para coordinar todo.', fin: true },
 ]
+const DURA_ACTO = 0.13      // cuánto del guion queda en pantalla cada texto
+
+// ── Tiempos del tramo final (en puntos del guion, 0 a 1) ──
+// Después del golpe la pelota pica, rebota, y en lo alto del rebote un destello
+// la tapa: cuando se apaga, ya es una caja que cae y se asienta. El destello
+// existe para esconder el cambio de objeto — el paso intermedio de pelota a
+// caja, hecho a la vista, parecía una pelota desinflada.
+const RITMO_VUELO = 6.24    // segundos de vuelo por unidad de guion
+const T_DESTELLO = 0.70     // pico del destello = lo alto del rebote
+const T_APOYO = 0.80        // la caja ya quedó quieta en el piso
 
 // Tramo del scroll en el que transcurre el golpe completo (para la animación mocap)
 
@@ -113,15 +128,19 @@ const SHOTS = {
   globo:  { zAmp: 0.55, xBias: -0.32, yAmp: -0.5,  thrust: 0.8 },
   remate: { zAmp: 0.6,  xBias:  0.34, yAmp: -0.32, thrust: 1.4 },
   reves:  { zAmp: 0.6,  xBias:  0.05, yAmp: -0.5,  thrust: 1.2, flip: true },
+  // El del guion es un drive con MENOS giro de cara. Con el giro del drive
+  // (-0.95, unos 54°) la paleta se ponía de canto en la preparación y mostraba
+  // el costado, que es justo donde la textura de Meshy quedó mal. Mismo empuje
+  // que el drive, así el punto de contacto no cambia.
+  guion:  { zAmp: 0.9,  xBias:  0.0,  yAmp: -0.32, thrust: 1.4 },
 }
 
-// Dónde está la CARA en ese instante: adelantada por el empuje del drive, que
-// es el tiro que usa el guion. La pelota del guion tiene que salir de ahí, no
-// del contacto en reposo.
+// Dónde está la CARA en ese instante: adelantada por el empuje del tiro del
+// guion. La pelota tiene que salir de ahí, no del contacto en reposo.
 const CONTACTO_GUION = {
   x: CONTACTO.x,
   y: CONTACTO.y,
-  z: CONTACTO.z + empujeDe(P_GOLPE, SHOTS.drive.thrust),
+  z: CONTACTO.z + empujeDe(P_GOLPE, SHOTS.guion.thrust),
 }
 
 function balistica(t, y0, v0, g, suelo, e) {
@@ -139,7 +158,7 @@ function balistica(t, y0, v0, g, suelo, e) {
   return Math.max(suelo, y + v * resto - 0.5 * g * resto * resto)
 }
 
-export default function ScrollLab() {
+export default function ScrollLab({ whatsappNumber = '' }) {
   const rootRef = useRef(null)
   const stageRef = useRef(null)
   const mountRef = useRef(null)
@@ -147,6 +166,8 @@ export default function ScrollLab() {
   // Quien pide "reducir movimiento" suele hacerlo por mareo o vértigo. No
   // alcanza con no animar: hay que darle la misma historia en forma legible.
   const [sinMovimiento, setSinMovimiento] = useState(false)
+  // Se prende cuando llegó la paleta: saca la pantalla de carga
+  const [listo, setListo] = useState(false)
   useEffect(() => {
     setSinMovimiento(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   }, [])
@@ -167,9 +188,12 @@ export default function ScrollLab() {
       import('three/examples/jsm/postprocessing/UnrealBloomPass.js'),
       import('three/examples/jsm/postprocessing/ShaderPass.js'),
       import('three/examples/jsm/shaders/VignetteShader.js'),
+      import('three/examples/jsm/geometries/RoundedBoxGeometry.js'),
+      import('three/examples/jsm/utils/BufferGeometryUtils.js'),
     ]).then(([THREE, { GLTFLoader }, { MeshoptDecoder },
               { EffectComposer }, { RenderPass }, { GTAOPass }, { OutputPass },
-              { UnrealBloomPass }, { ShaderPass }, { VignetteShader }]) => {
+              { UnrealBloomPass }, { ShaderPass }, { VignetteShader },
+              { RoundedBoxGeometry }, { mergeVertices }]) => {
       if (disposed) return
       const mount = mountRef.current
       if (!mount) return
@@ -194,20 +218,26 @@ export default function ScrollLab() {
       // El gris que quedaba no venía tanto de la densidad como del COLOR: un
       // celeste desaturado tiñe de gris todo lo que toca. Este tiene el celeste
       // de la marca adentro, así que lo lejano se va a celeste, no a gris.
-      scene.fog = new THREE.Fog('#dcecfa', 130, 168)
+      // Arranca en 100 (antes 130): el seto, a 116-140, ahora se funde en la
+      // bruma en vez de recortarse nítido. Lo cercano (cancha, bancos, carteles
+      // a 84) sigue sin niebla.
+      scene.fog = new THREE.Fog('#cfe4f7', 105, 168)   // el color del horizonte del cielo
       // (Hubo una niebla antes que lavaba el fondo: era densa y arrancaba
       // demasiado cerca. La de arriba empieza recién pasada la cancha.)
 
       // FOV 34 como el hero de la página pública: menos distorsión de
       // perspectiva y la paleta se lee del mismo modo.
       const camera = new THREE.PerspectiveCamera(34, W() / H(), 0.1, 400)
-      // preserveDrawingBuffer permite leer el cuadro ya dibujado (para inspeccionarlo)
-      const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: true })
+      // preserveDrawingBuffer permite leer el cuadro ya dibujado (para
+      // inspeccionarlo con window.__lab). Cuesta rendimiento, así que sólo en
+      // desarrollo: en producción nadie lee el cuadro.
+      const inspeccion = process.env.NODE_ENV !== 'production'
+      const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: inspeccion })
       // Sin curva de exposición, las zonas claras se van a blanco puro y todo
       // queda plano y quemado — es buena parte de lo que se lee como "barato".
       // ACES comprime las altas luces como lo hace una cámara de verdad.
       renderer.toneMapping = THREE.ACESFilmicToneMapping
-      renderer.toneMappingExposure = 0.92
+      renderer.toneMappingExposure = 0.96
       // Sombras reales: apoyan los objetos en el piso mejor que cualquier truco.
       renderer.shadowMap.enabled = true
       renderer.shadowMap.type = THREE.PCFSoftShadowMap
@@ -236,6 +266,15 @@ export default function ScrollLab() {
       const equipoFlojo = (navigator.hardwareConcurrency || 4) <= 4
       gtao.enabled = W() >= 900 && !equipoFlojo
       composer.addPass(gtao)
+      // Escena aparte para los efectos de luz (el destello de la caja). Si van
+      // en la escena principal, la oclusión ambiental los dibuja como un plano
+      // sólido — sin la orientación hacia la cámara que tiene un sprite — y
+      // deja una mancha negra enorme cruzando el cuadro. Se dibujan encima,
+      // después de la oclusión y antes del bloom, así el destello además brilla.
+      const escenaFx = new THREE.Scene()
+      const pasoFx = new RenderPass(escenaFx, camera)
+      pasoFx.clear = false
+      composer.addPass(pasoFx)
       // Bloom muy contenido: el umbral alto hace que sólo florezca lo que ya
       // está casi blanco (el reflejo del sol en el dorado de la paleta, el
       // brillo del vidrio). Esto es una marca deportiva: si se nota que hay
@@ -254,8 +293,28 @@ export default function ScrollLab() {
       // gris y rompe el blanco de la marca: 0.85 es el techo acá.
       const vineta = new ShaderPass(VignetteShader)
       vineta.uniforms.offset.value = 1.15
-      vineta.uniforms.darkness.value = 0.85
+      // 0.6 (era 0.85): con las esquinas más oscuras el cuadro se sentía cerrado
+      vineta.uniforms.darkness.value = 0.6
       composer.addPass(vineta)
+      // Corrección de color final: un poco más de contraste y de saturación.
+      // La escena tenía un velo gris lavado — mucho relleno de ambiente y nada
+      // que lo compense — y se veía menos nítida que el hero público. Es una
+      // cuenta por píxel, no cuesta casi nada.
+      const grading = new ShaderPass({
+        uniforms: { tDiffuse: { value: null }, contraste: { value: 1.08 }, saturacion: { value: 1.12 } },
+        vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+        fragmentShader: `
+          uniform sampler2D tDiffuse; uniform float contraste; uniform float saturacion;
+          varying vec2 vUv;
+          void main() {
+            vec4 c = texture2D(tDiffuse, vUv);
+            vec3 col = (c.rgb - 0.5) * contraste + 0.5;
+            float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
+            col = mix(vec3(l), col, saturacion);
+            gl_FragColor = vec4(clamp(col, 0.0, 1.0), c.a);
+          }`,
+      })
+      composer.addPass(grading)
       composer.setSize(W(), H())
       composer.setPixelRatio(Math.min(devicePixelRatio, 2))
 
@@ -304,16 +363,25 @@ export default function ScrollLab() {
       // Baja de 0.55 a 0.42: el ambiente ilumina TODO por igual y, pasado
       // cierto punto, aplana los colores y los empuja al gris. Con el sol más
       // fuerte ya no hace falta tanto relleno.
-      scene.environmentIntensity = 0.42
-      scene.add(new THREE.HemisphereLight('#ffffff', '#c3d1e5', 0.30))   // menos relleno = sombra más marcada
+      // Baja de 0.42 a 0.32 junto con el hemisférico: el relleno parejo era lo
+      // que dejaba todo con el mismo valor y sin volumen. El sol sube para
+      // compensar, así la escena no se oscurece: sólo gana contraste.
+      scene.environmentIntensity = 0.32
+      scene.add(new THREE.HemisphereLight('#ffffff', '#c3d1e5', 0.22))   // menos relleno = sombra más marcada
       // Sube de 1.15 a 1.6 y se entibia: el pedido era que el día se vea
       // SOLEADO. Con el relleno un poco más bajo, la diferencia entre la cara
       // iluminada y la sombra crece, que es lo que hace leer un mediodía y no
       // un día nublado.
-      const sol = new THREE.DirectionalLight('#fff4e0', 1.6)
+      // Más cálido y más fuerte que antes (1.6, #fff4e0): un mediodía de sol se
+      // lee por la diferencia entre la cara iluminada y la sombra.
+      const sol = new THREE.DirectionalLight('#ffe8c4', 2.0)
       sol.position.set(...SOL_DIR)   // el mismo vector que el sol del entorno
       sol.castShadow = true
-      sol.shadow.mapSize.set(1024, 1024)
+      // El mapa cubre 180 x 180 unidades: a 1024 eran 5,7 píxeles por unidad y
+      // la sombra de la paleta salía como una mancha borrosa. A 2048 se
+      // duplica, salvo en equipos flojos o pantallas chicas.
+      const sombraFina = W() >= 900 && (navigator.hardwareConcurrency || 4) > 4
+      sol.shadow.mapSize.set(sombraFina ? 2048 : 1024, sombraFina ? 2048 : 1024)
       sol.shadow.camera.near = 1
       sol.shadow.camera.far = 260
       // el área que cubre la sombra: la cancha entera
@@ -347,9 +415,11 @@ export default function ScrollLab() {
       // cancha que se dibujaba estaba al fondo, así que nadie la esquivaba. Ese
       // era el desorden: plantas creciendo adentro de la cancha de al lado.
       const SEPARACION = 22            // el pasillo entre cancha y cancha
+      // La vecina está en la MISMA posición en la que la dibuja hacerVecina
+      // (antes esta lista decía -87 y se dibujaba en -91).
       const CANCHAS = [
         { x: 0, z: RED_Z, principal: true },
-        { x: -(CANCHA_ANCHO + SEPARACION), z: RED_Z },                 // la de al lado
+        { x: -(CANCHA_ANCHO + 26), z: RED_Z },                         // la de al lado
         // NO agregar una cancha al fondo: empuja el seto perimetral fuera del
         // domo de cielo (radio 170) y el horizonte queda pelado. El club se
         // lee igual con dos canchas.
@@ -358,6 +428,14 @@ export default function ScrollLab() {
       const libre = (x, z, margen = 12) => CANCHAS.every(c =>
         Math.abs(x - c.x) > CANCHA_ANCHO / 2 + margen ||
         Math.abs(z - c.z) > CANCHA_LARGO / 2 + margen)
+      // La tercera cancha, la más lejana, NO entra en CANCHAS: si entrara, el
+      // pasillo entre las dos vecinas quedaría sin lugar y los bancos, macetas y
+      // faroles de ese lado se empujarían fuera del cielo. Sólo la esquivan el
+      // cerco y los árboles, que van más lejos.
+      const VECINA_LEJOS = { x: -(CANCHA_ANCHO + 26) * 2, z: RED_Z }
+      const libreLejos = (x, z, margen = 12) => libre(x, z, margen) && (
+        Math.abs(x - VECINA_LEJOS.x) > CANCHA_ANCHO / 2 + margen ||
+        Math.abs(z - VECINA_LEJOS.z) > CANCHA_LARGO / 2 + margen)
 
       // Domo de cielo: un degradé suave alrededor de todo, para que fuera de la
       // cancha no quede el vacío blanco. Va por dentro de una esfera enorme, así
@@ -368,10 +446,14 @@ export default function ScrollLab() {
       cieloCnv.width = 1024; cieloCnv.height = 512
       const cieloCtx = cieloCnv.getContext('2d')
       const grad = cieloCtx.createLinearGradient(0, 0, 0, 512)
-      grad.addColorStop(0, '#8fc4ee')      // arriba: celeste de día despejado
-      grad.addColorStop(0.34, '#b8daf5')
-      grad.addColorStop(0.62, '#e4f1fd')
-      grad.addColorStop(1, '#f7fbff')      // abajo, casi blanco
+      // Más saturado que antes, sobre todo cerca del horizonte: con el club
+      // abierto se ve mucho más cielo, y el celeste casi blanco de antes hacía
+      // que pareciera un día de niebla.
+      grad.addColorStop(0, '#6aaee8')      // arriba: celeste de día despejado
+      grad.addColorStop(0.34, '#9ccbf1')
+      grad.addColorStop(0.5, '#c9e2f8')    // el horizonte
+      grad.addColorStop(0.62, '#dcedfb')
+      grad.addColorStop(1, '#eef6fe')
       cieloCtx.fillStyle = grad
       cieloCtx.fillRect(0, 0, 1024, 512)
       // Nubes: cada una son varios óvalos difusos superpuestos, que es lo que
@@ -430,29 +512,79 @@ export default function ScrollLab() {
       const afuera = new THREE.Group()
       const cartelesRef = {}
 
-      // ── LONAS DE FONDO ──
-      // En una cancha de verdad las paredes del fondo llevan lonas publicitarias.
-      // Acá cumplen doble función: tapan el fondo, que era el problema, y ponen
-      // la marca donde el ojo ya está mirando.
-      const lonaCnv = document.createElement('canvas')
-      lonaCnv.width = 1024; lonaCnv.height = 128
-      const lx = lonaCnv.getContext('2d')
-      lx.fillStyle = '#2563EB'                        // azul de la marca, no el navy
-      lx.fillRect(0, 0, 1024, 128)
-      const texLona = new THREE.CanvasTexture(lonaCnv)
+      // ── PANTALLAS LED DE TORNEO ──
+      // Donde había una lona azul fija ahora hay una pantalla como las de los
+      // torneos: fondo azul de la marca, el logo y mensajes que corren despacio.
+      // Está justo detrás de la paleta, así que es lo que le da vida a su fondo
+      // sin competirle: se mueve lento y es del mismo azul que ya estaba.
+      // Los mensajes salen de la landing, como los textos del guion.
+      const LED_W = 2048, LED_H = 224          // 9,3 : 1, la proporción de la pantalla
+      const ledCnv = document.createElement('canvas')
+      ledCnv.width = LED_W; ledCnv.height = LED_H
+      const lx = ledCnv.getContext('2d')
+      const texLona = new THREE.CanvasTexture(ledCnv)
       texLona.colorSpace = THREE.SRGBColorSpace
-      const matLona = new THREE.MeshStandardMaterial({ map: texLona, roughness: 0.85 })
-      // El logo va en blanco y con separación calculada, no a ojo: antes se
-      // dibujaba cada 232 px con anchos variables y terminaba encimándose.
+      texLona.wrapS = THREE.RepeatWrapping      // para que el contenido corra sin corte
+      texLona.anisotropy = 4
+      // Sin iluminación y sin tonemapping: es una pantalla, emite su propia luz.
+      // El blanco del texto pasa el umbral del bloom y brilla apenas, como un LED.
+      const matLona = new THREE.MeshBasicMaterial({ map: texLona, toneMapped: false })
+      // Frases de la landing que NO dice el guion: con "Fábrica argentina" o
+      // "Envíos a todo el país" la pantalla repetía, justo detrás, el texto que
+      // estaba en primer plano.
+      const MENSAJES = ['DISEÑOS PERSONALIZADOS', 'PARA CLUBES Y EVENTOS', '15 AÑOS EN EL MERCADO']
+      const pintarLed = (logo) => {
+        const g = lx.createLinearGradient(0, 0, 0, LED_H)
+        g.addColorStop(0, '#1d4ed8')
+        g.addColorStop(0.5, '#2563EB')
+        g.addColorStop(1, '#1d4ed8')
+        lx.fillStyle = g
+        lx.fillRect(0, 0, LED_W, LED_H)
+        // Tamaño contenido: con letra de 74 px el texto competía con el
+        // titular y con la paleta, justo detrás de ella.
+        const altoLogo = 62
+        const anchoLogo = logo ? altoLogo * (logo.width / logo.height) : 0
+        // el cuerpo de letra más grande que entre con aire entre pieza y pieza
+        let fs = 50, anchos = []
+        do {
+          lx.font = `800 ${fs}px Inter, system-ui, sans-serif`
+          anchos = MENSAJES.map(m => lx.measureText(m).width)
+          fs -= 2
+        } while (anchos.reduce((a, b) => a + b, 0) + anchoLogo + 4 * 110 > LED_W && fs > 30)
+        const piezas = [{ ancho: anchoLogo, logo: true }, ...MENSAJES.map((m, i) => ({ ancho: anchos[i], texto: m }))]
+        const hueco = (LED_W - piezas.reduce((a, q) => a + q.ancho, 0)) / piezas.length
+        lx.textBaseline = 'middle'
+        let x = hueco / 2
+        for (const q of piezas) {
+          // separador: un punto celeste en el medio del hueco anterior. El
+          // primero cae en el borde y se dibuja también del otro lado, así el
+          // corte al repetir no se nota.
+          const sep = x - hueco / 2
+          lx.fillStyle = 'rgba(191,219,254,0.9)'
+          for (const sx of sep < 12 ? [sep, sep + LED_W] : [sep]) {
+            lx.beginPath(); lx.arc(sx, LED_H / 2, 7, 0, Math.PI * 2); lx.fill()
+          }
+          lx.fillStyle = 'rgba(255,255,255,0.88)'
+          if (q.logo && logo) lx.drawImage(logo, x, LED_H / 2 - altoLogo / 2, anchoLogo, altoLogo)
+          else if (q.texto) lx.fillText(q.texto, x, LED_H / 2 + 4)
+          x += q.ancho + hueco
+        }
+        // líneas de barrido muy suaves: la textura de una pantalla de LEDs
+        lx.fillStyle = 'rgba(0,0,0,0.10)'
+        for (let y = 0; y < LED_H; y += 4) lx.fillRect(0, y, LED_W, 1)
+        texLona.needsUpdate = true
+      }
+      pintarLed(null)
+
+      // El logo va en blanco: se pinta usando el logo como recorte. Se arma una
+      // sola vez, grande, y de ahí sale para la pantalla, la franja de los
+      // carteles, la cinta de la caja y las banderas.
       const imgLogo = new Image()
       imgLogo.crossOrigin = 'anonymous'
       imgLogo.onload = () => {
         if (disposed) return
-        const alto = 46
+        const alto = 128
         const ancho = alto * (imgLogo.width / imgLogo.height || 3)
-        const veces = 3
-        const paso = 1024 / veces
-        // se pinta en blanco usando el logo como recorte
         const aux = document.createElement('canvas')
         aux.width = Math.ceil(ancho); aux.height = Math.ceil(alto)
         const ax = aux.getContext('2d')
@@ -460,10 +592,17 @@ export default function ScrollLab() {
         ax.globalCompositeOperation = 'source-in'
         ax.fillStyle = '#ffffff'
         ax.fillRect(0, 0, ancho, alto)
-        for (let k = 0; k < veces; k++) {
-          lx.drawImage(aux, paso * (k + 0.5) - ancho / 2, 64 - alto / 2)
-        }
-        texLona.needsUpdate = true
+        pintarLed(aux)
+        // el mismo logo blanco, centrado, en la franja de los carteles
+        const az = 40, anz = az * (imgLogo.width / imgLogo.height || 3)
+        zocCtx.drawImage(aux, 256 - anz / 2, 32 - az / 2, anz, az)
+        texZocalo.needsUpdate = true
+        // en las banderas, a lo alto (se lee de abajo hacia arriba)
+        pintarBanderas(aux)
+        // y en la cinta de la caja, dos veces a lo largo
+        const ac = 30, anc = ac * (imgLogo.width / imgLogo.height || 3)
+        ;[128, 384].forEach(cx => cintaCtx.drawImage(aux, cx - anc / 2, 32 - ac / 2, anc, ac))
+        texCinta.needsUpdate = true
       }
       imgLogo.src = '/assets/logo-horizontal.png'
 
@@ -474,6 +613,15 @@ export default function ScrollLab() {
         lona.position.set(0, SUELO_Y + LONA_ALTO / 2 + 0.4, RED_Z + lado * (CANCHA_LARGO / 2 + 0.6))
         lona.rotation.y = lado > 0 ? Math.PI : 0
         scene.add(lona)
+        // el gabinete de la pantalla: un marco oscuro con espesor, detrás
+        const gabinete = new THREE.Mesh(
+          new THREE.BoxGeometry(CANCHA_ANCHO + 0.8, LONA_ALTO + 0.8, 0.9),
+          new THREE.MeshStandardMaterial({ color: '#0f172a', roughness: 0.6, metalness: 0.3 })
+        )
+        gabinete.position.copy(lona.position)
+        gabinete.position.z += lado * 0.5
+        gabinete.rotation.y = lona.rotation.y
+        scene.add(gabinete)
       })
 
       // ── MOBILIARIO DEL CLUB ──
@@ -633,12 +781,46 @@ export default function ScrollLab() {
       // cancha de color liso y una red de líneas desentonaban, y aplanarles la
       // textura no alcanzó. El problema no era el color, era el NIVEL DE
       // DETALLE — un objeto fotográfico entre objetos esquemáticos canta.
-      // Un icosaedro de pocas caras con flatShading da una masa de follaje
-      // facetada, que habla el mismo idioma que todo lo demás.
-      const geoFollaje = new THREE.IcosahedronGeometry(1, 1)
-      const VERDES = ['#5f8f4e', '#6d9b55', '#4e7a42', '#78a561']
+      // Cambio de estilo: antes eran icosaedros de pocas caras con flatShading,
+      // y al lado de una paleta hiperrealista se leían como "videojuego viejo".
+      // Ahora son masas suaves: más subdivisión, la superficie ondulada con
+      // ruido (bollos de follaje, no una bola lisa) y sombreado continuo.
+      // Sigue siendo estilizado — nada de hojas una por una — pero moderno.
+      const hacerGeoFollaje = (detalle, relieve = 1) => {
+        // El icosaedro viene con cada triángulo suelto (sin vértices
+        // compartidos): recalcular normales así da luz plana cara por cara, o
+        // sea las mismas facetas de antes. Se unen los vértices primero.
+        const base = new THREE.IcosahedronGeometry(1, detalle)
+        base.deleteAttribute('normal')
+        base.deleteAttribute('uv')
+        const geo = mergeVertices(base)
+        base.dispose()
+        const pos = geo.attributes.position
+        const v = new THREE.Vector3()
+        for (let i = 0; i < pos.count; i++) {
+          v.fromBufferAttribute(pos, i)
+          // Ruido fijo (senos cruzados), no Math.random: todos los arbustos
+          // comparten esta geometría y tiene que ser siempre la misma.
+          const r = 1 + relieve * (
+            0.09 * Math.sin(v.x * 5.1 + v.y * 2.3) * Math.cos(v.z * 4.7 - v.y * 1.9)
+            + 0.05 * Math.sin(v.x * 11.3 - v.z * 9.1 + v.y * 7.7))
+          v.multiplyScalar(r)
+          pos.setXYZ(i, v.x, v.y, v.z)
+        }
+        geo.computeVertexNormals()
+        return geo
+      }
+      // Los arbustos cercanos son pocos y van con 1280 caras. El seto son 390
+      // copias enormes a lo lejos: con 320 caras y el relieve más suave alcanza
+      // — lo facetado venía de las normales planas, no de la cantidad de caras
+      // (ver hacerGeoFollaje). Con 1280 sumaba 375 mil triángulos para nada.
+      const geoFollaje = hacerGeoFollaje(3)
+      const geoSeto = hacerGeoFollaje(2, 0.6)
+      // Verdes un poco más profundos: con el sol más fuerte, los claros de
+      // antes se iban a verde agua.
+      const VERDES = ['#4f7f40', '#5e8c48', '#416b36', '#6a9752']
       const matFollaje = VERDES.map(c => new THREE.MeshStandardMaterial({
-        color: c, roughness: 1, flatShading: true,
+        color: c, roughness: 0.95,
       }))
       // Un arbusto son dos o tres bollos pegados: así no es una bola perfecta
       const hacerArbusto = (alto, semilla) => {
@@ -657,9 +839,10 @@ export default function ScrollLab() {
       }
       // Tres portes, para que el verde no sea liso ni repetido
       ;[
-        [[0.04, 0.34, 0.68, 0.92], 15, 96],                       // grandes, al fondo
-        [[0.16, 0.46, 0.8], 10, 74],                              // medianos
-        [[0.1, 0.26, 0.4, 0.56, 0.72, 0.88], 6, 62],              // chicos, cerca
+        // más bajos que antes (15 / 10 / 6): eran parte de la pared verde
+        [[0.04, 0.34, 0.68, 0.92], 9, 96],                        // grandes, al fondo
+        [[0.16, 0.46, 0.8], 7, 74],                               // medianos
+        [[0.1, 0.26, 0.4, 0.56, 0.72, 0.88], 5, 62],              // chicos, cerca
       ].forEach(([lugares, alto, radio], fila) => {
         lugares.forEach((f, i) => {
           const [x, z] = enArco(f, radio + (i % 3) * 14, (i % 2 ? 0.09 : -0.09))
@@ -781,13 +964,29 @@ export default function ScrollLab() {
         const j = Math.floor(Math.random() * (i + 1))
         ;[PRODUCTOS[i], PRODUCTOS[j]] = [PRODUCTOS[j], PRODUCTOS[i]]
       }
-      const CARTEL_ALTO = 20
+      // 13 (eran 20): con 20 el cartel llegaba al borde de arriba del cuadro y
+      // no quedaba cielo; así se ve el horizonte por encima.
+      const CARTEL_ALTO = 13
       // Altura del pie. Con 10 los carteles quedaban entre 15 y 32 px POR ENCIMA
       // del borde de arriba en todo el tramo del hero: existían, tenían la foto
       // cargada y no se veían nunca. Medido proyectándolos a pantalla.
-      const CARTEL_PIE = 5
+      const CARTEL_PIE = 3
       const carteles = new THREE.Group()
       const rotables = []
+      // Franja azul con el logo, compartida por todos los carteles. El logo se
+      // pinta cuando carga la imagen (ver imgLogo.onload, más arriba).
+      const zocCnv = document.createElement('canvas')
+      zocCnv.width = 512; zocCnv.height = 64
+      const zocCtx = zocCnv.getContext('2d')
+      zocCtx.fillStyle = '#2563EB'
+      zocCtx.fillRect(0, 0, 512, 64)
+      const texZocalo = new THREE.CanvasTexture(zocCnv)
+      texZocalo.colorSpace = THREE.SRGBColorSpace
+      const matZocalo = new THREE.MeshStandardMaterial({ map: texZocalo, roughness: 0.7 })
+      const matZocaloCanto = new THREE.MeshStandardMaterial({ color: '#2563EB', roughness: 0.7 })
+      // Marco: un panel con espesor alrededor de la foto. Sin marco, la foto
+      // blanca sin iluminación se leía como una calcomanía pegada en el vidrio.
+      const matMarcoCartel = new THREE.MeshStandardMaterial({ color: '#1b2a3d', roughness: 0.55, metalness: 0.25 })
       const matPoste2 = new THREE.MeshStandardMaterial({ color: '#2f4257', roughness: 0.6, metalness: 0.3 })
 
       // La cámara arranca mirando al fondo y gira 90° hacia un costado. Los
@@ -836,12 +1035,20 @@ export default function ScrollLab() {
           matFoto.needsUpdate = true
         }, undefined, () => { foto.visible = false })
 
-        // marco de la marca abajo, para que se lea como cartelería y no como foto pegada
-        const zocalo = new THREE.Mesh(
-          new THREE.BoxGeometry(CARTEL_ALTO * 0.86, CARTEL_ALTO * 0.1, 0.4),
-          new THREE.MeshStandardMaterial({ color: '#2563EB', roughness: 0.7 })
+        // Marco con espesor, apenas detrás del fondo blanco
+        const marcoC = new THREE.Mesh(
+          new THREE.BoxGeometry(CARTEL_ALTO * 0.84 + 1.1, CARTEL_ALTO + 1.1, 0.7), matMarcoCartel
         )
-        zocalo.position.set(0, SUELO_Y + CARTEL_PIE + CARTEL_ALTO * 0.05, 0)
+        marcoC.position.set(0, SUELO_Y + CARTEL_ALTO / 2 + CARTEL_PIE, -0.4)
+        grupo.add(marcoC)
+        // franja de la marca abajo, con el logo: se lee como cartelería de la
+        // marca y no como una foto suelta. Sólo la cara de adelante lleva el
+        // logo; los cantos van lisos para que no se estire.
+        const caras = [matZocaloCanto, matZocaloCanto, matZocaloCanto, matZocaloCanto, matZocalo, matZocaloCanto]
+        const zocalo = new THREE.Mesh(
+          new THREE.BoxGeometry(CARTEL_ALTO * 0.84 + 1.1, CARTEL_ALTO * 0.13, 0.9), caras
+        )
+        zocalo.position.set(0, SUELO_Y + CARTEL_PIE + CARTEL_ALTO * 0.065, 0.05)
         grupo.add(zocalo)
 
         ;[-0.34, 0.34].forEach(d => {
@@ -911,61 +1118,40 @@ export default function ScrollLab() {
       afuera.add(club)
 
       // ── EL LÍMITE DEL TERRENO ──
-      // Sin esto el césped se corta de golpe contra el cielo y se ve el borde
-      // del mundo. Un seto perimetral cierra la vista a lo lejos.
-      // Una hilera de arbustos de verdad, no un tubo pintado de verde. El anillo
-      // liso que había antes se leía como un rectángulo de color plano porque no
-      // tenía ni textura ni volumen. Van con InstancedMesh: setenta arbustos
-      // cuestan lo mismo que uno para la placa de video.
-      // El seto es el mismo follaje facetado, repetido con InstancedMesh: 220
-      // arbustos cuestan lo mismo que uno para la placa de video. Dos filas
-      // desfasadas, porque con una sola se veía el fondo entre planta y planta.
-      // Los radios TIENEN que caer dentro del domo de cielo (170) y dentro del
-      // `far` de la niebla: a 172 y 186 el seto entero quedaba detrás del cielo
-      // y no se veía ninguno de los 220. Acá se disuelven en el horizonte, que
-      // es justo lo que tiene que hacer un fondo.
-      const FILAS = [
-        { radio: 116, cuantos: 165, desfase: 0 },
-        { radio: 128, cuantos: 165, desfase: Math.PI / 165 },
-        { radio: 140, cuantos: 165, desfase: Math.PI / 82 },
-      ]
-      const TOTAL = FILAS.reduce((n, f) => n + f.cuantos, 0)
-      const seto = new THREE.InstancedMesh(
-        geoFollaje,
-        new THREE.MeshStandardMaterial({ roughness: 1, flatShading: true }),
-        TOTAL
-      )
-      seto.castShadow = true
+      // Antes era un seto de tres filas, de hasta 2,4 m, que rodeaba todo el
+      // club: visto desde la cancha era una pared verde continua y nunca se veía
+      // el cielo ni el horizonte — por eso la escena se sentía cerrada. Ahora el
+      // límite se arma en capas, de cerca a lejos, con aire entre una y otra:
+      //   1. un cerco bajo (medio metro) que marca el borde del terreno
+      //   2. árboles sueltos, con cielo entre copa y copa
+      //   3. lomas lejanas, casi del color del cielo, que dan profundidad
+      // Todo va sin sombra: queda fuera del área que cubre el mapa de sombras.
+
+      // 1. Cerco bajo. Si una planta cae adentro de una cancha no se empuja
+      //    (antes se empujaba hacia afuera y terminaba fuera del cielo): se omite.
+      const CERCO = { radio: 124, cuantos: 150 }
+      const seto = new THREE.InstancedMesh(geoSeto, new THREE.MeshStandardMaterial({ roughness: 0.95 }), CERCO.cuantos)
+      seto.castShadow = false
       seto.receiveShadow = true
       {
         const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler()
         const col = new THREE.Color()
-        let n = 0
-        for (const fila of FILAS) {
-          for (let i = 0; i < fila.cuantos; i++) {
-            const ang = (i / fila.cuantos) * Math.PI * 2 + fila.desfase
-            let rad = fila.radio + ((i * 7) % 5) * 3
-            // si cae adentro de una cancha se empuja hacia afuera hasta salir
-            for (let intento = 0; intento < 24; intento++) {
-              if (libre(Math.cos(ang) * rad, RED_Z + Math.sin(ang) * rad)) break
-              rad += 10
-            }
-            // Antes salían de ((i*3)%4), que da sólo CUATRO alturas y se repiten
-            // en un patrón visible. Con dos ciclos de largos distintos (7 y 5,
-            // que no comparten divisores) la combinación tarda 35 arbustos en
-            // repetirse, así que se lee como variado y no como una guarda.
-            const alto = 5.5 + ((i * 3) % 7) * 1.15 + ((i * 5) % 5) * 0.75
-            const ancho = alto * (1.35 + ((i * 11) % 7) * 0.11)   // más ancho que alto
-            e.set(0, i * 1.31, 0)
-            m.compose(
-              new THREE.Vector3(Math.cos(ang) * rad, SUELO_Y + alto * 0.72, RED_Z + Math.sin(ang) * rad),
-              q.setFromEuler(e),
-              new THREE.Vector3(ancho, alto, ancho)
-            )
-            seto.setMatrixAt(n, m)
-            seto.setColorAt(n, col.set(VERDES[i % VERDES.length]))
-            n++
-          }
+        for (let i = 0; i < CERCO.cuantos; i++) {
+          const ang = (i / CERCO.cuantos) * Math.PI * 2
+          const rad = CERCO.radio + ((i * 7) % 5) * 1.6
+          const x = Math.cos(ang) * rad, z = RED_Z + Math.sin(ang) * rad
+          // dos ciclos de largo distinto (5 y 7): el patrón tarda 35 en repetirse
+          const alto = 3 + ((i * 3) % 5) * 0.45 + ((i * 5) % 7) * 0.2
+          const ancho = alto * (1.7 + ((i * 11) % 7) * 0.12)
+          const visible = libreLejos(x, z, 6)
+          e.set(0, i * 1.31, 0)
+          m.compose(
+            new THREE.Vector3(x, SUELO_Y + alto * 0.55, z),
+            q.setFromEuler(e),
+            visible ? new THREE.Vector3(ancho, alto, ancho) : new THREE.Vector3(0, 0, 0)
+          )
+          seto.setMatrixAt(i, m)
+          seto.setColorAt(i, col.set(VERDES[i % VERDES.length]))
         }
         seto.instanceMatrix.needsUpdate = true
         if (seto.instanceColor) seto.instanceColor.needsUpdate = true
@@ -973,21 +1159,155 @@ export default function ScrollLab() {
       seto.frustumCulled = false
       afuera.add(seto)
 
+      // 2. Árboles sueltos: tronco y copa de tres bollos, del mismo estilo
+      //    suave que los arbustos. Repartidos con el ángulo áureo, que no deja
+      //    ni huecos grandes ni hileras. Detrás de la paleta (lo primero que se
+      //    ve) se deja una ventana sin árboles, para que se vea el horizonte.
+      const arboles = []
+      for (let i = 0; i < 90 && arboles.length < 40; i++) {
+        const ang = i * 2.39996                         // ángulo áureo
+        const rad = 116 + ((i * 37) % 36)               // entre 116 y 151
+        const x = Math.cos(ang) * rad, z = RED_Z + Math.sin(ang) * rad
+        const frente = Math.atan2(Math.sin(ang + Math.PI / 2), Math.cos(ang + Math.PI / 2))
+        if (Math.abs(frente) < 0.2) continue            // la ventana detrás de la paleta
+        if (!libreLejos(x, z, 14)) continue
+        arboles.push({ x, z, alto: 17 + ((i * 13) % 11), i })
+      }
+      const troncos = new THREE.InstancedMesh(
+        new THREE.CylinderGeometry(0.42, 0.62, 1, 7),
+        new THREE.MeshStandardMaterial({ color: '#6b5a48', roughness: 0.95 }),
+        arboles.length
+      )
+      const copas = new THREE.InstancedMesh(
+        geoSeto, new THREE.MeshStandardMaterial({ roughness: 0.95 }), arboles.length * 3
+      )
+      {
+        const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler()
+        const col = new THREE.Color()
+        arboles.forEach((a, k) => {
+          const hT = a.alto * 0.5
+          m.compose(new THREE.Vector3(a.x, SUELO_Y + hT / 2, a.z), q.identity(), new THREE.Vector3(1, hT, 1))
+          troncos.setMatrixAt(k, m)
+          const r = a.alto * 0.3
+          ;[[0, 0.74, 0, 1], [0.42, 0.6, 0.2, 0.72], [-0.36, 0.64, -0.24, 0.66]].forEach(([dx, dy, dz, esc], j) => {
+            e.set(0, a.i * 0.9 + j, 0)
+            const rr = r * esc
+            m.compose(
+              new THREE.Vector3(a.x + dx * r, SUELO_Y + a.alto * dy, a.z + dz * r),
+              q.setFromEuler(e),
+              new THREE.Vector3(rr * 1.1, rr, rr * 1.1)
+            )
+            copas.setMatrixAt(k * 3 + j, m)
+            copas.setColorAt(k * 3 + j, col.set(VERDES[(a.i + j) % VERDES.length]))
+          })
+        })
+        troncos.instanceMatrix.needsUpdate = true
+        copas.instanceMatrix.needsUpdate = true
+        if (copas.instanceColor) copas.instanceColor.needsUpdate = true
+      }
+      troncos.frustumCulled = copas.frustumCulled = false
+      troncos.receiveShadow = copas.receiveShadow = true
+      afuera.add(troncos, copas)
+
+      // 3. Lomas lejanas: dos siluetas en anillo alrededor de todo, pegadas al
+      //    cielo. Son geometría y no un dibujo en el cielo porque el cielo tiene
+      //    5 píxeles por grado: pintadas ahí salían como una mancha borrosa.
+      //    Sin niebla, con el color ya "lavado" de lejos. Las frecuencias son
+      //    enteras para que el anillo cierre sin salto.
+      const hacerLomas = (radio, color, base, amp, f1, f2, grano) => {
+        const SEG = 480
+        const pos = [], idx = []
+        for (let i = 0; i <= SEG; i++) {
+          const a = (i / SEG) * Math.PI * 2
+          const h = base
+            + amp * (0.5 + 0.5 * Math.sin(a * f1 + 1.3)) * (0.55 + 0.45 * Math.sin(a * f2 + 0.4))
+            + grano * Math.abs(Math.sin(a * 97)) * (0.5 + 0.5 * Math.sin(a * 23 + 2))
+          const x = Math.cos(a) * radio, z = RED_Z + Math.sin(a) * radio
+          pos.push(x, SUELO_Y - 1, z, x, SUELO_Y + h, z)
+          if (i < SEG) { const k = i * 2; idx.push(k, k + 1, k + 2, k + 1, k + 3, k + 2) }
+        }
+        const g = new THREE.BufferGeometry()
+        g.setAttribute('position', new THREE.Float32BufferAttribute(pos, 3))
+        g.setIndex(idx)
+        return new THREE.Mesh(g, new THREE.MeshBasicMaterial({ color, fog: false, side: THREE.DoubleSide }))
+      }
+      afuera.add(hacerLomas(167, '#b4cfe8', 7, 11, 3, 7, 0))       // lomas, casi cielo
+      afuera.add(hacerLomas(161, '#9dbbd5', 4, 5, 5, 11, 1.6))     // una arboleda más cerca
+
+      // ── BANDERAS SARO ──
+      // Banderas "vela" como las de los eventos, detrás del fondo de la cancha:
+      // intercaladas con los carteles, suman altura, color de la marca y algo
+      // que se mueve (se mecen con el viento, ver el bucle de cuadros).
+      const bandCnv = document.createElement('canvas')
+      bandCnv.width = 128; bandCnv.height = 512
+      const bCtx = bandCnv.getContext('2d')
+      const texBandera = new THREE.CanvasTexture(bandCnv)
+      texBandera.colorSpace = THREE.SRGBColorSpace
+      const pintarBanderas = (logo) => {
+        const g = bCtx.createLinearGradient(0, 0, 128, 0)
+        g.addColorStop(0, '#1d4ed8')
+        g.addColorStop(1, '#2563EB')
+        bCtx.fillStyle = g
+        bCtx.fillRect(0, 0, 128, 512)
+        bCtx.fillStyle = '#ffffff'
+        bCtx.fillRect(0, 0, 9, 512)                  // la vaina blanca del mástil
+        if (logo) {
+          bCtx.save()
+          bCtx.translate(68, 300)
+          bCtx.rotate(-Math.PI / 2)
+          const al = 58, an = al * (logo.width / logo.height)
+          bCtx.drawImage(logo, -an / 2, -al / 2, an, al)
+          bCtx.restore()
+        }
+        texBandera.needsUpdate = true
+      }
+      pintarBanderas(null)
+      // La vela: un rectángulo que se achica hacia el borde libre (la forma de
+      // pluma de estas banderas) y apenas curvado, como tomando viento.
+      const ANCHO_B = 3.2, ALTO_B = 12, MASTIL = 16.5
+      const geoVela = new THREE.PlaneGeometry(ANCHO_B, ALTO_B, 8, 16)
+      geoVela.translate(ANCHO_B / 2, ALTO_B / 2, 0)
+      {
+        const p = geoVela.attributes.position
+        for (let i = 0; i < p.count; i++) {
+          const t = p.getX(i) / ANCHO_B
+          p.setY(i, p.getY(i) * (1 - 0.3 * t * t) + 0.9 * t * t)
+          p.setZ(i, Math.sin(t * Math.PI) * 0.35)
+        }
+        geoVela.computeVertexNormals()
+      }
+      const matVela = new THREE.MeshStandardMaterial({ map: texBandera, roughness: 0.8, side: THREE.DoubleSide })
+      const matMastil = new THREE.MeshStandardMaterial({ color: '#94a3b8', roughness: 0.4, metalness: 0.6 })
+      const banderas = []
+      // Detrás del fondo, entre el cartel del centro y los de los costados:
+      // cartel, bandera, cartel, bandera, cartel. La altura está medida para que
+      // la punta entre en el cuadro del arranque.
+      ;[[-Math.PI / 2 - 0.2, 72], [-Math.PI / 2 + 0.2, 72], [-Math.PI / 2 - 0.55, 76], [-Math.PI / 2 + 0.55, 76]]
+        .forEach(([ang, rad], i) => {
+          const x = Math.cos(ang) * rad, z = RED_Z + Math.sin(ang) * rad
+          const grupo = new THREE.Group()
+          const mastil = new THREE.Mesh(new THREE.CylinderGeometry(0.14, 0.18, MASTIL, 8), matMastil)
+          mastil.position.y = MASTIL / 2
+          const vela = new THREE.Mesh(geoVela, matVela)
+          vela.position.set(0.15, MASTIL - ALTO_B - 0.8, 0)
+          const pie = new THREE.Mesh(new THREE.CylinderGeometry(1.1, 1.3, 0.45, 12), matMastil)
+          pie.position.y = 0.22
+          grupo.add(mastil, vela, pie)
+          grupo.position.set(x, SUELO_Y, z)
+          // de cara a la cancha, con un poco de ángulo para que la vela se lea
+          const base = Math.atan2(-x, RED_Z - z) + (i % 2 ? 0.5 : -0.5)
+          grupo.rotation.y = base
+          grupo.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true } })
+          afuera.add(grupo)
+          banderas.push({ grupo, base, fase: i * 1.9 })
+        })
+
       // Las canchas vecinas, insinuadas: dan idea de club y no de cancha suelta.
       // Salen de la misma lista y con la MISMA medida que la principal — antes
       // era un rectángulo de 58 x 26 puesto a mano, que a esta escala no era
       // una cancha de pádel sino un rectángulo cualquiera.
-      for (const c of CANCHAS) {
-        if (c.principal) continue
-        const v2 = new THREE.Mesh(
-          new THREE.PlaneGeometry(CANCHA_ANCHO, CANCHA_LARGO),
-          new THREE.MeshStandardMaterial({ color: '#8fc0e8', roughness: 0.95 })
-        )
-        v2.rotation.x = -Math.PI / 2
-        v2.position.set(c.x, -2.98, c.z)
-        v2.receiveShadow = true
-        afuera.add(v2)
-      }
+      // (El piso de las vecinas lo dibuja hacerVecina, más abajo. Acá había un
+      // segundo piso encimado que titilaba contra el primero.)
       scene.add(afuera)
 
       const explanada = new THREE.Mesh(
@@ -998,34 +1318,139 @@ export default function ScrollLab() {
       explanada.position.y = -3.06
       scene.add(explanada)
 
-      // Césped sintético: fibras verticales finas con variación, no un celeste
-      // plano. Se dibuja al vuelo y se repite, así no pesa nada.
+      // ── EL PISO: césped sintético de pádel ──
+      // Dos capas que se multiplican:
+      //  1. DETALLE, que se repite: fibras que caen en direcciones distintas y
+      //     los granos de arena del relleno, que en una cancha de verdad asoman
+      //     entre las fibras y le dan ese moteado claro. También da el relieve.
+      //  2. VARIACIÓN, que NO se repite y cubre la cancha entera: las juntas de
+      //     los rollos de césped a lo largo, manchones de tono y el desgaste
+      //     donde se para la gente (junto a la red y en la línea de saque).
+      // Sin la segunda capa el detalle se nota repetido y el piso se lee como
+      // una alfombra estampada; sin la primera, como un plástico liso.
+      const TEX_PISO = 1024
+      const REP_PISO = [6, 12]                 // cada baldosa ~10,8 unidades (1,7 m)
       const cesCnv2 = document.createElement('canvas')
-      cesCnv2.width = cesCnv2.height = 128
+      cesCnv2.width = cesCnv2.height = TEX_PISO
       const cx2 = cesCnv2.getContext('2d')
-      cx2.fillStyle = '#7fb3e3'
-      cx2.fillRect(0, 0, 128, 128)
-      for (let i = 0; i < 2600; i++) {
-        const x = Math.random() * 128, y = Math.random() * 128
-        const claro = Math.random() > 0.5
-        cx2.strokeStyle = claro ? 'rgba(255,255,255,0.16)' : 'rgba(40,90,140,0.14)'
-        cx2.lineWidth = 1
-        cx2.beginPath()
-        cx2.moveTo(x, y)
-        cx2.lineTo(x + (Math.random() - 0.5) * 1.5, y + 2.5 + Math.random() * 2)
-        cx2.stroke()
+      cx2.fillStyle = '#78addf'
+      cx2.fillRect(0, 0, TEX_PISO, TEX_PISO)
+      // Todo lo que se dibuja cerca de un borde se repite del otro lado, así la
+      // baldosa empalma sin costura al repetirse.
+      const enLosCuatro = (x, y, margen, dibujar) => {
+        for (const dx of [0, -TEX_PISO, TEX_PISO]) {
+          for (const dy of [0, -TEX_PISO, TEX_PISO]) {
+            const px = x + dx, py = y + dy
+            if (px < -margen || px > TEX_PISO + margen || py < -margen || py > TEX_PISO + margen) continue
+            dibujar(px, py)
+          }
+        }
+      }
+      // Fibras finas y parejas, casi todas peinadas para el mismo lado (el
+      // césped sintético tiene "pelo"), con algunas sueltas. Se probó con matas
+      // de fibras que caían juntas y el piso se veía manchado como camuflaje:
+      // de cerca, el césped de verdad es un grano fino y uniforme.
+      cx2.lineWidth = 1
+      for (let i = 0; i < 90000; i++) {
+        const x = Math.random() * TEX_PISO, y = Math.random() * TEX_PISO
+        const a = Math.random() < 0.8 ? Math.PI / 2 + (Math.random() - 0.5) * 0.6 : Math.random() * Math.PI * 2
+        const largo = 2.5 + Math.random() * 4
+        cx2.strokeStyle = Math.random() > 0.5
+          ? `rgba(225,240,255,${0.07 + Math.random() * 0.07})`
+          : `rgba(30,78,130,${0.07 + Math.random() * 0.07})`
+        enLosCuatro(x, y, 8, (px, py) => {
+          cx2.beginPath()
+          cx2.moveTo(px, py)
+          cx2.lineTo(px + Math.cos(a) * largo, py + Math.sin(a) * largo)
+          cx2.stroke()
+        })
+      }
+      // arena del relleno: un polvillo claro, apenas amarillento, muy fino
+      for (let i = 0; i < 22000; i++) {
+        const x = Math.random() * TEX_PISO, y = Math.random() * TEX_PISO
+        cx2.fillStyle = Math.random() > 0.25
+          ? `rgba(236,228,205,${0.10 + Math.random() * 0.14})`
+          : `rgba(20,55,95,${0.08 + Math.random() * 0.08})`
+        cx2.fillRect(x, y, 1, 1)
       }
       const texPiso = new THREE.CanvasTexture(cesCnv2)
       // Sin esto Three la toma como lineal y la muestra lavada: el piso se veía
       // blanco. Era la única textura del archivo a la que le faltaba.
       texPiso.colorSpace = THREE.SRGBColorSpace
       texPiso.wrapS = texPiso.wrapT = THREE.RepeatWrapping
-      texPiso.repeat.set(26, 52)
-      texPiso.anisotropy = 8
-      const piso = new THREE.Mesh(
-        new THREE.PlaneGeometry(CANCHA_ANCHO, CANCHA_LARGO),
-        new THREE.MeshStandardMaterial({ map: texPiso, roughness: 1, metalness: 0, color: '#cfe0ee' })
-      )
+      texPiso.repeat.set(...REP_PISO)
+      // el máximo que dé la placa: es lo que mantiene nítido el piso visto de costado
+      texPiso.anisotropy = renderer.capabilities.getMaxAnisotropy()
+      // El relieve sale de la misma imagen (sin espacio de color: es un dato,
+      // no un color). Las fibras claras sobresalen y las oscuras se hunden.
+      const texRelieve = new THREE.CanvasTexture(cesCnv2)
+      texRelieve.wrapS = texRelieve.wrapT = THREE.RepeatWrapping
+      texRelieve.repeat.set(...REP_PISO)
+      texRelieve.anisotropy = texPiso.anisotropy
+
+      // Capa de variación: gris medio (128 = no cambia nada), más claro o más
+      // oscuro donde corresponde. Proporción 1:2, la de la cancha.
+      const varCnv = document.createElement('canvas')
+      varCnv.width = 256; varCnv.height = 512
+      {
+        const c = varCnv.getContext('2d')
+        c.fillStyle = 'rgb(128,128,128)'
+        c.fillRect(0, 0, 256, 512)
+        // juntas de los rollos: el césped viene en rollos de ~4 m a lo largo,
+        // y cada uno tiene un tono apenas distinto
+        const ROLLO = 256 * (4 / 0.155) / CANCHA_ANCHO
+        for (let k = 0, x = 0; x < 256; k++, x += ROLLO) {
+          c.fillStyle = k % 2 ? 'rgba(255,255,255,0.045)' : 'rgba(0,0,0,0.035)'
+          c.fillRect(x, 0, ROLLO, 512)
+          c.fillStyle = 'rgba(0,0,0,0.06)'
+          c.fillRect(x, 0, 1, 512)
+        }
+        // manchones de tono sueltos
+        for (let i = 0; i < 70; i++) {
+          const x = Math.random() * 256, y = Math.random() * 512, r = 12 + Math.random() * 40
+          const g = c.createRadialGradient(x, y, 0, x, y, r)
+          const claro = Math.random() > 0.5
+          g.addColorStop(0, claro ? 'rgba(255,255,255,0.07)' : 'rgba(0,0,0,0.06)')
+          g.addColorStop(1, 'rgba(128,128,128,0)')
+          c.fillStyle = g
+          c.fillRect(x - r, y - r, r * 2, r * 2)
+        }
+        // desgaste: donde más se pisa, la fibra se aplasta y asoma la arena
+        const desgaste = (x, y, rx, ry, a) => {
+          c.save()
+          c.translate(x, y); c.scale(rx / ry, 1)
+          const g = c.createRadialGradient(0, 0, 0, 0, 0, ry)
+          g.addColorStop(0, `rgba(255,248,230,${a})`)
+          g.addColorStop(1, 'rgba(255,248,230,0)')
+          c.fillStyle = g
+          c.fillRect(-ry, -ry, ry * 2, ry * 2)
+          c.restore()
+        }
+        const saque = 512 * (6.95 / 0.155) / CANCHA_LARGO   // línea de saque a 6,95 m
+        ;[-1, 1].forEach(lado => {
+          desgaste(128, 256 + lado * 26, 90, 22, 0.10)           // junto a la red
+          desgaste(128, 256 + lado * saque, 110, 30, 0.08)       // la línea de saque
+          desgaste(128, 256 + lado * (saque + 60), 100, 40, 0.06) // detrás, donde se defiende
+        })
+      }
+      const texVariacion = new THREE.CanvasTexture(varCnv)
+      texVariacion.colorSpace = THREE.NoColorSpace
+
+      const matPiso = new THREE.MeshStandardMaterial({
+        map: texPiso, roughness: 0.96, metalness: 0, color: '#d3e3f0',
+        bumpMap: texRelieve, bumpScale: 0.7,
+      })
+      // La variación se multiplica en el shader, con su propia escala: cubre la
+      // cancha entera una sola vez aunque el detalle se repita 6 x 12 veces.
+      matPiso.onBeforeCompile = (sh) => {
+        sh.uniforms.tVariacion = { value: texVariacion }
+        sh.fragmentShader = sh.fragmentShader
+          .replace('#include <common>', '#include <common>\nuniform sampler2D tVariacion;')
+          .replace('#include <map_fragment>', `#include <map_fragment>
+            vec3 variacion = texture2D(tVariacion, vMapUv / vec2(${REP_PISO[0].toFixed(1)}, ${REP_PISO[1].toFixed(1)})).rgb;
+            diffuseColor.rgb *= variacion * 2.0;`)
+      }
+      const piso = new THREE.Mesh(new THREE.PlaneGeometry(CANCHA_ANCHO, CANCHA_LARGO), matPiso)
       piso.rotation.x = -Math.PI / 2
       piso.position.set(0, SUELO_Y, RED_Z)
       piso.receiveShadow = true
@@ -1043,7 +1468,7 @@ export default function ScrollLab() {
       // rugosidad, no con transmisión real (cara y acá no se notaría).
       const matVidrio = new THREE.MeshStandardMaterial({
         color: '#dff0fb', roughness: 0.08, metalness: 0.1,
-        transparent: true, opacity: 0.14, side: THREE.DoubleSide,   // más limpio: deja ver el afuera
+        transparent: true, opacity: 0.09, side: THREE.DoubleSide,   // apenas se nota: deja ver el afuera
       })
       const matMarco = new THREE.MeshStandardMaterial({ color: '#2f4257', roughness: 0.5, metalness: 0.35 })
       const VIDRIO_ALTO = 26
@@ -1093,8 +1518,10 @@ export default function ScrollLab() {
         t.wrapS = t.wrapT = THREE.RepeatWrapping
         t.repeat.set(Math.max(1, repX), Math.max(1, alto / 0.7))   // cuadros más chicos
         t.anisotropy = 4
+        // Gris pizarra y no negro, y apenas translúcida: la reja negra sólida
+        // enjaulaba la cancha y tapaba el afuera.
         const m = new THREE.MeshStandardMaterial({
-          alphaMap: t, transparent: true, color: '#0a0a0a',   // el negro va acá
+          alphaMap: t, transparent: true, color: '#243142', opacity: 0.75,
           roughness: 0.75, metalness: 0.15, side: THREE.DoubleSide, depthWrite: false,
         })
         return new THREE.Mesh(new THREE.PlaneGeometry(ancho, alto), m)
@@ -1223,25 +1650,11 @@ export default function ScrollLab() {
       }
       // dos canchas más, en la fila que mira la cámara al final
       hacerVecina(-(CANCHA_ANCHO + 26), RED_Z)
-      hacerVecina(-(CANCHA_ANCHO + 26) * 2, RED_Z)
+      hacerVecina(VECINA_LEJOS.x, VECINA_LEJOS.z)
 
 
-      // Techo: vigas cruzadas bien altas. Cierran la escena por arriba, que era
-      // lo que quedaba más vacío, sin taparle el cielo al fondo.
-      const TECHO_Y = -3 + 34
-      const matViga = new THREE.MeshStandardMaterial({ color: '#c8d6e5', roughness: 0.8 })
-      const techo = new THREE.Group()
-      for (let x = -MEDIA; x <= MEDIA + 0.01; x += 16) {
-        const v = new THREE.Mesh(new THREE.BoxGeometry(0.5, 0.9, 96), matViga)
-        v.position.set(x, TECHO_Y, RED_Z)
-        techo.add(v)
-      }
-      for (let z = -42; z <= 42.01; z += 14) {
-        const v = new THREE.Mesh(new THREE.BoxGeometry(MEDIA * 2, 0.5, 0.5), matViga)
-        v.position.set(0, TECHO_Y - 0.7, RED_Z + z)
-        techo.add(v)
-      }
-      scene.add(techo)
+      // (Había un techo de vigas cruzadas sobre la cancha. Se sacó: cerraba la
+      // escena por arriba y el pedido fue que se vea más el entorno.)
 
       // ── LA RED ──
       // La malla usa una rejilla dibujada al vuelo, así se ve el tejido en lugar
@@ -1256,22 +1669,27 @@ export default function ScrollLab() {
       ctx.fillStyle = '#000000'
       ctx.fillRect(0, 0, 64, 64)
       ctx.strokeStyle = '#ffffff'
-      ctx.lineWidth = 6    // hilo más fino
+      // Hilo fino y cuadro chico, como una red de pádel de verdad (cuadros de
+      // unos 4,5 cm). Antes eran cuadros de 10 cm con hilo grueso y en primer
+      // plano se leía como un alambrado.
+      ctx.lineWidth = 4
       ctx.strokeRect(0, 0, 64, 64)
       const texRed = new THREE.CanvasTexture(cnv)
       texRed.wrapS = texRed.wrapT = THREE.RepeatWrapping
-      texRed.repeat.set(100, 9)
+      texRed.repeat.set(MEDIA * 2 / 0.29, RED_ALTO / 0.29)   // 0,29 unidades = 4,5 cm
+      texRed.anisotropy = renderer.capabilities.getMaxAnisotropy()
       const matMalla = new THREE.MeshStandardMaterial({
-        alphaMap: texRed, transparent: true, opacity: 1, color: '#2b3a4d',   // gris oscuro, más claro que el alambre
+        alphaMap: texRed, transparent: true, opacity: 0.9, color: '#1f2937',
         roughness: 0.95, side: THREE.DoubleSide, depthWrite: false,
       })
       const malla = new THREE.Mesh(new THREE.PlaneGeometry(MEDIA * 2, RED_ALTO), matMalla)
       malla.position.y = SUELO_Y + RED_ALTO / 2
+      // Faja blanca de arriba: es lo primero que el ojo reconoce de una red.
       const cinta = new THREE.Mesh(
-        new THREE.BoxGeometry(MEDIA * 2, 0.42, 0.14),
-        new THREE.MeshStandardMaterial({ color: '#f8fafc', roughness: 0.6 })
+        new THREE.BoxGeometry(MEDIA * 2, 0.4, 0.1),
+        new THREE.MeshStandardMaterial({ color: '#ffffff', roughness: 0.55 })
       )
-      cinta.position.y = SUELO_Y + RED_ALTO
+      cinta.position.y = SUELO_Y + RED_ALTO - 0.2
       const matPoste = new THREE.MeshStandardMaterial({ color: '#243447', roughness: 0.6, metalness: 0.3 })
       const posteIzq = new THREE.Mesh(new THREE.CylinderGeometry(0.16, 0.16, RED_ALTO + 1.1, 12), matPoste)
       posteIzq.position.set(-MEDIA, SUELO_Y + (RED_ALTO + 1.1) / 2, 0)
@@ -1284,7 +1702,11 @@ export default function ScrollLab() {
       // ── LÍNEAS ──
       // Las de reglamento y nada más. Antes había cuatro líneas paralelas, dos
       // de ellas a 1.6 m de la red: en una cancha de pádel no existen.
-      const matLinea = new THREE.MeshBasicMaterial({ color: '#ffffff', transparent: true, opacity: 0.9 })
+      // Con luz y sombra, y apenas transparentes: en una cancha de verdad la
+      // línea es césped blanco, así que se tiene que ver la fibra de abajo. Con
+      // MeshBasic además la sombra de la paleta y de la caja se cortaba justo
+      // al pasar sobre una línea.
+      const matLinea = new THREE.MeshStandardMaterial({ color: '#f4f7fa', roughness: 0.95, transparent: true, opacity: 0.86 })
       const lineas = new THREE.Group()
       const SAQUE = 6.95 / 0.155        // 44.8 — la línea de saque va a 6.95 m de la red
       // una línea de saque de cada lado
@@ -1304,6 +1726,7 @@ export default function ScrollLab() {
         lineas.add(l)
       })
       const linea = central
+      lineas.traverse(o => { if (o.isMesh) o.receiveShadow = true })
       scene.add(lineas)
 
       // Placeholders: paleta, pelota y paquete
@@ -1406,32 +1829,15 @@ export default function ScrollLab() {
         cont.traverse(o => { if (o.isMesh) o.castShadow = true })
         cara.visible = false                  // se van los placeholders
         mango.visible = false
-      }, undefined, () => { /* si falla, queda la silueta simple */ })
+        setListo(true)
+      }, undefined, () => { if (!disposed) setListo(true) /* si falla, queda la silueta simple */ })
 
-      // Pelota de pádel: fieltro (nada de brillo) y las costuras blancas curvas
-      // ── LA PELOTA QUE SE VUELVE ENVÍO ──
-      // No hay dos objetos que se intercambian: es UNA sola malla cuyos vértices
-      // viajan de la esfera al cubo. Cada vértice se mueve por su propia dirección
-      // hasta la cara del cubo (d / mayor componente), así la forma cambia de a
-      // poco y sin saltos. Como las esquinas del cubo quedan MÁS lejos del centro
-      // que la superficie de la esfera, la pelota nunca se achica: se expande
-      // hacia las esquinas hasta volverse caja.
+      // Pelota de pádel: fieltro (nada de brillo) y las costuras blancas curvas.
+      // Ya no se deforma en caja a la vista: el paso intermedio parecía una
+      // pelota desinflada. Ahora un destello la tapa y, cuando se apaga, lo que
+      // queda es una caja de verdad (ver "EL ENVÍO", más abajo).
       const R_BOLA = 0.29
       const geoBola = new THREE.SphereGeometry(R_BOLA, 40, 30)
-      const vertEsfera = Float32Array.from(geoBola.attributes.position.array)
-      const vertCubo = new Float32Array(vertEsfera.length)
-      for (let i = 0; i < vertEsfera.length; i += 3) {
-        const x = vertEsfera[i], y = vertEsfera[i + 1], z = vertEsfera[i + 2]
-        const L = Math.hypot(x, y, z) || 1
-        const dx = x / L, dy = y / L, dz = z / L
-        const may = Math.max(Math.abs(dx), Math.abs(dy), Math.abs(dz)) || 1
-        vertCubo[i] = (dx / may) * R_BOLA
-        vertCubo[i + 1] = (dy / may) * R_BOLA
-        vertCubo[i + 2] = (dz / may) * R_BOLA
-      }
-      // colores entre los que viaja la superficie: fieltro → cartón
-      const COLOR_FIELTRO = new THREE.Color('#d8e83c')
-      const COLOR_CARTON = new THREE.Color('#eef2f7')   // claro y plano, no cartón realista
 
       const pelota = new THREE.Group()
       const matFieltro = new THREE.MeshStandardMaterial({
@@ -1458,191 +1864,175 @@ export default function ScrollLab() {
       pelota.add(bola, costuraA, costuraB)
       bola.castShadow = true
 
-      // El cesto se arma ACA y no mas arriba porque usa la geometria y el
-      // material de la pelota del guion, que se definen unas lineas antes.
-      // ── PRIMER PLANO ──
-      // No había NADA cerca de cámara en todo el guion: la escena entera pasaba
-      // a media y larga distancia, y sin algo cercano que se superponga a lo
-      // lejano el ojo se queda sin una de las señales más fuertes de
-      // profundidad. Dos cestos de pelotas, que es lo que hay de verdad tirado
-      // en una cancha de club. Van al BORDE del cuadro, nunca al centro: la
-      // idea es que enmarquen, no que tapen la paleta ni la caja.
-      const hacerCesto = () => {
-        const g = new THREE.Group()
-        // Rejilla de verdad, no un cilindro translúcido: se dibuja la trama en
-        // un canvas y se usa de alphaMap, que es lo mismo que hace el alambrado
-        // de la cancha. Un cesto de pelotas es agujeros con alambre entre
-        // medio; pintarlo como vidrio esmerilado era lo que lo hacía de mentira.
-        // El alambre va en BLANCO porque el alphaMap se lee por BRILLO: blanco
-        // es opaco, negro es transparente. El color sale del material.
-        const tramaCnv = document.createElement('canvas')
-        tramaCnv.width = 64; tramaCnv.height = 64
-        {
-          const c = tramaCnv.getContext('2d')
-          c.fillStyle = '#000'; c.fillRect(0, 0, 64, 64)
-          c.strokeStyle = '#fff'; c.lineWidth = 5
-          for (let i = 0; i <= 64; i += 16) {
-            c.beginPath(); c.moveTo(i, 0); c.lineTo(i, 64); c.stroke()
-            c.beginPath(); c.moveTo(0, i); c.lineTo(64, i); c.stroke()
-          }
-        }
-        const texTrama = new THREE.CanvasTexture(tramaCnv)
-        texTrama.wrapS = texTrama.wrapT = THREE.RepeatWrapping
-        texTrama.repeat.set(9, 4)
-        const rejilla = new THREE.MeshStandardMaterial({
-          color: '#5B7285', roughness: 0.6, metalness: 0.3,
-          side: THREE.DoubleSide, transparent: true, alphaMap: texTrama,
-        })
-        const canasto = new THREE.Mesh(new THREE.CylinderGeometry(3.2, 2.6, 5.6, 20, 1, true), rejilla)
-        canasto.position.y = 3.4
-        g.add(canasto)
-        const aro = new THREE.Mesh(new THREE.TorusGeometry(3.2, 0.16, 6, 16), rejilla)
-        aro.rotation.x = Math.PI / 2
-        aro.position.y = 6.2
-        g.add(aro)
-        // fondo, para que las pelotas no se vean caer por abajo
-        const fondoCesto = new THREE.Mesh(new THREE.CircleGeometry(2.6, 20), rejilla)
-        fondoCesto.rotation.x = -Math.PI / 2
-        fondoCesto.position.y = 0.6
-        g.add(fondoCesto)
+      // (Hubo un cesto de pelotas como elemento de primer plano. Se sacó: en
+      // cualquier lugar terminaba detrás del texto, detrás de la paleta en el
+      // golpe o cruzándose con la cámara en el cierre. La profundidad ahora la
+      // dan las banderas, los árboles y la pantalla del fondo.)
 
-        // Lleno de pelotas, y las MISMAS que las del guion: la esfera y la
-        // costura van en dos InstancedMesh que comparten las matrices, así 34
-        // pelotas cuestan lo que dos objetos y no 68.
-        const LLENO = 34
-        const bolasInst = new THREE.InstancedMesh(geoBola, matFieltro, LLENO)
-        const costInst = new THREE.InstancedMesh(geoCostura, matCostura, LLENO)
-        bolasInst.castShadow = true
-        {
-          const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler()
-          const ESC = 0.85 / R_BOLA            // del tamaño real al del cesto
-          let n = 0
-          // apiladas en capas, cada una girada: se acomodan solas sin calcularlo
-          for (let capa = 0; capa < 5 && n < LLENO; capa++) {
-            const enCapa = capa < 4 ? 8 : 2
-            const radio = capa < 4 ? 1.55 : 0.6
-            for (let i = 0; i < enCapa && n < LLENO; i++) {
-              const a = (i / enCapa) * Math.PI * 2 + capa * 0.7
-              e.set(n * 1.1, n * 0.7, n * 0.4)
-              m.compose(
-                new THREE.Vector3(Math.cos(a) * radio, 1.5 + capa * 0.95, Math.sin(a) * radio),
-                q.setFromEuler(e),
-                new THREE.Vector3(ESC, ESC, ESC)
-              )
-              bolasInst.setMatrixAt(n, m)
-              costInst.setMatrixAt(n, m)
-              n++
-            }
-          }
-          bolasInst.count = costInst.count = n
-          bolasInst.instanceMatrix.needsUpdate = true
-          costInst.instanceMatrix.needsUpdate = true
-        }
-        g.add(bolasInst, costInst)
 
-        // Las patas van DEBAJO del fondo. Antes salían del piso hasta media
-        // altura y en x=±2, o sea por dentro del canasto (que abajo tiene radio
-        // 2.6): se veían cruzándolo por adentro.
-        ;[-1, 1].forEach(d => {
-          const pata = new THREE.Mesh(
-            new THREE.CylinderGeometry(0.22, 0.22, 0.7, 6),
-            new THREE.MeshStandardMaterial({ color: '#33485f', roughness: 0.6, metalness: 0.35 })
-          )
-          pata.position.set(d * 1.9, 0.3, 0)
-          g.add(pata)
-        })
-        g.traverse(o => { if (o.isMesh) { o.castShadow = true; o.receiveShadow = true } })
-        return g
-      }
-      // Dónde va sale de la cuenta del encuadre, no del ojo: con FOV 34 y esta
-      // pantalla el borde del cuadro cae a 0.54 x la distancia, así que a 14
-      // unidades el borde está en x≈7.6. Ahí va, entrando apenas por la
-      // izquierda durante todo el arranque.
-      // Va UNO SOLO, y en el arranque. Hubo un segundo sobre el recorrido
-      // final y tapaba la caja SARO entera: el tramo del envío tiene que
-      // quedar limpio, que es el remate de todo el guion.
+      // ── EL ENVÍO ──
+      // Una caja de cartón con cara de envío: bordes rectos apenas redondeados,
+      // cinta de la marca cruzando la tapa y etiqueta con el logo en el frente.
+      // La anterior salía de deformar la esfera y quedaba con los bordes
+      // ondulados: parecía un terrón de azúcar, no un paquete.
+      const L_CAJA = 1.5                     // ~23 cm de lado
+      const caja = new THREE.Group()
+      // Cartón kraft dibujado al vuelo: fibras finas y un borde apenas más
+      // oscuro por cara, que es lo que hace leer "cartón" y no "plástico marrón".
+      const kraftCnv = document.createElement('canvas')
+      kraftCnv.width = kraftCnv.height = 256
       {
-        // Corrido a la izquierda y un poco más lejos: antes entraba casi un
-        // tercio del cuadro y tapaba la lona. Ahora asoma por el borde, que es
-        // todo lo que tiene que hacer un elemento de primer plano.
-        const c = hacerCesto()
-        c.position.set(-9.4, SUELO_Y, -15.5)
-        c.rotation.y = -1.4
-        scene.add(c)
+        const c = kraftCnv.getContext('2d')
+        c.fillStyle = '#c69c6d'
+        c.fillRect(0, 0, 256, 256)
+        for (let i = 0; i < 2600; i++) {
+          // fibras apenas marcadas: más contraste y se leía como veta de madera
+          c.strokeStyle = Math.random() > 0.5 ? 'rgba(255,236,205,0.06)' : 'rgba(92,60,28,0.06)'
+          const x = Math.random() * 256, y = Math.random() * 256
+          c.beginPath(); c.moveTo(x, y); c.lineTo(x + 3 + Math.random() * 7, y + (Math.random() - 0.5) * 1.5); c.stroke()
+        }
+        const borde = c.createRadialGradient(128, 128, 90, 128, 128, 186)
+        borde.addColorStop(0, 'rgba(90,58,26,0)')
+        borde.addColorStop(1, 'rgba(90,58,26,0.22)')
+        c.fillStyle = borde
+        c.fillRect(0, 0, 256, 256)
       }
-
-
-      // k = 0 pelota · k = 1 caja. Mueve los vértices y el color a la vez.
-      const posBola = geoBola.attributes.position
-      let kAnterior = -1
-      const transformar = (k) => {
-        if (Math.abs(k - kAnterior) < 0.002) return
-        kAnterior = k
-        const a = posBola.array
-        for (let i = 0; i < a.length; i++) a[i] = vertEsfera[i] + (vertCubo[i] - vertEsfera[i]) * k
-        posBola.needsUpdate = true
-        geoBola.computeVertexNormals()
-        matFieltro.color.copy(COLOR_FIELTRO).lerp(COLOR_CARTON, k)
-        matFieltro.roughness = mix(0.95, 0.75, k)
-        // las costuras se borran en la primera mitad: son de la pelota, no de la caja
-        const vc = Math.max(0, 1 - k * 2)
-        matCostura.opacity = vc
-        costuraA.visible = costuraB.visible = vc > 0.02
-      }
-      matCostura.transparent = true
-      // Los detalles del envío (cintas + etiqueta) NO son otra caja: se apoyan
-      // sobre la misma malla que antes era pelota, y aparecen recién cuando la
-      // forma ya es cúbica. Así nunca hay dos objetos pisándose.
-      // Sombra de contacto: una mancha suave debajo. Sin esto la caja se ve
-      // despegada del piso por más que esté apoyada.
-      const matSombra = new THREE.MeshBasicMaterial({
-        color: '#4a6885', transparent: true, opacity: 0, depthWrite: false,
+      const texKraft = new THREE.CanvasTexture(kraftCnv)
+      texKraft.colorSpace = THREE.SRGBColorSpace
+      texKraft.anisotropy = 4
+      const cuerpoCaja = new THREE.Mesh(
+        new RoundedBoxGeometry(L_CAJA, L_CAJA, L_CAJA, 3, L_CAJA * 0.035),
+        new THREE.MeshStandardMaterial({ map: texKraft, roughness: 0.92, metalness: 0 })
+      )
+      cuerpoCaja.castShadow = true
+      cuerpoCaja.receiveShadow = true
+      caja.add(cuerpoCaja)
+      // la unión de las solapas de la tapa, de lado a lado
+      const union = new THREE.Mesh(
+        new THREE.BoxGeometry(L_CAJA * 0.98, 0.004, 0.012),
+        new THREE.MeshBasicMaterial({ color: '#6b4a2a' })
+      )
+      union.position.y = L_CAJA / 2 + 0.002
+      caja.add(union)
+      // Cinta azul con el logo en blanco. Tapa la unión y baja por los costados,
+      // así el frente queda libre para la etiqueta (una cinta vertical por el
+      // frente tapaba el logo — pasó con la caja anterior). El logo se pinta
+      // cuando carga la imagen (ver imgLogo.onload).
+      const cintaCnv = document.createElement('canvas')
+      cintaCnv.width = 512; cintaCnv.height = 64
+      const cintaCtx = cintaCnv.getContext('2d')
+      cintaCtx.fillStyle = '#2563EB'
+      cintaCtx.fillRect(0, 0, 512, 64)
+      const texCinta = new THREE.CanvasTexture(cintaCnv)
+      texCinta.colorSpace = THREE.SRGBColorSpace
+      const matCintaCaja = new THREE.MeshStandardMaterial({ map: texCinta, roughness: 0.35, metalness: 0.05 })
+      const ANCHO_CINTA = L_CAJA * 0.24
+      const cintaTapa = new THREE.Mesh(new THREE.PlaneGeometry(L_CAJA * 1.001, ANCHO_CINTA), matCintaCaja)
+      cintaTapa.rotation.x = -Math.PI / 2
+      cintaTapa.position.y = L_CAJA / 2 + 0.006
+      caja.add(cintaTapa)
+      ;[-1, 1].forEach(lado => {
+        const baja = L_CAJA * 0.34
+        const c2 = new THREE.Mesh(new THREE.PlaneGeometry(baja, ANCHO_CINTA), matCintaCaja)
+        c2.rotation.set(0, lado * Math.PI / 2, Math.PI / 2)
+        c2.position.set(lado * (L_CAJA / 2 + 0.006), L_CAJA / 2 - baja / 2, 0)
+        caja.add(c2)
       })
-      const sombra = new THREE.Mesh(new THREE.CircleGeometry(R_BOLA * 1.9, 28), matSombra)
+      // Etiqueta blanca en el frente con el logo. Se compone en un canvas para
+      // que el logo quede con aire y una línea azul abajo, como una etiqueta
+      // de envío impresa.
+      const etqCnv = document.createElement('canvas')
+      etqCnv.width = 512; etqCnv.height = 256
+      const etqCtx = etqCnv.getContext('2d')
+      const texEtiqueta = new THREE.CanvasTexture(etqCnv)
+      texEtiqueta.colorSpace = THREE.SRGBColorSpace
+      texEtiqueta.anisotropy = 4
+      const pintarEtiqueta = (logo) => {
+        etqCtx.fillStyle = '#fbfaf6'
+        etqCtx.fillRect(0, 0, 512, 256)
+        etqCtx.fillStyle = '#2563EB'
+        etqCtx.fillRect(0, 226, 512, 30)
+        if (logo) {
+          const an = 400, al = an * (logo.height / logo.width)
+          etqCtx.drawImage(logo, 256 - an / 2, 112 - al / 2, an, al)
+        }
+        etqCtx.fillStyle = '#64748b'
+        etqCtx.font = '600 22px Inter, system-ui, sans-serif'
+        etqCtx.textAlign = 'center'
+        etqCtx.fillText('PÁDEL · FÁBRICA ARGENTINA', 256, 196)
+        texEtiqueta.needsUpdate = true
+      }
+      pintarEtiqueta(null)
+      const imgLogoCaja = new Image()
+      imgLogoCaja.onload = () => { if (!disposed) pintarEtiqueta(imgLogoCaja) }
+      imgLogoCaja.src = '/assets/logo-caja.png'
+      const etiqueta = new THREE.Mesh(
+        new THREE.PlaneGeometry(L_CAJA * 0.7, L_CAJA * 0.35),
+        new THREE.MeshStandardMaterial({ map: texEtiqueta, roughness: 0.85 })
+      )
+      etiqueta.position.set(0, -L_CAJA * 0.04, L_CAJA / 2 + 0.006)
+      caja.add(etiqueta)
+      caja.visible = false
+
+      // ── EL DESTELLO ──
+      // Tapa el cambio de pelota a caja. Un halo (núcleo blanco opaco que se
+      // difumina hacia afuera) más un anillo que se expande cuando se apaga,
+      // como una onda. Van sin niebla, sin tonemapping y por encima de todo:
+      // es luz, no un objeto de la escena.
+      const hacerSprite = (pintar) => {
+        const cnv2 = document.createElement('canvas')
+        cnv2.width = cnv2.height = 256
+        pintar(cnv2.getContext('2d'))
+        const tx = new THREE.CanvasTexture(cnv2)
+        tx.colorSpace = THREE.SRGBColorSpace
+        const sp = new THREE.Sprite(new THREE.SpriteMaterial({
+          map: tx, transparent: true, depthWrite: false, depthTest: false,
+          toneMapped: false, fog: false, opacity: 0,
+        }))
+        sp.renderOrder = 10
+        sp.visible = false
+        escenaFx.add(sp)
+        return sp
+      }
+      const destello = hacerSprite(c => {
+        const g = c.createRadialGradient(128, 128, 0, 128, 128, 128)
+        g.addColorStop(0, 'rgba(255,255,255,1)')
+        g.addColorStop(0.34, 'rgba(255,255,255,1)')      // núcleo opaco: esconde el cambio
+        g.addColorStop(0.55, 'rgba(255,248,226,0.55)')
+        g.addColorStop(1, 'rgba(255,240,200,0)')
+        c.fillStyle = g
+        c.fillRect(0, 0, 256, 256)
+      })
+      const anillo = hacerSprite(c => {
+        const g = c.createRadialGradient(128, 128, 70, 128, 128, 126)
+        g.addColorStop(0, 'rgba(255,255,255,0)')
+        g.addColorStop(0.55, 'rgba(255,255,255,0.9)')
+        g.addColorStop(1, 'rgba(255,255,255,0)')
+        c.fillStyle = g
+        c.fillRect(0, 0, 256, 256)
+      })
+
+      // Sombra de contacto de la caja: una mancha difusa debajo, que se
+      // concentra al apoyarse. La sombra del sol sola la dejaba despegada.
+      const sombraCnv = document.createElement('canvas')
+      sombraCnv.width = sombraCnv.height = 128
+      {
+        const c = sombraCnv.getContext('2d')
+        const g = c.createRadialGradient(64, 64, 0, 64, 64, 64)
+        g.addColorStop(0, 'rgba(20,40,70,0.55)')
+        g.addColorStop(0.6, 'rgba(20,40,70,0.22)')
+        g.addColorStop(1, 'rgba(20,40,70,0)')
+        c.fillStyle = g
+        c.fillRect(0, 0, 128, 128)
+      }
+      const matSombra = new THREE.MeshBasicMaterial({
+        map: new THREE.CanvasTexture(sombraCnv), transparent: true, opacity: 0, depthWrite: false,
+      })
+      const sombra = new THREE.Mesh(new THREE.PlaneGeometry(1, 1), matSombra)
       sombra.rotation.x = -Math.PI / 2
       scene.add(sombra)
 
-      // La paleta también proyecta: sin sombra propia se ve flotando sobre la
-      // cancha por más que esté bien ubicada en el espacio.
-      const matSombraPal = new THREE.MeshBasicMaterial({
-        color: '#3f5d7d', transparent: true, opacity: 0, depthWrite: false,
-      })
-      const sombraPal = new THREE.Mesh(new THREE.CircleGeometry(1, 32), matSombraPal)
-      sombraPal.rotation.x = -Math.PI / 2
-      sombraPal.scale.set(ALTO_PALETA * 0.20, 1, ALTO_PALETA * 0.34)
-      scene.add(sombraPal)
-
-      const paquete = new THREE.Group()
-      const L = R_BOLA * 2                       // la caja mide esto de cara a cara
-      const matCinta = new THREE.MeshStandardMaterial({
-        color: '#2563EB', roughness: 0.55, transparent: true, opacity: 0,   // cintas en el azul de la marca
-      })
-      const geoCintaH = new THREE.BoxGeometry(L * 1.02, L * 0.17, L * 1.02)
-      const cintaH = new THREE.Mesh(geoCintaH, matCinta)
-      // Una sola cinta, la horizontal. La vertical cruzaba justo por encima del
-      // logo y lo dejaba ilegible, azul sobre azul.
-      const geoCintaV = new THREE.BoxGeometry(L * 0.17, L * 1.02, L * 1.02)
-      const cintaV = new THREE.Mesh(geoCintaV, matCinta)
-      cintaV.visible = false
-      // etiqueta con el logo, en una cara
-      const matEtiqueta = new THREE.MeshStandardMaterial({
-        color: '#f3efe6', roughness: 0.9, transparent: true, opacity: 0,
-      })
-      // proporción 3:1, la del logo: antes el cartel era casi cuadrado y lo estiraba
-      const caja = new THREE.Mesh(new THREE.PlaneGeometry(L * 0.72, L * 0.24), matEtiqueta)
-      caja.position.set(0, L * 0.26, L * 0.51)   // arriba de la cinta, no encima
-      const tapa = new THREE.Mesh(new THREE.PlaneGeometry(L * 0.72, L * 0.24), matEtiqueta)
-      tapa.position.set(0, L * 0.26, -L * 0.51)
-      tapa.rotation.y = Math.PI
-      new THREE.TextureLoader().load('/assets/logo-caja.png', tx => {
-        if (disposed) return
-        tx.colorSpace = THREE.SRGBColorSpace
-        matEtiqueta.map = tx
-        matEtiqueta.needsUpdate = true
-      })
-      paquete.add(cintaH, cintaV, caja, tapa)
-
-      scene.add(codo, pelota, paquete)
+      scene.add(codo, pelota, caja)
 
       // ── LANZADOR DE PELOTAS (el 0% del scroll) ──
       // Antes de que arranque el guion, la paleta se puede jugar: cada clic manda
@@ -1805,7 +2195,7 @@ export default function ScrollLab() {
             for (let t = 0.16; t <= 0.46; t += 0.0025) {
               dibujar(t)
               const prog = seg(t, 0.12, 0.48)
-              const caraZ = IMPACTO.z + empujeDe(prog, SHOTS.drive.thrust) + 0.42
+              const caraZ = IMPACTO.z + empujeDe(prog, SHOTS.guion.thrust) + 0.42
               const d = pelota.position.z - caraZ
               if (Math.abs(d) < Math.abs(sep)) { sep = d; cuando = t }
               if (d < -0.02) dentro++          // cuadros con la pelota DETRÁS de la cara
@@ -1899,6 +2289,8 @@ export default function ScrollLab() {
         }
       }
       const pistaJuego = document.querySelector('.pista-juego')
+      const pistaScroll = document.querySelector('.pista-scroll')
+      const pistaCaja = document.querySelector('.pista-caja')
       let ultimoCuadro = performance.now() / 1000
       const frame = () => {
         raf = requestAnimationFrame(frame)
@@ -1907,12 +2299,19 @@ export default function ScrollLab() {
         ultimoCuadro = ahora                              // vuelve de fondo, no salta
         const jugando = progRef.current.t <= JUEGO_HASTA
         if (pistaJuego) pistaJuego.style.opacity = jugando ? '1' : '0'
+        if (pistaScroll) pistaScroll.style.opacity = progRef.current.t < 0.08 ? '1' : '0'
+        if (pistaCaja) pistaCaja.style.opacity = progRef.current.t < 0.08 ? '1' : '0'
         juego.activo = jugando
         // El clic corre su propio reloj y se apaga solo al completarse: eso es lo
         // que evita que el swing se corte a mitad o se repita.
         if (clic.activo) { clic.t += dt / clic.dur; if (clic.t >= 1) clic.activo = false }
         if (!jugando) clic.activo = false
         moverJuego(dt, jugando)
+        // Cosas que se mueven solas, como en un club de verdad: la pantalla LED
+        // corre sus mensajes y las banderas se mecen con el viento. Van con el
+        // reloj y no con el scroll: son ambiente, no guion.
+        texLona.offset.x = (texLona.offset.x + dt * 0.022) % 1
+        for (const b of banderas) b.grupo.rotation.y = b.base + Math.sin(ahora * 1.25 + b.fase) * 0.16
         // Con la pestaña de fondo el navegador ya frena requestAnimationFrame
         // solo, así que no hace falta nada más para no gastar batería. La versión
         // anterior usaba un IntersectionObserver y, si marcaba "no visible", el
@@ -1920,25 +2319,70 @@ export default function ScrollLab() {
         dibujar(progRef.current.t)
       }
       /* eslint-enable no-use-before-define */
+      // ── Física del tiro ──
+      // Van afuera de `dibujar` porque la usa también el tramo de la caja: la
+      // caja nace donde estaba la pelota en el destello.
+      const G = 15, REBOTE = 0.62
+      // Salida más fuerte quiere decir más RÁPIDA, no más alta: sube la
+      // velocidad de avance y se baja la vertical, si no queda un globo.
+      // Verificado: pasa la red con 2.64 de aire, pica en z=18.3 y rebota
+      // 3.2 unidades, un solo pique.
+      const VZ = 15, VX = 2.1, V0Y = 8.5
+      const T_PIQUE = 1.62                     // cuándo toca el piso (calculado)
+      const PISO_BOLA = SUELO_Y + R_BOLA
+      const posicionBola = (tt, v) => {
+        if (tt < T_IMPACTO) {
+          // ENTRADA por el costado, no de frente a la cámara: antes venía casi
+          // pegada al lente y no se leía la trayectoria.
+          // Acelera al llegar, no desacelera. `suave` (smoothstep) frena la
+          // pelota justo antes del impacto, y ahí se quedaba flotando en la
+          // zona que barre la paleta: por eso la alcanzaba. Una pelota en
+          // vuelo no frena, así que al cuadrado además de real es lo que
+          // resuelve el cruce.
+          const te = Math.pow(seg(tt, 0.02, T_IMPACTO), 2)
+          // Y en Z entra todavía un poco más tarde: durante el swing la paleta
+          // rota en Y, queda de canto y su borde barre hacia adelante casi un
+          // ancho de paleta.
+          const tz = te * te
+          return v.set(
+            mix(-17, CONTACTO_GUION.x, te),
+            mix(8.2, CONTACTO_GUION.y, te) - Math.sin(te * Math.PI) * 1.4,
+            mix(3.5, CONTACTO_GUION.z, tz)
+          )
+        }
+        // El tiempo de vuelo avanza LINEAL con el scroll (sin suavizado): si
+        // no, la pelota parece frenar y acelerar sola.
+        const tv = (tt - T_IMPACTO) * RITMO_VUELO
+        const rz = tv < T_PIQUE ? tv : T_PIQUE + (tv - T_PIQUE) * 0.42
+        return v.set(
+          CONTACTO_GUION.x + VX * rz,
+          Math.max(PISO_BOLA, balistica(tv, CONTACTO_GUION.y, V0Y, G, PISO_BOLA, REBOTE)),
+          CONTACTO_GUION.z + VZ * rz          // cruza la red y pica del otro lado
+        )
+      }
+      // easeOutBack: llega pasándose un poco y vuelve. La caja "se infla" al
+      // salir del destello en vez de aparecer de golpe.
+      const conRebote = k => 1 + 2.7 * Math.pow(k - 1, 3) + 1.7 * Math.pow(k - 1, 2)
+      const vInicioCaja = new THREE.Vector3()
+      posicionBola(T_DESTELLO, vInicioCaja)
+      const foco = new THREE.Vector3()
+      const RADIO_INICIO = 8.55
+      const FILM_TAN = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
+      const anchoLg = window.matchMedia('(min-width: 1024px)')
+
       const dibujar = (t) => {
 
         // ── El guion, escrito en función del progreso ──
-        // 0.00–0.18 · la paleta espera quieta, de frente
-        // 0.18–0.30 · la pelota ENTRA desde el frente, cayendo hacia la paleta
-        // 0.30–0.38 · el golpe
-        // 0.30–0.68 · vuelo: cruza la red y pica del otro lado
-        // 0.42–0.90 · la cámara gira 90° alrededor de la pelota, sin cortes
-        // 0.68–0.95 · la pelota cambia de forma y color hasta ser el envío
-        // 0.92–1.00 · la caja se asienta y queda quieta
-        const aMano   = suave(seg(t, 0.10, 0.22))
-        const aEntra  = suave(seg(t, 0.18, 0.30))
-        const aGolpe  = suave(seg(t, 0.30, 0.38))
-        const aVuelo  = suave(seg(t, 0.38, 0.64))
+        // 0.00–0.055 · se puede jugar: cada clic manda una pelota
+        // 0.02–0.34  · la pelota del guion entra desde el costado
+        // 0.12–0.48  · el swing; el golpe cae en T_IMPACTO (≈0.336)
+        // 0.34–0.70  · vuelo: cruza la red, pica y rebota
+        // 0.67–0.745 · destello en lo alto del rebote: la pelota pasa a ser caja
+        // 0.70–0.84  · la caja cae, rebota apenas y se asienta
+        // 0.40–0.80  · la cámara gira 90° siguiendo la pelota, sin cortes
+        // 0.74–0.92  · la cámara se acerca a la caja; al final, los botones
+        const aEntra = suave(seg(t, 0.18, 0.30))
 
-        // ── Paleta: el mismo golpe del hero de la página pública ──
-        // Tres fases sobre un único progreso, como en Paleta3D: carga (w), golpe
-        // (sw) y vuelta (rec). El swing sale del codo, así el mango acompaña el
-        // arco. Los números son los del golpe "drive" de allá.
         // ── EL SWING ──
         // Portado tal cual de Paleta3D: mismas tres fases, mismos coeficientes y
         // los mismos cinco tipos de golpe. Lo que faltaba acá era la PRIORIDAD y
@@ -1946,7 +2390,7 @@ export default function ScrollLab() {
         // scroll, y al terminar el clic saltaba de una pose a otra — de ahí los
         // cortes y el golpe repetido.
         //   1º el guion (scroll)   2º el clic   3º reposo
-        let prog = 0, lado = 1, tiro = SHOTS.drive
+        let prog = 0, lado = 1, tiro = SHOTS.guion
         if (t > JUEGO_HASTA) {
           prog = seg(t, 0.12, 0.48)
         } else if (clic.activo) {
@@ -1979,118 +2423,140 @@ export default function ScrollLab() {
         codo.visible = true
 
         // ── Pelota ──
-        // Nunca se oculta: es esta misma malla la que termina siendo la caja.
-        pelota.visible = aEntra > 0.01
+        const enCaja = t >= T_DESTELLO
+        posicionBola(Math.min(t, T_DESTELLO), pelota.position)
+        pelota.visible = aEntra > 0.01 && !enCaja
+        // Gira mientras vuela y, justo antes del destello, se acelera y crece un
+        // poco: anticipa que algo va a pasar.
+        const sube = seg(t, T_DESTELLO - 0.03, T_DESTELLO)
+        const vueltas = seg(t, 0.30, 0.72) * 9 + suave(sube) * 6
+        pelota.rotation.set(vueltas, vueltas * 0.3, vueltas * 0.4)
+        pelota.scale.setScalar(1 + 0.18 * suave(sube))
 
-        // Cuánto se transformó y cuánto se alineó. Va acá arriba porque de esto
-        // depende dónde está el piso para esta forma.
-        const cambio = suave(seg(t, 0.68, 0.95))
-        const alinea = suave(seg(t, 0.68, 0.90))
-        // Una esfera apoya a R del centro mire como mire, pero un CUBO ROTADO
-        // apoya sobre una esquina, hasta 1.73·R. Sin esto la caja se hunde en el
-        // piso justo mientras se transforma.
-        // La caja crece mientras se forma, así que el radio que toca el piso
-        // también crece. Antes se usaba el radio sin escalar y la caja terminaba
-        // 0.13 unidades hundida.
-        const escalaForma = 1 + 0.55 * cambio
-        const PISO_FORMA = SUELO_Y + R_BOLA * escalaForma * (1 + 0.732 * cambio * (1 - alinea))
-
-        // Física del tiro. El tiempo avanza LINEAL con el scroll (sin suavizado):
-        // si no, la pelota parece frenar y acelerar sola.
-        const G = 15, REBOTE = 0.62
-        // Salida más fuerte quiere decir más RÁPIDA, no más alta: sube la
-        // velocidad de avance y se baja la vertical, si no queda un globo.
-        // Verificado: pasa la red con 2.64 de aire, pica en z=18.3 y rebota
-        // 3.2 unidades, un solo pique.
-        const VZ = 15, VX = 2.1, V0Y = 8.5
-        const T_PIQUE = 1.62                     // cuándo toca el piso (calculado)
-        let bx, by, bz
-        if (t < T_IMPACTO) {
-          // ENTRADA por el costado, no de frente a la cámara: antes venía casi
-          // pegada al lente y no se leía la trayectoria.
-          // Acelera al llegar, no desacelera. `suave` (smoothstep) frena la
-          // pelota justo antes del impacto, y ahí se quedaba flotando en la
-          // zona que barre la paleta: por eso la alcanzaba. Una pelota en
-          // vuelo no frena, así que al cuadrado además de real es lo que
-          // resuelve el cruce.
-          const te = Math.pow(seg(t, 0.02, T_IMPACTO), 2)
-          // Y en Z entra todavía un poco más tarde: durante el swing la paleta
-          // rota en Y, queda de canto y su borde barre hacia adelante casi un
-          // ancho de paleta.
-          const tz = te * te
-          bx = mix(-17, CONTACTO_GUION.x, te)
-          bz = mix(3.5, CONTACTO_GUION.z, tz)
-          by = mix(8.2, CONTACTO_GUION.y, te) - Math.sin(te * Math.PI) * 1.4
-        } else {
-          const tv = seg(t, T_IMPACTO, 0.92) * 2.60   // segundos de vuelo: da para UN pique
-          const rz = tv < T_PIQUE ? tv : T_PIQUE + (tv - T_PIQUE) * 0.42
-          bx = CONTACTO_GUION.x + VX * rz
-          bz = CONTACTO_GUION.z + VZ * rz         // cruza la red y pica del otro lado
-          by = balistica(tv, CONTACTO_GUION.y, V0Y, G, PISO_FORMA, REBOTE)
-        }
-        by = Math.max(by, PISO_FORMA)
-        by = mix(by, SUELO_Y + R_BOLA * escalaForma + 0.02, suave(seg(t, 0.86, 1.00)))
-        pelota.position.set(bx, by, bz)
-
-        // ── Cámara: un giro continuo de 90° alrededor de la pelota ──
+        // ── Cámara: un giro continuo de 90° alrededor de la acción ──
         // Se resuelve ANTES que la caja, porque la caja tiene que terminar
         // enfrentando a la cámara para que el logo se lea.
         const sigue = suave(seg(t, 0.24, 0.46))          // suelta la paleta, toma la pelota
-        const giro = suave(seg(t, 0.42, 0.90)) * (Math.PI / 2)
-        const foco = new THREE.Vector3(IMPACTO.x, IMPACTO.y, IMPACTO.z).lerp(pelota.position, sigue)
-        // Arranca cerca para que la paleta se lea como protagonista, y termina
-        // un poco más lejos y más alta: pegada al piso, la red entraba de canto
-        // cortando la pantalla en diagonal.
-        // La cámara ORBITA alrededor de la paleta, así que alejar la paleta no
-        // sirve de nada: la cámara la sigue. El tamaño en pantalla lo fija este
-        // radio y nada más.
-        // En el hero público la paleta mide 5.2 con la cámara a 11.5, o sea
-        // 0.452 de alto por unidad de distancia. Acá mide 3.9, así que para dar
-        // lo mismo la cámara tiene que estar a 8.63 (contando el 1.2 de altura,
-        // el radio es 8.55). Al final se acerca para que la caja se lea.
-        const RADIO_INICIO = 8.55
+        const giro = suave(seg(t, 0.40, 0.80)) * (Math.PI / 2)
+
+        // ── LA CAJA ──
+        // Nace en el pico del destello donde estaba la pelota, sale "inflándose"
+        // y cae con la misma gravedad, con un rebote corto (e = 0.3: el cartón
+        // casi no rebota) y un aplaste mínimo al tocar el piso.
+        const tc = Math.max(0, t - T_DESTELLO) * RITMO_VUELO     // segundos desde el destello
+        const pop = seg(t, T_DESTELLO, T_DESTELLO + 0.035)
+        const escCaja = enCaja ? mix(0.35, 1, conRebote(pop)) : 0.35
+        const asienta = suave(seg(t, T_DESTELLO, T_APOYO + 0.02))
+        // Mientras gira en el aire apoya sobre una arista, no sobre la cara: se
+        // le da margen para que no se hunda (un cubo rotado llega a 1,73 x R).
+        const pisoCaja = SUELO_Y + (L_CAJA * escCaja) / 2 * (1 + 0.5 * (1 - asienta))
+        const V0_CAJA = 1.2
+        const yCaja = balistica(tc, vInicioCaja.y, V0_CAJA, G, pisoCaja, 0.3)
+        // cuándo toca el piso por primera vez (para el aplaste)
+        const caida = vInicioCaja.y - (SUELO_Y + L_CAJA / 2)
+        const tToca = (V0_CAJA + Math.sqrt(V0_CAJA * V0_CAJA + 2 * G * Math.max(0, caida))) / G
+        const aplaste = tc > tToca - 0.03 ? Math.exp(-Math.pow((tc - tToca) / 0.06, 2)) * 0.07 : 0
+        // sigue avanzando un poco al caer (traía la inercia de la pelota)
+        const avance = 1 - Math.exp(-tc * 3)
+        caja.visible = enCaja
+        caja.position.set(
+          vInicioCaja.x + 0.35 * avance,
+          yCaja - aplaste * L_CAJA * 0.5,
+          vInicioCaja.z + 2.4 * avance
+        )
+        caja.scale.set(escCaja * (1 + aplaste * 0.5), escCaja * (1 - aplaste), escCaja * (1 + aplaste * 0.5))
+        // Da vueltas al caer y se endereza al apoyarse, en tres cuartos respecto
+        // de la cámara: de frente puro se veía plana; así se lee la etiqueta, la
+        // tapa y la cinta del costado.
+        const TRES_CUARTOS = -0.42
+        caja.rotation.set(
+          (1 - asienta) * 1.1 * Math.sin(tc * 5),
+          giro + TRES_CUARTOS + (1 - asienta) * 2.2,
+          (1 - asienta) * 0.5 * Math.cos(tc * 4)
+        )
+
+        // Sombra de contacto: se achica y se oscurece a medida que baja
+        const alturaCaja = Math.max(0, caja.position.y - (SUELO_Y + (L_CAJA * escCaja) / 2))
+        sombra.visible = enCaja
+        sombra.position.set(caja.position.x, SUELO_Y + 0.015, caja.position.z)
+        const sc = L_CAJA * escCaja * (1.7 + alturaCaja * 0.35)
+        sombra.scale.set(sc, sc, 1)
+        matSombra.opacity = Math.max(0, 0.9 - alturaCaja * 0.28)
+
+        // ── EL DESTELLO ──
+        const baja = seg(t, T_DESTELLO, T_DESTELLO + 0.045)
+        const brillo = suave(sube) * (1 - suave(baja))
+        destello.visible = brillo > 0.01
+        destello.material.opacity = brillo
+        destello.scale.setScalar(mix(0.5, 2.8, suave(sube)) * (1 + 0.3 * suave(baja)))
+        destello.position.copy(enCaja ? vInicioCaja : pelota.position)
+        const onda = seg(t, T_DESTELLO, T_DESTELLO + 0.06)
+        anillo.visible = onda > 0 && onda < 1
+        anillo.material.opacity = (1 - onda) * 0.75
+        anillo.scale.setScalar(mix(1.2, 6.5, 1 - Math.pow(1 - onda, 2)))
+        anillo.position.copy(vInicioCaja)
+
+        // ── Cámara ──
+        // Sigue a la pelota y después a la caja. Arranca cerca para que la
+        // paleta se lea como protagonista; sube cuando la pelota cruza la red
+        // (a la altura de la faja, la red cortaba media pantalla); y al final
+        // baja y se acerca a la caja, mirándola apenas desde arriba.
+        // La cámara ORBITA alrededor del foco, así que el tamaño de la paleta
+        // en pantalla lo fija este radio: en el hero público mide 5.2 con la
+        // cámara a 11.5 (0.452 por unidad); acá mide 3.9, o sea 8.55 de radio.
+        foco.set(IMPACTO.x, IMPACTO.y, IMPACTO.z).lerp(enCaja ? caja.position : pelota.position, sigue)
+        const acerca = suave(seg(t, 0.74, 0.92))
         // Pantalla angosta (celular vertical): con el FOV vertical fijo, la
         // paleta llenaba el alto entero. Se aleja igual que en el hero público.
         const angosto = Math.max(1, 0.58 / (camera.aspect || 1))
-        const dist = mix(RADIO_INICIO, 7.4, suave(seg(t, 0.40, 0.92))) * angosto
-        const alto = mix(1.2, 2.4, suave(seg(t, 0.45, 0.92)))
+        // Cierre a 6.8 y 5.3 de alto: más cerca la caja pisaba los botones, y
+        // más baja la línea central de la cancha le quedaba tangente al borde
+        // de arriba, que visualmente la cortaba (con 4.2 todavía la rozaba).
+        // Desde arriba además se ve la cinta de la tapa.
+        // A mitad del vuelo la cámara se abre y sube (`abre` va de 0 a 1 y
+        // vuelve): es el plano general que muestra el club, justo cuando el
+        // texto dice "Envíos a todo el país". Vuelve antes del destello.
+        // Se aleja casi sin subir y la mira apunta por encima de la pelota: si
+        // la cámara sube, mira para abajo y lo que se ve es piso, no el club.
+        const abre = Math.sin(Math.PI * seg(t, 0.44, 0.69))
+        const dist = (mix(mix(RADIO_INICIO, 7.6, suave(seg(t, 0.40, 0.72))), 6.8, acerca) + 16 * abre) * angosto
+        const alto = mix(mix(1.2, 3.8, suave(seg(t, 0.36, 0.52))), 5.3, acerca) + 1.5 * abre
         camera.position.set(
           foco.x + Math.sin(giro) * dist,
           foco.y + alto,
           foco.z + Math.cos(giro) * dist
         )
-        camera.lookAt(foco)
+        // En pantalla vertical el texto va en una tarjeta abajo, y en el cierre
+        // (con los botones) esa tarjeta tapaba la base de la caja. Se apunta un
+        // poco por debajo de la caja para que suba en el cuadro.
+        const bajaMira = camera.aspect < 1 ? 1.3 * acerca : 0
+        camera.lookAt(foco.x, foco.y - bajaMira + 5 * abre, foco.z)
+
+        // ── Encuadre ──
+        // En pantallas anchas el protagonista se corre al lado CONTRARIO del
+        // texto, como en un plano de cine: con la paleta al centro, "Paletas de
+        // pádel" le quedaba encima. Se hace corriendo el sensor de la cámara
+        // (filmOffset), no moviendo la cámara, así la perspectiva no cambia.
+        // En el celular no hace falta: el texto va en una tarjeta abajo.
+        let corrimiento = 0
+        // Mismo corte que el CSS (lg: = 1024 px), si no el texto ya está al
+        // costado y la paleta todavía al centro.
+        if (camera.aspect > 1.2 && anchoLg.matches) {
+          ACTOS.forEach((a, i) => {
+            const entra = i === 0 ? 1 : suave(seg(t, a.at - 0.03, a.at + 0.02))
+            const sale = a.fin ? 0 : suave(seg(t, a.at + DURA_ACTO - 0.02, a.at + DURA_ACTO + 0.03))
+            corrimiento += (a.lado === 'izq' ? 1 : -1) * entra * (1 - sale)
+          })
+          corrimiento = Math.max(-1, Math.min(1, corrimiento))
+        }
+        const CORRE = 0.13                     // fracción del ancho de pantalla
+        camera.filmOffset = -corrimiento * CORRE * camera.getFilmWidth() * camera.aspect * FILM_TAN
+        camera.updateProjectionMatrix()
 
         // El sol gira despacio con el guion: con la luz clavada, el tramo largo
         // del vuelo quedaba plano porque nada cambiaba de tono.
         sol.position.set(4 + 9 * suave(t), 8 + 3 * suave(t), 6 - 11 * suave(t))
-          sol.intensity = mix(1.6, 1.3, suave(seg(t, 0.3, 0.95)))   // más directa, sombra más definida
-
-        // ── DE PELOTA A ENVÍO ──
-        // La misma malla cambia de forma y de color. No se achica ni desaparece
-        // para dejarle lugar a otra: es la pelota la que se vuelve caja.
-        transformar(cambio)
-
-        // Gira mientras es pelota; al volverse caja se alinea y queda QUIETA, con
-        // la cara del logo enfrentando a la cámara. Se calcula en función del
-        // scroll (no acumulando) para que ir y volver den lo mismo.
-        const vueltas = seg(t, 0.30, 0.72) * 9
-        pelota.rotation.x = vueltas * (1 - alinea)
-        pelota.rotation.z = vueltas * 0.4 * (1 - alinea)
-        pelota.rotation.y = mix(vueltas * 0.3, giro, alinea)
-
-        // Cintas y etiqueta: se apoyan encima y sólo cuando la forma ya es
-        // cúbica. Antes se verían flotando alrededor de una esfera.
-        const detalle = suave(seg(t, 0.80, 0.98))
-        paquete.visible = detalle > 0.01
-        matCinta.opacity = detalle
-        matEtiqueta.opacity = detalle
-        // La caja CRECE al formarse: la pelota nunca se achica, pero el envío
-        // termina con más presencia que una pelota de pádel.
-        pelota.scale.setScalar(escalaForma)
-        paquete.position.copy(pelota.position)
-        paquete.rotation.copy(pelota.rotation)
-        paquete.scale.setScalar(escalaForma)
+        sol.intensity = mix(2.0, 1.7, suave(seg(t, 0.3, 0.95)))
 
         // Los carteles de producto basculan apenas, cada uno con su desfase: da
         // sensación de carrusel sin que ninguno llegue a darse vuelta.
@@ -2099,20 +2565,6 @@ export default function ScrollLab() {
             c.grupo.rotation.y = c.base + Math.sin(t * 5 + c.fase) * 0.20
           }
         }
-
-        // La sombra sigue a la pelota por el piso: se agranda y se aclara cuanto
-        // más alto va, como una sombra de verdad.
-        // La sombra de la paleta la sigue por el piso: se agranda y se aclara
-        // cuanto más alto está, igual que la de la pelota.
-        const altPal = Math.max(0, codo.position.y + BRAZO - SUELO_Y)
-        sombraPal.position.set(IMPACTO.x, SUELO_Y + 0.02, IMPACTO.z + 0.4)
-        sombraPal.scale.set(ALTO_PALETA * 0.20 * (1 + altPal * 0.03), 1, ALTO_PALETA * 0.34 * (1 + altPal * 0.03))
-        matSombraPal.opacity = 0   // ya hay sombra real proyectada por el sol
-
-        const altura = Math.max(0, pelota.position.y - SUELO_Y)
-        // La sombra ahora la proyecta el sol. La mancha pintada quedaba siempre
-        // del mismo tamaño y no seguía la distancia: se apaga.
-        sombra.visible = false
 
         composer.render()
       }
@@ -2127,11 +2579,11 @@ export default function ScrollLab() {
         renderer.domElement.removeEventListener('pointermove', alMover)
         // geoJuego/matJuego son los de la pelota del guion: los libera aquel bloque
         ro.disconnect()
-        ;scene.traverse(o => {
+        ;[scene, escenaFx].forEach(esc => esc.traverse(o => {
           o.geometry?.dispose()
           if (Array.isArray(o.material)) o.material.forEach(m => m.dispose())
           else o.material?.dispose()
-        })
+        }))
         texRed.dispose()
         pmrem.dispose()
         renderer.dispose()
@@ -2145,9 +2597,9 @@ export default function ScrollLab() {
   // ── Scroll: una timeline que sólo mueve el progreso y los textos ──
   useGSAP(() => {
     if (window.matchMedia('(prefers-reduced-motion: reduce)').matches) {
-      // La escena queda en un cuadro que ya cuenta el final (la caja formada) y
-      // no se crea el pin: antes quedaban siete pantallas de scroll vacío.
-      progRef.current.t = 0.97
+      // La escena queda en el cuadro final (la caja apoyada) y no se crea el
+      // pin: antes quedaban siete pantallas de scroll vacío.
+      progRef.current.t = 1
       return
     }
 
@@ -2155,7 +2607,9 @@ export default function ScrollLab() {
       scrollTrigger: {
         trigger: stageRef.current,
         start: 'top top',
-        end: '+=600%',     // cuánto hay que scrollear para recorrer el guion
+        // Cuánto hay que scrollear para recorrer el guion. Eran 6 pantallas:
+        // en el celular es mucho y la gente se va antes de llegar al final.
+        end: '+=400%',
         pin: true,
         scrub: 0.6,
         anticipatePin: 1,
@@ -2167,17 +2621,34 @@ export default function ScrollLab() {
     // El guion completo dura 1 unidad: así el `at` de cada texto es directo.
     tl.to(progRef.current, { t: 1, duration: 1 }, 0)
 
+    // El titular se ve apenas carga la página: un hero no puede arrancar mudo.
     gsap.set('.acto', { autoAlpha: 0, y: 26 })
+    gsap.set('.acto-0', { autoAlpha: 1, y: 0 })
+    gsap.set('.scrim-izq', { autoAlpha: 1 })
+    gsap.set('.scrim-der', { autoAlpha: 0 })
+    gsap.set('.cta-final', { autoAlpha: 0, y: 12 })
     ACTOS.forEach((a, i) => {
-      tl.to(`.acto-${i}`, { autoAlpha: 1, y: 0, duration: 0.05 }, a.at)
-        .to(`.acto-${i}`, { autoAlpha: 0, y: -22, duration: 0.05 }, a.at + 0.14)
+      // el velo del lado del texto entra y sale con él
+      const velo = a.lado === 'izq' ? '.scrim-izq' : '.scrim-der'
+      if (i > 0) {
+        tl.to(`.acto-${i}`, { autoAlpha: 1, y: 0, duration: 0.04 }, a.at)
+        tl.to(velo, { autoAlpha: 1, duration: 0.04 }, a.at)
+      }
+      if (!a.fin) {
+        tl.to(`.acto-${i}`, { autoAlpha: 0, y: -22, duration: 0.04 }, a.at + DURA_ACTO)
+        tl.to(velo, { autoAlpha: 0, duration: 0.04 }, a.at + DURA_ACTO)
+      }
     })
+    // Los botones, cuando la caja ya está apoyada y la cámara se acercó
+    tl.to('.cta-final', { autoAlpha: 1, y: 0, duration: 0.04 }, 0.9)
   }, { scope: rootRef })
+
+  const textoWhatsApp = encodeURIComponent('¡Hola SARO! Quiero hacer un pedido.')
 
   return (
     <div ref={rootRef} className="bg-[#eef2f8]">
       <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-saro-dark/90 text-white text-[11px] font-bold px-3 py-1.5 rounded-full backdrop-blur">
-        MAQUETA · formas simples para validar el guion
+        MAQUETA · hero de scroll, todavía no publicado
       </div>
 
       <section
@@ -2188,6 +2659,32 @@ export default function ScrollLab() {
       >
         <div ref={mountRef} className="absolute inset-0" />
 
+        {/* Pantalla de carga: tapa la escena hasta que llega la paleta. Sin
+            esto se veía un fondo celeste vacío mientras bajaba el modelo. */}
+        {!sinMovimiento && (
+          <div
+            aria-hidden={listo}
+            className={`absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#eef2f8] transition-opacity duration-700 ${
+              listo ? 'opacity-0 pointer-events-none' : 'opacity-100'
+            }`}
+          >
+            <img src="/assets/logo-icon.png" alt="" className="w-14 h-14 animate-pulse" />
+            <p className="mt-4 text-[11px] font-semibold uppercase tracking-[.3em] text-slate-400">
+              Cargando
+            </p>
+          </div>
+        )}
+
+        {/* Velos detrás del texto, sólo en pantallas anchas: sin ellos la bajada
+            gris quedaba sobre la cancha y no se leía. En el celular el texto ya
+            va sobre una tarjeta. */}
+        {!sinMovimiento && (
+          <>
+            <div className="scrim scrim-izq pointer-events-none absolute inset-y-0 left-0 w-[46%] hidden lg:block bg-gradient-to-r from-white/75 via-white/35 to-transparent" />
+            <div className="scrim scrim-der pointer-events-none absolute inset-y-0 right-0 w-[46%] hidden lg:block bg-gradient-to-l from-white/75 via-white/35 to-transparent" />
+          </>
+        )}
+
         {ACTOS.map((a, i) => (
           <div
             key={i}
@@ -2196,36 +2693,75 @@ export default function ScrollLab() {
                 // en columna y sobre un fondo propio: los cinco textos comparten
                 // el mismo punto absoluto y, sin la animación que los turna,
                 // quedarían encimados e ilegibles
-                ? 'acto relative mx-auto w-[min(90vw,560px)] text-left bg-white/85 backdrop-blur rounded-2xl px-5 py-4 mb-3 shadow-card'
-                // En el celular NO van al costado ni al medio: la pantalla es
-                // angosta y quedaban encima de la paleta, ilegibles. Van abajo,
-                // a lo ancho y sobre un panel claro. Recién en sm: vuelven a
-                // los costados, que es donde hay lugar de sobra.
-                : `acto acto-${i} absolute w-[calc(100%-2rem)] left-4 right-4 bottom-8 text-left
-                   bg-white/85 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-card
-                   sm:w-[min(86vw,380px)] sm:top-1/2 sm:bottom-auto sm:-translate-y-1/2
-                   sm:bg-transparent sm:backdrop-blur-none sm:rounded-none sm:px-0 sm:py-0 sm:shadow-none ${
-                    a.lado === 'izq' ? 'sm:left-16 sm:right-auto sm:text-left'
-                                     : 'sm:right-16 sm:left-auto sm:text-right'
+                ? 'relative mx-auto w-[min(90vw,560px)] text-left bg-white/85 backdrop-blur rounded-2xl px-5 py-4 mb-3 shadow-card'
+                // En el celular y la tablet NO van al costado: la pantalla es
+                // angosta y quedaban encima de la paleta. Van abajo, a lo ancho
+                // y sobre un panel claro. Recién en lg: vuelven a los costados,
+                // con el protagonista corrido al otro lado (ver "Encuadre").
+                // El posicionamiento va en este contenedor y la animación en el
+                // de adentro: si GSAP anima `y` sobre el mismo elemento, pisa
+                // el -translate-y-1/2 que lo centra.
+                : `absolute w-[calc(100%-2rem)] left-4 right-4 bottom-8
+                   lg:w-[min(40vw,440px)] lg:top-1/2 lg:bottom-auto lg:-translate-y-1/2 ${
+                    a.lado === 'izq' ? 'lg:left-[6vw] lg:right-auto' : 'lg:right-[6vw] lg:left-auto'
                   }`
             }
           >
-            <p className="text-[11px] font-bold uppercase tracking-[.32em] text-saro-blue mb-2">{a.k}</p>
-            <h2 className="text-3xl sm:text-5xl font-extrabold text-saro-dark tracking-tight leading-[1.05]">
-              {a.t}
-            </h2>
-            <p className="text-sm sm:text-base text-gray-500 mt-3 leading-relaxed">{a.d}</p>
+            <div
+              className={
+                sinMovimiento
+                  ? ''
+                  : `acto acto-${i} text-left bg-white/85 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-card
+                     lg:bg-transparent lg:backdrop-blur-none lg:rounded-none lg:px-0 lg:py-0 lg:shadow-none ${
+                      a.lado === 'izq' ? 'lg:text-left' : 'lg:text-right'
+                    }`
+              }
+            >
+              <p className="text-[11px] font-bold uppercase tracking-[.32em] text-saro-blue mb-2">{a.k}</p>
+              <h2 className="text-3xl lg:text-5xl font-extrabold text-saro-dark tracking-tight leading-[1.05]">
+                {a.t}
+              </h2>
+              <p className="text-sm lg:text-lg text-slate-600 lg:text-slate-700 mt-3 leading-relaxed">{a.d}</p>
+              {a.fin && (
+                <div className={`cta-final mt-5 flex flex-col sm:flex-row gap-2.5 ${
+                  a.lado === 'der' ? 'lg:justify-end' : ''
+                }`}>
+                  <Link
+                    href="/paletas"
+                    className="inline-flex items-center justify-center gap-2 bg-saro-dark hover:bg-saro-blue text-white font-bold text-sm px-6 py-3.5 rounded-xl transition-colors shadow-lg shadow-saro-dark/20 btn-press"
+                  >
+                    Ver paletas
+                    <span aria-hidden="true">→</span>
+                  </Link>
+                  <a
+                    href={`https://wa.me/${whatsappNumber}?text=${textoWhatsApp}`}
+                    target="_blank"
+                    rel="noopener noreferrer"
+                    className="inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-6 py-3.5 rounded-xl transition-colors shadow-lg shadow-emerald-500/25 btn-press"
+                  >
+                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4" aria-hidden="true">
+                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+                      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.853L.054 23.446a.5.5 0 0 0 .612.612l5.598-1.479A11.947 11.947 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.686-.523-5.212-1.43l-.374-.22-3.878 1.023 1.023-3.877-.22-.374A9.955 9.955 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+                    </svg>
+                    Escribinos por WhatsApp
+                  </a>
+                </div>
+              )}
+            </div>
           </div>
         ))}
 
-        {/* Dos pistas al pie: que se puede jugar y que se puede scrollear. La
-            primera se desvanece en cuanto arranca el guion. */}
-        <div className="absolute bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-5 text-[10px] font-semibold uppercase tracking-widest">
-          <span className="pista-juego text-saro-blue transition-opacity duration-300">
-            Tocá para jugar
-          </span>
-          <span className="text-slate-400">Scrolleá</span>
-        </div>
+        {/* Dos pistas al pie: que se puede jugar y que se puede scrollear. Se
+            desvanecen en cuanto arranca el guion: en el celular quedaban
+            debajo de la tarjeta de texto. */}
+        {!sinMovimiento && (
+          <div className="absolute top-20 lg:top-auto lg:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-5 whitespace-nowrap text-[10px] font-semibold uppercase tracking-widest bg-white/75 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm pista-caja transition-opacity duration-300">
+            <span className="pista-juego text-saro-blue transition-opacity duration-300">
+              Tocá para jugar
+            </span>
+            <span className="pista-scroll text-slate-400 transition-opacity duration-300">Scrolleá</span>
+          </div>
+        )}
       </section>
 
       <section className="min-h-screen flex items-center justify-center bg-white">

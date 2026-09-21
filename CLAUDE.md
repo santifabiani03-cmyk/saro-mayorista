@@ -5,7 +5,7 @@
 > chats viejos ni preguntar nada. Prioriza ser exhaustivo. Si algo cambia, actualizá este
 > archivo y `docs/ESTETICA.md`.
 
-Última actualización: 2026-08-26.
+Última actualización: 2026-09-21.
 
 > ⚠️ **Cambio importante (agosto 2026): el sitio pasó de MAYORISTA a MINORISTA.**
 > La compra mínima está **oculta** (con un interruptor en el admin para volver a mostrarla) y
@@ -472,10 +472,18 @@ Una segunda versión del hero, **todavía en maqueta**, en la ruta interna
 `/lab-scroll` (no indexada, no enlazada). El hero que está en producción sigue
 siendo el de `Paleta3D.jsx`; este NO lo reemplazó todavía.
 
-**El guion**, todo atado al scroll con GSAP ScrollTrigger (`scrub`):
-la paleta espera → la pelota entra de costado → el golpe → la pelota cruza la
-red y pica del otro lado → la cámara gira 90° siguiéndola → la pelota **se
-transforma en una caja de envío** → la caja se apoya.
+**El guion**, todo atado al scroll con GSAP ScrollTrigger (`scrub`, 4 pantallas
+de scroll): la paleta espera (se puede jugar con clics) → la pelota entra de
+costado → el golpe → la pelota cruza la red, pica y rebota → la cámara gira 90°
+siguiéndola → en lo alto del rebote **un destello la tapa y sale una caja de
+cartón** (cinta azul con el logo, etiqueta SARO) → la caja cae, rebota apenas y
+se apoya → aparecen los botones **"Ver paletas"** y **"Escribinos por
+WhatsApp"** (número de `public/config.json`).
+
+Cada texto acompaña lo que se ve: golpe → "Carbono para cada nivel", vuelo →
+"Envíos a todo el país", caja → "Armalo en dos minutos", cierre → "Cerrá por
+WhatsApp" + botones. Los tiempos están arriba de todo en `ScrollLab.jsx`
+(`ACTOS`, `T_DESTELLO`, `T_APOYO`, `RITMO_VUELO`).
 
 **Cómo está armado** (`src/app/lab-scroll/ScrollLab.jsx`):
 
@@ -483,10 +491,35 @@ transforma en una caja de envío** → la caja se apoya.
   lo lee en cada cuadro. Nada más se comunica entre las dos librerías.
 - **El tiempo de vuelo avanza LINEAL con el scroll.** Con suavizado, la pelota
   parece frenar y acelerar sola.
-- **La transformación es geométrica, no un cruce entre dos objetos.** Los
-  vértices de la esfera viajan hasta la cara del cubo (`d / mayor componente`).
-  Como las esquinas del cubo quedan más lejos del centro que la superficie de la
-  esfera, la pelota **nunca se achica**: se expande hasta volverse caja.
+- **El cambio de pelota a caja lo tapa un destello.** Antes era una deformación
+  geométrica a la vista (los vértices de la esfera viajaban al cubo) y el paso
+  intermedio parecía una pelota desinflada; la caja final además quedaba con
+  bordes ondulados. Ahora son dos objetos: la pelota se acelera y crece un poco,
+  el destello llega a su pico, y en ese instante se cambia una por otra.
+- **El entorno se arma en capas, con aire entre una y otra** (antes un seto de
+  tres filas rodeaba todo y la escena se sentía cerrada): cerco bajo de medio
+  metro → árboles sueltos con cielo entre las copas (se deja una ventana sin
+  árboles detrás de la paleta) → dos siluetas de lomas lejanas en anillo, sin
+  niebla. Sin techo de vigas, carteles más bajos (13 de alto) y reja gris
+  translúcida en vez de negra.
+- **El fondo de la paleta:** las lonas son **pantallas LED de torneo** con
+  mensajes que corren solos (reloj real, no el scroll) y detrás hay
+  **banderas SARO** que se mecen, intercaladas con los carteles. Los mensajes de
+  la pantalla NO repiten los textos del guion (con "Fábrica argentina" se
+  duplicaba el titular).
+- **Plano general a mitad del vuelo** (`abre`): la cámara se aleja casi sin
+  subir y apunta por encima de la pelota. Si sube, mira al piso y no se ve el
+  club.
+- **Piso de césped sintético en dos capas:** detalle que se repite (fibras
+  finas peinadas + arena del relleno, también usado como relieve) × variación
+  que cubre la cancha una sola vez (juntas de los rollos, manchones, desgaste
+  junto a la red y en la línea de saque), multiplicada en el shader
+  (`onBeforeCompile`). Se probó con matas de fibras y quedaba como camuflaje.
+- **Encuadre de cine en pantallas anchas** (≥ 1024 px): el protagonista se corre
+  al lado contrario del texto moviendo el sensor de la cámara (`filmOffset`), no
+  la cámara. Detrás del texto hay un velo blanco que entra y sale con él. En
+  celular y tablet el texto va en una tarjeta abajo y la cámara apunta un poco
+  más abajo en el cierre para que la caja quede arriba de la tarjeta.
 - **Escala real.** 1 unidad ≈ 15,5 cm. La cancha mide 129 × 65 (20 × 10 m) y la
   red 5,67 (88 cm). Cuando la red medía 1,5 el pique no se leía como pádel.
 
@@ -499,6 +532,11 @@ transforma en una caja de envío** → la caja se apoya.
 | La paleta no llega a tiempo | La cara pasa por el impacto en un instante exacto; la pelota tiene que usar **ese mismo** momento |
 | La caja se hunde en el piso | Una esfera apoya a R mire como mire, pero un **cubo rotado** apoya en una esquina, hasta 1,73·R |
 | El césped no se veía | El piso celeste medía 240×240 (37 m): siete veces una cancha. Tapaba todo el terreno |
+| Mancha negra enorme cruzando el destello | La oclusión ambiental (GTAO) dibuja los sprites como planos sólidos. Los efectos de luz van en una **escena aparte** (`escenaFx`) que se dibuja después |
+| El follaje sigue facetado aunque se suban las caras | El icosaedro viene sin vértices compartidos y las normales salen planas. Hay que unirlos (`mergeVertices`) antes de `computeVertexNormals` |
+| Un objeto de primer plano (el cesto de pelotas) molesta en todos lados | Con el protagonista corriéndose de lado a lado y la cámara orbitando, siempre termina detrás del texto, detrás de la paleta o en el camino de la cámara. Se sacó |
+| `medirCuadro` o los cuadros por segundo dan valores absurdos | Con el navegador integrado **oculto**, el navegador frena la animación. Para capturar: `__lab.ver(t)`, esperar 2 s y sacar la captura |
+| El texto ya está al costado pero la paleta sigue al centro | El corte del encuadre tiene que ser el **mismo** que el del CSS (`matchMedia('(min-width: 1024px)')`), no el ancho del lienzo |
 
 **Assets 3D y Meshy.** Patrón confirmado con seis modelos: Meshy **rinde en
 objetos compactos y orgánicos** (mano, caja y árbol funcionaron, con reducciones
@@ -514,16 +552,26 @@ retazos sin estructura, no se va a poder optimizar.
 **Cómo verificar la escena.** El componente expone `window.__lab` en desarrollo:
 `ver(t)` dibuja un cuadro puntual del guion sin depender del scroll, y
 `vistaGeneral(t)` encuadra toda la escena y cuenta mallas. El renderer usa
-`preserveDrawingBuffer: true` para poder leer el cuadro dibujado. Con eso
+`preserveDrawingBuffer: true` para poder leer el cuadro dibujado (**sólo en
+desarrollo**: en producción cuesta rendimiento y nadie lo lee). Con eso
 aparecieron en minutos errores que a ciegas costaron horas.
+
+**Medir el costo:** `medirCuadro()` en el navegador integrado da números muy
+inestables (la misma versión dio 31 ms y 219 ms seguidos). Para comparar
+versiones sirve más contar triángulos recorriendo la escena. Referencia de
+septiembre 2026: ~404 mil triángulos con el entorno nuevo (antes de las mejoras
+eran ~545 mil).
 
 ⚠️ La pestaña que maneja la extensión de Chrome a veces **no tiene viewport**
 (`window.innerWidth` en 0 y `document.hidden` en true). Ahí el lienzo queda en
 1×1 y toda captura falla — no es un problema del sitio.
 
-**Qué falta para llevarlo a producción:** criterio visual sobre el resultado
-final, la cancha 3D que está haciendo smfab, y la decisión de reemplazar el hero
-actual (§5.3: eso requiere confirmación del dueño).
+**Qué falta para llevarlo a producción:** el OK visual de smfab, probarlo en un
+celular de gama media real, sacar el cartel "MAQUETA" y la sección "Acá sigue la
+página", meterlo en `Landing.jsx`, y la decisión de reemplazar el hero actual
+(§5.3: eso requiere confirmación del dueño). La cancha 3D que estaba haciendo
+smfab ya no es imprescindible: la cancha armada por código funciona. Pendiente
+menor: en los planos abiertos la paleta queda flotando sola en el aire.
 
 ---
 
