@@ -1,7 +1,7 @@
 'use client'
 
 import { useState, useRef, useEffect } from 'react'
-import { track } from '../utils/analytics'
+import { track, trackContacto } from '../utils/analytics'
 
 const BIENVENIDA = {
   role: 'bot',
@@ -86,7 +86,6 @@ export default function ChatWidget({ whatsappNumber }) {
     const texto = ultima
       ? `Hola! Venía consultando por el chat de la web: ${ultima}`
       : 'Hola! Quería hacer una consulta.'
-    track('chat_deriva_whatsapp')
     return `https://wa.me/${whatsappNumber}?text=${encodeURIComponent(texto)}`
   }
 
@@ -181,6 +180,7 @@ export default function ChatWidget({ whatsappNumber }) {
           {derivar && !loading && (
             <a
               href={linkWhatsApp()}
+              onClick={() => { track('chat_deriva_whatsapp'); trackContacto('chat') }}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold py-2.5 rounded-xl transition-colors btn-press"

@@ -5,6 +5,7 @@ import ProductList from '../components/admin/ProductList'
 import DemandDashboard from '../components/admin/DemandDashboard'
 import LabelCompiler from '../components/admin/LabelCompiler'
 import SettingsPanel from '../components/admin/SettingsPanel'
+import PublicidadPanel from '../components/admin/PublicidadPanel'
 import { exportCatalogPdf, uploadCatalogPdf } from '../utils/exportCatalogPdf'
 
 
@@ -232,6 +233,16 @@ export default function AdminPage() {
     await persistProducts(newList)
   }
 
+  const handleTogglePublicitar = async (id) => {
+    const newList = products.map(p => {
+      if (p.id !== id) return p
+      const { publicitar, ...resto } = p
+      // Prendido es el valor por defecto: se guarda sólo cuando está apagado
+      return publicitar === false ? resto : { ...resto, publicitar: false }
+    })
+    await persistProducts(newList)
+  }
+
   const handleToggleSinStock = async (id) => {
     const newList = products.map(p =>
       p.id === id ? { ...p, sinStock: !p.sinStock } : p
@@ -438,6 +449,7 @@ export default function AdminPage() {
             { key: 'nuevo',  label: editingProduct ? '✏️ Editando producto' : '＋ Nuevo producto' },
             { key: 'etiquetas', label: '🏷️ Etiquetas' },
             { key: 'demanda', label: '📊 Demanda' },
+            { key: 'publicidad', label: '📣 Publicidad' },
             { key: 'ajustes', label: '⚙️ Ajustes' },
           ].map(t => (
             <button
@@ -478,6 +490,14 @@ export default function AdminPage() {
           <LabelCompiler />
         ) : tab === 'demanda' ? (
           <DemandDashboard />
+        ) : tab === 'publicidad' ? (
+          <PublicidadPanel
+            products={products}
+            onTogglePublicitar={handleTogglePublicitar}
+            onEdit={handleEdit}
+            saving={saving}
+            isSynced={isSynced}
+          />
         ) : tab === 'ajustes' ? (
           <SettingsPanel onToast={showToast} />
         ) : (

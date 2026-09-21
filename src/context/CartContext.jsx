@@ -1,6 +1,7 @@
 'use client'
 
 import { createContext, useContext, useState, useEffect } from 'react'
+import { trackAgregarAlCarrito } from '../utils/analytics'
 
 const CartContext = createContext(null)
 const CART_KEY = 'saro_cart_v1'
@@ -65,6 +66,8 @@ export function CartProvider({ children }) {
       })
       return next.filter(i => i.cantidad > 0)
     })
+    const unidades = selections.reduce((s, x) => s + (x.cantidad > 0 ? x.cantidad : 0), 0)
+    if (unidades > 0) trackAgregarAlCarrito(product, unidades)
     setIsOpen(true)
   }
 

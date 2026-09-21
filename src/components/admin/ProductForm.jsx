@@ -1612,6 +1612,8 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     if (!product.peso) delete product.peso
     // Sin precio minorista el producto no se publica en ese catálogo
     if (!product.precioMinorista) delete product.precioMinorista
+    // Publicitar viene prendido por defecto: sólo se guarda cuando se apaga
+    if (product.publicitar !== false) delete product.publicitar
 
     onSave(product)
   }
@@ -1742,6 +1744,32 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
             <p className="text-xs text-gray-400">
               Si lo dejás vacío, el producto no aparece en el catálogo minorista.
             </p>
+          </Field>
+
+          {/* Publicidad: si sale en los anuncios de Meta/Google (feed /feed.xml) */}
+          <Field>
+            <div className="flex items-center justify-between gap-4 bg-gray-50 rounded-xl p-3 border border-gray-100">
+              <div>
+                <Label>📣 Publicitar este producto</Label>
+                <p className="text-xs text-gray-400 mt-0.5">
+                  {!(Number(form.precioMinorista) > 0)
+                    ? 'Sin precio minorista no puede salir en los anuncios.'
+                    : form.publicitar === false
+                      ? 'Apagado: no sale en los anuncios de Instagram, Facebook ni Google.'
+                      : 'Sale en los anuncios de Instagram, Facebook y Google.'}
+                </p>
+              </div>
+              <button
+                type="button"
+                role="switch"
+                aria-checked={form.publicitar !== false}
+                aria-label="Publicitar este producto"
+                onClick={() => set('publicitar', form.publicitar === false)}
+                className={`relative w-12 h-7 rounded-full transition-colors flex-shrink-0 ${form.publicitar !== false ? 'bg-saro-blue' : 'bg-gray-300'}`}
+              >
+                <span className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${form.publicitar !== false ? 'translate-x-5' : ''}`} />
+              </button>
+            </div>
           </Field>
 
           <Field>

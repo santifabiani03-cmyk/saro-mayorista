@@ -5,6 +5,7 @@ import Image from 'next/image'
 import { usePathname } from 'next/navigation'
 import { useCart } from '../context/CartContext'
 import HowToBuyModal from './HowToBuyModal'
+import { trackContacto } from '../utils/analytics'
 
 export default function Header({ config }) {
   const { totalItems, isOpen, setIsOpen, fichaModo } = useCart()
@@ -76,6 +77,7 @@ export default function Header({ config }) {
             {/* Botón WhatsApp */}
             <a
               href={`https://wa.me/${config.whatsappNumber}`}
+              onClick={() => trackContacto('header')}
               target="_blank"
               rel="noopener noreferrer"
               className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition duration-200 shadow-md shadow-emerald-500/20 btn-press"

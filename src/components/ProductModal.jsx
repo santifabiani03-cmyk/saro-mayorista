@@ -3,6 +3,7 @@ import { useState, useEffect } from 'react'
 import { useCart } from '../context/CartContext'
 import { COLOR_MAP, TAG_CONFIG, SIZE_ORDER, getProductTags, getSwatchStyle } from '../utils/colors'
 import ImageCarousel from './ImageCarousel'
+import { trackVerProducto } from '../utils/analytics'
 
 const getImages = p => p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : []
 
@@ -26,6 +27,8 @@ export default function ProductModal({ product, onClose }) {
 
   const [matrix, setMatrix] = useState(() => buildMatrix(product.colores, sortedTalles))
   const imgs = getImages(product)
+
+  useEffect(() => { trackVerProducto(product) }, [product.id]) // eslint-disable-line react-hooks/exhaustive-deps
 
   useEffect(() => {
     document.body.style.overflow = 'hidden'

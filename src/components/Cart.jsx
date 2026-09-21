@@ -3,7 +3,7 @@ import { useState } from 'react'
 import { useCart } from '../context/CartContext'
 import CartSuggestions from './CartSuggestions'
 import { pesoAproxKg, pesoParaCotizar } from '../utils/envio'
-import { track } from '../utils/analytics'
+import { track, trackPedidoWhatsApp } from '../utils/analytics'
 
 /**
  * Cotizador de envío: APAGADO hasta tener las credenciales de la API de MiCorreo
@@ -123,6 +123,7 @@ export default function Cart({ config }) {
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ items, total, totalItems }),
     }).catch(() => {})
+    trackPedidoWhatsApp(items, total)
     track('finalizar_pedido', {
       value: total,
       currency: 'ARS',

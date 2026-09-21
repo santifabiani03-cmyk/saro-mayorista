@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import IntroHero from '../../components/IntroHero'
 import FaqSection from '../../components/FaqSection'
 import HistoriaTrabaja from '../../components/HistoriaTrabaja'
+import { trackContacto } from '../../utils/analytics'
 
 export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCompraMinima }) {
   const router = useRouter()
@@ -317,6 +318,7 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
               </div>
               <a
                 href={`https://wa.me/${whatsappNumber}?text=${encodeURIComponent('Hola SARO! Quiero consultar por productos personalizados (ropa y/o paletas) para un club o evento.')}`}
+                onClick={() => trackContacto('personalizados')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="mt-6 sm:mt-0 inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-7 py-4 rounded-xl shadow-lg shadow-emerald-500/25 transition duration-200 btn-press flex-shrink-0"
@@ -368,6 +370,7 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
               </Link>
               <a
                 href={`https://wa.me/${whatsappNumber}`}
+                onClick={() => trackContacto('landing')}
                 target="_blank"
                 rel="noopener noreferrer"
                 className="inline-flex items-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-8 py-4 rounded-xl shadow-lg shadow-emerald-500/20 transition duration-200 btn-press"

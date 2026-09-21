@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import { track } from '../utils/analytics'
+import { track, trackLeadMayorista } from '../utils/analytics'
 
 // Cada provincia con una localidad de ejemplo (se usa como placeholder del campo Localidad)
 const PROVINCIAS = {
@@ -114,6 +114,7 @@ function Formulario({ whatsappNumber }) {
     l.push(`• *Localidad:* ${f.localidad.trim()}`)
     if (f.mensaje.trim()) l.push(`• *Mensaje:* ${f.mensaje.trim()}`)
     track('trabaja_con_nosotros', { provincia: f.provincia })
+    trackLeadMayorista(f.provincia)
     window.open(`https://wa.me/${whatsappNumber}?text=${encodeURIComponent(l.join('\n'))}`, '_blank')
   }
 

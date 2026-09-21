@@ -12,6 +12,7 @@ import {
   getSwatchStyle,
 } from '../../../../utils/colors'
 import ImageCarousel from '../../../../components/ImageCarousel'
+import { trackVerProducto } from '../../../../utils/analytics'
 
 const getImages = p =>
   p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : []
@@ -37,8 +38,12 @@ export default function ProductClient({ product }) {
     return () => setFichaModo(null)
   }, [product.modo, setFichaModo])
 
+  useEffect(() => { trackVerProducto(product) }, [product.id]) // eslint-disable-line react-hooks/exhaustive-deps
+
   // Volver al catálogo que corresponde según la categoría del producto.
-  const backHref = product.categoria === 'paleta' ? '/paletas' : '/ropa-y-accesorios'
+  const backHref = product.categoria === 'paleta' ? '/paletas'
+    : product.modo === 'mayorista' ? '/ropa-y-accesorios/mayorista'
+    : '/ropa-y-accesorios'
 
   const sortedTalles = [...product.talles].sort((a, b) => {
     const ia = SIZE_ORDER.indexOf(a)

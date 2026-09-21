@@ -68,8 +68,9 @@ export async function generateMetadata({ params }) {
 }
 
 // --- Página del producto (Server Component) ---
-export default async function ProductoPage({ params }) {
+export default async function ProductoPage({ params, searchParams }) {
   const { slug } = await params
+  const { modo } = (await searchParams) ?? {}
   const products = getProducts()
   const found = findBySlug(products, slug)
 
@@ -77,10 +78,19 @@ export default async function ProductoPage({ params }) {
 
   // Las paletas se venden al público: la ficha muestra el precio minorista.
   // Sin precio minorista cargado no se publican (igual que en /paletas).
+  // El resto también muestra el minorista si lo tiene, salvo que se entre desde
+  // el catálogo mayorista (?modo=mayorista). Así el precio de la ficha coincide
+  // con el del catálogo público y con el de los anuncios (/feed.xml): si no
+  // coinciden, Meta y Google rechazan el producto.
   let product = found
+  const tieneMinorista = Number(found.precioMinorista) > 0
   if (found.categoria === 'paleta') {
-    if (!(Number(found.precioMinorista) > 0)) redirect('/paletas')
+    if (!tieneMinorista) redirect('/paletas')
     product = { ...found, precio: Number(found.precioMinorista), promos: [], modo: 'minorista' }
+  } else if (tieneMinorista && modo !== 'mayorista') {
+    product = { ...found, precio: Number(found.precioMinorista), promos: [], modo: 'minorista' }
+  } else {
+    product = { ...found, modo: 'mayorista' }
   }
 
   const imgs = getImages(product)

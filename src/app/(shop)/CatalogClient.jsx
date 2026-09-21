@@ -158,7 +158,7 @@ export default function CatalogClient({ products, heading, showFilters = true, m
                     product={p}
                     onClick={() => setSelected(p)}
                     onNavigate={() =>
-                      router.push(`/producto/${toSlug(p.nombre, p.id)}`)
+                      router.push(`/producto/${toSlug(p.nombre, p.id)}${p.modo === 'mayorista' ? '?modo=mayorista' : ''}`)
                     }
                   />
                 </div>

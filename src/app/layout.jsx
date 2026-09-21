@@ -2,6 +2,7 @@ import './globals.css'
 import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
+import MetaPixel from '../components/MetaPixel'
 
 export const metadata = {
   title: 'SARO Mayorista | Paletas de Padel, Ropa Deportiva y Accesorios al por Mayor',
@@ -142,6 +143,9 @@ function gtag(){dataLayer.push(arguments);}
 gtag('js', new Date());
 gtag('config', 'G-WSMCJDHZWH');`}
         </Script>
+
+        {/* Pixel de Meta (sólo si NEXT_PUBLIC_META_PIXEL_ID está cargado en Vercel) */}
+        <MetaPixel />
       </body>
     </html>
   )
