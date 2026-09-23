@@ -505,6 +505,21 @@ WhatsApp" + botones. Los tiempos están arriba de todo en `ScrollLab.jsx`
   105 fundía árboles y cerco en una bruma celeste que se sentía como una pared.
   Por eso se sacó la tercera cancha: quedaba en parte fuera de la cúpula del
   cielo y sólo la niebla la escondía.
+- **Los árboles son el roble de Meshy** (`public/models/arbol.glb`, 9 mil
+  triángulos, textura de 64 KB) repetido con InstancedMesh: 22 copias (15 en
+  celular o equipos flojos), con tamaño, giro, ancho y tono distintos, y un
+  vaivén de viento. Reemplazaron árboles de bolas de follaje que, sin niebla, se
+  veían de bajo presupuesto. El modelo trae un disco de pasto en la base hasta
+  el 10% del alto: se hunde ese 10% bajo el suelo. Viene cuantizado: hay que
+  pasar la geometría a decimales antes de escalarla.
+- **Tres estilos de texto para comparar** (selector en el cartel de MAQUETA o
+  `?texto=lateral|cine|etiqueta`): *lateral* (al costado con velo),
+  *cine* (subtítulo blanco abajo sobre degradé oscuro, barra de capítulos
+  arriba, cámara un poco más lejos) y *etiqueta* (cada texto sale de un punto
+  pegado a la paleta, la pelota o la caja; la escena lo reubica en cada cuadro
+  proyectando ese punto a pantalla). Pendiente: cuando smfab elija uno, sacar
+  los otros dos. Cada estilo usa sus propias `key` en React: si reusa los
+  elementos, arrastran el desplazamiento que la escena les pone a mano.
 - **El fondo de la paleta:** las lonas son **pantallas LED de torneo** con
   mensajes que corren solos (reloj real, no el scroll) y detrás hay
   **banderas SARO** que se mecen, intercaladas con los carteles. Los mensajes de

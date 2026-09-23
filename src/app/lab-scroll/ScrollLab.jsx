@@ -43,6 +43,19 @@ const ACTOS = [
 ]
 const DURA_ACTO = 0.13      // cuánto del guion queda en pantalla cada texto
 
+// Tres maneras de mostrar los textos, para compararlas en la maqueta (se
+// eligen con el selector de arriba o con ?texto= en la dirección):
+//   lateral  · al costado, con un velo detrás y el protagonista corrido
+//   cine     · subtítulo centrado abajo sobre un degradé oscuro, con barra de
+//              capítulos arriba, como un video
+//   etiqueta · cada texto sale de un punto pegado al objeto del que habla
+//              (paleta, pelota, caja) y lo sigue mientras se mueve
+const ESTILOS = [
+  { id: 'lateral', nombre: 'Lateral' },
+  { id: 'cine', nombre: 'Cine' },
+  { id: 'etiqueta', nombre: 'Etiquetas' },
+]
+
 // ── Tiempos del tramo final (en puntos del guion, 0 a 1) ──
 // Después del golpe la pelota pica, rebota, y en lo alto del rebote un destello
 // la tapa: cuando se apaga, ya es una caja que cae y se asienta. El destello
@@ -168,6 +181,22 @@ export default function ScrollLab({ whatsappNumber = '' }) {
   const [sinMovimiento, setSinMovimiento] = useState(false)
   // Se prende cuando llegó la paleta: saca la pantalla de carga
   const [listo, setListo] = useState(false)
+  // Estilo de los textos. La escena lo lee en cada cuadro por la ref (el bucle
+  // de Three no se entera de los renders de React).
+  const [estilo, setEstilo] = useState('lateral')
+  const estiloRef = useRef('lateral')
+  useEffect(() => {
+    const pedido = new URLSearchParams(window.location.search).get('texto')
+    if (ESTILOS.some(e => e.id === pedido)) setEstilo(pedido)
+  }, [])
+  useEffect(() => { estiloRef.current = estilo }, [estilo])
+  const elegirEstilo = (id) => {
+    setEstilo(id)
+    // queda en la dirección: al recargar o compartir el link se ve el mismo
+    const url = new URL(window.location.href)
+    url.searchParams.set('texto', id)
+    window.history.replaceState(null, '', url)
+  }
   useEffect(() => {
     setSinMovimiento(window.matchMedia('(prefers-reduced-motion: reduce)').matches)
   }, [])
@@ -1154,55 +1183,96 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       seto.frustumCulled = false
       afuera.add(seto)
 
-      // 2. Árboles sueltos: tronco y copa de tres bollos, del mismo estilo
-      //    suave que los arbustos. Repartidos con el ángulo áureo, que no deja
-      //    ni huecos grandes ni hileras. Detrás de la paleta (lo primero que se
-      //    ve) se deja una ventana sin árboles, para que se vea el horizonte.
+      // 2. Árboles: el roble de Meshy (`arbol.glb`, 9 mil triángulos y una
+      //    textura de 64 KB), repetido con InstancedMesh. Reemplazó a unos
+      //    árboles hechos de tres bollos de follaje, que sin la niebla que los
+      //    tapaba se veían de bajo presupuesto. Cada copia cambia de tamaño,
+      //    de giro, de ancho y apenas de tono, así no se leen como clones.
+      //    Repartidos con el ángulo áureo (ni huecos grandes ni hileras) y con
+      //    distancia mínima entre uno y otro: la copa mide más de una vez el
+      //    alto, y juntos volvían a formar una pared. Detrás de la paleta (lo
+      //    primero que se ve) se deja una ventana sin árboles.
       const arboles = []
-      for (let i = 0; i < 90 && arboles.length < 40; i++) {
+      const CUANTOS_ARBOLES = equipoFlojo || W() < 700 ? 15 : 22
+      for (let i = 0; i < 200 && arboles.length < CUANTOS_ARBOLES; i++) {
         const ang = i * 2.39996                         // ángulo áureo
         const rad = 116 + ((i * 37) % 36)               // entre 116 y 151
         const x = Math.cos(ang) * rad, z = RED_Z + Math.sin(ang) * rad
         const frente = Math.atan2(Math.sin(ang + Math.PI / 2), Math.cos(ang + Math.PI / 2))
         if (Math.abs(frente) < 0.2) continue            // la ventana detrás de la paleta
         if (!libre(x, z, 14)) continue
-        arboles.push({ x, z, alto: 17 + ((i * 13) % 11), i })
-      }
-      const troncos = new THREE.InstancedMesh(
-        new THREE.CylinderGeometry(0.42, 0.62, 1, 7),
-        new THREE.MeshStandardMaterial({ color: '#6b5a48', roughness: 0.95 }),
-        arboles.length
-      )
-      const copas = new THREE.InstancedMesh(
-        geoSeto, new THREE.MeshStandardMaterial({ roughness: 0.95 }), arboles.length * 3
-      )
-      {
-        const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler()
-        const col = new THREE.Color()
-        arboles.forEach((a, k) => {
-          const hT = a.alto * 0.5
-          m.compose(new THREE.Vector3(a.x, SUELO_Y + hT / 2, a.z), q.identity(), new THREE.Vector3(1, hT, 1))
-          troncos.setMatrixAt(k, m)
-          const r = a.alto * 0.3
-          ;[[0, 0.74, 0, 1], [0.42, 0.6, 0.2, 0.72], [-0.36, 0.64, -0.24, 0.66]].forEach(([dx, dy, dz, esc], j) => {
-            e.set(0, a.i * 0.9 + j, 0)
-            const rr = r * esc
-            m.compose(
-              new THREE.Vector3(a.x + dx * r, SUELO_Y + a.alto * dy, a.z + dz * r),
-              q.setFromEuler(e),
-              new THREE.Vector3(rr * 1.1, rr, rr * 1.1)
-            )
-            copas.setMatrixAt(k * 3 + j, m)
-            copas.setColorAt(k * 3 + j, col.set(VERDES[(a.i + j) % VERDES.length]))
-          })
+        if (arboles.some(a => Math.hypot(a.x - x, a.z - z) < 26)) continue
+        arboles.push({
+          x, z, i,
+          alto: 17 + ((i * 13) % 10),                   // 2,6 a 4 m
+          ancho: 0.85 + ((i * 7) % 5) * 0.08,           // copas más anchas o más angostas
+          giro: i * 2.1,
+          fase: i * 1.37,                               // para que no se mezan al unísono
         })
-        troncos.instanceMatrix.needsUpdate = true
-        copas.instanceMatrix.needsUpdate = true
-        if (copas.instanceColor) copas.instanceColor.needsUpdate = true
       }
-      troncos.frustumCulled = copas.frustumCulled = false
-      troncos.receiveShadow = copas.receiveShadow = true
-      afuera.add(troncos, copas)
+      // Tonos para multiplicar la textura: apenas más amarillo, más fresco o
+      // más oscuro. Sutiles: la textura ya trae el color.
+      const TONOS_ARBOL = ['#ffffff', '#eef7dc', '#e2efd6', '#f6f3dc', '#dbe8d2']
+      const bosque = { malla: null, datos: arboles }
+      loader.load('/models/arbol.glb', gltf => {
+        if (disposed) return
+        let malla = null
+        gltf.scene.updateMatrixWorld(true)
+        gltf.scene.traverse(o => { if (o.isMesh && !malla) malla = o })
+        if (!malla) return
+        // El modelo viene cuantizado (enteros): se pasa a decimales antes de
+        // moverlo, si no el cambio de escala se recorta.
+        const geo = new THREE.BufferGeometry()
+        for (const nombre of ['position', 'normal', 'uv']) {
+          const at = malla.geometry.getAttribute(nombre)
+          if (!at) continue
+          const arr = new Float32Array(at.count * at.itemSize)
+          for (let i = 0; i < at.count; i++) {
+            for (let k = 0; k < at.itemSize; k++) arr[i * at.itemSize + k] = at.getComponent(i, k)
+          }
+          geo.setAttribute(nombre, new THREE.BufferAttribute(arr, at.itemSize))
+        }
+        geo.setIndex(malla.geometry.index)
+        geo.applyMatrix4(malla.matrixWorld)
+        geo.computeBoundingBox()
+        const bb = geo.boundingBox
+        const centro = new THREE.Vector3(); bb.getCenter(centro)
+        const H = bb.max.y - bb.min.y
+        // Trae un disco de pasto en la base que llega al 10% del alto: se
+        // hunde ese 10% bajo el suelo. Queda normalizado a 1 de alto.
+        geo.translate(-centro.x, -bb.min.y - 0.1 * H, -centro.z)
+        geo.scale(1 / H, 1 / H, 1 / H)
+        const inst = new THREE.InstancedMesh(geo, malla.material, arboles.length)
+        const col = new THREE.Color()
+        arboles.forEach((a, k) => inst.setColorAt(k, col.set(TONOS_ARBOL[a.i % TONOS_ARBOL.length])))
+        if (inst.instanceColor) inst.instanceColor.needsUpdate = true
+        inst.receiveShadow = true
+        inst.frustumCulled = false
+        bosque.malla = inst
+        moverBosque(0)
+        afuera.add(inst)
+      }, undefined, () => { /* si no carga, el club queda sin árboles */ })
+      // Viento: cada árbol se inclina apenas desde la base, con su propio
+      // ritmo. Se llama desde el bucle de cuadros.
+      const mBosque = new THREE.Matrix4(), qBosque = new THREE.Quaternion(), eBosque = new THREE.Euler()
+      const pBosque = new THREE.Vector3(), sBosque = new THREE.Vector3()
+      const moverBosque = (ahora) => {
+        if (!bosque.malla) return
+        bosque.datos.forEach((a, k) => {
+          eBosque.set(
+            Math.sin(ahora * 0.9 + a.fase) * 0.012,
+            a.giro,
+            Math.sin(ahora * 0.7 + a.fase * 1.3) * 0.016
+          )
+          mBosque.compose(
+            pBosque.set(a.x, SUELO_Y, a.z),
+            qBosque.setFromEuler(eBosque),
+            sBosque.set(a.alto * a.ancho, a.alto, a.alto * a.ancho)
+          )
+          bosque.malla.setMatrixAt(k, mBosque)
+        })
+        bosque.malla.instanceMatrix.needsUpdate = true
+      }
 
       // 3. Lomas lejanas: dos siluetas en anillo alrededor de todo, pegadas al
       //    cielo. Son geometría y no un dibujo en el cielo porque el cielo tiene
@@ -2166,6 +2236,8 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         bloom.setSize(W() / 2, H() / 2)   // igual que al crearlo: media resolución
         camera.aspect = W() / H()
         camera.updateProjectionMatrix()
+        // las etiquetas se vuelven a medir: el ancho de la tarjeta cambia
+        document.querySelectorAll('.pos-etiqueta').forEach(n => { delete n.dataset.w })
       }
       const ro = new ResizeObserver(onResize)
       ro.observe(mount)
@@ -2180,6 +2252,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       if (typeof window !== 'undefined') {
         window.__lab = {
           escena: scene, camara: camera,
+          loader,   // para probar modelos en la escena sin tocar el código
           codo, pelota, THREE,   // para medir choques de verdad, no por aproximación
           // Igual que probarGolpe pero para el GUION (el golpe que dispara el
           // scroll, no el clic). Son dos caminos distintos y hasta ahora sólo
@@ -2308,6 +2381,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         // reloj y no con el scroll: son ambiente, no guion.
         texLona.offset.x = (texLona.offset.x + dt * 0.022) % 1
         for (const b of banderas) b.grupo.rotation.y = b.base + Math.sin(ahora * 1.25 + b.fase) * 0.16
+        moverBosque(ahora)
         // Con la pestaña de fondo el navegador ya frena requestAnimationFrame
         // solo, así que no hace falta nada más para no gastar batería. La versión
         // anterior usaba un IntersectionObserver y, si marcaba "no visible", el
@@ -2365,6 +2439,82 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       const RADIO_INICIO = 8.55
       const FILM_TAN = 2 * Math.tan(THREE.MathUtils.degToRad(camera.fov / 2))
       const anchoLg = window.matchMedia('(min-width: 1024px)')
+
+      // ── Estilo "etiqueta": de qué punto del mundo sale cada texto ──
+      // En pantalla ancha la tarjeta va al costado (del lado de `lado`), y el
+      // punto de la paleta se toma de ese mismo borde para que la línea no la
+      // cruce. En el celular la tarjeta va abajo, así que en el arranque la
+      // línea sale de la base de la cara.
+      const vAncla = new THREE.Vector3(), vDerecha = new THREE.Vector3()
+      const anclaDe = (i, ancho) => {
+        const lado = ACTOS[i].lado === 'izq' ? -1 : 1
+        if (i === 0) return paleta.localToWorld(ancho ? vAncla.set(0.95 * lado, 0.9, 0.15) : vAncla.set(0, -1.1, 0.15))
+        if (i === 1) return paleta.localToWorld(vAncla.set(0.6 * lado, 0.1, 0.15))
+        if (i === 2) return vAncla.copy(pelota.position)
+        // la caja: arriba y sobre el borde que da a la tarjeta (en pantalla
+        // ancha), así la tarjeta queda al costado y no encima de la caja
+        vAncla.copy(caja.position).setY(caja.position.y + L_CAJA * 0.5 * caja.scale.y)
+        if (!ancho) return vAncla
+        vDerecha.setFromMatrixColumn(camera.matrixWorld, 0)   // la derecha de la pantalla, en el mundo
+        return vAncla.addScaledVector(vDerecha, lado * L_CAJA * 0.6 * caja.scale.x)
+      }
+      // Coloca las cinco etiquetas: el contenedor en el punto proyectado a
+      // pantalla, la tarjeta corrida y la línea uniendo los dos. Los tamaños
+      // de las tarjetas se miden una vez (leerlos en cada cuadro obliga al
+      // navegador a recalcular el diseño de la página cada vez).
+      const colocarEtiquetas = () => {
+        const nodos = document.querySelectorAll('.pos-etiqueta')
+        if (!nodos.length) return
+        const w = W(), h = H(), ancho = anchoLg.matches
+        // La cámara y la paleta se movieron en este cuadro pero sus matrices
+        // se actualizan recién al dibujar: sin esto las etiquetas quedan un
+        // cuadro atrasadas.
+        camera.updateMatrixWorld()
+        codo.updateMatrixWorld(true)
+        nodos.forEach(n => {
+          if (n.dataset.w) return
+          const tj = n.querySelector('.tarjeta-etiqueta')
+          n.dataset.w = tj.offsetWidth
+          n.dataset.h = tj.offsetHeight
+        })
+        nodos.forEach((n, i) => {
+          const p = anclaDe(i, ancho).project(camera)
+          if (p.z > 1) { n.style.visibility = 'hidden'; return }
+          n.style.visibility = ''
+          const ax = (p.x + 1) / 2 * w, ay = (1 - p.y) / 2 * h
+          const tw = +n.dataset.w, th = +n.dataset.h
+          let cx, cy                                    // esquina de la tarjeta, relativa al punto
+          if (ancho) {
+            const der = ACTOS[i].lado !== 'izq'
+            cx = Math.min(Math.max(ax + (der ? 64 : -64 - tw), 24), w - tw - 24) - ax
+            // Si el borde de la pantalla la empujó contra el punto y la línea
+            // casi no se ve, la tarjeta sube: la línea sale en diagonal.
+            const hueco = der ? cx : -(cx + tw)
+            const arriba = hueco < 48 ? -th - 40 : -th / 2 - 36
+            cy = Math.min(Math.max(ay + arriba, 72), h - th - 32) - ay
+          } else {
+            // Celular: la tarjeta al pie, donde va en los otros estilos (a media
+            // altura tapaba el mango), y la línea sube hasta el objeto.
+            cx = (w - tw) / 2 - ax
+            cy = h - th - 32 - ay
+          }
+          n.style.transform = `translate3d(${ax.toFixed(1)}px, ${ay.toFixed(1)}px, 0)`
+          n.querySelector('.tarjeta-etiqueta').style.transform = `translate3d(${cx.toFixed(1)}px, ${cy.toFixed(1)}px, 0)`
+          // la línea va del punto al punto más cercano del borde de la tarjeta
+          const ex = Math.min(Math.max(0, cx), cx + tw)
+          const ey = Math.min(Math.max(0, cy), cy + th)
+          const linea = n.querySelector('.linea-etiqueta')
+          linea.style.width = `${Math.hypot(ex, ey).toFixed(1)}px`
+          linea.style.transform = `rotate(${Math.atan2(ey, ex).toFixed(4)}rad)`
+        })
+      }
+      // ── Estilo "cine": la barra de capítulos se llena con el scroll ──
+      const marcarCapitulos = (t) => {
+        document.querySelectorAll('.capitulo-relleno').forEach((el, i) => {
+          const fin = ACTOS[i + 1] ? ACTOS[i + 1].at : 1
+          el.style.transform = `scaleX(${seg(t, i === 0 ? 0 : ACTOS[i].at, fin).toFixed(3)})`
+        })
+      }
 
       const dibujar = (t) => {
 
@@ -2524,7 +2674,11 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         // Se aleja casi sin subir y la mira apunta por encima de la pelota: si
         // la cámara sube, mira para abajo y lo que se ve es piso, no el club.
         const abre = Math.sin(Math.PI * seg(t, 0.44, 0.69))
-        const dist = (mix(mix(RADIO_INICIO, 7.6, suave(seg(t, 0.40, 0.72))), 6.8, acerca) + 16 * abre) * angosto
+        // En el estilo "cine" el texto ocupa la franja de abajo de toda la
+        // pantalla: la cámara se aleja un poco para que lo que se cuenta entre
+        // arriba del subtítulo.
+        const cine = estiloRef.current === 'cine'
+        const dist = (mix(mix(RADIO_INICIO, 7.6, suave(seg(t, 0.40, 0.72))), 6.8, acerca) + 16 * abre) * angosto * (cine ? 1.15 : 1)
         const alto = mix(mix(1.2, 3.8, suave(seg(t, 0.36, 0.52))), 5.3, acerca) + 1.5 * abre
         camera.position.set(
           foco.x + Math.sin(giro) * dist,
@@ -2536,7 +2690,8 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         // para que la paleta, y al final la caja, queden centradas en lo que se
         // ve por ENCIMA de la tarjeta. Es proporcional a la distancia, así sube
         // lo mismo en pantalla esté la cámara cerca o lejos.
-        const bajaMira = aspecto < 1 ? dist * (0.08 + 0.07 * acerca) : 0
+        // (Con el estilo "cine" pasa lo mismo en computadora: el texto va abajo.)
+        const bajaMira = aspecto < 1 || cine ? dist * (0.08 + 0.07 * acerca) : 0
         camera.lookAt(foco.x, foco.y - bajaMira + 5 * abre, foco.z)
 
         // ── Encuadre ──
@@ -2548,7 +2703,9 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         let corrimiento = 0
         // Mismo corte que el CSS (lg: = 1024 px), si no el texto ya está al
         // costado y la paleta todavía al centro.
-        if (camera.aspect > 1.2 && anchoLg.matches) {
+        // En "lateral" y en "etiqueta" (la tarjeta también va a un costado y,
+        // con el objeto al centro, lo tapaba). En "cine" el texto va abajo.
+        if (camera.aspect > 1.2 && anchoLg.matches && estiloRef.current !== 'cine') {
           ACTOS.forEach((a, i) => {
             const entra = i === 0 ? 1 : suave(seg(t, a.at - 0.03, a.at + 0.02))
             const sale = a.fin ? 0 : suave(seg(t, a.at + DURA_ACTO - 0.02, a.at + DURA_ACTO + 0.03))
@@ -2559,6 +2716,8 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         const CORRE = 0.13                     // fracción del ancho de pantalla
         camera.filmOffset = -corrimiento * CORRE * camera.getFilmWidth() * camera.aspect * FILM_TAN
         camera.updateProjectionMatrix()
+        if (estiloRef.current === 'etiqueta') colocarEtiquetas()
+        if (cine) marcarCapitulos(t)
 
         // El sol gira despacio con el guion: con la luz clavada, el tramo largo
         // del vuelo quedaba plano porque nada cambiaba de tono.
@@ -2629,33 +2788,117 @@ export default function ScrollLab({ whatsappNumber = '' }) {
     tl.to(progRef.current, { t: 1, duration: 1 }, 0)
 
     // El titular se ve apenas carga la página: un hero no puede arrancar mudo.
-    gsap.set('.acto', { autoAlpha: 0, y: 26 })
+    // En "etiqueta" los textos no suben ni bajan al aparecer: la línea está
+    // pegada al objeto y se despegaría.
+    const sube = estilo === 'etiqueta' ? 0 : 26
+    gsap.set('.acto', { autoAlpha: 0, y: sube })
     gsap.set('.acto-0', { autoAlpha: 1, y: 0 })
     gsap.set('.scrim-izq', { autoAlpha: 1 })
     gsap.set('.scrim-der', { autoAlpha: 0 })
     gsap.set('.cta-final', { autoAlpha: 0, y: 12 })
     ACTOS.forEach((a, i) => {
-      // el velo del lado del texto entra y sale con él
+      // el velo del lado del texto entra y sale con él (sólo existe en "lateral")
       const velo = a.lado === 'izq' ? '.scrim-izq' : '.scrim-der'
       if (i > 0) {
         tl.to(`.acto-${i}`, { autoAlpha: 1, y: 0, duration: 0.04 }, a.at)
-        tl.to(velo, { autoAlpha: 1, duration: 0.04 }, a.at)
+        if (estilo === 'lateral') tl.to(velo, { autoAlpha: 1, duration: 0.04 }, a.at)
       }
       if (!a.fin) {
-        tl.to(`.acto-${i}`, { autoAlpha: 0, y: -22, duration: 0.04 }, a.at + DURA_ACTO)
-        tl.to(velo, { autoAlpha: 0, duration: 0.04 }, a.at + DURA_ACTO)
+        tl.to(`.acto-${i}`, { autoAlpha: 0, y: sube ? -22 : 0, duration: 0.04 }, a.at + DURA_ACTO)
+        if (estilo === 'lateral') tl.to(velo, { autoAlpha: 0, duration: 0.04 }, a.at + DURA_ACTO)
       }
     })
     // Los botones, cuando la caja ya está apoyada y la cámara se acercó
     tl.to('.cta-final', { autoAlpha: 1, y: 0, duration: 0.04 }, 0.9)
-  }, { scope: rootRef })
+    // Al cambiar de estilo se rearma todo (los textos cambian de lugar y de
+    // forma); revertOnUpdate deshace la línea de tiempo anterior primero.
+  }, { scope: rootRef, dependencies: [estilo], revertOnUpdate: true })
 
   const textoWhatsApp = encodeURIComponent('¡Hola SARO! Quiero hacer un pedido.')
 
+  // Estilo con el que se dibujan los textos. Con "reducir movimiento" no hay
+  // animación que los turne, así que va siempre la lista fija de "lateral".
+  const modo = sinMovimiento ? 'lateral' : estilo
+
+  // Clases de cada parte del texto según el estilo
+  const TIPO = {
+    lateral: {
+      k: 'text-[11px] font-bold uppercase tracking-[.32em] text-saro-blue mb-2',
+      t: 'text-3xl lg:text-5xl font-extrabold text-saro-dark tracking-tight leading-[1.05]',
+      d: 'text-sm lg:text-lg text-slate-600 lg:text-slate-700 mt-3 leading-relaxed',
+    },
+    // blanco sobre el degradé oscuro de abajo, con una sombra suave que lo
+    // despega de la cancha cuando el degradé es más claro
+    cine: {
+      k: 'text-[11px] font-bold uppercase tracking-[.32em] text-sky-200 mb-2',
+      t: 'text-3xl lg:text-6xl font-extrabold text-white tracking-tight leading-[1.05] [text-shadow:0_2px_24px_rgba(2,6,23,.45)]',
+      d: 'text-sm lg:text-lg text-white/85 mt-3 leading-relaxed',
+    },
+    // más compacto: va en una tarjeta chica al lado del objeto
+    etiqueta: {
+      k: 'text-[10px] font-bold uppercase tracking-[.3em] text-saro-blue mb-1.5',
+      t: 'text-2xl lg:text-3xl font-extrabold text-saro-dark tracking-tight leading-[1.08]',
+      d: 'text-[13px] lg:text-sm text-slate-600 mt-2 leading-relaxed',
+    },
+  }[modo]
+
+  const botones = (a) => (
+    // en la tarjeta de "etiqueta" no entran lado a lado: van uno abajo del otro
+    <div className={`cta-final mt-5 flex flex-col gap-2.5 ${modo === 'etiqueta' ? '' : 'sm:flex-row'} ${
+      modo === 'cine' ? 'sm:justify-center'
+        : modo === 'lateral' && a.lado === 'der' ? 'lg:justify-end' : ''
+    }`}>
+      <Link
+        href="/paletas"
+        className="inline-flex items-center justify-center gap-2 bg-saro-dark hover:bg-saro-blue text-white font-bold text-sm px-6 py-3.5 rounded-xl transition-colors shadow-lg shadow-saro-dark/20 btn-press"
+      >
+        Ver paletas
+        <span aria-hidden="true">→</span>
+      </Link>
+      <a
+        href={`https://wa.me/${whatsappNumber}?text=${textoWhatsApp}`}
+        target="_blank"
+        rel="noopener noreferrer"
+        className="inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-6 py-3.5 rounded-xl transition-colors shadow-lg shadow-emerald-500/25 btn-press"
+      >
+        <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4" aria-hidden="true">
+          <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
+          <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.853L.054 23.446a.5.5 0 0 0 .612.612l5.598-1.479A11.947 11.947 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.686-.523-5.212-1.43l-.374-.22-3.878 1.023 1.023-3.877-.22-.374A9.955 9.955 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
+        </svg>
+        Escribinos por WhatsApp
+      </a>
+    </div>
+  )
+
+  const contenido = (a) => (
+    <>
+      <p className={TIPO.k}>{a.k}</p>
+      <h2 className={TIPO.t}>{a.t}</h2>
+      <p className={TIPO.d}>{a.d}</p>
+      {a.fin && botones(a)}
+    </>
+  )
+
   return (
     <div ref={rootRef} className="bg-[#eef2f8]">
-      <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 bg-saro-dark/90 text-white text-[11px] font-bold px-3 py-1.5 rounded-full backdrop-blur">
-        MAQUETA · hero de scroll, todavía no publicado
+      {/* Cartel de maqueta con el selector de estilo de los textos */}
+      <div className="fixed top-3 left-1/2 -translate-x-1/2 z-50 flex items-center gap-2 bg-saro-dark/90 text-white text-[11px] font-bold pl-3 pr-1.5 py-1.5 rounded-full backdrop-blur whitespace-nowrap">
+        <span>MAQUETA · Texto:</span>
+        <div className="flex gap-1">
+          {ESTILOS.map(e => (
+            <button
+              key={e.id}
+              type="button"
+              onClick={() => elegirEstilo(e.id)}
+              aria-pressed={estilo === e.id}
+              className={`px-2.5 py-1 rounded-full transition-colors ${
+                estilo === e.id ? 'bg-white text-saro-dark' : 'text-white/70 hover:text-white'
+              }`}
+            >
+              {e.nombre}
+            </button>
+          ))}
+        </div>
       </div>
 
       <section
@@ -2682,87 +2925,108 @@ export default function ScrollLab({ whatsappNumber = '' }) {
           </div>
         )}
 
-        {/* Velos detrás del texto, sólo en pantallas anchas: sin ellos la bajada
-            gris quedaba sobre la cancha y no se leía. En el celular el texto ya
-            va sobre una tarjeta. */}
-        {!sinMovimiento && (
+        {/* "lateral": velos detrás del texto, sólo en pantallas anchas. Sin
+            ellos la bajada gris quedaba sobre la cancha y no se leía. En el
+            celular el texto ya va sobre una tarjeta. */}
+        {!sinMovimiento && modo === 'lateral' && (
           <>
             <div className="scrim scrim-izq pointer-events-none absolute inset-y-0 left-0 w-[46%] hidden lg:block bg-gradient-to-r from-white/75 via-white/35 to-transparent" />
             <div className="scrim scrim-der pointer-events-none absolute inset-y-0 right-0 w-[46%] hidden lg:block bg-gradient-to-l from-white/75 via-white/35 to-transparent" />
           </>
         )}
 
-        {ACTOS.map((a, i) => (
-          <div
-            key={i}
-            className={
-              sinMovimiento
-                // en columna y sobre un fondo propio: los cinco textos comparten
-                // el mismo punto absoluto y, sin la animación que los turna,
-                // quedarían encimados e ilegibles
-                ? 'relative mx-auto w-[min(90vw,560px)] text-left bg-white/85 backdrop-blur rounded-2xl px-5 py-4 mb-3 shadow-card'
-                // En el celular y la tablet NO van al costado: la pantalla es
-                // angosta y quedaban encima de la paleta. Van abajo, a lo ancho
-                // y sobre un panel claro. Recién en lg: vuelven a los costados,
-                // con el protagonista corrido al otro lado (ver "Encuadre").
-                // El posicionamiento va en este contenedor y la animación en el
-                // de adentro: si GSAP anima `y` sobre el mismo elemento, pisa
-                // el -translate-y-1/2 que lo centra.
-                : `absolute w-[calc(100%-2rem)] left-4 right-4 bottom-8
-                   lg:w-[min(40vw,440px)] lg:top-1/2 lg:bottom-auto lg:-translate-y-1/2 ${
-                    a.lado === 'izq' ? 'lg:left-[6vw] lg:right-auto' : 'lg:right-[6vw] lg:left-auto'
-                  }`
-            }
-          >
-            <div
-              className={
-                sinMovimiento
-                  ? ''
-                  : `acto acto-${i} text-left bg-white/85 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-card
-                     lg:bg-transparent lg:backdrop-blur-none lg:rounded-none lg:px-0 lg:py-0 lg:shadow-none ${
-                      a.lado === 'izq' ? 'lg:text-left' : 'lg:text-right'
-                    }`
-              }
-            >
-              <p className="text-[11px] font-bold uppercase tracking-[.32em] text-saro-blue mb-2">{a.k}</p>
-              <h2 className="text-3xl lg:text-5xl font-extrabold text-saro-dark tracking-tight leading-[1.05]">
-                {a.t}
-              </h2>
-              <p className="text-sm lg:text-lg text-slate-600 lg:text-slate-700 mt-3 leading-relaxed">{a.d}</p>
-              {a.fin && (
-                <div className={`cta-final mt-5 flex flex-col sm:flex-row gap-2.5 ${
-                  a.lado === 'der' ? 'lg:justify-end' : ''
-                }`}>
-                  <Link
-                    href="/paletas"
-                    className="inline-flex items-center justify-center gap-2 bg-saro-dark hover:bg-saro-blue text-white font-bold text-sm px-6 py-3.5 rounded-xl transition-colors shadow-lg shadow-saro-dark/20 btn-press"
-                  >
-                    Ver paletas
-                    <span aria-hidden="true">→</span>
-                  </Link>
-                  <a
-                    href={`https://wa.me/${whatsappNumber}?text=${textoWhatsApp}`}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className="inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-6 py-3.5 rounded-xl transition-colors shadow-lg shadow-emerald-500/25 btn-press"
-                  >
-                    <svg viewBox="0 0 24 24" fill="currentColor" className="w-4 h-4" aria-hidden="true">
-                      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
-                      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.853L.054 23.446a.5.5 0 0 0 .612.612l5.598-1.479A11.947 11.947 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.686-.523-5.212-1.43l-.374-.22-3.878 1.023 1.023-3.877-.22-.374A9.955 9.955 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z" />
-                    </svg>
-                    Escribinos por WhatsApp
-                  </a>
+        {/* "cine": degradé oscuro abajo para el subtítulo, uno suave arriba
+            para la barra, y la barra de capítulos (la llena la escena). */}
+        {!sinMovimiento && modo === 'cine' && (
+          <>
+            <div className="pointer-events-none absolute inset-x-0 bottom-0 h-[58%] bg-gradient-to-t from-slate-950/75 via-slate-950/30 to-transparent" />
+            <div className="pointer-events-none absolute inset-x-0 top-0 h-32 bg-gradient-to-b from-slate-950/25 to-transparent" />
+            <div className="absolute top-[3.75rem] left-1/2 -translate-x-1/2 flex gap-1.5 w-[min(80vw,420px)]" aria-hidden="true">
+              {ACTOS.map((a, i) => (
+                <div key={i} className="h-1 flex-1 rounded-full bg-white/35 overflow-hidden">
+                  <div className="capitulo-relleno h-full w-full bg-white origin-left" style={{ transform: 'scaleX(0)' }} />
                 </div>
-              )}
+              ))}
             </div>
-          </div>
-        ))}
+          </>
+        )}
 
-        {/* Dos pistas al pie: que se puede jugar y que se puede scrollear. Se
-            desvanecen en cuanto arranca el guion: en el celular quedaban
-            debajo de la tarjeta de texto. */}
+        {/* Cada estilo lleva sus propias claves: así React crea elementos nuevos
+            al cambiar. Si reusara los mismos, arrastraban el desplazamiento
+            que la escena le pone a mano a las etiquetas y el subtítulo de
+            "cine" quedaba fuera de la pantalla. */}
+        {ACTOS.map((a, i) => {
+          if (sinMovimiento) {
+            // en columna y sobre un fondo propio: los cinco textos comparten
+            // el mismo punto absoluto y, sin la animación que los turna,
+            // quedarían encimados e ilegibles
+            return (
+              <div key={i} className="relative mx-auto w-[min(90vw,560px)] text-left bg-white/85 backdrop-blur rounded-2xl px-5 py-4 mb-3 shadow-card">
+                {contenido(a)}
+              </div>
+            )
+          }
+          if (modo === 'cine') {
+            return (
+              // el margen de abajo suma la zona de la barrita de inicio del iPhone
+              <div key={`cine-${i}`} className="absolute inset-x-0 bottom-0 flex justify-center px-5 pb-[calc(2.25rem+env(safe-area-inset-bottom))] lg:pb-14 pointer-events-none">
+                <div className={`acto acto-${i} w-full max-w-3xl text-center pointer-events-auto`}>
+                  {contenido(a)}
+                </div>
+              </div>
+            )
+          }
+          if (modo === 'etiqueta') {
+            // El contenedor mide cero y la escena lo lleva al punto del objeto
+            // en cada cuadro; la línea y la tarjeta se ubican desde ahí.
+            return (
+              <div key={`etiqueta-${i}`} className="pos-etiqueta absolute left-0 top-0 w-0 h-0 pointer-events-none">
+                <div className={`acto acto-${i}`}>
+                  {/* blanca con un filo oscuro: gris sobre el azul de la cancha no se veía */}
+                  <span className="linea-etiqueta absolute left-0 top-0 h-[2px] -mt-px w-0 bg-white origin-left shadow-[0_0_0_1px_rgba(15,23,42,0.25)]" />
+                  <span className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-saro-blue/40 animate-ping" />
+                  <span className="absolute left-0 top-0 -translate-x-1/2 -translate-y-1/2 w-3 h-3 rounded-full bg-white ring-[3px] ring-saro-blue shadow" />
+                  <div className="tarjeta-etiqueta absolute left-0 top-0 w-[calc(100vw-2rem)] lg:w-[320px] bg-white/90 backdrop-blur-md rounded-2xl px-5 py-4 shadow-float border border-white/60 pointer-events-auto">
+                    {contenido(a)}
+                  </div>
+                </div>
+              </div>
+            )
+          }
+          // "lateral". En el celular y la tablet NO van al costado: la
+          // pantalla es angosta y quedaban encima de la paleta. Van abajo, a lo
+          // ancho y sobre un panel claro. Recién en lg: vuelven a los costados,
+          // con el protagonista corrido al otro lado (ver "Encuadre"). El
+          // posicionamiento va en este contenedor y la animación en el de
+          // adentro: si GSAP anima `y` sobre el mismo elemento, pisa el
+          // -translate-y-1/2 que lo centra.
+          return (
+            <div
+              key={`lateral-${i}`}
+              className={`absolute w-[calc(100%-2rem)] left-4 right-4 bottom-8
+                lg:w-[min(40vw,440px)] lg:top-1/2 lg:bottom-auto lg:-translate-y-1/2 ${
+                  a.lado === 'izq' ? 'lg:left-[6vw] lg:right-auto' : 'lg:right-[6vw] lg:left-auto'
+                }`}
+            >
+              <div
+                className={`acto acto-${i} text-left bg-white/85 backdrop-blur-sm rounded-2xl px-5 py-4 shadow-card
+                  lg:bg-transparent lg:backdrop-blur-none lg:rounded-none lg:px-0 lg:py-0 lg:shadow-none ${
+                    a.lado === 'izq' ? 'lg:text-left' : 'lg:text-right'
+                  }`}
+              >
+                {contenido(a)}
+              </div>
+            </div>
+          )
+        })}
+
+        {/* Dos pistas: que se puede jugar y que se puede scrollear. Se
+            desvanecen en cuanto arranca el guion. En "cine" van arriba en
+            todas las pantallas, porque abajo está el subtítulo. */}
         {!sinMovimiento && (
-          <div className="absolute top-20 lg:top-auto lg:bottom-6 left-1/2 -translate-x-1/2 flex items-center gap-5 whitespace-nowrap text-[10px] font-semibold uppercase tracking-widest bg-white/75 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm pista-caja transition-opacity duration-300">
+          <div className={`absolute left-1/2 -translate-x-1/2 flex items-center gap-5 whitespace-nowrap text-[10px] font-semibold uppercase tracking-widest bg-white/75 backdrop-blur-sm px-4 py-2 rounded-full shadow-sm pista-caja transition-opacity duration-300 ${
+            modo === 'cine' ? 'top-20' : 'top-20 lg:top-auto lg:bottom-6'
+          }`}>
             <span className="pista-juego text-saro-blue transition-opacity duration-300">
               Tocá para jugar
             </span>
