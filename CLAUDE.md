@@ -501,7 +501,10 @@ WhatsApp" + botones. Los tiempos están arriba de todo en `ScrollLab.jsx`
   metro → árboles sueltos con cielo entre las copas (se deja una ventana sin
   árboles detrás de la paleta) → dos siluetas de lomas lejanas en anillo, sin
   niebla. Sin techo de vigas, carteles más bajos (13 de alto) y reja gris
-  translúcida en vez de negra.
+  translúcida en vez de negra. **La niebla es mínima** (arranca en 140): en
+  105 fundía árboles y cerco en una bruma celeste que se sentía como una pared.
+  Por eso se sacó la tercera cancha: quedaba en parte fuera de la cúpula del
+  cielo y sólo la niebla la escondía.
 - **El fondo de la paleta:** las lonas son **pantallas LED de torneo** con
   mensajes que corren solos (reloj real, no el scroll) y detrás hay
   **banderas SARO** que se mecen, intercaladas con los carteles. Los mensajes de
@@ -519,7 +522,10 @@ WhatsApp" + botones. Los tiempos están arriba de todo en `ScrollLab.jsx`
   al lado contrario del texto moviendo el sensor de la cámara (`filmOffset`), no
   la cámara. Detrás del texto hay un velo blanco que entra y sale con él. En
   celular y tablet el texto va en una tarjeta abajo y la cámara apunta un poco
-  más abajo en el cierre para que la caja quede arriba de la tarjeta.
+  por debajo del foco para que la paleta y la caja queden arriba de la
+  tarjeta. **En celular el arranque va más lejos** (factor `0.9 / aspecto` en
+  vez del `0.58` del hero público): probado en un iPhone 15, con 0.58 la paleta
+  ocupaba casi todo el ancho. Vuelve al factor normal cuando la pelota sale.
 - **Escala real.** 1 unidad ≈ 15,5 cm. La cancha mide 129 × 65 (20 × 10 m) y la
   red 5,67 (88 cm). Cuando la red medía 1,5 el pique no se leía como pádel.
 

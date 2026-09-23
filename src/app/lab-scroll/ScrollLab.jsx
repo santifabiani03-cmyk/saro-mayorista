@@ -218,10 +218,13 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       // El gris que quedaba no venía tanto de la densidad como del COLOR: un
       // celeste desaturado tiñe de gris todo lo que toca. Este tiene el celeste
       // de la marca adentro, así que lo lejano se va a celeste, no a gris.
-      // Arranca en 100 (antes 130): el seto, a 116-140, ahora se funde en la
-      // bruma en vez de recortarse nítido. Lo cercano (cancha, bancos, carteles
-      // a 84) sigue sin niebla.
-      scene.fog = new THREE.Fog('#cfe4f7', 105, 168)   // el color del horizonte del cielo
+      // Septiembre 2026: casi sin niebla. Arrancaba en 105 y a esa distancia
+      // están los árboles y el cerco, así que todo el fondo se fundía en una
+      // bruma celeste que se sentía como una pared (probado en un iPhone 15).
+      // Ahora apenas vela lo más lejano. Ya no hace falta para esconder el
+      // borde del mundo: eso lo tapan las lomas lejanas, que dan la vuelta
+      // completa y llegan hasta el piso.
+      scene.fog = new THREE.Fog('#cfe4f7', 140, 400)   // el color del horizonte del cielo
       // (Hubo una niebla antes que lavaba el fondo: era densa y arrancaba
       // demasiado cerca. La de arriba empieza recién pasada la cancha.)
 
@@ -428,14 +431,6 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       const libre = (x, z, margen = 12) => CANCHAS.every(c =>
         Math.abs(x - c.x) > CANCHA_ANCHO / 2 + margen ||
         Math.abs(z - c.z) > CANCHA_LARGO / 2 + margen)
-      // La tercera cancha, la más lejana, NO entra en CANCHAS: si entrara, el
-      // pasillo entre las dos vecinas quedaría sin lugar y los bancos, macetas y
-      // faroles de ese lado se empujarían fuera del cielo. Sólo la esquivan el
-      // cerco y los árboles, que van más lejos.
-      const VECINA_LEJOS = { x: -(CANCHA_ANCHO + 26) * 2, z: RED_Z }
-      const libreLejos = (x, z, margen = 12) => libre(x, z, margen) && (
-        Math.abs(x - VECINA_LEJOS.x) > CANCHA_ANCHO / 2 + margen ||
-        Math.abs(z - VECINA_LEJOS.z) > CANCHA_LARGO / 2 + margen)
 
       // Domo de cielo: un degradé suave alrededor de todo, para que fuera de la
       // cancha no quede el vacío blanco. Va por dentro de una esfera enorme, así
@@ -1143,7 +1138,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
           // dos ciclos de largo distinto (5 y 7): el patrón tarda 35 en repetirse
           const alto = 3 + ((i * 3) % 5) * 0.45 + ((i * 5) % 7) * 0.2
           const ancho = alto * (1.7 + ((i * 11) % 7) * 0.12)
-          const visible = libreLejos(x, z, 6)
+          const visible = libre(x, z, 6)
           e.set(0, i * 1.31, 0)
           m.compose(
             new THREE.Vector3(x, SUELO_Y + alto * 0.55, z),
@@ -1170,7 +1165,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         const x = Math.cos(ang) * rad, z = RED_Z + Math.sin(ang) * rad
         const frente = Math.atan2(Math.sin(ang + Math.PI / 2), Math.cos(ang + Math.PI / 2))
         if (Math.abs(frente) < 0.2) continue            // la ventana detrás de la paleta
-        if (!libreLejos(x, z, 14)) continue
+        if (!libre(x, z, 14)) continue
         arboles.push({ x, z, alto: 17 + ((i * 13) % 11), i })
       }
       const troncos = new THREE.InstancedMesh(
@@ -1650,7 +1645,8 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       }
       // dos canchas más, en la fila que mira la cámara al final
       hacerVecina(-(CANCHA_ANCHO + 26), RED_Z)
-      hacerVecina(VECINA_LEJOS.x, VECINA_LEJOS.z)
+      // (Había una tercera cancha más allá. Quedaba en parte fuera de la cúpula
+      // del cielo y sólo la niebla la escondía: sin niebla se veía cortada.)
 
 
       // (Había un techo de vigas cruzadas sobre la cancha. Se sacó: cerraba la
@@ -2507,8 +2503,17 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         foco.set(IMPACTO.x, IMPACTO.y, IMPACTO.z).lerp(enCaja ? caja.position : pelota.position, sigue)
         const acerca = suave(seg(t, 0.74, 0.92))
         // Pantalla angosta (celular vertical): con el FOV vertical fijo, la
-        // paleta llenaba el alto entero. Se aleja igual que en el hero público.
-        const angosto = Math.max(1, 0.58 / (camera.aspect || 1))
+        // paleta llenaba el alto entero. En el ARRANQUE la cámara se aleja más:
+        // con el factor del hero público (0.58) la paleta ocupaba casi todo el
+        // ancho de un iPhone 15. Con 0.9 ocupa cerca de la mitad y se ve el
+        // entorno. A medida que la pelota sale vuelve al factor de siempre, que
+        // es el que deja bien encuadrada la caja del cierre.
+        const aspecto = camera.aspect || 1
+        const angosto = mix(
+          Math.max(1, 0.9 / aspecto),
+          Math.max(1, 0.58 / aspecto),
+          suave(seg(t, 0.36, 0.56))
+        )
         // Cierre a 6.8 y 5.3 de alto: más cerca la caja pisaba los botones, y
         // más baja la línea central de la cancha le quedaba tangente al borde
         // de arriba, que visualmente la cortaba (con 4.2 todavía la rozaba).
@@ -2526,10 +2531,12 @@ export default function ScrollLab({ whatsappNumber = '' }) {
           foco.y + alto,
           foco.z + Math.cos(giro) * dist
         )
-        // En pantalla vertical el texto va en una tarjeta abajo, y en el cierre
-        // (con los botones) esa tarjeta tapaba la base de la caja. Se apunta un
-        // poco por debajo de la caja para que suba en el cuadro.
-        const bajaMira = camera.aspect < 1 ? 1.3 * acerca : 0
+        // En pantalla vertical el texto va en una tarjeta abajo que tapa cerca
+        // de un tercio de la pantalla. Se apunta un poco por debajo del foco
+        // para que la paleta, y al final la caja, queden centradas en lo que se
+        // ve por ENCIMA de la tarjeta. Es proporcional a la distancia, así sube
+        // lo mismo en pantalla esté la cámara cerca o lejos.
+        const bajaMira = aspecto < 1 ? dist * (0.08 + 0.07 * acerca) : 0
         camera.lookAt(foco.x, foco.y - bajaMira + 5 * abre, foco.z)
 
         // ── Encuadre ──
