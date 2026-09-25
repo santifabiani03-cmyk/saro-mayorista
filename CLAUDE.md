@@ -558,6 +558,7 @@ WhatsApp" + botones. Los tiempos están arriba de todo en `ScrollLab.jsx`
 | Un objeto de primer plano (el cesto de pelotas) molesta en todos lados | Con el protagonista corriéndose de lado a lado y la cámara orbitando, siempre termina detrás del texto, detrás de la paleta o en el camino de la cámara. Se sacó |
 | `medirCuadro` o los cuadros por segundo dan valores absurdos | Con el navegador integrado **oculto**, el navegador frena la animación. Para capturar: `__lab.ver(t)`, esperar 2 s y sacar la captura |
 | El texto ya está al costado pero la paleta sigue al centro | El corte del encuadre tiene que ser el **mismo** que el del CSS (`matchMedia('(min-width: 1024px)')`), no el ancho del lienzo |
+| Un bucle de un millón de píxeles tarda 0,8 s (suelto tarda 0,08 s) | La función que arma la escena tiene 2.600 líneas y el navegador **no optimiza funciones tan grandes**: todo lo que corre adentro va lento. Los cálculos pesados van en funciones sueltas arriba del archivo (como `pintarCesped`) |
 
 **Assets 3D y Meshy.** Patrón confirmado con seis modelos: Meshy **rinde en
 objetos compactos y orgánicos** (mano, caja y árbol funcionaron, con reducciones
@@ -582,6 +583,36 @@ inestables (la misma versión dio 31 ms y 219 ms seguidos). Para comparar
 versiones sirve más contar triángulos recorriendo la escena. Referencia de
 septiembre 2026: ~404 mil triángulos con el entorno nuevo (antes de las mejoras
 eran ~545 mil).
+
+**Carga y tirones (septiembre 2026).** Lo que hacía que "se vea trabado" no eran
+los triángulos sino **compilar shaders a mitad del scroll**: cada material nuevo
+que entraba en cuadro (la caja, el destello, las pelotas del banco) congelaba
+la página un instante. Cómo quedó:
+
+- **Todo se prepara detrás del cartel de carga.** Un `LoadingManager` sigue la
+  paleta, los árboles, las texturas y los logos (el porcentaje del cartel sale
+  de ahí). Cuando termina, `prepararTodo` hace visibles un momento los objetos
+  que arrancan ocultos, llama a `renderer.compileAsync` y dibuja cuatro cuadros
+  de ensayo (0, 0,5, 0,72, 0,99). Recién ahí se saca el cartel. Si algo no
+  carga, a los 15 s se muestra igual.
+- **Sombras a pedido:** `shadowMap.autoUpdate = false`; el mapa se recalcula
+  sólo si cambió el scroll o hay pelotas en vuelo. Quieta, la escena no gasta.
+- **Calidad que se adapta:** si el promedio de cuadros pasa de 1/45 s se apagan
+  la oclusión y el brillo y después se baja la resolución (4 escalones); si
+  anda sobrado un buen rato, vuelve a subir. Fuera de pantalla no se dibuja.
+- **Textura del piso por píxeles** (`ImageData`) en vez de 90 mil trazos de
+  canvas, calculada en `pintarCesped`, una función **suelta arriba de todo del
+  archivo** (ver la trampa de la tabla: adentro del armado tardaba 0,8 s).
+- **Lo que había bajo el suelo:** el disco de pasto de los árboles (se recortan
+  los triángulos por debajo de 0), plantas del cerco que quedaban ocultas (ahora
+  sólo se crean las que se ven), la cara y el mango de reemplazo de la paleta y
+  una segunda costura de la pelota. Pesaban poco, pero ya no están.
+- Medido en desarrollo: armar la escena 1,3 s → 0,15–0,3 s; primer cuadro
+  2,7 s → casi inmediato; programas nuevos a mitad del scroll 13 → 0; en
+  Chrome con tamaño de celular, cartel de carga ~1,2 s en total.
+- En el navegador integrado de la app, a 1440 px la escena anda tan lenta que
+  las capturas salen con el scroll a medio camino (la caja cortada en el
+  borde). Para revisar encuadres usar Chrome con DevTools.
 
 ⚠️ La pestaña que maneja la extensión de Chrome a veces **no tiene viewport**
 (`window.innerWidth` en 0 y `document.hidden` en true). Ahí el lienzo queda en

@@ -81,6 +81,46 @@ const mix = (x, y, k) => x + (y - x) * k
 const suave = k => k * k * (3 - 2 * k)
 
 /**
+ * Pinta la baldosa del césped sintético, píxel por píxel, en `px` (los datos de
+ * un ImageData de tam × tam, con tam potencia de 2). Pasos:
+ *  1. ruido suelto (un valor al azar por píxel)
+ *  2. "peinado": cada píxel suma los 6 de arriba y el ruido queda en rayitas
+ *     verticales finas — las fibras, casi todas para el mismo lado
+ *  3. un poco de diagonal, por las fibras que caen para otro lado
+ *  4. la arena del relleno: puntitos sueltos claros y algunos oscuros
+ * Los índices dan la vuelta (& M): la baldosa empalma sola al repetirse.
+ *
+ * Tiene que vivir ACÁ, afuera del componente. Adentro de la función que arma
+ * la escena (2.600 líneas) el navegador no optimiza el bucle — es demasiado
+ * grande para compilarla — y el millón de píxeles tardaba 0,8 s con la página
+ * congelada. Suelta, tarda menos de 0,1 s.
+ */
+function pintarCesped(px, tam) {
+  const M = tam - 1, N = tam * tam
+  const ruido = new Float32Array(N)
+  for (let i = 0; i < N; i++) ruido[i] = Math.random() * 2 - 1
+  const BASE_R = 120, BASE_G = 173, BASE_B = 223          // #78addf
+  for (let y = 0; y < tam; y++) {
+    for (let x = 0; x < tam; x++) {
+      let s = 0
+      for (let k = 0; k < 6; k++) s += ruido[((y + k) & M) * tam + x]
+      s += 0.6 * ruido[((y + 2) & M) * tam + ((x + 3) & M)]
+      const v = s / 3.6                                   // la fibra, más o menos entre -1 y 1
+      const f = Math.min(0.5, Math.abs(v) * 0.22)         // cuánto se acerca al claro o al oscuro
+      // hacia el claro (225,240,255) o hacia el oscuro (30,78,130)
+      let r = BASE_R + (v > 0 ? 105 : -90) * f
+      let g = BASE_G + (v > 0 ? 67 : -95) * f
+      let b = BASE_B + (v > 0 ? 32 : -93) * f
+      const azar = Math.random()
+      if (azar < 0.016) { r += 22; g += 10; b -= 4 }          // arena
+      else if (azar < 0.022) { r -= 12; g -= 14; b -= 14 }    // granito oscuro
+      const o = (y * tam + x) * 4
+      px[o] = r; px[o + 1] = g; px[o + 2] = b; px[o + 3] = 255
+    }
+  }
+}
+
+/**
  * Altura de la pelota con física real: cae como parábola y cuando toca el piso
  * rebota más bajo (pierde energía, como una pelota de verdad).
  *   y0/v0 = altura y velocidad al salir · g = gravedad · e = cuánto rebota (0-1)
@@ -181,6 +221,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
   const [sinMovimiento, setSinMovimiento] = useState(false)
   // Se prende cuando llegó la paleta: saca la pantalla de carga
   const [listo, setListo] = useState(false)
+  const [avance, setAvance] = useState(0)     // % de carga, para la pantalla de carga
   // Estilo de los textos. La escena lo lee en cada cuadro por la ref (el bucle
   // de Three no se entera de los renders de React).
   const [estilo, setEstilo] = useState('lateral')
@@ -216,16 +257,16 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       import('three/examples/jsm/postprocessing/OutputPass.js'),
       import('three/examples/jsm/postprocessing/UnrealBloomPass.js'),
       import('three/examples/jsm/postprocessing/ShaderPass.js'),
-      import('three/examples/jsm/shaders/VignetteShader.js'),
       import('three/examples/jsm/geometries/RoundedBoxGeometry.js'),
       import('three/examples/jsm/utils/BufferGeometryUtils.js'),
     ]).then(([THREE, { GLTFLoader }, { MeshoptDecoder },
               { EffectComposer }, { RenderPass }, { GTAOPass }, { OutputPass },
-              { UnrealBloomPass }, { ShaderPass }, { VignetteShader },
+              { UnrealBloomPass }, { ShaderPass },
               { RoundedBoxGeometry }, { mergeVertices }]) => {
       if (disposed) return
       const mount = mountRef.current
       if (!mount) return
+      const inicioArmado = performance.now()   // para medir cuánto tarda en armarse la escena
 
       const W = () => mount.clientWidth || 1
       const H = () => mount.clientHeight || 1
@@ -264,7 +305,11 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       // inspeccionarlo con window.__lab). Cuesta rendimiento, así que sólo en
       // desarrollo: en producción nadie lee el cuadro.
       const inspeccion = process.env.NODE_ENV !== 'production'
-      const renderer = new THREE.WebGLRenderer({ antialias: true, preserveDrawingBuffer: inspeccion })
+      // Sin antialias del lienzo: todo se dibuja en las capas del compositor y
+      // lo último que llega al lienzo es un rectángulo a pantalla completa, así
+      // que el suavizado de bordes del lienzo no suavizaba nada y sí costaba
+      // memoria y ancho de banda (en el celular, con 3 píxeles por punto, mucho).
+      const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: inspeccion })
       // Sin curva de exposición, las zonas claras se van a blanco puro y todo
       // queda plano y quemado — es buena parte de lo que se lee como "barato".
       // ACES comprime las altas luces como lo hace una cámara de verdad.
@@ -272,8 +317,20 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       renderer.toneMappingExposure = 0.96
       // Sombras reales: apoyan los objetos en el piso mejor que cualquier truco.
       renderer.shadowMap.enabled = true
-      renderer.shadowMap.type = THREE.PCFSoftShadowMap
-      renderer.setPixelRatio(Math.min(devicePixelRatio, 2))
+      // PCF y no PCFSoft: esta versión de Three ya no tiene la "Soft" y la
+      // cambiaba por esta igual, avisando en la consola.
+      renderer.shadowMap.type = THREE.PCFShadowMap
+      // El mapa de sombras NO se recalcula en cada cuadro: sólo cuando algo que
+      // proyecta sombra se movió (ver `sombrasAlDia` en dibujar). Es una
+      // pasada entera de la escena, y con la página quieta se hacía igual.
+      renderer.shadowMap.autoUpdate = false
+      // Resolución: en el celular arranca en 1,5 píxeles por punto (el iPhone
+      // tiene 3; a 2 dibujaba 1,8 veces más píxeles para una diferencia que no
+      // se ve en una escena en movimiento). Después se ajusta sola según cómo
+      // venga andando (ver "Calidad que se adapta").
+      const DPR_MAX = Math.min(devicePixelRatio, 2)
+      let dpr = W() < 900 ? Math.min(DPR_MAX, 1.5) : DPR_MAX
+      renderer.setPixelRatio(dpr)
       renderer.setSize(W(), H())
       mount.appendChild(renderer.domElement)
 
@@ -319,28 +376,29 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       bloom.enabled = gtao.enabled
       composer.addPass(bloom)
       composer.addPass(new OutputPass())           // tonemapping va al final
-      // Viñeta apenas marcada, DESPUÉS del tonemapping para que el valor sea
-      // predecible. Baja la luminancia de las esquinas sin cambiarles el tono,
-      // así el ojo cae al centro del cuadro. Con `darkness` alto se ensucia de
-      // gris y rompe el blanco de la marca: 0.85 es el techo acá.
-      const vineta = new ShaderPass(VignetteShader)
-      vineta.uniforms.offset.value = 1.15
-      // 0.6 (era 0.85): con las esquinas más oscuras el cuadro se sentía cerrado
-      vineta.uniforms.darkness.value = 0.6
-      composer.addPass(vineta)
-      // Corrección de color final: un poco más de contraste y de saturación.
-      // La escena tenía un velo gris lavado — mucho relleno de ambiente y nada
-      // que lo compense — y se veía menos nítida que el hero público. Es una
-      // cuenta por píxel, no cuesta casi nada.
+      // Viñeta y corrección de color, en UNA sola pasada (antes eran dos: cada
+      // pasada recorre la pantalla entera, y en el celular eso se nota).
+      // · Viñeta apenas marcada, DESPUÉS del tonemapping para que el valor sea
+      //   predecible: baja la luminancia de las esquinas y el ojo cae al centro.
+      //   0.6 (era 0.85): con las esquinas más oscuras el cuadro se sentía cerrado.
+      // · Un poco más de contraste y de saturación: la escena tenía un velo gris
+      //   lavado y se veía menos nítida que el hero público.
       const grading = new ShaderPass({
-        uniforms: { tDiffuse: { value: null }, contraste: { value: 1.08 }, saturacion: { value: 1.12 } },
+        uniforms: {
+          tDiffuse: { value: null },
+          offset: { value: 1.15 }, darkness: { value: 0.6 },
+          contraste: { value: 1.08 }, saturacion: { value: 1.12 },
+        },
         vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
         fragmentShader: `
-          uniform sampler2D tDiffuse; uniform float contraste; uniform float saturacion;
+          uniform sampler2D tDiffuse; uniform float offset; uniform float darkness;
+          uniform float contraste; uniform float saturacion;
           varying vec2 vUv;
           void main() {
             vec4 c = texture2D(tDiffuse, vUv);
-            vec3 col = (c.rgb - 0.5) * contraste + 0.5;
+            vec2 uv = (vUv - vec2(0.5)) * vec2(offset);
+            vec3 col = mix(c.rgb, vec3(1.0 - darkness), dot(uv, uv));
+            col = (col - 0.5) * contraste + 0.5;
             float l = dot(col, vec3(0.2126, 0.7152, 0.0722));
             col = mix(vec3(l), col, saturacion);
             gl_FragColor = vec4(clamp(col, 0.0, 1.0), c.a);
@@ -348,7 +406,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       })
       composer.addPass(grading)
       composer.setSize(W(), H())
-      composer.setPixelRatio(Math.min(devicePixelRatio, 2))
+      composer.setPixelRatio(dpr)
 
       // Iluminación de entorno: el modelo real necesita reflejos para verse bien
       const pmrem = new THREE.PMREMGenerator(renderer)
@@ -529,8 +587,29 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       texCesped.wrapS = texCesped.wrapT = THREE.RepeatWrapping
       texCesped.repeat.set(40, 40)
       // El cargador se declara ACÁ, antes del primer uso.
-      const loader = new GLTFLoader()
+      // Todas las cargas (modelos, fotos, logos) pasan por un mismo gestor: así
+      // se sabe cuándo terminó TODO y la pantalla de carga puede mostrar el
+      // avance. Cuando termina, se prepara la escena entera (ver `prepararTodo`).
+      const gestor = new THREE.LoadingManager()
+      gestor.onProgress = (url, hechos, total) => {
+        if (!disposed) setAvance(Math.round((hechos / Math.max(total, 1)) * 90))
+      }
+      const loader = new GLTFLoader(gestor)
       loader.setMeshoptDecoder(MeshoptDecoder)
+      const cargadorTex = new THREE.TextureLoader(gestor)
+      // Las imágenes que se dibujan en un canvas (logos) no pasan por los
+      // cargadores de Three: se le avisa al gestor a mano.
+      const cargarImagen = (url, alCargar) => {
+        const img = new Image()
+        img.crossOrigin = 'anonymous'
+        gestor.itemStart(url)
+        // itemEnd va en `finally`: si el dibujo del logo fallara, la carga igual
+        // se da por terminada y la pantalla de carga no queda trabada
+        img.onload = () => { try { if (!disposed) alCargar(img) } finally { gestor.itemEnd(url) } }
+        img.onerror = () => gestor.itemEnd(url)
+        img.src = url
+        return img
+      }
 
       // ── AFUERA DE LA CANCHA ──
       const afuera = new THREE.Group()
@@ -603,10 +682,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       // El logo va en blanco: se pinta usando el logo como recorte. Se arma una
       // sola vez, grande, y de ahí sale para la pantalla, la franja de los
       // carteles, la cinta de la caja y las banderas.
-      const imgLogo = new Image()
-      imgLogo.crossOrigin = 'anonymous'
-      imgLogo.onload = () => {
-        if (disposed) return
+      cargarImagen('/assets/logo-horizontal.png', (imgLogo) => {
         const alto = 128
         const ancho = alto * (imgLogo.width / imgLogo.height || 3)
         const aux = document.createElement('canvas')
@@ -627,8 +703,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         const ac = 30, anc = ac * (imgLogo.width / imgLogo.height || 3)
         ;[128, 384].forEach(cx => cintaCtx.drawImage(aux, cx - anc / 2, 32 - ac / 2, anc, ac))
         texCinta.needsUpdate = true
-      }
-      imgLogo.src = '/assets/logo-horizontal.png'
+      })
 
       const LONA_ALTO = 7
       ;[-1, 1].forEach(lado => {
@@ -1052,7 +1127,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         )
         foto.position.set(0, SUELO_Y + CARTEL_ALTO / 2 + CARTEL_PIE, 0.25)
         grupo.add(foto)
-        new THREE.TextureLoader().load(ruta, tx => {
+        cargadorTex.load(ruta, tx => {
           if (disposed) return
           tx.colorSpace = THREE.SRGBColorSpace
           matFoto.map = tx
@@ -1119,7 +1194,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       })
       const cartel = new THREE.Mesh(new THREE.PlaneGeometry(CL_ANCHO * 0.34, CL_ANCHO * 0.34 / 3), matCartel)
       cartel.position.set(0, SUELO_Y + CL_ALTO * 0.85, CL_FONDO / 2 + 0.4)
-      new THREE.TextureLoader().load('/assets/logo-caja.png', tx => {
+      cargadorTex.load('/assets/logo-caja.png', tx => {
         if (disposed) return
         tx.colorSpace = THREE.SRGBColorSpace
         matCartel.map = tx
@@ -1153,30 +1228,35 @@ export default function ScrollLab({ whatsappNumber = '' }) {
 
       // 1. Cerco bajo. Si una planta cae adentro de una cancha no se empuja
       //    (antes se empujaba hacia afuera y terminaba fuera del cielo): se omite.
+      // Las plantas que caerían adentro de una cancha directamente no se crean
+      // (antes se creaban achicadas a cero: invisibles, pero se dibujaban igual).
       const CERCO = { radio: 124, cuantos: 150 }
-      const seto = new THREE.InstancedMesh(geoSeto, new THREE.MeshStandardMaterial({ roughness: 0.95 }), CERCO.cuantos)
+      const plantasCerco = []
+      for (let i = 0; i < CERCO.cuantos; i++) {
+        const ang = (i / CERCO.cuantos) * Math.PI * 2
+        const rad = CERCO.radio + ((i * 7) % 5) * 1.6
+        const x = Math.cos(ang) * rad, z = RED_Z + Math.sin(ang) * rad
+        if (libre(x, z, 6)) plantasCerco.push({ i, x, z })
+      }
+      const seto = new THREE.InstancedMesh(geoSeto, new THREE.MeshStandardMaterial({ roughness: 0.95 }), plantasCerco.length)
       seto.castShadow = false
       seto.receiveShadow = true
       {
         const m = new THREE.Matrix4(), q = new THREE.Quaternion(), e = new THREE.Euler()
         const col = new THREE.Color()
-        for (let i = 0; i < CERCO.cuantos; i++) {
-          const ang = (i / CERCO.cuantos) * Math.PI * 2
-          const rad = CERCO.radio + ((i * 7) % 5) * 1.6
-          const x = Math.cos(ang) * rad, z = RED_Z + Math.sin(ang) * rad
+        plantasCerco.forEach(({ i, x, z }, k) => {
           // dos ciclos de largo distinto (5 y 7): el patrón tarda 35 en repetirse
           const alto = 3 + ((i * 3) % 5) * 0.45 + ((i * 5) % 7) * 0.2
           const ancho = alto * (1.7 + ((i * 11) % 7) * 0.12)
-          const visible = libre(x, z, 6)
           e.set(0, i * 1.31, 0)
           m.compose(
             new THREE.Vector3(x, SUELO_Y + alto * 0.55, z),
             q.setFromEuler(e),
-            visible ? new THREE.Vector3(ancho, alto, ancho) : new THREE.Vector3(0, 0, 0)
+            new THREE.Vector3(ancho, alto, ancho)
           )
-          seto.setMatrixAt(i, m)
-          seto.setColorAt(i, col.set(VERDES[i % VERDES.length]))
-        }
+          seto.setMatrixAt(k, m)
+          seto.setColorAt(k, col.set(VERDES[i % VERDES.length]))
+        })
         seto.instanceMatrix.needsUpdate = true
         if (seto.instanceColor) seto.instanceColor.needsUpdate = true
       }
@@ -1242,6 +1322,19 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         // hunde ese 10% bajo el suelo. Queda normalizado a 1 de alto.
         geo.translate(-centro.x, -bb.min.y - 0.1 * H, -centro.z)
         geo.scale(1 / H, 1 / H, 1 / H)
+        // Y los triángulos que quedaron enteros bajo el suelo se borran: no se
+        // ven nunca, pero la placa de video los procesaba igual en cada cuadro.
+        {
+          const pos = geo.attributes.position, idx = geo.index.array
+          const bajoTierra = i => pos.getY(i) < -0.002
+          const quedan = []
+          for (let i = 0; i < idx.length; i += 3) {
+            const a = idx[i], b = idx[i + 1], c = idx[i + 2]
+            if (bajoTierra(a) && bajoTierra(b) && bajoTierra(c)) continue
+            quedan.push(a, b, c)
+          }
+          geo.setIndex(quedan)
+        }
         const inst = new THREE.InstancedMesh(geo, malla.material, arboles.length)
         const col = new THREE.Color()
         arboles.forEach((a, k) => inst.setColorAt(k, col.set(TONOS_ARBOL[a.i % TONOS_ARBOL.length])))
@@ -1398,45 +1491,15 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       const cesCnv2 = document.createElement('canvas')
       cesCnv2.width = cesCnv2.height = TEX_PISO
       const cx2 = cesCnv2.getContext('2d')
-      cx2.fillStyle = '#78addf'
-      cx2.fillRect(0, 0, TEX_PISO, TEX_PISO)
-      // Todo lo que se dibuja cerca de un borde se repite del otro lado, así la
-      // baldosa empalma sin costura al repetirse.
-      const enLosCuatro = (x, y, margen, dibujar) => {
-        for (const dx of [0, -TEX_PISO, TEX_PISO]) {
-          for (const dy of [0, -TEX_PISO, TEX_PISO]) {
-            const px = x + dx, py = y + dy
-            if (px < -margen || px > TEX_PISO + margen || py < -margen || py > TEX_PISO + margen) continue
-            dibujar(px, py)
-          }
-        }
-      }
-      // Fibras finas y parejas, casi todas peinadas para el mismo lado (el
-      // césped sintético tiene "pelo"), con algunas sueltas. Se probó con matas
-      // de fibras que caían juntas y el piso se veía manchado como camuflaje:
-      // de cerca, el césped de verdad es un grano fino y uniforme.
-      cx2.lineWidth = 1
-      for (let i = 0; i < 90000; i++) {
-        const x = Math.random() * TEX_PISO, y = Math.random() * TEX_PISO
-        const a = Math.random() < 0.8 ? Math.PI / 2 + (Math.random() - 0.5) * 0.6 : Math.random() * Math.PI * 2
-        const largo = 2.5 + Math.random() * 4
-        cx2.strokeStyle = Math.random() > 0.5
-          ? `rgba(225,240,255,${0.07 + Math.random() * 0.07})`
-          : `rgba(30,78,130,${0.07 + Math.random() * 0.07})`
-        enLosCuatro(x, y, 8, (px, py) => {
-          cx2.beginPath()
-          cx2.moveTo(px, py)
-          cx2.lineTo(px + Math.cos(a) * largo, py + Math.sin(a) * largo)
-          cx2.stroke()
-        })
-      }
-      // arena del relleno: un polvillo claro, apenas amarillento, muy fino
-      for (let i = 0; i < 22000; i++) {
-        const x = Math.random() * TEX_PISO, y = Math.random() * TEX_PISO
-        cx2.fillStyle = Math.random() > 0.25
-          ? `rgba(236,228,205,${0.10 + Math.random() * 0.14})`
-          : `rgba(20,55,95,${0.08 + Math.random() * 0.08})`
-        cx2.fillRect(x, y, 1, 1)
+      // Se calcula píxel por píxel en un solo arreglo (ver pintarCesped, arriba
+      // de todo). Antes se dibujaban 90 mil trazos de a uno y la página quedaba
+      // congelada más de medio segundo.
+      // (Se probó con matas de fibras que caían juntas y el piso se veía
+      // manchado como camuflaje: de cerca, el césped es un grano fino y parejo.)
+      {
+        const img = cx2.createImageData(TEX_PISO, TEX_PISO)
+        pintarCesped(img.data, TEX_PISO)
+        cx2.putImageData(img, 0, 0)
       }
       const texPiso = new THREE.CanvasTexture(cesCnv2)
       // Sin esto Three la toma como lineal y la muestra lavada: el piso se veía
@@ -1893,10 +1956,11 @@ export default function ScrollLab({ whatsappNumber = '' }) {
           paleta.add(disco)
         }
         cont.traverse(o => { if (o.isMesh) o.castShadow = true })
-        cara.visible = false                  // se van los placeholders
-        mango.visible = false
-        setListo(true)
-      }, undefined, () => { if (!disposed) setListo(true) /* si falla, queda la silueta simple */ })
+        // Los reemplazos provisorios se sacan de la escena (antes quedaban
+        // escondidos, ocupando memoria y recorridos en cada cuadro).
+        paleta.remove(cara, mango)
+        ;[cara, mango].forEach(o => { o.geometry.dispose(); o.material.dispose() })
+      }, undefined, () => { /* si falla, queda la silueta simple */ })
 
       // Pelota de pádel: fieltro (nada de brillo) y las costuras blancas curvas.
       // Ya no se deforma en caja a la vista: el paso intermedio parecía una
@@ -1925,9 +1989,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       const geoCostura = new THREE.TubeGeometry(new Costura(), 220, R_BOLA * 0.055, 8, true)
       const matCostura = new THREE.MeshStandardMaterial({ color: '#fdfdf5', roughness: 0.85 })
       const costuraA = new THREE.Mesh(geoCostura, matCostura)
-      const costuraB = new THREE.Mesh(geoCostura, matCostura)
-      costuraB.visible = false
-      pelota.add(bola, costuraA, costuraB)
+      pelota.add(bola, costuraA)
       bola.castShadow = true
 
       // (Hubo un cesto de pelotas como elemento de primer plano. Se sacó: en
@@ -2029,9 +2091,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         texEtiqueta.needsUpdate = true
       }
       pintarEtiqueta(null)
-      const imgLogoCaja = new Image()
-      imgLogoCaja.onload = () => { if (!disposed) pintarEtiqueta(imgLogoCaja) }
-      imgLogoCaja.src = '/assets/logo-caja.png'
+      cargarImagen('/assets/logo-caja.png', pintarEtiqueta)
       const etiqueta = new THREE.Mesh(
         new THREE.PlaneGeometry(L_CAJA * 0.7, L_CAJA * 0.35),
         new THREE.MeshStandardMaterial({ map: texEtiqueta, roughness: 0.85 })
@@ -2274,7 +2334,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
                      veredicto: dentro > 0 ? 'LA ATRAVIESA'
                        : Math.abs(sep - 0.45) < 0.10 ? 'toca la cara' : 'pasa de largo' }
           },
-          bloom, vineta,   // para comparar valores sin recompilar
+          bloom, vineta: grading,   // para comparar valores sin recompilar
           ao: gtao,   // para prender/apagar la oclusión y comparar el costo
           // Cuánto cuesta dibujar un cuadro, en milisegundos. No usa
           // requestAnimationFrame a propósito: con la pestaña en segundo plano
@@ -2360,12 +2420,55 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       const pistaJuego = document.querySelector('.pista-juego')
       const pistaScroll = document.querySelector('.pista-scroll')
       const pistaCaja = document.querySelector('.pista-caja')
+      // ── Calidad que se adapta ──
+      // Se mide cuánto tarda cada cuadro. Si viene lento (por debajo de unos 45
+      // cuadros por segundo) se baja un escalón: primero se apagan la oclusión
+      // ambiental y el brillo, que son lo más caro y lo que menos se nota;
+      // después se baja la resolución. Si sobra, se vuelve a subir de a poco,
+      // nunca por encima de cómo arrancó.
+      //   escalón 0 · como arrancó
+      //   escalón 1 · sin oclusión ni brillo
+      //   escalón 2 · además, 80% de la resolución
+      //   escalón 3 · además, 65% de la resolución (nunca menos de 1 píxel por punto)
+      const dprInicial = dpr
+      const efectosInicio = gtao.enabled
+      let escalon = 0, promedio = 1 / 60, cuadrosMedidos = 0, holgados = 0
+      const aplicarCalidad = () => {
+        gtao.enabled = bloom.enabled = efectosInicio && escalon === 0
+        dpr = Math.max(1, dprInicial * [1, 1, 0.8, 0.65][escalon])
+        renderer.setPixelRatio(dpr)
+        composer.setPixelRatio(dpr)
+        onResize()
+      }
+      const medirCalidad = (real) => {
+        if (!preparado || real > 0.25) return        // la carga y los saltos de pestaña no cuentan
+        promedio = promedio * 0.94 + real * 0.06
+        if (++cuadrosMedidos < 60) return            // se evalúa cada unos 60 cuadros
+        cuadrosMedidos = 0
+        if (promedio > 1 / 45 && escalon < 3) {
+          escalon++; holgados = 0; aplicarCalidad()
+        } else if (promedio < 1 / 57 && escalon > 0) {
+          // para subir tiene que andar holgado un buen rato (unos 8 s), si no
+          // sube y baja todo el tiempo
+          if (++holgados >= 8) { escalon--; holgados = 0; aplicarCalidad() }
+        } else {
+          holgados = 0
+        }
+      }
+
       let ultimoCuadro = performance.now() / 1000
       const frame = () => {
         raf = requestAnimationFrame(frame)
         const ahora = performance.now() / 1000
-        const dt = Math.min(0.05, ahora - ultimoCuadro)   // topado: si la pestaña
+        const real = ahora - ultimoCuadro
+        const dt = Math.min(0.05, real)                   // topado: si la pestaña
         ultimoCuadro = ahora                              // vuelve de fondo, no salta
+        // Si el hero ya quedó arriba (la persona siguió bajando por la página)
+        // no se dibuja: no se ve, y le quitaba fluidez al resto del sitio. El
+        // bucle sigue andando, así que apenas vuelve a aparecer se dibuja.
+        const rect = stageRef.current?.getBoundingClientRect()
+        if (rect && (rect.bottom <= 0 || rect.top >= window.innerHeight)) return
+        medirCalidad(real)
         const jugando = progRef.current.t <= JUEGO_HASTA
         if (pistaJuego) pistaJuego.style.opacity = jugando ? '1' : '0'
         if (pistaScroll) pistaScroll.style.opacity = progRef.current.t < 0.08 ? '1' : '0'
@@ -2516,6 +2619,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         })
       }
 
+      let tSombra = -1          // en qué punto del guion se calcularon las sombras por última vez
       const dibujar = (t) => {
 
         // ── El guion, escrito en función del progreso ──
@@ -2732,9 +2836,70 @@ export default function ScrollLab({ whatsappNumber = '' }) {
           }
         }
 
+        // Sombras: se recalculan sólo si algo que las proyecta se movió en este
+        // cuadro — avanzó el guion (se mueven la paleta, la pelota, la caja y el
+        // sol) o se está jugando. Con la página quieta ya no se rehace el mapa.
+        if (t !== tSombra || clic.activo || banco.some(b => b.viva)) {
+          renderer.shadowMap.needsUpdate = true
+          tSombra = t
+        }
         composer.render()
       }
+
+      // ── Preparar todo antes de mostrar ──
+      // La placa de video tiene que "compilar" un programa por cada tipo de
+      // material, de sombra y de efecto. Si lo hace la primera vez que algo
+      // aparece, la animación se congela en ese instante: pasaba al llegar los
+      // árboles, en el plano general, en el destello y al aparecer la caja
+      // (medido: 49 programas, 13 de ellos a mitad del scroll). Acá se compila
+      // todo junto, detrás de la pantalla de carga, y recién después se muestra.
+      let preparado = false
+      const prepararTodo = async () => {
+        if (preparado || disposed) return
+        preparado = true
+        setAvance(94)
+        const inicioPreparar = performance.now()
+        // lo que aparece recién más adelante en el guion se prende un instante
+        const ocultos = [caja, sombra, pelota, destello, anillo, ...banco.map(b => b.malla)]
+        const antes = ocultos.map(o => o.visible)
+        ocultos.forEach(o => { o.visible = true })
+        // compileAsync junta los materiales en el momento de llamarlo; lo que
+        // espera después es que la placa termine. Por eso la visibilidad se
+        // devuelve enseguida y no al final: mientras tanto el bucle sigue
+        // dibujando y podría haber cambiado alguno (una pelota del juego).
+        let compilando = []
+        try {
+          compilando = [renderer.compileAsync(scene, camera), renderer.compileAsync(escenaFx, camera)]
+        } catch { /* si falla, igual se compila al dibujar */ }
+        ocultos.forEach((o, i) => { o.visible = antes[i] })
+        try { await Promise.all(compilando) } catch { /* ídem */ }
+        if (disposed) return
+        try {
+          // Cuadros de práctica en los momentos clave del guion: terminan de
+          // preparar lo que no se compila por adelantado (el mapa de sombras y
+          // los efectos de pantalla). No se ven: los tapa la pantalla de carga.
+          for (const tPrueba of [0, 0.5, 0.72, 0.99]) dibujar(tPrueba)
+          tSombra = -1                                 // que el próximo cuadro rehaga las sombras
+          dibujar(progRef.current.t)
+          if (inspeccion && window.__lab.tiempos) {
+            window.__lab.tiempos.prepararMs = Math.round(performance.now() - inicioPreparar)
+            window.__lab.tiempos.hastaMostrarMs = Math.round(performance.now() - inicioArmado)
+          }
+        } finally {
+          // pase lo que pase en la práctica, la pantalla de carga se va
+          if (!disposed) { setAvance(100); setListo(true) }
+        }
+      }
+      gestor.onLoad = prepararTodo
+      // si algo tarda demasiado o no carga nunca, la escena se muestra igual
+      setTimeout(prepararTodo, 15000)
+
+      const armadoMs = performance.now() - inicioArmado
       frame()
+      if (inspeccion) {
+        window.__lab.renderer = renderer
+        window.__lab.tiempos = { armadoMs: Math.round(armadoMs), primerCuadroMs: Math.round(performance.now() - inicioArmado - armadoMs) }
+      }
 
       // La escena ya ocupa su lugar: recién ahora ScrollTrigger puede medir bien
       ScrollTrigger.refresh()
@@ -2920,8 +3085,11 @@ export default function ScrollLab({ whatsappNumber = '' }) {
           >
             <img src="/assets/logo-icon.png" alt="" className="w-14 h-14 animate-pulse" />
             <p className="mt-4 text-[11px] font-semibold uppercase tracking-[.3em] text-slate-400">
-              Cargando
+              Cargando {avance}%
             </p>
+            <div className="mt-3 h-1 w-40 rounded-full bg-slate-200 overflow-hidden" aria-hidden="true">
+              <div className="h-full bg-saro-blue rounded-full transition-[width] duration-300" style={{ width: `${avance}%` }} />
+            </div>
           </div>
         )}
 
