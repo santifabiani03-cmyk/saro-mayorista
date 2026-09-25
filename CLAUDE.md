@@ -607,6 +607,15 @@ la página un instante. Cómo quedó:
   (si no, sube y baja y cada bajada es un tirón). Fuera de pantalla no se
   dibuja. `__lab.calidad.ver() / fijar(escalón, resolución) / soltar()`
   sirven para comparar a mano.
+- **Suavizado de bordes: SMAA**, último pase del compositor (el lienzo va
+  sin antialias). Sin él, las líneas de la cancha y el borde de la paleta
+  hacían escalones, y peor cuando la calidad baja la resolución (cada píxel
+  dibujado ocupa varios de pantalla). Se comparó con FXAA a la misma
+  resolución: FXAA también empasta las texturas (las letras de la LED
+  quedaban borrosas). En desarrollo, `?aa=no|fxaa|smaa` para comparar.
+- **Los logos se cargan sin `crossOrigin`**: son del mismo dominio y, con
+  él, el navegador no aprovechaba la precarga del sitio y bajaba el logo dos
+  veces.
 - **Qué pesa de verdad** (placa Intel integrada, 1440 px): **la cantidad de
   píxeles**. A media resolución va a 60 cuadros por segundo; apagar
   oclusión, brillo o bajar las sombras casi no cambia (28-30). Los reflejos

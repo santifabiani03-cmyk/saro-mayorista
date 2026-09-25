@@ -259,10 +259,12 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       import('three/examples/jsm/postprocessing/ShaderPass.js'),
       import('three/examples/jsm/geometries/RoundedBoxGeometry.js'),
       import('three/examples/jsm/utils/BufferGeometryUtils.js'),
+      import('three/examples/jsm/postprocessing/SMAAPass.js'),
+      import('three/examples/jsm/postprocessing/FXAAPass.js'),
     ]).then(([THREE, { GLTFLoader }, { MeshoptDecoder },
               { EffectComposer }, { RenderPass }, { GTAOPass }, { OutputPass },
               { UnrealBloomPass }, { ShaderPass },
-              { RoundedBoxGeometry }, { mergeVertices }]) => {
+              { RoundedBoxGeometry }, { mergeVertices }, { SMAAPass }, { FXAAPass }]) => {
       if (disposed) return
       const mount = mountRef.current
       if (!mount) return
@@ -309,6 +311,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       // lo último que llega al lienzo es un rectángulo a pantalla completa, así
       // que el suavizado de bordes del lienzo no suavizaba nada y sí costaba
       // memoria y ancho de banda (en el celular, con 3 píxeles por punto, mucho).
+      // El suavizado lo hace SMAA, al final del compositor.
       const renderer = new THREE.WebGLRenderer({ antialias: false, preserveDrawingBuffer: inspeccion })
       // Sin curva de exposición, las zonas claras se van a blanco puro y todo
       // queda plano y quemado — es buena parte de lo que se lee como "barato".
@@ -340,6 +343,14 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       // bollos de un arbusto. Sin eso los objetos parecen apoyados encima de la
       // escena en vez de estar adentro, y es buena parte de lo que se lee como
       // "barato". GTAO calcula ese oscurecimiento por geometría, cada cuadro.
+      // Suavizado de bordes (los "dientes de sierra" en líneas y curvas): el
+      // lienzo no tiene (ver el renderer), así que va al final del compositor.
+      // SMAA y no FXAA: comparados a la misma resolución, FXAA también empasta
+      // las texturas (las letras de la pantalla LED quedaban borrosas); SMAA
+      // sólo toca los bordes. Importa más cuando la calidad adaptable baja la
+      // resolución: cada píxel dibujado ocupa varios de la pantalla y los
+      // escalones se agrandan. En desarrollo: ?aa=no|fxaa|smaa para comparar.
+      const modoAA = (inspeccion && new URLSearchParams(window.location.search).get('aa')) || 'smaa'
       const composer = new EffectComposer(renderer)
       composer.addPass(new RenderPass(scene, camera))
       const gtao = new GTAOPass(scene, camera, W(), H())
@@ -405,6 +416,8 @@ export default function ScrollLab({ whatsappNumber = '' }) {
           }`,
       })
       composer.addPass(grading)
+      if (modoAA === 'smaa') composer.addPass(new SMAAPass())
+      if (modoAA === 'fxaa') composer.addPass(new FXAAPass())
       composer.setSize(W(), H())
       composer.setPixelRatio(dpr)
 
@@ -600,8 +613,10 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       // Las imágenes que se dibujan en un canvas (logos) no pasan por los
       // cargadores de Three: se le avisa al gestor a mano.
       const cargarImagen = (url, alCargar) => {
+        // Sin crossOrigin: los logos son del mismo dominio y no lo necesitan
+        // para dibujarse en un canvas. Con él, el navegador no aprovechaba la
+        // precarga del logo que ya hace el sitio y lo bajaba dos veces.
         const img = new Image()
-        img.crossOrigin = 'anonymous'
         gestor.itemStart(url)
         // itemEnd va en `finally`: si el dibujo del logo fallara, la carga igual
         // se da por terminada y la pantalla de carga no queda trabada
