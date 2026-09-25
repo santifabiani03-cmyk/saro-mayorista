@@ -558,6 +558,7 @@ WhatsApp" + botones. Los tiempos están arriba de todo en `ScrollLab.jsx`
 | Un objeto de primer plano (el cesto de pelotas) molesta en todos lados | Con el protagonista corriéndose de lado a lado y la cámara orbitando, siempre termina detrás del texto, detrás de la paleta o en el camino de la cámara. Se sacó |
 | `medirCuadro` o los cuadros por segundo dan valores absurdos | Con el navegador integrado **oculto**, el navegador frena la animación. Para capturar: `__lab.ver(t)`, esperar 2 s y sacar la captura |
 | El texto ya está al costado pero la paleta sigue al centro | El corte del encuadre tiene que ser el **mismo** que el del CSS (`matchMedia('(min-width: 1024px)')`), no el ancho del lienzo |
+| Medís cuadros por segundo "scrolleando" y la escena ni se movió | La página tiene scroll suave: `scrollTo(0, y)` en cada cuadro se cancela solo y no scrollea. Para medir: `scrollTo({ top: y, behavior: 'instant' })` y controlar `scrollY` al final |
 | Un bucle de un millón de píxeles tarda 0,8 s (suelto tarda 0,08 s) | La función que arma la escena tiene 2.600 líneas y el navegador **no optimiza funciones tan grandes**: todo lo que corre adentro va lento. Los cálculos pesados van en funciones sueltas arriba del archivo (como `pintarCesped`) |
 
 **Assets 3D y Meshy.** Patrón confirmado con seis modelos: Meshy **rinde en
@@ -597,9 +598,24 @@ la página un instante. Cómo quedó:
   carga, a los 15 s se muestra igual.
 - **Sombras a pedido:** `shadowMap.autoUpdate = false`; el mapa se recalcula
   sólo si cambió el scroll o hay pelotas en vuelo. Quieta, la escena no gasta.
-- **Calidad que se adapta:** si el promedio de cuadros pasa de 1/45 s se apagan
-  la oclusión y el brillo y después se baja la resolución (4 escalones); si
-  anda sobrado un buen rato, vuelve a subir. Fuera de pantalla no se dibuja.
+- **Calidad que se adapta:** mide tandas de 30 cuadros (también con la
+  escena quieta, así se acomoda mientras la paleta espera y antes del
+  scroll). Por debajo de ~45 cuadros por segundo baja un escalón, por debajo
+  de 28 baja dos: 0 completo → 1 sin oclusión, brillo ni sombras a 2048 →
+  2/3/4 resolución al 80/65/50% (piso 0,6 píxeles por punto). Vuelve a subir
+  sólo si anda holgado ~6 s, y un escalón que falló no se vuelve a probar
+  (si no, sube y baja y cada bajada es un tirón). Fuera de pantalla no se
+  dibuja. `__lab.calidad.ver() / fijar(escalón, resolución) / soltar()`
+  sirven para comparar a mano.
+- **Qué pesa de verdad** (placa Intel integrada, 1440 px): **la cantidad de
+  píxeles**. A media resolución va a 60 cuadros por segundo; apagar
+  oclusión, brillo o bajar las sombras casi no cambia (28-30). Los reflejos
+  del entorno (`scene.environment`) son ~35% del costo por píxel. Los 22
+  árboles suman 199 mil triángulos (ocultos: de 30 a 37); los faroles, 30 mil
+  cada uno, no influyen. En total ~574 mil triángulos contando cada copia de
+  los árboles. Las notebooks con Windows escaladas al 150% dibujan 2,25
+  veces más píxeles: con calidad completa andaban a ~19 cuadros por segundo,
+  y ahora se estabilizan en 36-48.
 - **Textura del piso por píxeles** (`ImageData`) en vez de 90 mil trazos de
   canvas, calculada en `pintarCesped`, una función **suelta arriba de todo del
   archivo** (ver la trampa de la tabla: adentro del armado tardaba 0,8 s).

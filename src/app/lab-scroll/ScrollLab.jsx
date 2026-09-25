@@ -2421,38 +2421,71 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       const pistaScroll = document.querySelector('.pista-scroll')
       const pistaCaja = document.querySelector('.pista-caja')
       // ── Calidad que se adapta ──
-      // Se mide cuánto tarda cada cuadro. Si viene lento (por debajo de unos 45
-      // cuadros por segundo) se baja un escalón: primero se apagan la oclusión
-      // ambiental y el brillo, que son lo más caro y lo que menos se nota;
-      // después se baja la resolución. Si sobra, se vuelve a subir de a poco,
-      // nunca por encima de cómo arrancó.
+      // Se mide cuánto tarda cada cuadro, en tandas de 30. Si viene lento (por
+      // debajo de unos 45 cuadros por segundo) se baja la calidad; si viene muy
+      // lento (menos de 28), dos escalones de una. Como también se miden los
+      // cuadros quietos, se adapta en los primeros segundos, mientras la
+      // paleta espera y antes de que la persona empiece a scrollear. Si sobra,
+      // vuelve a subir de a poco, nunca por encima de cómo arrancó.
       //   escalón 0 · como arrancó
-      //   escalón 1 · sin oclusión ni brillo
+      //   escalón 1 · sin oclusión ni brillo, sombras a 1024 (si eran 2048)
       //   escalón 2 · además, 80% de la resolución
-      //   escalón 3 · además, 65% de la resolución (nunca menos de 1 píxel por punto)
+      //   escalón 3 · 65% de la resolución
+      //   escalón 4 · 50% de la resolución (nunca menos de 0,6 píxeles por punto)
+      // Lo que manda es la resolución. Medido en una placa Intel integrada a
+      // 1440 px: apagar oclusión, brillo o bajar las sombras casi no cambia
+      // nada (28-30 cuadros por segundo); a media resolución llega a 60. Las
+      // pantallas escaladas al 150% (lo común en notebooks con Windows)
+      // dibujan 2,25 veces más píxeles y arrancan todavía más lentas.
       const dprInicial = dpr
       const efectosInicio = gtao.enabled
-      let escalon = 0, promedio = 1 / 60, cuadrosMedidos = 0, holgados = 0
+      const sombraInicio = sol.shadow.mapSize.x
+      const RESOLUCION = [1, 1, 0.8, 0.65, 0.5]
+      const ULTIMO = RESOLUCION.length - 1
+      let escalon = 0, suma = 0, cuadrosMedidos = 0, holgados = 0
+      let descartar = 0            // cuadros que no se miden después de un cambio
+      let mediaMs = 0              // la última tanda, para __lab
+      // Si subió de escalón y enseguida tuvo que volver a bajar, ese escalón no
+      // se vuelve a probar: si no, en un equipo que anda justo sube y baja
+      // cada pocos segundos, y cada bajada es un tirón.
+      let mejorPermitido = 0, recienSubio = 0
+      let calidadFija = false                        // sólo la usa __lab.calidad, para medir
       const aplicarCalidad = () => {
         gtao.enabled = bloom.enabled = efectosInicio && escalon === 0
-        dpr = Math.max(1, dprInicial * [1, 1, 0.8, 0.65][escalon])
+        const lado = escalon === 0 ? sombraInicio : Math.min(sombraInicio, 1024)
+        if (sol.shadow.mapSize.x !== lado) {
+          sol.shadow.mapSize.set(lado, lado)
+          // sin mapa, Three lo vuelve a crear con el tamaño nuevo
+          sol.shadow.map?.dispose()
+          sol.shadow.map = null
+          renderer.shadowMap.needsUpdate = true
+        }
+        dpr = Math.max(0.6, dprInicial * RESOLUCION[escalon])
         renderer.setPixelRatio(dpr)
         composer.setPixelRatio(dpr)
         onResize()
+        // el primer cuadro después de cambiar rearma las capas y sale lento: no
+        // se cuenta, y la tanda arranca de cero (si no, arrastra la anterior)
+        suma = 0; cuadrosMedidos = 0; descartar = 8
       }
       const medirCalidad = (real) => {
-        if (!preparado || real > 0.25) return        // la carga y los saltos de pestaña no cuentan
-        promedio = promedio * 0.94 + real * 0.06
-        if (++cuadrosMedidos < 60) return            // se evalúa cada unos 60 cuadros
-        cuadrosMedidos = 0
-        if (promedio > 1 / 45 && escalon < 3) {
-          escalon++; holgados = 0; aplicarCalidad()
-        } else if (promedio < 1 / 57 && escalon > 0) {
-          // para subir tiene que andar holgado un buen rato (unos 8 s), si no
-          // sube y baja todo el tiempo
-          if (++holgados >= 8) { escalon--; holgados = 0; aplicarCalidad() }
+        if (calidadFija || !preparado || real > 0.25) return   // la carga y los saltos de pestaña no cuentan
+        if (descartar > 0) { descartar--; return }
+        suma += real
+        if (++cuadrosMedidos < 30) return
+        const media = suma / cuadrosMedidos
+        mediaMs = Math.round(media * 1000)
+        suma = 0; cuadrosMedidos = 0
+        if (media > 1 / 45 && escalon < ULTIMO) {
+          if (recienSubio > 0) mejorPermitido = escalon + 1
+          escalon = Math.min(ULTIMO, escalon + (media > 1 / 28 ? 2 : 1))
+          holgados = 0; recienSubio = 0; aplicarCalidad()
+        } else if (media < 1 / 57 && escalon > mejorPermitido) {
+          // para subir tiene que andar holgado un buen rato (unos 6 s)
+          if (++holgados >= 12) { escalon--; holgados = 0; recienSubio = 4; aplicarCalidad() }
         } else {
           holgados = 0
+          if (recienSubio > 0) recienSubio--
         }
       }
 
@@ -2898,6 +2931,16 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       frame()
       if (inspeccion) {
         window.__lab.renderer = renderer
+        // Para comparar costos a mano: fijar(escalón, resolución) congela el
+        // ajuste automático; soltar() lo devuelve.
+        window.__lab.calidad = {
+          ver: () => ({ escalon, dpr, efectos: gtao.enabled, mediaMs, mejorPermitido, sombra: sol.shadow.mapSize.x }),
+          fijar: (e, d) => {
+            calidadFija = true; escalon = e; aplicarCalidad()
+            if (d) { dpr = d; renderer.setPixelRatio(d); composer.setPixelRatio(d); onResize() }
+          },
+          soltar: () => { calidadFija = false },
+        }
         window.__lab.tiempos = { armadoMs: Math.round(armadoMs), primerCuadroMs: Math.round(performance.now() - inicioArmado - armadoMs) }
       }
 
