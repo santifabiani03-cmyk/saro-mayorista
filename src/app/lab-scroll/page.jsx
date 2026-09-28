@@ -14,11 +14,15 @@ export default function LabScrollPage() {
   const config = JSON.parse(fs.readFileSync(path.resolve('public/config.json'), 'utf-8'))
   return (
     <>
-      {/* Precarga de los modelos más pesados: empiezan a bajar apenas llega la
-          página, en paralelo con el código, en vez de esperar a que arranque la
-          escena (la paleta sola pesa 1,3 MB). */}
-      <link rel="preload" href="/models/paleta-opt.glb" as="fetch" crossOrigin="anonymous" />
-      <link rel="preload" href="/models/arbol.glb" as="fetch" crossOrigin="anonymous" />
+      {/* Precarga de lo que se ve en el primer cuadro: empieza a bajar apenas
+          llega la página, en paralelo con el código, en vez de esperar a que
+          arranque la escena. Los árboles y el farol sólo se ven en pantallas
+          horizontales; en el celular se piden después (ver "Carga por partes"
+          en ScrollLab). La imagen de portada no necesita precarga: ya está en
+          el HTML con prioridad alta. */}
+      <link rel="preload" href="/models/paleta-lab.glb" as="fetch" crossOrigin="anonymous" />
+      <link rel="preload" href="/models/arbol.glb" as="fetch" crossOrigin="anonymous" media="(orientation: landscape)" />
+      <link rel="preload" href="/models/farola.glb" as="fetch" crossOrigin="anonymous" media="(orientation: landscape)" />
       <ScrollLab whatsappNumber={config.whatsappNumber} />
     </>
   )

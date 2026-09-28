@@ -591,12 +591,49 @@ los triángulos sino **compilar shaders a mitad del scroll**: cada material nuev
 que entraba en cuadro (la caja, el destello, las pelotas del banco) congelaba
 la página un instante. Cómo quedó:
 
-- **Todo se prepara detrás del cartel de carga.** Un `LoadingManager` sigue la
-  paleta, los árboles, las texturas y los logos (el porcentaje del cartel sale
-  de ahí). Cuando termina, `prepararTodo` hace visibles un momento los objetos
-  que arrancan ocultos, llama a `renderer.compileAsync` y dibuja cuatro cuadros
-  de ensayo (0, 0,5, 0,72, 0,99). Recién ahí se saca el cartel. Si algo no
-  carga, a los 15 s se muestra igual.
+- **Sin pantalla de carga: imagen de portada.** Apenas abre la página se ve
+  una foto del primer cuadro de la escena (con los textos encima, que ya están
+  en el HTML) y cuando el 3D está listo se funde sobre ella en 0,7 s. Arriba
+  queda sólo una línea de 2 px con el avance. Son cuatro archivos en
+  `public/assets/`: `lab-portada-ancha.webp` y `lab-portada-alta.webp`
+  (horizontal / vertical, se elige por orientación con `<picture>`) y sus
+  versiones `-cine` (ese estilo arranca con la cámara más lejos); el de
+  "etiqueta" usa el de lateral. Pesan 42-84 KB. El recorte (`object-cover`) se
+  **ancla en el centro de la paleta** (`object-[62.7%_47.6%]`, etc.): con ese
+  punto la foto calza exacto con el 3D en cualquier proporción, porque la
+  cámara mantiene el alto visible en horizontal y el ancho en vertical. Por
+  eso las horizontales son 21:9 y las verticales más altas que un celular:
+  siempre sobra imagen. **Si cambia el arranque de la escena, hay que
+  regenerarlas:** en desarrollo, con Chrome emulando 2520×1080×1 (ancha) y
+  393×936×2 (alta), `?texto=lateral|cine`, en consola:
+  `__lab.renderer.setPixelRatio(pr)` + `setSize(innerWidth, innerHeight)`,
+  `__lab.calidad.fijar(0, pr)`, `__lab.led.offset.x = 0` (la pantalla LED
+  arranca ahí y corre recién cuando aparece el 3D), `__lab.ver(0)` y
+  `__lab.renderer.domElement.toDataURL('image/png')`; pasarla a WebP calidad
+  ~72 y volver a medir el centro de la paleta para el anclaje. Si el 3D no
+  carga nunca, queda la foto.
+- **Carga en dos tiempos.** Primero sólo lo que se ve en el primer cuadro
+  (medido con la cámara del arranque): la paleta, las fotos de los carteles y
+  el logo de la LED; en pantallas horizontales también los árboles y los
+  faroles. Con eso se compila y se muestra (`prepararTodo`, ~0,4 s en vez de
+  ~1 s). El local, los maceteros, las plantas y el logo de la caja se piden
+  recién después (`diferir`), así no le quitan ancho de banda a la paleta. Lo
+  que aparece más adelante (la caja, el destello, las pelotas y los modelos
+  que llegaron después) se compila con la escena ya visible (`compileAsync`,
+  no frena) y se "estrena" fuera de pantalla, un momento del guion por
+  cuadro (`calentar`, en una capa de 64×64). Si algo no carga, a los 15 s se
+  muestra igual.
+- **Paleta liviana sólo para la maqueta:** `public/models/paleta-lab.glb`,
+  734 KB en vez de 1,5 MB (el hero público sigue con `paleta-opt.glb`). Se
+  hizo con `npx gltfpack -i paleta-opt.glb -o x.glb -si 0.3 -cc -kn -km`
+  (138 mil → 41 mil triángulos) y `scripts/achicar-texturas-glb.py` (relieve
+  y brillo a 1024, emisión a 512; la de color queda a 2048 porque da la
+  nitidez de la cara). A este tamaño no se distingue de la original.
+- **Caché de los modelos:** `vercel.json` le pone a `/models/*` y a las
+  portadas `max-age` de 1 día (+ 1 semana revalidando en segundo plano): quien
+  vuelve entra sin bajar nada. Aplica también al hero público. Si se
+  reemplaza un modelo con el mismo nombre, algunos visitantes pueden ver el
+  viejo hasta un día; para un cambio urgente, usar un nombre nuevo.
 - **Sombras a pedido:** `shadowMap.autoUpdate = false`; el mapa se recalcula
   sólo si cambió el scroll o hay pelotas en vuelo. Quieta, la escena no gasta.
 - **Nitidez en reposo:** con la escena quieta (no cambia el scroll ni hay

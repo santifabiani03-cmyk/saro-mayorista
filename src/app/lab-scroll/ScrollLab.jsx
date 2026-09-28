@@ -633,6 +633,17 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       }
       const loader = new GLTFLoader(gestor)
       loader.setMeshoptDecoder(MeshoptDecoder)
+      // Carga por partes: lo que se ve en el primer cuadro se carga primero y
+      // es lo único que se espera para mostrar el 3D. El resto (lo que aparece
+      // recién cuando la cámara gira) arranca cuando eso terminó, así no le
+      // quita ancho de banda a la paleta. Medido con la cámara del arranque: en
+      // pantallas horizontales se ven los árboles y un farol; en el celular,
+      // sólo la paleta. El local, los maceteros, las plantas y el logo de la
+      // caja no se ven hasta más adelante.
+      const cola = []
+      const diferir = (fn) => { cola.push(fn) }
+      const horizontal = W() / H() > 1
+      const siSeVe = (fn) => (horizontal ? fn() : diferir(fn))
       const cargadorTex = new THREE.TextureLoader(gestor)
       // Las imágenes que se dibujan en un canvas (logos) no pasan por los
       // cargadores de Three: se le avisa al gestor a mano.
@@ -865,7 +876,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       }
 
       // Farolas: dan altura y marcan el perímetro
-      ponerModelo('/models/farola.glb', (base) => {
+      siSeVe(() => ponerModelo('/models/farola.glb', (base) => {
         [0.06, 0.42, 0.78].forEach((f, i) => {
           const [x, z] = enArco(f, 106)
           const l = base.clone()
@@ -874,11 +885,11 @@ export default function ScrollLab({ whatsappNumber = '' }) {
           l.rotation.y = Math.atan2(-x, RED_Z - z)
           afuera.add(l)
         })
-      })
+      }))
 
       // Maceteros contra la vereda, cada uno con su planta adentro
       const LUGARES_MACETA = [0.14, 0.3, 0.58, 0.74]
-      ponerModelo('/models/macetero.glb', (base) => {
+      diferir(() => ponerModelo('/models/macetero.glb', (base) => {
         LUGARES_MACETA.forEach(f => {
           const [x, z] = enArco(f, 62)
           const m = base.clone()
@@ -887,9 +898,9 @@ export default function ScrollLab({ whatsappNumber = '' }) {
           m.rotation.y = Math.atan2(-x, RED_Z - z)
           afuera.add(m)
         })
-      })
+      }))
       // La planta va aparte: el macetero viene vacío, es sólo el cajón
-      ponerModelo('/models/planta.glb', (base) => {
+      diferir(() => ponerModelo('/models/planta.glb', (base) => {
         LUGARES_MACETA.forEach((f, i) => {
           const [x, z] = enArco(f, 62)
           const pl = base.clone()
@@ -898,7 +909,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
           pl.rotation.y = i * 1.9
           afuera.add(pl)
         })
-      })
+      }))
 
       // Los bancos van sobre el mismo arco que el resto. Antes tenían su
       // posición escrita a mano, 3 unidades MÁS CERCA que el borde de la
@@ -1013,7 +1024,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         ShopCounter: { color: '#e4ebf1', roughness: 0.85 },
       }
       const matEstante = new THREE.MeshStandardMaterial({ color: '#cdd9e3', roughness: 0.85 })
-      ponerModelo('/models/shop.glb', (base) => {
+      diferir(() => ponerModelo('/models/shop.glb', (base) => {
         base.traverse(o => {
           if (!o.isMesh) return
           const receta = PINTURA[o.name] || (o.name.startsWith('Shelf_') ? null : null)
@@ -1031,7 +1042,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         base.position.set(-52, SUELO_Y, 40)
         base.rotation.y = Math.PI / 2      // el frente mira a la cancha
         afuera.add(base)
-      })
+      }))
 
       // ── ZONA DE DESCANSO ──
       // Entre las dos canchas, justo donde la cámara termina mirando. Mesas con
@@ -1095,13 +1106,12 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         '/assets/imagen-1779452345276.webp',   // caramelera
         '/assets/imagen-1779452499007.webp',   // toalla
       ]
-      // Orden distinto en cada carga: quien vuelve al sitio no ve siempre lo
-      // mismo. Se mezcla una copia para no tocar la lista original.
-      const PRODUCTOS = [...CATALOGO]
-      for (let i = PRODUCTOS.length - 1; i > 0; i--) {
-        const j = Math.floor(Math.random() * (i + 1))
-        ;[PRODUCTOS[i], PRODUCTOS[j]] = [PRODUCTOS[j], PRODUCTOS[i]]
-      }
+      // Orden fijo. Antes se mezclaba en cada carga, pero la imagen de portada
+      // es una foto del primer cuadro: con otro orden, al fundirse con el 3D
+      // los carteles cambiaban de producto delante de la persona. Con 4
+      // productos y 3 a la vista desde el arranque, la variedad casi no se
+      // notaba.
+      const PRODUCTOS = CATALOGO
       // 13 (eran 20): con 20 el cartel llegaba al borde de arriba del cuadro y
       // no quedaba cielo; así se ve el horizonte por encima.
       const CARTEL_ALTO = 13
@@ -1233,12 +1243,12 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       })
       const cartel = new THREE.Mesh(new THREE.PlaneGeometry(CL_ANCHO * 0.34, CL_ANCHO * 0.34 / 3), matCartel)
       cartel.position.set(0, SUELO_Y + CL_ALTO * 0.85, CL_FONDO / 2 + 0.4)
-      cargadorTex.load('/assets/logo-caja.png', tx => {
+      diferir(() => cargadorTex.load('/assets/logo-caja.png', tx => {
         if (disposed) return
         tx.colorSpace = THREE.SRGBColorSpace
         matCartel.map = tx
         matCartel.needsUpdate = true
-      })
+      }))
       club.add(cartel)
       // A 132 el club ocupaba el 97% del cuadro a lo ancho y tapaba el fondo
       // entero, así que se lo mandó a 260 para que se leyera como un edificio a
@@ -1333,7 +1343,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       // más oscuro. Sutiles: la textura ya trae el color.
       const TONOS_ARBOL = ['#ffffff', '#eef7dc', '#e2efd6', '#f6f3dc', '#dbe8d2']
       const bosque = { malla: null, datos: arboles }
-      loader.load('/models/arbol.glb', gltf => {
+      siSeVe(() => loader.load('/models/arbol.glb', gltf => {
         if (disposed) return
         let malla = null
         gltf.scene.updateMatrixWorld(true)
@@ -1383,7 +1393,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         bosque.malla = inst
         moverBosque(0)
         afuera.add(inst)
-      }, undefined, () => { /* si no carga, el club queda sin árboles */ })
+      }, undefined, () => { /* si no carga, el club queda sin árboles */ }))
       // Viento: cada árbol se inclina apenas desde la base, con su propio
       // ritmo. Se llama desde el bucle de cuadros.
       const mBosque = new THREE.Matrix4(), qBosque = new THREE.Quaternion(), eBosque = new THREE.Euler()
@@ -1922,7 +1932,11 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       // Mano generada con Meshy (101 KB ya optimizada). Si carga, reemplaza a la
       // mano de cápsulas; si falla, queda la simple y el guion sigue igual.
 
-      loader.load('/models/paleta-opt.glb', gltf => {
+      // Copia liviana de la paleta del hero público, sólo para esta maqueta:
+      // 41 mil triángulos en vez de 138 mil y las texturas de relieve y brillo
+      // a 1024 (la de color queda a 2048, es la que da la nitidez de la cara).
+      // Pesa 734 KB en vez de 1,5 MB y a este tamaño no se distingue.
+      loader.load('/models/paleta-lab.glb', gltf => {
         if (disposed) return
         const modelo = gltf.scene
         const box = new THREE.Box3().setFromObject(modelo)
@@ -2130,7 +2144,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         texEtiqueta.needsUpdate = true
       }
       pintarEtiqueta(null)
-      cargarImagen('/assets/logo-caja.png', pintarEtiqueta)
+      diferir(() => cargarImagen('/assets/logo-caja.png', pintarEtiqueta))
       const etiqueta = new THREE.Mesh(
         new THREE.PlaneGeometry(L_CAJA * 0.7, L_CAJA * 0.35),
         new THREE.MeshStandardMaterial({ map: texEtiqueta, roughness: 0.85 })
@@ -2602,13 +2616,21 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         // Cosas que se mueven solas, como en un club de verdad: la pantalla LED
         // corre sus mensajes y las banderas se mecen con el viento. Van con el
         // reloj y no con el scroll: son ambiente, no guion.
-        texLona.offset.x = (texLona.offset.x + dt * 0.022) % 1
+        // La pantalla arranca a correr recién cuando se muestra el 3D: hasta
+        // ahí queda en la misma posición que en la imagen de portada, así el
+        // fundido no hace saltar el texto.
+        if (mostrado) texLona.offset.x = (texLona.offset.x + dt * 0.022) % 1
         for (const b of banderas) b.grupo.rotation.y = b.base + Math.sin(ahora * 1.25 + b.fase) * 0.16
         moverBosque(ahora)
         // Con la pestaña de fondo el navegador ya frena requestAnimationFrame
         // solo, así que no hace falta nada más para no gastar batería. La versión
         // anterior usaba un IntersectionObserver y, si marcaba "no visible", el
         // bucle se cortaba y la pantalla quedaba en blanco.
+        if (calentar.length) {
+          dibujar(calentar.shift(), true)
+          tSombra = -1                   // el cuadro de verdad rehace sus sombras
+          descartar = Math.max(descartar, 2)   // y este no cuenta para la calidad
+        }
         dibujar(progRef.current.t)
       }
       /* eslint-enable no-use-before-define */
@@ -2740,7 +2762,10 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       }
 
       let tSombra = -1          // en qué punto del guion se calcularon las sombras por última vez
-      const dibujar = (t) => {
+      // `fuera`: se dibuja en una capa chica que no se ve, sólo para que la placa
+      // "estrene" ese momento del guion (programas, texturas, sombras) antes de
+      // que la persona llegue ahí. Ver `calentar`.
+      const dibujar = (t, fuera = false) => {
 
         // ── El guion, escrito en función del progreso ──
         // 0.00–0.055 · se puede jugar: cada clic manda una pelota
@@ -2963,6 +2988,13 @@ export default function ScrollLab({ whatsappNumber = '' }) {
           renderer.shadowMap.needsUpdate = true
           tSombra = t
         }
+        if (fuera) {
+          renderer.setRenderTarget(capaCalentar)
+          renderer.render(scene, camera)
+          renderer.render(escenaFx, camera)
+          renderer.setRenderTarget(null)
+          return
+        }
         // La cadena de movimiento se rearmó en reposo: se la dibuja una vez para
         // que la placa cree sus capas ahora y no en el primer cuadro del scroll.
         // Queda tapada por la de reposo, que se dibuja encima en este cuadro.
@@ -2973,58 +3005,75 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         composer.render()
       }
 
-      // ── Preparar todo antes de mostrar ──
+      // ── Preparar y mostrar ──
       // La placa de video tiene que "compilar" un programa por cada tipo de
       // material, de sombra y de efecto. Si lo hace la primera vez que algo
-      // aparece, la animación se congela en ese instante: pasaba al llegar los
-      // árboles, en el plano general, en el destello y al aparecer la caja
-      // (medido: 49 programas, 13 de ellos a mitad del scroll). Acá se compila
-      // todo junto, detrás de la pantalla de carga, y recién después se muestra.
-      let preparado = false
+      // aparece, la animación se congela en ese instante (medido: 49 programas,
+      // 13 de ellos a mitad del scroll). Se hace en dos tiempos:
+      //  1. Antes de mostrar, sólo lo que se ve en el primer cuadro. Mientras
+      //     tanto la persona ve la imagen de portada, no un cartel de carga.
+      //  2. Ya con la escena a la vista, lo que aparece más adelante (la caja,
+      //     el destello, las pelotas, el resto de los modelos): se compila sin
+      //     frenar la página (compileAsync) y después se "estrena" fuera de
+      //     pantalla, un momento del guion por cuadro. Cuando la persona
+      //     scrollea hasta ahí, ya está todo listo.
+      let preparado = false, restoPedido = false, mostrado = false
+      const capaCalentar = new THREE.WebGLRenderTarget(64, 64, { type: THREE.HalfFloatType })
+      const calentar = []          // momentos del guion por estrenar, uno por cuadro
       const prepararTodo = async () => {
         if (preparado || disposed) return
         preparado = true
-        setAvance(94)
         const inicioPreparar = performance.now()
-        // lo que aparece recién más adelante en el guion se prende un instante
-        const ocultos = [caja, sombra, pelota, destello, anillo, ...banco.map(b => b.malla)]
-        const antes = ocultos.map(o => o.visible)
-        ocultos.forEach(o => { o.visible = true })
-        // compileAsync junta los materiales en el momento de llamarlo; lo que
-        // espera después es que la placa termine. Por eso la visibilidad se
-        // devuelve enseguida y no al final: mientras tanto el bucle sigue
-        // dibujando y podría haber cambiado alguno (una pelota del juego).
-        let compilando = []
-        try {
-          compilando = [renderer.compileAsync(scene, camera), renderer.compileAsync(escenaFx, camera)]
-        } catch { /* si falla, igual se compila al dibujar */ }
-        ocultos.forEach((o, i) => { o.visible = antes[i] })
-        try { await Promise.all(compilando) } catch { /* ídem */ }
+        try { await renderer.compileAsync(scene, camera) } catch { /* se compila al dibujar */ }
         if (disposed) return
         try {
-          // Cuadros de práctica en los momentos clave del guion: terminan de
-          // preparar lo que no se compila por adelantado (el mapa de sombras y
-          // los efectos de pantalla). No se ven: los tapa la pantalla de carga.
-          for (const tPrueba of [0, 0.5, 0.72, 0.99]) dibujar(tPrueba)
-          tSombra = -1                                 // que el próximo cuadro rehaga las sombras
+          tSombra = -1                                 // que el cuadro rehaga las sombras
           dibujar(progRef.current.t)
           if (inspeccion && window.__lab.tiempos) {
             window.__lab.tiempos.prepararMs = Math.round(performance.now() - inicioPreparar)
             window.__lab.tiempos.hastaMostrarMs = Math.round(performance.now() - inicioArmado)
           }
         } finally {
-          // pase lo que pase en la práctica, la pantalla de carga se va
-          if (!disposed) { setAvance(100); setListo(true) }
+          // pase lo que pase, la portada se va y queda la escena
+          if (!disposed) { setAvance(100); setListo(true); mostrado = true }
+        }
+        prepararResto()
+      }
+      const prepararResto = async () => {
+        // lo que aparece recién más adelante en el guion se prende un instante
+        const ocultos = [caja, sombra, pelota, destello, anillo, ...banco.map(b => b.malla)]
+        const antes = ocultos.map(o => o.visible)
+        ocultos.forEach(o => { o.visible = true })
+        // compileAsync junta los materiales en el momento de llamarlo; lo que
+        // espera después es que la placa termine. Por eso la visibilidad se
+        // devuelve enseguida: mientras tanto el bucle sigue dibujando.
+        let compilando = []
+        try {
+          compilando = [renderer.compileAsync(scene, camera), renderer.compileAsync(escenaFx, camera)]
+        } catch { /* si falla, igual se compila al dibujar */ }
+        ocultos.forEach((o, i) => { o.visible = antes[i] })
+        try { await Promise.all(compilando) } catch { /* ídem */ }
+        if (!disposed) calentar.push(0.5, 0.72, 0.99)
+      }
+      gestor.onLoad = () => {
+        if (!preparado) {
+          prepararTodo()
+          // recién ahora se piden los modelos que no están en el primer cuadro
+          if (!restoPedido) { restoPedido = true; cola.splice(0).forEach(fn => fn()) }
+        } else {
+          // llegó el resto: se compila sin frenar y se estrena fuera de pantalla
+          renderer.compileAsync(scene, camera).catch(() => {})
+            .then(() => { if (!disposed) calentar.push(0.5, 0.99) })
         }
       }
-      gestor.onLoad = prepararTodo
       // si algo tarda demasiado o no carga nunca, la escena se muestra igual
-      setTimeout(prepararTodo, 15000)
+      setTimeout(() => { if (!preparado && !disposed) gestor.onLoad() }, 15000)
 
       const armadoMs = performance.now() - inicioArmado
       frame()
       if (inspeccion) {
         window.__lab.renderer = renderer
+        window.__lab.led = texLona    // para las portadas: led.offset.x = 0 antes de ver(0)
         // Para comparar costos a mano: fijar(escalón, resolución) congela el
         // ajuste automático; soltar() lo devuelve.
         window.__lab.calidad = {
@@ -3057,6 +3106,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         // las capas de las dos cadenas de pases
         compMov.c.dispose()
         compQuieto?.c.dispose()
+        capaCalentar.dispose()
         renderer.dispose()
         if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement)
       }
@@ -3214,23 +3264,53 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       >
         <div ref={mountRef} className="absolute inset-0" />
 
-        {/* Pantalla de carga: tapa la escena hasta que llega la paleta. Sin
-            esto se veía un fondo celeste vacío mientras bajaba el modelo. */}
+        {/* Imagen de portada: el primer cuadro de la escena, ya dibujado, en
+            vez de una pantalla de carga. Se ve en menos de un segundo (con los
+            textos encima, que ya están en la página) y cuando el 3D está listo
+            se funde sobre ella. Si el 3D no llega a cargar, queda la foto.
+            Hay una para pantallas horizontales y otra para verticales (el
+            encuadre cambia), y otras dos para el estilo "cine", que arranca con
+            la cámara más lejos. Se regeneran si cambia el arranque de la escena
+            (ver CLAUDE.md §5.6). */}
         {!sinMovimiento && (
-          <div
-            aria-hidden={listo}
-            className={`absolute inset-0 z-20 flex flex-col items-center justify-center bg-[#eef2f8] transition-opacity duration-700 ${
-              listo ? 'opacity-0 pointer-events-none' : 'opacity-100'
+          <picture
+            aria-hidden="true"
+            className={`pointer-events-none absolute inset-0 transition-opacity duration-700 ${
+              listo ? 'opacity-0' : 'opacity-100'
             }`}
           >
-            <img src="/assets/logo-icon.png" alt="" className="w-14 h-14 animate-pulse" />
-            <p className="mt-4 text-[11px] font-semibold uppercase tracking-[.3em] text-slate-400">
-              Cargando {avance}%
-            </p>
-            <div className="mt-3 h-1 w-40 rounded-full bg-slate-200 overflow-hidden" aria-hidden="true">
-              <div className="h-full bg-saro-blue rounded-full transition-[width] duration-300" style={{ width: `${avance}%` }} />
-            </div>
-          </div>
+            <source
+              media="(orientation: portrait)"
+              srcSet={modo === 'cine' ? '/assets/lab-portada-alta-cine.webp' : '/assets/lab-portada-alta.webp'}
+            />
+            {/* El recorte se ancla en el centro de la paleta (medido en cada
+                imagen): así la foto calza con el 3D en cualquier proporción de
+                pantalla. Las horizontales son más anchas (21:9) y las verticales
+                más altas que cualquier pantalla común, para que siempre sobre
+                imagen hacia los costados (o arriba y abajo) y no falte. */}
+            <img
+              src={modo === 'cine' ? '/assets/lab-portada-ancha-cine.webp' : '/assets/lab-portada-ancha.webp'}
+              alt=""
+              fetchPriority="high"
+              decoding="async"
+              className={`h-full w-full object-cover ${
+                modo === 'cine'
+                  ? 'object-[50%_36%] portrait:object-[50%_35.8%]'
+                  : 'object-[62.7%_47.6%] portrait:object-[50%_35.7%]'
+              }`}
+            />
+          </picture>
+        )}
+        {/* Avance real de la carga, apenas una línea arriba: la portada ya da
+            algo para mirar, esto sólo dice que falta un poco para que responda. */}
+        {!sinMovimiento && (
+          <div
+            aria-hidden="true"
+            className={`pointer-events-none absolute left-0 top-0 z-30 h-[2px] bg-saro-blue/70 transition-[width,opacity] duration-500 ${
+              listo ? 'opacity-0' : 'opacity-100'
+            }`}
+            style={{ width: `${Math.max(avance, 4)}%` }}
+          />
         )}
 
         {/* "lateral": velos detrás del texto, sólo en pantallas anchas. Sin
