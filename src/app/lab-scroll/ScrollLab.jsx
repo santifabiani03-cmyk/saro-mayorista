@@ -2601,6 +2601,12 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         // bucle sigue andando, así que apenas vuelve a aparecer se dibuja.
         const rect = stageRef.current?.getBoundingClientRect()
         if (rect && (rect.bottom <= 0 || rect.top >= window.innerHeight)) return
+        // Hasta que la escena se muestra no se dibuja: la tapa la portada, y
+        // cada cuadro obligaba a la placa a compilar de golpe lo que
+        // `prepararTodo` estaba compilando en paralelo (medido: tareas de 100 a
+        // 200 ms seguidas, justo antes de mostrar). El primer cuadro lo dibuja
+        // `prepararTodo`.
+        if (!mostrado) return
         revisarReposo(ahora)
         medirCalidad(real)
         const jugando = progRef.current.t <= JUEGO_HASTA
