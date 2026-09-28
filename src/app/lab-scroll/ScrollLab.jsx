@@ -351,42 +351,18 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       // resolución: cada píxel dibujado ocupa varios de la pantalla y los
       // escalones se agrandan. En desarrollo: ?aa=no|fxaa|smaa para comparar.
       const modoAA = (inspeccion && new URLSearchParams(window.location.search).get('aa')) || 'smaa'
-      const composer = new EffectComposer(renderer)
-      composer.addPass(new RenderPass(scene, camera))
-      const gtao = new GTAOPass(scene, camera, W(), H())
-      gtao.output = GTAOPass.OUTPUT.Default        // AO mezclado, no el AO solo
-      // Radio en unidades de la escena: 1 unidad ~ 15,5 cm, así que 6 son unos
-      // 90 cm — el tamaño de los recovecos que queremos marcar.
-      gtao.updateGtaoMaterial({ radius: 6, distanceExponent: 1.2, thickness: 1.4,
-                                scale: 1.1, samples: 8 })
       // El AO es un pase entero de pantalla y cuesta. En un celular ese costo
       // sale del mismo presupuesto que la animación, y un hero que se traba es
       // peor que un hero sin oclusión: se apaga solo en pantallas chicas y en
       // equipos de pocos núcleos. En desktop queda prendido.
       const equipoFlojo = (navigator.hardwareConcurrency || 4) <= 4
-      gtao.enabled = W() >= 900 && !equipoFlojo
-      composer.addPass(gtao)
+      const efectosInicio = W() >= 900 && !equipoFlojo
       // Escena aparte para los efectos de luz (el destello de la caja). Si van
       // en la escena principal, la oclusión ambiental los dibuja como un plano
       // sólido — sin la orientación hacia la cámara que tiene un sprite — y
       // deja una mancha negra enorme cruzando el cuadro. Se dibujan encima,
       // después de la oclusión y antes del bloom, así el destello además brilla.
       const escenaFx = new THREE.Scene()
-      const pasoFx = new RenderPass(escenaFx, camera)
-      pasoFx.clear = false
-      composer.addPass(pasoFx)
-      // Bloom muy contenido: el umbral alto hace que sólo florezca lo que ya
-      // está casi blanco (el reflejo del sol en el dorado de la paleta, el
-      // brillo del vidrio). Esto es una marca deportiva: si se nota que hay
-      // bloom, está de más.
-      // A resolución completa este pase costaba 8,2 ms — más que la oclusión
-      // ambiental, para un efecto que casi no se ve. A la mitad cuesta un
-      // cuarto y, siendo un halo difuso, no se distingue. Se apaga con el mismo
-      // criterio que el AO.
-      const bloom = new UnrealBloomPass(new THREE.Vector2(W() / 2, H() / 2), 0.13, 0.5, 0.92)
-      bloom.enabled = gtao.enabled
-      composer.addPass(bloom)
-      composer.addPass(new OutputPass())           // tonemapping va al final
       // Viñeta y corrección de color, en UNA sola pasada (antes eran dos: cada
       // pasada recorre la pantalla entera, y en el celular eso se nota).
       // · Viñeta apenas marcada, DESPUÉS del tonemapping para que el valor sea
@@ -394,7 +370,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       //   0.6 (era 0.85): con las esquinas más oscuras el cuadro se sentía cerrado.
       // · Un poco más de contraste y de saturación: la escena tenía un velo gris
       //   lavado y se veía menos nítida que el hero público.
-      const grading = new ShaderPass({
+      const SHADER_GRADING = {
         uniforms: {
           tDiffuse: { value: null },
           offset: { value: 1.15 }, darkness: { value: 0.6 },
@@ -414,12 +390,60 @@ export default function ScrollLab({ whatsappNumber = '' }) {
             col = mix(vec3(l), col, saturacion);
             gl_FragColor = vec4(clamp(col, 0.0, 1.0), c.a);
           }`,
-      })
-      composer.addPass(grading)
-      if (modoAA === 'smaa') composer.addPass(new SMAAPass())
-      if (modoAA === 'fxaa') composer.addPass(new FXAAPass())
-      composer.setSize(W(), H())
-      composer.setPixelRatio(dpr)
+      }
+      // Arma la cadena completa de pases a una resolución `pr` (píxeles por
+      // punto). Hay dos: la de movimiento, a la resolución del escalón, y la
+      // de reposo, a la resolución completa (se arma recién la primera vez que
+      // hace falta). Cambiar la resolución de UNA cadena obliga a rearmar sus
+      // capas y costaba un tirón de 144 ms justo al empezar a scrollear;
+      // alternar entre dos ya armadas no cuesta nada.
+      // El lienzo queda siempre a resolución completa: la cadena de movimiento
+      // dibuja en capas más chicas y su último pase las estira al lienzo.
+      const hacerCompositor = (pr) => {
+        const c = new EffectComposer(renderer)
+        c.addPass(new RenderPass(scene, camera))
+        const ao = new GTAOPass(scene, camera, W(), H())
+        ao.output = GTAOPass.OUTPUT.Default        // AO mezclado, no el AO solo
+        // Radio en unidades de la escena: 1 unidad ~ 15,5 cm, así que 6 son unos
+        // 90 cm — el tamaño de los recovecos que queremos marcar.
+        ao.updateGtaoMaterial({ radius: 6, distanceExponent: 1.2, thickness: 1.4,
+                                scale: 1.1, samples: 8 })
+        ao.enabled = efectosInicio
+        c.addPass(ao)
+        const fx = new RenderPass(escenaFx, camera)
+        fx.clear = false
+        c.addPass(fx)
+        // Bloom muy contenido: el umbral alto hace que sólo florezca lo que ya
+        // está casi blanco (el reflejo del sol en el dorado de la paleta, el
+        // brillo del vidrio). Esto es una marca deportiva: si se nota que hay
+        // bloom, está de más.
+        // A resolución completa este pase costaba 8,2 ms — más que la oclusión
+        // ambiental, para un efecto que casi no se ve. A la mitad cuesta un
+        // cuarto y, siendo un halo difuso, no se distingue. Se apaga con el mismo
+        // criterio que el AO.
+        const brillo = new UnrealBloomPass(new THREE.Vector2(W() / 2, H() / 2), 0.13, 0.5, 0.92)
+        brillo.enabled = ao.enabled
+        c.addPass(brillo)
+        c.addPass(new OutputPass())           // tonemapping va al final
+        const color = new ShaderPass(SHADER_GRADING)
+        c.addPass(color)
+        if (modoAA === 'smaa') c.addPass(new SMAAPass())
+        if (modoAA === 'fxaa') c.addPass(new FXAAPass())
+        const k = { c, gtao: ao, bloom: brillo, grading: color, pr }
+        k.medir = () => {
+          c.setSize(W(), H())
+          ao.setSize(W(), H())
+          brillo.setSize(W() / 2, H() / 2)   // media resolución
+        }
+        k.resolucion = (nueva) => { k.pr = nueva; c.setPixelRatio(nueva); k.medir() }
+        k.resolucion(pr)
+        return k
+      }
+      const compMov = hacerCompositor(dpr)
+      let compQuieto = null
+      let composer = compMov.c                     // la cadena que se dibuja ahora
+      // referencias para __lab (las de la cadena de movimiento)
+      const { gtao, bloom, grading } = compMov
 
       // Iluminación de entorno: el modelo real necesita reflejos para verse bien
       const pmrem = new THREE.PMREMGenerator(renderer)
@@ -2306,9 +2330,8 @@ export default function ScrollLab({ whatsappNumber = '' }) {
 
       const onResize = () => {
         renderer.setSize(W(), H())
-        composer.setSize(W(), H())
-        gtao.setSize(W(), H())
-        bloom.setSize(W() / 2, H() / 2)   // igual que al crearlo: media resolución
+        compMov.medir()
+        compQuieto?.medir()
         camera.aspect = W() / H()
         camera.updateProjectionMatrix()
         // las etiquetas se vuelven a medir: el ancho de la tarjeta cambia
@@ -2436,12 +2459,17 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       const pistaScroll = document.querySelector('.pista-scroll')
       const pistaCaja = document.querySelector('.pista-caja')
       // ── Calidad que se adapta ──
-      // Se mide cuánto tarda cada cuadro, en tandas de 30. Si viene lento (por
-      // debajo de unos 45 cuadros por segundo) se baja la calidad; si viene muy
-      // lento (menos de 28), dos escalones de una. Como también se miden los
-      // cuadros quietos, se adapta en los primeros segundos, mientras la
-      // paleta espera y antes de que la persona empiece a scrollear. Si sobra,
-      // vuelve a subir de a poco, nunca por encima de cómo arrancó.
+      // Se mide cuánto tarda cada cuadro EN MOVIMIENTO, en tandas de 30. Si
+      // viene lento (por debajo de unos 45 cuadros por segundo) se baja la
+      // calidad; si viene muy lento (menos de 28), dos escalones de una. Si
+      // sobra, vuelve a subir de a poco, nunca por encima de cómo arrancó.
+      // Nitidez en reposo: con la escena quieta (no cambia el scroll ni hay
+      // pelotas en juego) se dibuja a la resolución completa de la pantalla, y
+      // la del escalón se usa sólo mientras algo se mueve. En movimiento la
+      // blandura casi no se ve; quieta, sí (fue la queja: "dientes de sierra"
+      // y la imagen blanda en una notebook con placa integrada). Los primeros
+      // segundos, mientras la paleta espera, se queda en modo movimiento para
+      // calibrar el escalón antes de que la persona scrollee.
       //   escalón 0 · como arrancó
       //   escalón 1 · sin oclusión ni brillo, sombras a 1024 (si eran 2048)
       //   escalón 2 · además, 80% de la resolución
@@ -2453,7 +2481,6 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       // pantallas escaladas al 150% (lo común en notebooks con Windows)
       // dibujan 2,25 veces más píxeles y arrancan todavía más lentas.
       const dprInicial = dpr
-      const efectosInicio = gtao.enabled
       const sombraInicio = sol.shadow.mapSize.x
       const RESOLUCION = [1, 1, 0.8, 0.65, 0.5]
       const ULTIMO = RESOLUCION.length - 1
@@ -2465,8 +2492,37 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       // cada pocos segundos, y cada bajada es un tirón.
       let mejorPermitido = 0, recienSubio = 0
       let calidadFija = false                        // sólo la usa __lab.calidad, para medir
+      let quieto = false           // reposo: resolución completa, no se mide
+      let tandas = 0               // tandas medidas; con menos de 2 no se entra en reposo
+      let ultimoMovimiento = 0, tAnterior = -1
+      // Resolución nueva de la cadena de movimiento que espera a la próxima
+      // pausa, y aviso para estrenarla (dibujarla una vez) mientras está quieta.
+      let pendiente = false, calentarMov = false
+      // Pasa a reposo (cadena a resolución completa) o a movimiento. Si el
+      // escalón no bajó la resolución, las dos serían iguales y se usa una sola.
+      const usarReposo = (si) => {
+        quieto = si
+        if (si && pendiente) {
+          // se rearma ahora, que no se ve, y se estrena en el próximo cuadro
+          compMov.resolucion(dpr)
+          pendiente = false; calentarMov = true
+        }
+        if (si && dpr < dprInicial - 0.001) {
+          if (!compQuieto) {
+            compQuieto = hacerCompositor(dprInicial)
+            compQuieto.gtao.enabled = compQuieto.bloom.enabled = compMov.gtao.enabled
+          }
+          composer = compQuieto.c
+        } else {
+          composer = compMov.c
+        }
+        // la tanda arranca de cero: si no, arrastra cuadros del otro modo
+        suma = 0; cuadrosMedidos = 0; descartar = 4
+      }
       const aplicarCalidad = () => {
-        gtao.enabled = bloom.enabled = efectosInicio && escalon === 0
+        for (const k of [compMov, compQuieto]) {
+          if (k) k.gtao.enabled = k.bloom.enabled = efectosInicio && escalon === 0
+        }
         const lado = escalon === 0 ? sombraInicio : Math.min(sombraInicio, 1024)
         if (sol.shadow.mapSize.x !== lado) {
           sol.shadow.mapSize.set(lado, lado)
@@ -2476,21 +2532,36 @@ export default function ScrollLab({ whatsappNumber = '' }) {
           renderer.shadowMap.needsUpdate = true
         }
         dpr = Math.max(0.6, dprInicial * RESOLUCION[escalon])
-        renderer.setPixelRatio(dpr)
-        composer.setPixelRatio(dpr)
-        onResize()
-        // el primer cuadro después de cambiar rearma las capas y sale lento: no
-        // se cuenta, y la tanda arranca de cero (si no, arrastra la anterior)
+        // Sólo se rearma la cadena de movimiento, y sólo si cambió. Rearmarla
+        // traba un instante: al calibrar (la paleta espera) no se nota, pero en
+        // pleno scroll sí, así que ahí queda pendiente hasta la próxima pausa.
+        if (Math.abs(compMov.pr - dpr) > 0.001) {
+          if (quieto || tandas <= 2) compMov.resolucion(dpr)
+          else pendiente = true
+        }
+        usarReposo(quieto)
         suma = 0; cuadrosMedidos = 0; descartar = 8
       }
+      // Reposo o movimiento, cuadro a cuadro. `t` sólo cambia mientras el
+      // scroll (con su arrastre de 0,6 s) está andando.
+      const revisarReposo = (ahora) => {
+        const t = progRef.current.t
+        if (t !== tAnterior || clic.activo || banco.some(b => b.viva)) ultimoMovimiento = ahora
+        tAnterior = t
+        if (calidadFija) return
+        const reposo = preparado && tandas >= 2 && ahora - ultimoMovimiento > 0.35
+        if (reposo !== quieto) usarReposo(reposo)
+      }
       const medirCalidad = (real) => {
-        if (calidadFija || !preparado || real > 0.25) return   // la carga y los saltos de pestaña no cuentan
+        // la carga, el reposo y los saltos de pestaña no cuentan
+        // (con un cambio pendiente tampoco: seguiría midiendo la resolución vieja)
+        if (calidadFija || !preparado || quieto || pendiente || real > 0.25) return
         if (descartar > 0) { descartar--; return }
         suma += real
         if (++cuadrosMedidos < 30) return
         const media = suma / cuadrosMedidos
         mediaMs = Math.round(media * 1000)
-        suma = 0; cuadrosMedidos = 0
+        suma = 0; cuadrosMedidos = 0; tandas++
         if (media > 1 / 45 && escalon < ULTIMO) {
           if (recienSubio > 0) mejorPermitido = escalon + 1
           escalon = Math.min(ULTIMO, escalon + (media > 1 / 28 ? 2 : 1))
@@ -2516,6 +2587,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         // bucle sigue andando, así que apenas vuelve a aparecer se dibuja.
         const rect = stageRef.current?.getBoundingClientRect()
         if (rect && (rect.bottom <= 0 || rect.top >= window.innerHeight)) return
+        revisarReposo(ahora)
         medirCalidad(real)
         const jugando = progRef.current.t <= JUEGO_HASTA
         if (pistaJuego) pistaJuego.style.opacity = jugando ? '1' : '0'
@@ -2891,6 +2963,13 @@ export default function ScrollLab({ whatsappNumber = '' }) {
           renderer.shadowMap.needsUpdate = true
           tSombra = t
         }
+        // La cadena de movimiento se rearmó en reposo: se la dibuja una vez para
+        // que la placa cree sus capas ahora y no en el primer cuadro del scroll.
+        // Queda tapada por la de reposo, que se dibuja encima en este cuadro.
+        if (calentarMov) {
+          calentarMov = false
+          if (composer !== compMov.c) compMov.c.render()
+        }
         composer.render()
       }
 
@@ -2949,10 +3028,10 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         // Para comparar costos a mano: fijar(escalón, resolución) congela el
         // ajuste automático; soltar() lo devuelve.
         window.__lab.calidad = {
-          ver: () => ({ escalon, dpr, efectos: gtao.enabled, mediaMs, mejorPermitido, sombra: sol.shadow.mapSize.x }),
+          ver: () => ({ escalon, dpr, quieto, resolucion: composer === compMov.c ? compMov.pr : compQuieto.pr, efectos: gtao.enabled, mediaMs, tandas, mejorPermitido, sombra: sol.shadow.mapSize.x }),
           fijar: (e, d) => {
-            calidadFija = true; escalon = e; aplicarCalidad()
-            if (d) { dpr = d; renderer.setPixelRatio(d); composer.setPixelRatio(d); onResize() }
+            calidadFija = true; quieto = false; escalon = e; aplicarCalidad()
+            if (d) { dpr = d; compMov.resolucion(d); composer = compMov.c }
           },
           soltar: () => { calidadFija = false },
         }
@@ -2975,6 +3054,9 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         }))
         texRed.dispose()
         pmrem.dispose()
+        // las capas de las dos cadenas de pases
+        compMov.c.dispose()
+        compQuieto?.c.dispose()
         renderer.dispose()
         if (renderer.domElement.parentNode === mount) mount.removeChild(renderer.domElement)
       }

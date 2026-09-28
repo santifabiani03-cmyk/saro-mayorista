@@ -558,6 +558,7 @@ WhatsApp" + botones. Los tiempos están arriba de todo en `ScrollLab.jsx`
 | Un objeto de primer plano (el cesto de pelotas) molesta en todos lados | Con el protagonista corriéndose de lado a lado y la cámara orbitando, siempre termina detrás del texto, detrás de la paleta o en el camino de la cámara. Se sacó |
 | `medirCuadro` o los cuadros por segundo dan valores absurdos | Con el navegador integrado **oculto**, el navegador frena la animación. Para capturar: `__lab.ver(t)`, esperar 2 s y sacar la captura |
 | El texto ya está al costado pero la paleta sigue al centro | El corte del encuadre tiene que ser el **mismo** que el del CSS (`matchMedia('(min-width: 1024px)')`), no el ancho del lienzo |
+| Un tirón de ~150 ms al empezar a scrollear | Se cambiaba la resolución del compositor en ese cuadro: rearma todas sus capas (y las de la oclusión y el brillo, aunque estén apagados). Se resolvió con dos cadenas ya armadas; nunca cambiar la resolución en medio de la animación |
 | Medís cuadros por segundo "scrolleando" y la escena ni se movió | La página tiene scroll suave: `scrollTo(0, y)` en cada cuadro se cancela solo y no scrollea. Para medir: `scrollTo({ top: y, behavior: 'instant' })` y controlar `scrollY` al final |
 | Un bucle de un millón de píxeles tarda 0,8 s (suelto tarda 0,08 s) | La función que arma la escena tiene 2.600 líneas y el navegador **no optimiza funciones tan grandes**: todo lo que corre adentro va lento. Los cálculos pesados van en funciones sueltas arriba del archivo (como `pintarCesped`) |
 
@@ -598,8 +599,18 @@ la página un instante. Cómo quedó:
   carga, a los 15 s se muestra igual.
 - **Sombras a pedido:** `shadowMap.autoUpdate = false`; el mapa se recalcula
   sólo si cambió el scroll o hay pelotas en vuelo. Quieta, la escena no gasta.
-- **Calidad que se adapta:** mide tandas de 30 cuadros (también con la
-  escena quieta, así se acomoda mientras la paleta espera y antes del
+- **Nitidez en reposo:** con la escena quieta (no cambia el scroll ni hay
+  pelotas en juego durante 0,35 s) se dibuja a la resolución completa de la
+  pantalla; la resolución baja del escalón se usa sólo en movimiento, donde
+  la blandura casi no se nota. Hay **dos cadenas de pases armadas** (la de
+  movimiento y la de reposo, esta última se arma la primera vez que hace
+  falta) y se alterna entre ellas: cambiarle la resolución a una sola
+  rearmaba sus capas y trababa 144 ms justo al empezar a scrollear. El lienzo
+  queda siempre a resolución completa y la cadena de movimiento estira su
+  imagen en el último pase. Los primeros segundos se queda en movimiento para
+  calibrar el escalón.
+- **Calidad que se adapta:** mide tandas de 30 cuadros, **sólo en
+  movimiento** (con la escena quieta, al arrancar, calibra antes del
   scroll). Por debajo de ~45 cuadros por segundo baja un escalón, por debajo
   de 28 baja dos: 0 completo → 1 sin oclusión, brillo ni sombras a 2048 →
   2/3/4 resolución al 80/65/50% (piso 0,6 píxeles por punto). Vuelve a subir
