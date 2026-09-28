@@ -27,9 +27,9 @@
     ]
   },
   {
-    "nombre": "MEDIAS ALGODON 3/4 ",
+    "nombre": "MEDIAS ALGODÓN 3/4",
     "precio": 3500,
-    "descripcion": "Medias algodon 3/4 \nPACK X DOCENA $35.000 ",
+    "descripcion": "Medias algodón 3/4\nPACK X DOCENA $35.000 ",
     "tags": [],
     "categoria": "padel",
     "genero": "unisex",
@@ -56,7 +56,7 @@
     "imagenes": [
       "/assets/imagen-1779451998087.webp"
     ],
-    "fechaActualizacion": "2026-09-07T18:56:35.360Z"
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "CUBRE GRIP PERFORADO C/RELIEVE ",
@@ -135,7 +135,7 @@
   {
     "nombre": "CARAMELERA NOAC PERFORADOS X60u. ",
     "precio": 60000,
-    "descripcion": "Caramelera cubre grip importados NOAC \n60 unidades surtidas o todas blancas.\nimportados. ",
+    "descripcion": "Caramelera de cubre grips NOAC importados.\n60 unidades surtidas o todas blancas.",
     "tags": [],
     "categoria": "padel",
     "genero": "unisex",
@@ -161,12 +161,12 @@
     "imagenes": [
       "/assets/imagen-1779452345276.webp"
     ],
-    "fechaActualizacion": "2026-08-13T12:56:28.394Z"
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "TOALLA DE MANO MICROFIBRA ",
     "precio": 4200,
-    "descripcion": "Toalla de mano micrifibra.\nSecado rapido \nIncluye estuche",
+    "descripcion": "Toalla de mano de microfibra.\nSecado rápido\nIncluye estuche",
     "tags": [],
     "categoria": "padel",
     "genero": "unisex",
@@ -198,7 +198,7 @@
     "imagenes": [
       "/assets/imagen-1779452499007.webp"
     ],
-    "fechaActualizacion": "2026-08-13T12:54:28.445Z"
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "Mochila Paletera",
@@ -262,7 +262,7 @@
   {
     "nombre": "NECESER OBJ. PERSONALES ",
     "precio": 13000,
-    "descripcion": "Neceser deportivo para objetos personales mas pequeños (celular, llaves, billetera, pelotas, etc.)\nMedidas Largo 28cm / Alto 13cm / Profundidad 13cm\n",
+    "descripcion": "Neceser deportivo para objetos personales más pequeños (celular, llaves, billetera, pelotas, etc.)\nMedidas Largo 28cm / Alto 13cm / Profundidad 13cm\n",
     "tags": [],
     "categoria": "padel",
     "genero": "unisex",
@@ -283,7 +283,7 @@
     "visible": true,
     "sinStock": false,
     "fechaPublicacion": "2026-05-22T21:20:53.000Z",
-    "fechaActualizacion": "2026-08-13T13:14:45.267Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/protectores-elastizados-1779973546168.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/protectores-elastizados-1779973541116.webp"
@@ -292,7 +292,7 @@
   {
     "nombre": "Pelotas Nova Padel Pro",
     "precio": 5800,
-    "descripcion": "- NOVA PRO - Tubo x2u. \nExcelente paño, compresion y duravilidad. \nImportadas.\n\nTambien disponible CAJA X 24u. ",
+    "descripcion": "- NOVA PRO - Tubo x2u. \nExcelente paño, compresión y durabilidad. \nImportadas.\n\nTambién disponible CAJA X 24u. ",
     "tags": [
       "nuevo"
     ],
@@ -315,12 +315,12 @@
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pelotas-nova-padel-pro-1779969106167.webp"
     ],
-    "fechaActualizacion": "2026-05-28T11:53:21.649Z"
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
-    "nombre": "Saro MAX Carbono 12 k",
+    "nombre": "Saro MAX Carbono 12k",
     "precio": 180000,
-    "descripcion": "La Paleta MAX Carbono Pro es una paleta de pádel con formato redondo, diseñada para un equilibrio óptimo entre control y potencia en cada golpe. Su composición íntegra de carbono garantiza una alta durabilidad y resistencia, ideal para jugadores que buscan rendimiento constante. Ofrece una experiencia de juego superior, adaptándose a diversas situaciones en la cancha.",
+    "descripcion": "La paleta Saro MAX Carbono 12k es una paleta de pádel con formato redondo, diseñada para un equilibrio óptimo entre control y potencia en cada golpe. Su composición íntegra de carbono garantiza una alta durabilidad y resistencia, ideal para jugadores que buscan rendimiento constante. Ofrece una experiencia de juego superior, adaptándose a diversas situaciones en la cancha.",
     "tags": [
       "carbono",
       "nuevo"
@@ -341,9 +341,9 @@
     "_aiCount": 1,
     "id": "p1779916282248",
     "fechaPublicacion": "2026-05-27T21:11:22.249Z",
-    "fechaActualizacion": "2026-05-29T20:07:09.233Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779989234833.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779989234833-encuadre.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779986492622.webp"
     ]
   },
@@ -351,7 +351,7 @@
     "nombre": "Saro SR Junior ",
     "precio": 75000,
     "peso": 300,
-    "descripcion": "La paleta Saro SR Junior está diseñada específicamente para niños. Entre los  6 a 12 años. \nSu matriz especial ofrece un equilibrio óptimo para el desarrollo de jóvenes jugadores de pádel. Este modelo asegura un control adecuado y una experiencia de juego cómoda. Es una opción confiable para iniciarse en el deporte.\nEl peso puede variar entre los 290g a 310g ",
+    "descripcion": "La paleta Saro SR Junior está diseñada específicamente para niños de entre 6 y 12 años.\nSu matriz especial ofrece un equilibrio óptimo para el desarrollo de jóvenes jugadores de pádel. Este modelo asegura un control adecuado y una experiencia de juego cómoda. Es una opción confiable para iniciarse en el deporte.\nEl peso puede variar entre 290 g y 310 g. ",
     "tags": [
       "destacado"
     ],
@@ -377,20 +377,20 @@
         "Celeste"
       ]
     },
-    "fechaActualizacion": "2026-08-14T17:22:45.936Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
     "_aiLoading": false,
     "_aiCount": 2,
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786728140732.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786728160145.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786728140732-encuadre.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786728160145-encuadre.webp"
     ]
   },
   {
     "nombre": "Muñequera x par ",
     "precio": 5500,
-    "descripcion": "Muñequeras x par - Algodon \nSuper elastizadas ",
+    "descripcion": "Muñequeras x par - Algodón\nSúper elastizadas",
     "tags": [],
-    "categoria": "",
+    "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "accesorio",
     "colores": [
@@ -408,7 +408,7 @@
     "promos": [],
     "id": "p1779968140080",
     "fechaPublicacion": "2026-05-28T11:35:40.080Z",
-    "fechaActualizacion": "2026-09-02T16:27:21.893Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mu-equera-x-par-1787836390834.webp"
     ]
@@ -435,9 +435,9 @@
     "id": "p1779990539906",
     "fechaPublicacion": "2026-05-28T17:48:59.906Z",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-nexus-woman-1779992751622.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-nexus-woman-1779992751622-encuadre.webp"
     ],
-    "fechaActualizacion": "2026-05-28T18:26:09.708Z"
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "Saro Radian Pro Carbono",
@@ -463,10 +463,11 @@
     "_aiCount": 1,
     "id": "p1780084771974",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780084512601.jpg",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780084512601-encuadre.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780084526132.jpg"
     ],
-    "fechaPublicacion": "2026-05-29T19:59:31.974Z"
+    "fechaPublicacion": "2026-05-29T19:59:31.974Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "Saro MAX 3.0 Carbono",
@@ -492,15 +493,15 @@
     "id": "p1780099106807",
     "fechaPublicacion": "2026-05-29T23:58:26.807Z",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780098751394.jpg",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780098751394-encuadre.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780098762369.jpg"
     ],
-    "fechaActualizacion": "2026-06-09T12:41:46.474Z"
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "Bolso mochila ELITE ",
     "precio": 52000,
-    "descripcion": "El bolso mochila paletero ELITE es un accesorio versátil para el equipamiento deportivo. Cuenta con dos compartimentos laterales diseñados para paletas, junto con depósitos independientes para zapatillas y ropa. Incorpora tiradores de mochila regulables, una manija superior y un bolsillo específico para objetos personales pequeños.\nCompuesto por ecocuero resistente y facil de limpiar, lona reforzada e interior forrado. ",
+    "descripcion": "El bolso mochila paletero ELITE es un accesorio versátil para el equipamiento deportivo. Cuenta con dos compartimentos laterales diseñados para paletas, junto con depósitos independientes para zapatillas y ropa. Incorpora tiradores de mochila regulables, una manija superior y un bolsillo específico para objetos personales pequeños.\nCompuesto por ecocuero resistente y fácil de limpiar, lona reforzada e interior forrado. ",
     "tags": [],
     "categoria": "padel",
     "genero": "unisex",
@@ -530,7 +531,7 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388111268.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388112957.webp"
     ],
-    "fechaActualizacion": "2026-08-13T12:59:29.055Z"
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "TUBO PELOTAS x2 NOVA ",
@@ -632,13 +633,13 @@
     ]
   },
   {
-    "nombre": "CARAMALERA NOAC LISA ",
+    "nombre": "CARAMELERA NOAC LISA",
     "precio": 58000,
     "descripcion": "",
     "tags": [
       "destacado"
     ],
-    "categoria": "",
+    "categoria": "padel",
     "genero": "",
     "parteCuerpo": "",
     "colores": [
@@ -660,7 +661,8 @@
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786625815315.webp"
     ],
-    "fechaPublicacion": "2026-08-13T12:58:12.440Z"
+    "fechaPublicacion": "2026-08-13T12:58:12.440Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "MOCHILA RAQUETERA",
@@ -669,7 +671,7 @@
     "tags": [
       "nuevo"
     ],
-    "categoria": "",
+    "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "",
     "colores": [
@@ -689,14 +691,15 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626041062.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626049326.webp"
     ],
-    "fechaPublicacion": "2026-08-13T13:03:03.132Z"
+    "fechaPublicacion": "2026-08-13T13:03:03.132Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "BOLSO MEDIANO LONA ",
     "precio": 31000,
     "descripcion": "Este bolso mochila paletero mediano ofrece una opción básica y económica para deportistas. Cuenta con dos compartimentos principales, ideales para llevar paletas, indumentaria y objetos personales. Además, incluye un bolsillo delantero con cierre, perfecto para guardar artículos pequeños esenciales. Es el compañero ideal para quienes priorizan llevar lo justo y necesario al deporte.",
     "tags": [],
-    "categoria": "",
+    "categoria": "padel",
     "genero": "",
     "parteCuerpo": "",
     "colores": [
@@ -728,14 +731,15 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626256299.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626260414.webp"
     ],
-    "fechaPublicacion": "2026-08-13T13:07:33.330Z"
+    "fechaPublicacion": "2026-08-13T13:07:33.330Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "BOLSO MOCHILA GRANDE LONA ",
     "precio": 40000,
     "descripcion": "Bolso paletero grande de lona, diseñado para transportar equipamiento deportivo completo. Incorpora tres compartimentos principales: dos para paletas y uno espacioso para objetos personales. Cuenta con un compartimento independiente e impermeable ideal para zapatillas o ropa húmeda. Incluye una correa regulable y reforzada para mayor comodidad, junto con una manija frontal para un transporte rápido y sencillo.",
     "tags": [],
-    "categoria": "",
+    "categoria": "padel",
     "genero": "",
     "parteCuerpo": "",
     "colores": [
@@ -760,7 +764,8 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626667811.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626643468.webp"
     ],
-    "fechaPublicacion": "2026-08-13T13:13:50.320Z"
+    "fechaPublicacion": "2026-08-13T13:13:50.320Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "TOP LYCRA ESPALDA CRUZADA ",
@@ -794,7 +799,7 @@
     "fechaPublicacion": "2026-08-13T17:01:00.659Z"
   },
   {
-    "nombre": "CAMPERA ALGODON DOBLE NEO (SQUBA)",
+    "nombre": "CAMPERA ALGODÓN DOBLE NEO (SCUBA)",
     "precio": 21000,
     "descripcion": "",
     "tags": [
@@ -819,7 +824,8 @@
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640476927.webp"
     ],
-    "fechaPublicacion": "2026-08-13T17:01:58.778Z"
+    "fechaPublicacion": "2026-08-13T17:01:58.778Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
@@ -866,11 +872,11 @@
     ]
   },
   {
-    "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO CLASICA ",
+    "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO CLÁSICA",
     "precio": 13500,
     "descripcion": "",
     "tags": [],
-    "categoria": "",
+    "categoria": "ropa",
     "genero": "",
     "parteCuerpo": "",
     "colores": [
@@ -898,7 +904,7 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640596225.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640619728.webp"
     ],
-    "fechaActualizacion": "2026-08-13T17:05:20.702Z"
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "SHORT C/CALZA DRY ELASTIZADO DAMA",
@@ -957,7 +963,7 @@
     "fechaPublicacion": "2026-08-14T13:00:45.285Z"
   },
   {
-    "nombre": "CALZA TERMICA RECTA DAMA ",
+    "nombre": "CALZA TÉRMICA RECTA DAMA",
     "precio": 10000,
     "descripcion": "",
     "tags": [
@@ -994,10 +1000,11 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712493455.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712495196.webp"
     ],
-    "fechaPublicacion": "2026-08-14T13:02:28.448Z"
+    "fechaPublicacion": "2026-08-14T13:02:28.448Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
-    "nombre": "CAMISETA TERMICA DAMA ",
+    "nombre": "CAMISETA TÉRMICA DAMA",
     "precio": 10000,
     "descripcion": "",
     "tags": [
@@ -1036,7 +1043,8 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715204272.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715209179.webp"
     ],
-    "fechaPublicacion": "2026-08-14T13:47:36.504Z"
+    "fechaPublicacion": "2026-08-14T13:47:36.504Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "SHORT CON CALZA CABALLERO ",
@@ -1223,7 +1231,7 @@
     "fechaPublicacion": "2026-08-14T13:54:36.728Z"
   },
   {
-    "nombre": "CAMISETA TERMICA C/DEDAL CAB. ",
+    "nombre": "CAMISETA TÉRMICA C/DEDAL CAB.",
     "precio": 15000,
     "descripcion": "",
     "tags": [],
@@ -1246,10 +1254,11 @@
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715697068.webp"
     ],
-    "fechaPublicacion": "2026-08-14T13:55:21.456Z"
+    "fechaPublicacion": "2026-08-14T13:55:21.456Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
-    "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+    "nombre": "REMERA DRY ELAST. MULTIPUNTO CAB.",
     "precio": 13500,
     "descripcion": "",
     "tags": [
@@ -1291,7 +1300,8 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715765496.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715768236.webp"
     ],
-    "fechaPublicacion": "2026-08-14T13:56:45.040Z"
+    "fechaPublicacion": "2026-08-14T13:56:45.040Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "REMERA DRY ELAST. FULLPRINT CAB.",
@@ -1345,7 +1355,7 @@
     "precio": 150000,
     "precioMinorista": 190000,
     "peso": 360,
-    "descripcion": "La Raptor Carbono 12k es una pala de pádel diseñada para jugadores avanzados. Su construcción en carbono 12k ofrece una combinación óptima de potencia y control. La tecnología implementada asegura una gran durabilidad y estabilidad en cada golpe.",
+    "descripcion": "La Raptor Carbono 12k es una paleta de pádel diseñada para jugadores avanzados. Su construcción en carbono 12k ofrece una combinación óptima de potencia y control. La tecnología implementada asegura una gran durabilidad y estabilidad en cada golpe.",
     "tags": [
       "nuevo"
     ],
@@ -1365,16 +1375,17 @@
     "_aiCount": 4,
     "id": "p1787353287653",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353195821.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353195821-encuadre.webp"
     ],
-    "fechaPublicacion": "2026-08-21T23:01:27.653Z"
+    "fechaPublicacion": "2026-08-21T23:01:27.653Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "Massive 12k",
     "precio": 150000,
     "precioMinorista": 190000,
     "peso": 360,
-    "descripcion": "La pala Massive 12k está diseñada para jugadores de pádel que buscan equilibrio y potencia. Su construcción incorpora carbono 12k en las caras, proporcionando una respuesta sólida en cada golpe. Ofrece un control preciso y una salida de bola eficiente, ideal para un juego versátil en la cancha.",
+    "descripcion": "La paleta Massive 12k está diseñada para jugadores de pádel que buscan equilibrio y potencia. Su construcción incorpora carbono 12k en las caras, proporcionando una respuesta sólida en cada golpe. Ofrece un control preciso y una salida de bola eficiente, ideal para un juego versátil en la cancha.",
     "tags": [
       "nuevo"
     ],
@@ -1394,16 +1405,17 @@
     "_aiCount": 5,
     "id": "p1787353465696",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353339545.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353339545-encuadre.webp"
     ],
-    "fechaPublicacion": "2026-08-21T23:04:25.696Z"
+    "fechaPublicacion": "2026-08-21T23:04:25.696Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "Silver Carbono 12K ",
     "precio": 150000,
     "precioMinorista": 190000,
     "peso": 360,
-    "descripcion": "La pala Silver Carbono 12K presenta una construcción integral de carbono 12K, ofreciendo una combinación óptima de resistencia y ligereza. Su diseño de balance medio y amplio punto dulce facilita un control preciso y potencia equilibrada en cada golpe. Es una opción confiable para jugadores avanzados que buscan rendimiento y durabilidad en la cancha de pádel.",
+    "descripcion": "La paleta Silver Carbono 12K presenta una construcción integral de carbono 12K, ofreciendo una combinación óptima de resistencia y ligereza. Su diseño de balance medio y amplio punto dulce facilita un control preciso y potencia equilibrada en cada golpe. Es una opción confiable para jugadores avanzados que buscan rendimiento y durabilidad en la cancha de pádel.",
     "tags": [
       "nuevo"
     ],
@@ -1424,16 +1436,16 @@
     "id": "p1787353539609",
     "fechaPublicacion": "2026-08-21T23:05:39.609Z",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353488041.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353488041-encuadre.webp"
     ],
-    "fechaActualizacion": "2026-08-21T23:12:24.147Z"
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "Vortice X",
     "precio": 150000,
     "precioMinorista": 190000,
     "peso": 360,
-    "descripcion": "Vortice X es una línea de indumentaria deportiva de alto rendimiento diseñada para pádel y entrenamiento. Sus prendas incorporan tecnología de tejidos avanzada que optimiza la transpirabilidad y la libertad de movimiento. Esto asegura confort y eficiencia durante la actividad física intensa. La colección representa una opción confiable para el mercado mayorista en Argentina.",
+    "descripcion": "La paleta Vortice X está diseñada para jugadores de pádel que buscan rendimiento en cada golpe. Sus caras de carbono 12K ofrecen una respuesta sólida y una gran durabilidad. Es una opción confiable para un juego versátil en la cancha.",
     "tags": [
       "nuevo"
     ],
@@ -1453,16 +1465,17 @@
     "_aiCount": 7,
     "id": "p1787353757330",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353704421.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353704421-encuadre.webp"
     ],
-    "fechaPublicacion": "2026-08-21T23:09:17.330Z"
+    "fechaPublicacion": "2026-08-21T23:09:17.330Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
-    "nombre": "Kids de 3 a 6.años ",
+    "nombre": "Kids de 3 a 6 años",
     "precio": 62000,
     "precioMinorista": 75000,
     "peso": 290,
-    "descripcion": "Esta paleta está diseñado para niños de 3 a 6 años, es un producto recreativo para los más pequeños de la casa. ",
+    "descripcion": "Esta paleta está diseñada para niños de 3 a 6 años, es un producto recreativo para los más pequeños de la casa.",
     "tags": [
       "nuevo"
     ],
@@ -1482,9 +1495,10 @@
     "_aiCount": 8,
     "id": "p1787354132455",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787354001974.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787354001974-encuadre.webp"
     ],
-    "fechaPublicacion": "2026-08-21T23:15:32.455Z"
+    "fechaPublicacion": "2026-08-21T23:15:32.455Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "Flash Carbono 3k",
@@ -1512,9 +1526,10 @@
     "_aiCount": 10,
     "id": "p1787355012462",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787354935277.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787354935277-encuadre.webp"
     ],
-    "fechaPublicacion": "2026-08-21T23:30:12.463Z"
+    "fechaPublicacion": "2026-08-21T23:30:12.463Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
     "nombre": "Nexus Carbono 12k ",
@@ -1541,9 +1556,9 @@
     "_aiCount": 11,
     "id": "p1787356327294",
     "fechaPublicacion": "2026-08-21T23:52:07.295Z",
-    "fechaActualizacion": "2026-09-02T16:36:26.915Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787356252259.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787356252259-encuadre.webp"
     ],
     "colorDefs": {
       "Rojo/Negro": [
@@ -1553,7 +1568,7 @@
     }
   },
   {
-    "nombre": "REMERON DRY ELAS. DAMA",
+    "nombre": "REMERÓN DRY ELAST. DAMA",
     "precio": 12000,
     "precioMinorista": 21000,
     "descripcion": "",
@@ -1577,13 +1592,14 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835427436.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835429219.webp"
     ],
-    "fechaPublicacion": "2026-08-27T12:58:16.022Z"
+    "fechaPublicacion": "2026-08-27T12:58:16.022Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   },
   {
-    "nombre": "JOGGER SEMIRECTO C/ELASTICO REGULABLE y REFLEX CAB. ",
+    "nombre": "JOGGER SEMIRRECTO C/ELÁSTICO REGULABLE y REFLEX CAB.",
     "precio": 17000,
     "precioMinorista": 28000,
-    "descripcion": "Jogger sin friza, semirecto elastizado con elastico regulable y reflex. Material Scuba. ",
+    "descripcion": "Jogger sin friza, semirrecto elastizado con elástico regulable y reflex. Material Scuba. ",
     "tags": [],
     "categoria": "ropa",
     "genero": "masculino",
@@ -1606,6 +1622,7 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835519612.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835548097.webp"
     ],
-    "fechaPublicacion": "2026-08-27T13:02:13.397Z"
+    "fechaPublicacion": "2026-08-27T13:02:13.397Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
   }
 ]
