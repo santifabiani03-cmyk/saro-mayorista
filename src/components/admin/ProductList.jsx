@@ -2,6 +2,32 @@
 import { useState, useMemo } from 'react'
 import { COLOR_MAP, TAG_CONFIG, getProductTags, getSwatchStyle } from '../../utils/colors'
 
+const pesos = n => `$${Number(n).toLocaleString('es-AR')}`
+
+// Precio mayorista y minorista, uno debajo del otro. Sin minorista el producto
+// no sale en los catálogos minoristas ni en los anuncios (una paleta, en
+// ningún lado; ropa y accesorios, sólo en el mayorista): se marca en ámbar.
+function Precios({ p }) {
+  const minorista = Number(p.precioMinorista) > 0
+  const aviso = p.categoria === 'paleta'
+    ? 'Sin precio minorista: esta paleta no se muestra en la tienda ni en los anuncios'
+    : 'Sin precio minorista: sólo se muestra en el catálogo mayorista, no en la tienda ni en los anuncios'
+  return (
+    <div className="text-right text-sm leading-tight whitespace-nowrap space-y-0.5">
+      <p>
+        <span className="text-[10px] font-semibold text-gray-400 uppercase mr-1">May.</span>
+        <span className="font-bold text-saro-blue">{pesos(p.precio)}</span>
+      </p>
+      <p>
+        <span className="text-[10px] font-semibold text-gray-400 uppercase mr-1">Min.</span>
+        {minorista
+          ? <span className="font-bold text-saro-dark">{pesos(p.precioMinorista)}</span>
+          : <span className="text-xs font-semibold text-amber-600" title={aviso}>sin cargar</span>}
+      </p>
+    </div>
+  )
+}
+
 function EyeIcon() {
   return (
     <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round" className="w-4 h-4">
@@ -61,9 +87,7 @@ function MobileProductCard({ p, onEdit, onDelete, onToggleVisible, onToggleSinSt
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
             <p className="font-semibold text-gray-900 text-sm leading-tight truncate">{p.nombre}</p>
-            <span className="font-bold text-saro-blue text-sm whitespace-nowrap">
-              ${Number(p.precio).toLocaleString('es-AR')}
-            </span>
+            <Precios p={p} />
           </div>
 
           {/* Tags */}
@@ -327,7 +351,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                   <th className={`${thClass} hidden md:table-cell`}>Variantes</th>
                   <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
                     <button type="button" onClick={() => handleSort('precio')} className={`${thButton} justify-end`}>
-                      Precio
+                      Precios
                       <SortChevron active={sortKey === 'precio'} dir={sortDir} />
                     </button>
                   </th>
@@ -420,7 +444,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
 
                       {/* Precio */}
                       <td className="px-4 py-3 text-right">
-                        <span className="font-bold text-saro-blue">${Number(p.precio).toLocaleString('es-AR')}</span>
+                        <Precios p={p} />
                       </td>
 
                       {/* Fechas */}

@@ -1,25 +1,18 @@
 import fs from 'node:fs'
 import path from 'node:path'
 import { NextResponse } from 'next/server'
+import { toSlug } from '../../../utils/slug'
 
 const CATALOG_FILE = path.resolve('catalog/products.json')
 const BASE_URL = 'https://saro.com.ar'
 
-function toSlug(name, id) {
-  const base = name
-    .toLowerCase()
-    .normalize('NFD')
-    .replace(/[̀-ͯ]/g, '')
-    .replace(/[^a-z0-9]+/g, '-')
-    .replace(/(^-|-$)/g, '')
-  const suffix = (id || '').slice(-6)
-  return `${base}-${suffix}`
-}
-
 export async function GET() {
   try {
     const data = JSON.parse(fs.readFileSync(CATALOG_FILE, 'utf-8'))
-    const visibleProducts = data.filter(p => p.visible !== false)
+    // Las paletas sólo se publican con precio minorista: sin él, la ficha
+    // redirige a /paletas y no tiene sentido mandársela a Google.
+    const visibleProducts = data.filter(p => p.visible !== false
+      && (p.categoria !== 'paleta' || Number(p.precioMinorista) > 0))
 
     // Fecha más reciente de actualización de cualquier producto
     const latestDate = visibleProducts.reduce((max, p) => {

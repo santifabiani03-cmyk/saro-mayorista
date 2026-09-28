@@ -92,7 +92,8 @@ export function suggestFillers(products, cartItems, gap, limit = 3) {
   const enCarrito = new Set(cartItems.map(i => i.productId))
 
   return (products ?? [])
-    .filter(p => p.visible && !p.sinStock && p.precio > 0)
+    // Las paletas no se venden por mayor en la web: no se sugieren acá.
+    .filter(p => p.visible && !p.sinStock && p.precio > 0 && p.categoria !== 'paleta')
     .map(product => {
       const qty = bestQtyForGap(product, gap)
       if (!qty) return null

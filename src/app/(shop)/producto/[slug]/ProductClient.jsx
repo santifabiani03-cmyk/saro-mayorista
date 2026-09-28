@@ -142,6 +142,7 @@ export default function ProductClient({ product }) {
                 emoji={product.emoji}
                 thumbs
                 altText={product.nombre}
+                entera={product.categoria === 'paleta'}
               />
             </div>
 

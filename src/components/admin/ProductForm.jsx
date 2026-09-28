@@ -4,6 +4,7 @@ import {
   COLOR_MAP, PREDEFINED_COLORS, PREDEFINED_TALLES,
   getAutoEmoji, TAG_CONFIG, getProductTags, getSwatchStyle,
 } from '../../utils/colors'
+import { ENCUADRE, medirPaleta, planEncuadre, recortarConMascara } from '../../utils/encuadrePaleta'
 
 // ── Background removal & logo watermark ──────────────────────────────────────
 const LOGO_URL = '/assets/logo-icon.png'
@@ -49,6 +50,41 @@ function getTrimBounds(img) {
 }
 
 /**
+ * Encuadre estándar de paletas (ver utils/encuadrePaleta.js): lienzo 3:4 blanco
+ * con la paleta centrada y aire alrededor. Devuelve un Blob WebP, o null si la
+ * foto no se puede encuadrar sola (primer plano, fondo con textura): en ese caso
+ * se sube como vino. `filtro` es un filtro de canvas opcional para la paleta.
+ */
+async function encuadrarPaleta(src, filtro = 'none') {
+  const bmp = await createImageBitmap(src)
+  const w = bmp.width, h = bmp.height
+  const lectura = document.createElement('canvas')
+  lectura.width = w; lectura.height = h
+  const lctx = lectura.getContext('2d', { willReadFrequently: true })
+  lctx.drawImage(bmp, 0, 0)
+  bmp.close?.()
+  const { data } = lctx.getImageData(0, 0, w, h)
+
+  const medida = medirPaleta(data, w, h)
+  if (!medida) return null
+  const { caja } = medida
+  const recorte = document.createElement('canvas')
+  recorte.width = caja.w; recorte.height = caja.h
+  recorte.getContext('2d').putImageData(new ImageData(recortarConMascara(data, w, medida), caja.w, caja.h), 0, 0)
+
+  const plan = planEncuadre(caja)
+  const canvas = document.createElement('canvas')
+  canvas.width = ENCUADRE.ancho; canvas.height = ENCUADRE.alto
+  const ctx = canvas.getContext('2d')
+  ctx.fillStyle = '#ffffff'
+  ctx.fillRect(0, 0, canvas.width, canvas.height)
+  ctx.imageSmoothingQuality = 'high'
+  ctx.filter = filtro
+  ctx.drawImage(recorte, plan.x, plan.y, plan.w, plan.h)
+  return new Promise(resolve => { canvas.toBlob(b => resolve(b), 'image/webp', 0.9) })
+}
+
+/**
  * Remueve el fondo de una imagen y la coloca sobre un fondo estandarizado.
  * Recorta automáticamente el espacio transparente y centra el producto.
  * bgType: 'gradient' | 'white'
@@ -74,6 +110,13 @@ async function removeAndStandardize(imageUrl, onProgress, bgType = 'gradient', i
   })
 
   onProgress?.('Ajustando producto…')
+  // Paletas: encuadre estándar 3:4 (el mismo que al subir fotos). El filtro es
+  // la misma corrección de tono que se usa abajo para el resto.
+  if (isPaleta) {
+    const encuadrada = await encuadrarPaleta(blob, 'brightness(0.95) contrast(1.06) saturate(1.04)')
+    if (encuadrada) return encuadrada
+  }
+
   const img = new Image()
   img.src = URL.createObjectURL(blob)
   await new Promise((resolve, reject) => { img.onload = resolve; img.onerror = reject })
@@ -570,7 +613,7 @@ function RadioGroup({ options, value, onChange }) {
 
 // ── Multi-image uploader ──────────────────────────────────────────────────────
 
-function MultiImageUploader({ images, onChange, productName, applyLogo }) {
+function MultiImageUploader({ images, onChange, productName, applyLogo, encuadrar }) {
   const inputRef    = useRef()
   const [pending, setPending] = useState(0)
   const [dragging, setDragging] = useState(false)
@@ -587,7 +630,16 @@ function MultiImageUploader({ images, onChange, productName, applyLogo }) {
 
     const urls = []
     for (const f of list) {
-      let url = await uploadFile(f, productName)
+      let archivo = f
+      if (encuadrar) {
+        try {
+          const encuadrada = await encuadrarPaleta(f)
+          if (encuadrada) archivo = new File([encuadrada], 'paleta.webp', { type: 'image/webp' })
+        } catch (e) {
+          console.error('No se pudo encuadrar la paleta, se sube como vino:', e)
+        }
+      }
+      let url = await uploadFile(archivo, productName)
       if (url && applyLogo) {
         try {
           const logoBlob = await applyLogoWatermark(url, () => {})
@@ -1654,6 +1706,10 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                   <p className="font-semibold mb-1">SR Logo</p>
                   <p>• Si está activado el checkbox, al subir cada imagen se aplica automáticamente el logo SR (marca de agua sutil) en la esquina superior derecha.</p>
                   <p className="mt-1">• También se re-aplica después de quitar el fondo con IA.</p>
+                  <hr className="border-gray-700 my-1.5" />
+                  <p className="font-semibold mb-1">🏓 Fotos de paletas</p>
+                  <p>• Si la categoría es Paleta, cada foto se encuadra sola: fondo blanco, formato vertical y aire a los costados, para que no se corte en el catálogo. Elegí la categoría antes de subir.</p>
+                  <p className="mt-1">• Las fotos de primer plano o con fondo con textura se suben como vienen.</p>
                   <div className="absolute top-3 -left-1 w-2 h-2 bg-gray-900 rotate-45"></div>
                 </div>
               </div>
@@ -1663,6 +1719,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               onChange={setImagenes}
               productName={form.nombre}
               applyLogo={applyLogo}
+              encuadrar={form.categoria === 'paleta'}
             />
           </Field>
 

@@ -4,38 +4,54 @@ import GuiaPaletas from '../../components/GuiaPaletas'
 
 const getImages = p => (p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : [])
 
-// Contenido SEO por catálogo. `kind` = 'paletas' | 'ropa'.
+// Contenido SEO por catálogo. `kind` = 'paletas' | 'ropa'; `ropaMayorista` es
+// el catálogo por mayor de ropa y accesorios (/ropa-y-accesorios/mayorista).
 const SEO = {
   paletas: {
-    listName: 'Catalogo de Paletas de Padel — SARO Mayorista',
+    listName: 'Catálogo de Paletas de Pádel — SARO',
     heading: 'Paletas de pádel',
-    seoTitle: 'Paletas de padel al por mayor',
+    seoTitle: 'Paletas de pádel',
     blocks: [
       {
-        h: 'Paletas de padel',
-        p: 'Paletas de padel y palas de padel para todos los niveles. Modelos de control, potencia y polivalentes con materiales de carbono, fibra de vidrio y goma EVA. Venta mayorista con precios exclusivos por cantidad.',
+        h: 'Paletas de pádel',
+        p: 'Paletas de pádel para todos los niveles. Modelos de control, potencia y polivalentes con materiales de carbono, fibra de vidrio y goma EVA. Armá tu pedido y cerralo por WhatsApp, con envíos a todo el país.',
       },
     ],
   },
   ropa: {
-    listName: 'Catalogo de Ropa Deportiva y Accesorios de Padel — SARO Mayorista',
+    listName: 'Catálogo de Ropa Deportiva y Accesorios de Pádel — SARO',
     heading: 'Ropa y accesorios',
-    seoTitle: 'Ropa deportiva y accesorios de padel al por mayor',
+    seoTitle: 'Ropa deportiva y accesorios de pádel',
     blocks: [
       {
-        h: 'Accesorios de padel',
-        p: 'Grips, cubre grips perforados, pelotas de padel, bolsos, mochilas, protectores y accesorios deportivos para padel. Todo para equipar tu tienda o club de padel al por mayor en Argentina.',
+        h: 'Accesorios de pádel',
+        p: 'Grips, cubre grips perforados, pelotas de pádel, bolsos, mochilas, protectores y accesorios deportivos para pádel, con envíos a todo el país.',
       },
       {
         h: 'Ropa deportiva',
-        p: 'Indumentaria deportiva mayorista: remeras, buzos, shorts, calzas, camperas y medias deportivas. Ropa de entrenamiento y competicion para hombre y mujer con envios a toda Argentina.',
+        p: 'Indumentaria deportiva: remeras, buzos, shorts, calzas, camperas y medias deportivas. Ropa de entrenamiento y competición para hombre y mujer con envíos a toda Argentina.',
+      },
+    ],
+  },
+  ropaMayorista: {
+    listName: 'Catálogo Mayorista de Ropa Deportiva y Accesorios de Pádel — SARO',
+    heading: 'Ropa y accesorios',
+    seoTitle: 'Ropa deportiva y accesorios de pádel al por mayor',
+    blocks: [
+      {
+        h: 'Accesorios de pádel',
+        p: 'Grips, cubre grips perforados, pelotas de pádel, bolsos, mochilas, protectores y accesorios deportivos para pádel. Todo para equipar tu tienda o club de pádel al por mayor en Argentina.',
+      },
+      {
+        h: 'Ropa deportiva',
+        p: 'Indumentaria deportiva mayorista: remeras, buzos, shorts, calzas, camperas y medias deportivas. Ropa de entrenamiento y competición para hombre y mujer con envíos a toda Argentina.',
       },
     ],
   },
 }
 
 export default function CatalogView({ products, kind, modo = 'mayorista' }) {
-  const meta = SEO[kind]
+  const meta = SEO[kind === 'ropa' && modo === 'mayorista' ? 'ropaMayorista' : kind]
 
   // En minorista se muestra el precio minorista y sólo los productos que lo tienen
   // cargado. Se reemplaza `precio` para que el resto (cards, carrito, WhatsApp)

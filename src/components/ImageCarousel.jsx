@@ -115,6 +115,8 @@ function Lightbox({ images, startIdx, onClose }) {
  * compact=false → se autodimensiona (aspect-square).
  *                 Ideal para ProductModal.
  * thumbs=true   → muestra tira de miniaturas debajo (solo cuando compact=false).
+ * entera=true   → recuadro vertical 3:4 y la foto completa sobre blanco, sin
+ *                 recortar (paletas: en el cuadrado se les cortaba punta y mango).
  */
 export default function ImageCarousel({
   images = [],
@@ -122,6 +124,7 @@ export default function ImageCarousel({
   compact = false,
   thumbs  = false,
   altText = '',
+  entera  = false,
 }) {
   const [idx, setIdx]     = useState(0)
   const [touchX, setTouchX] = useState(null)
@@ -158,7 +161,7 @@ export default function ImageCarousel({
   const main = (
     <div
       className={`relative overflow-hidden group/car
-        ${compact ? 'w-full h-full' : 'aspect-square rounded-2xl cursor-zoom-in'}`}
+        ${compact ? 'w-full h-full' : `${entera ? 'aspect-[3/4] bg-white' : 'aspect-square'} rounded-2xl cursor-zoom-in`}`}
       onTouchStart={e => setTouchX(e.touches[0].clientX)}
       onTouchEnd={e => {
         if (touchX == null) return
@@ -170,7 +173,7 @@ export default function ImageCarousel({
       <img
         src={images[idx]}
         alt={altText ? `${altText} - imagen ${idx + 1}` : ''}
-        className={`w-full h-full object-cover
+        className={`w-full h-full ${entera ? 'object-contain bg-white' : 'object-cover'}
           ${compact ? 'transition-transform duration-200 group-hover:scale-105' : ''}`}
         loading="lazy"
         decoding="async"

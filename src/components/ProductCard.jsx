@@ -100,12 +100,14 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
         </div>
       </div>
 
-      {/* Imagen: cubre toda la card */}
+      {/* Imagen: cubre toda la card. Las fotos de paletas vienen encuadradas en
+          3:4 con aire alrededor (utils/encuadrePaleta.js), así que centrada sólo
+          se recorta margen, nunca la punta ni los costados. */}
       {imgs.length > 0 ? (
         <img
           src={imgs[0]}
           alt={product.nombre}
-          className="absolute inset-0 w-full h-full object-cover object-bottom transition-transform duration-500 ease-out group-hover:scale-105"
+          className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
           loading="lazy"
           decoding="async"
           onError={e => { e.currentTarget.style.opacity = '0.3' }}

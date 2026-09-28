@@ -5,13 +5,15 @@
 > chats viejos ni preguntar nada. Prioriza ser exhaustivo. Si algo cambia, actualizá este
 > archivo y `docs/ESTETICA.md`.
 
-Última actualización: 2026-09-21.
+Última actualización: 2026-09-28.
 
 > ⚠️ **Cambio importante (agosto 2026): el sitio pasó de MAYORISTA a MINORISTA.**
-> La compra mínima está **oculta** (con un interruptor en el admin para volver a mostrarla) y
-> los textos visibles ya no dicen "mayorista". Quien quiera comprar por mayor entra por la
-> sección **"Trabajá con nosotros"**. El **SEO/metadata todavía dice "Mayorista"** a propósito:
-> es una pasada pendiente (ver §6). El repo y el dominio siguen llamándose `saro-mayorista`.
+> La tienda principal es minorista (`/paletas` y `/ropa-y-accesorios`, precio `precioMinorista`).
+> La venta por mayor quedó como canal secundario: el catálogo **`/ropa-y-accesorios/mayorista`**
+> (precio `precio`, con compra mínima) y el formulario **"Trabajá con nosotros"**. Las paletas
+> **no** se venden por mayor en la web y sólo se publican si tienen precio minorista.
+> Desde el 28/09/2026 el **SEO/metadata también es minorista** ("SARO Tienda Oficial"). El repo
+> y el dominio siguen llamándose `saro-mayorista`.
 
 ---
 
@@ -183,6 +185,8 @@ Todas están en `src/app/api/<nombre>/route.js`:
 | `/api/update-config` | POST | Guarda `config.json` (compra mínima, teléfono) en GitHub | Sí |
 | `/api/sitemap` | GET | Genera el sitemap XML para Google | No |
 | `/api/cotizar-envio` | POST | Cotiza el envío con la **API MiCorreo** (CP + peso → precio a domicilio y a sucursal). Ver §2.10 | No |
+| `/feed.xml` | GET | **Feed de productos para Meta Ads y Google Merchant Center** (se arma solo desde el catálogo). Ver `docs/PUBLICIDAD.md` | No |
+| `/feed-img` | GET | Convierte las fotos del feed a JPG 1080×1080 con fondo blanco (sólo fotos de SARO) | No |
 
 ### 2.7 `public/config.json` (configuración de la tienda)
 
@@ -190,17 +194,21 @@ Es un archivo chico con la config editable desde el admin (pestaña **⚙️ Aju
 
 ```json
 {
-  "storeName": "SARO Mayorista",
+  "storeName": "SARO Mayorista",      ← no se usa en ningún lado del sitio
   "whatsappNumber": "5491123208058",   ← número donde caen los pedidos
-  "minPurchase": 150000,               ← mínimo real (barra de progreso del carrito)
-  "suggestedMinPurchase": 150000,      ← el que se muestra como "compra mín. sugerida"
-  "mostrarCompraMinima": false,        ← ⭐ interruptor mayorista/minorista (ver abajo)
-  "currency": "ARS"
+  "minPurchase": 10000,                ← mínimo (barra de progreso del carrito)
+  "suggestedMinPurchase": 200000,      ← el que se muestra como "compra mín. sugerida"
+  "currency": "ARS",
+  "mostrarCompraMinima": true,         ← ⭐ interruptor de la compra mínima (ver abajo)
+  "minPurchaseNuevo": 180000,          ← mínimo para la primera compra mayorista
+  "minPurchaseCliente": 10000          ← mínimo si ya es cliente
 }
 ```
+(Valores de producción al 28/09/2026.)
 
-⭐ **`mostrarCompraMinima`** es el interruptor que decide si el sitio se comporta como
-**minorista** (`false`, como está hoy) o **mayorista** (`true`). Cuando está en `false` se
+⭐ **`mostrarCompraMinima`** es el interruptor de la compra mínima. Hoy está en `true`, pero
+el carrito la aplica **sólo si hay productos del catálogo mayorista** (`Cart.jsx`: `hayMayorista`);
+un pedido minorista nunca tiene mínimo. Cuando está en `false` se
 ocultan solos: el badge del header (desktop y mobile), el chip de la landing, la barra de
 progreso del carrito y las sugerencias (`CartSuggestions`). Se cambia desde el
 **admin → ⚙️ Ajustes**, con un toggle.
@@ -714,16 +722,38 @@ menor: en los planos abiertos la paleta queda flotando sola en el aire.
 - **Google Analytics 4** + eventos `finalizar_pedido`, `cotizar_envio`, `trabaja_con_nosotros`.
 - **Campo peso** por producto en el admin + toggle de compra mínima en Ajustes.
 - Rediseño visual completo, seguridad (PIN + rate limiting) y SEO/Schema.org de siempre.
+- **Pasada de SEO a minorista (28/09/2026):** títulos, descriptions, OpenGraph, Schema.org,
+  `manifest.json` (también `theme_color` → `#2563EB`), textos SEO de los catálogos (según sea
+  minorista o mayorista), fichas y alt del logo. "Venta por mayor / Trabajá con nosotros"
+  queda como mención secundaria. `/ropa-y-accesorios/mayorista` conserva su SEO mayorista.
+- **Regla de paletas:** sólo se publican con `precioMinorista`. Sin él no salen en `/paletas`,
+  la ficha redirige, no van al sitemap, ni al feed, ni al chatbot, ni a las sugerencias del
+  carrito. Al cargarles el precio desde el admin aparecen solas.
+- **Admin → lista de productos:** muestra precio mayorista y minorista ("sin cargar" en ámbar).
+- **Encuadre estándar de fotos de paletas** (`src/utils/encuadrePaleta.js`, ver
+  `docs/ESTETICA.md` §6): el admin lo aplica al subir fotos con categoría Paleta. Las 13 fotos
+  de frente que había se encuadraron con `scripts/encuadrar-paletas.mjs` (archivos
+  `*-encuadre.webp`); los 3 primeros planos quedaron como estaban.
+- **Links viejos de productos:** la URL sale del nombre; si se renombra un producto, el link
+  viejo redirige al nuevo (`findBySlug` busca por el final del id).
+- **Catálogo corregido (28/09/2026):** typos en nombres y descripciones, "pala" → "paleta",
+  tildes, 6 productos que no tenían categoría, descripción de Vortice X (era de indumentaria).
 
 ### 🟡 Pendiente / a decidir con el dueño
+- **Publicidad (Meta/Google):** feed, Pixel de Meta, eventos y pestaña **📣 Publicidad** del admin
+  ya hechos (ver **`docs/PUBLICIDAD.md`**). Falta que smfab cree la cuenta comercial de Meta y
+  cargue `NEXT_PUBLIC_META_PIXEL_ID` en Vercel. Sólo salen en anuncios los productos con
+  **precio minorista** (9 de 50 al 21/09/2026).
 - **Cotizador de envío:** código listo pero **inactivo**. Falta que smfab **pida las credenciales
   de API a un ejecutivo comercial de Correo Argentino** y las cargue en `.env.local` + Vercel
   (§2.9). Entrada: https://www.correoargentino.com.ar/MiCorreo/public/primeros-pasos
 - **Cargar el peso de los productos** desde el admin (las paletas ≈ 400 g). Sin peso, el
   cotizador asume 400 g por producto.
-- **SEO/metadata todavía dice "Mayorista"** (títulos, descriptions, footer del `layout.jsx`,
-  `manifest.json`). Se dejó a propósito para no mover el posicionamiento sin un plan: falta hacer
-  esa pasada.
+- **5 paletas sin precio minorista** (Saro MAX Carbono 12k, SR Junior, Nexus woman, Radian Pro
+  Carbono, MAX 3.0 Carbono): no se publican hasta que smfab les cargue el precio en el admin.
+- **Vortice X:** la descripción nueva sólo dice lo que se ve en la foto (caras de carbono 12K).
+  Falta confirmar forma, balance y nivel de juego para completarla.
+- **"TUBO PELOTAS x2 NOVA"** no tiene descripción y parece repetido con "Pelotas Nova Padel Pro".
 - **Email `@saro.com.ar` (Zoho, plan gratis):** dominio verificado y MX cargados en el DNS de
   Vercel. Falta **crear las casillas** (`ventas@`, `info@`, la personal) y el alias `consultas@`
   → `info@`. La cuenta admin es `smfabiani11` (no se borra, es la dueña de la organización).
@@ -743,12 +773,66 @@ aparte del modelo actual (catálogo + WhatsApp).
 
 ---
 
+## 6.1 Handoff: publicidad de productos (septiembre 2026)
+
+**Objetivo actual:** promocionar productos minoristas de SARO en Meta Ads
+(Instagram/Facebook) y, más adelante, Google Ads. El checkout sigue siendo
+WhatsApp: no hay pagos online ni compras confirmadas automáticamente.
+
+**Qué quedó implementado:**
+
+- `GET /feed.xml` genera un RSS válido para Meta Commerce Manager y Google
+  Merchant Center a partir de `catalog/products.json`.
+- La regla del feed vive en `src/utils/feed.js`, y se reutiliza en
+  `src/components/admin/PublicidadPanel.jsx` para que el admin y las plataformas
+  muestren exactamente la misma selección.
+- Sólo entran productos visibles, con foto, `precioMinorista > 0` y sin
+  `publicitar: false`. El feed usa ese precio minorista y la misma URL pública
+  `/producto/[slug]`; no se deben usar precios mayoristas en anuncios B2C.
+- En `/admin` hay una pestaña **📣 Publicidad** y el toggle **Publicitar este
+  producto** en su formulario. Prendido es el valor por defecto; el campo sólo
+  se guarda cuando se apaga. El admin publica cambios por su flujo normal,
+  nunca editar `products.json` a mano.
+- `src/components/MetaPixel.jsx` carga Meta Pixel sólo cuando existe la variable
+  de Vercel `NEXT_PUBLIC_META_PIXEL_ID`. Excluye `/admin` y `/lab*`. Mientras
+  la variable no esté configurada, el sitio se comporta igual y no mide Meta.
+- Los eventos Meta son: `ViewContent` (ficha/modal), `AddToCart`,
+  `InitiateCheckout` (pedido enviado a WhatsApp), `Contact` (consultas) y
+  `Lead` (formulario Trabajá con nosotros). Los IDs son el `product.id` y deben
+  permanecer iguales a `g:id` del feed para el remarketing dinámico.
+- `InitiateCheckout` es intencional: abrir WhatsApp no confirma una venta, por
+  lo que **no** se debe enviar `Purchase` hasta tener una confirmación real.
+
+**Pendiente de cuenta (lo realiza el dueño):** crear/configurar Meta Business,
+Pixel y catálogo; cargar el ID del Pixel en Vercel; verificar `saro.com.ar`; y
+cargar `https://saro.com.ar/feed.xml` como feed programado. Google Merchant y
+Google Ads se conectan después con el mismo feed. No poner IDs, tokens ni
+secretos en código o Git.
+
+**Validación realizada:** `npm run check:orden` y
+`npx next build --experimental-build-mode compile` pasaron; este último listó
+la ruta dinámica `/feed.xml`. El build local completo puede colgarse por la
+limitación ya documentada en §5.5.
+
+**Estado Git al retomar:** el commit de publicidad se publicó como `606edb9`
+en `origin/master`, integrado encima de la configuración remota. La carpeta
+principal conserva cambios sin guardar del hero y de esta documentación; por
+eso su rama local puede quedar detrás de `origin/master`. **No hacer `pull`,
+`rebase`, `reset` ni `stash` a ciegas**: primero preservar/confirmar esos
+cambios del hero. Si se necesita trabajar sólo en publicidad, partir de
+`origin/master` en un worktree limpio.
+
+---
+
 ## 7. Instrucciones para Claude (o quien retome)
 
 - Respondé siempre en **español rioplatense** (Argentina), y para alguien que **no programa**.
 - Antes de tocar el catálogo/stock/pedidos: releé §5. **No pisar `products.json`/`orders.json`/
   `config.json`.** Si hay que cargar datos (pesos, precios, stock), **lo hace smfab desde
-  `/admin`** — no editar esos archivos desde el código.
+  `/admin`** — no editar esos archivos desde el código. **Excepción** (sólo si smfab la pide,
+  como las correcciones del 28/09/2026): un script de parche que cambia campos puntuales y
+  verifica que el valor original siga igual, corrido sobre la versión fresca de
+  `/api/catalog` justo antes de pushear, en un commit aparte del código.
 - Antes de tocar el hero 3D: leé §4.1 y §4.3 y `docs/ESTETICA.md`. Es lo más delicado del proyecto.
 - Para cualquier cambio visual, respetá la paleta y convenciones de §3 y `docs/ESTETICA.md`.
 - Deploy = push a `master` (con el cuidado de §5.2). No hay otro paso.

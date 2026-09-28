@@ -103,7 +103,7 @@ export default function ProductModal({ product, onClose }) {
 
             {/* Galería */}
             <div className="space-y-3">
-              <ImageCarousel images={imgs} emoji={product.emoji} thumbs altText={product.nombre} />
+              <ImageCarousel images={imgs} emoji={product.emoji} thumbs altText={product.nombre} entera={product.categoria === 'paleta'} />
               <p className="text-sm text-gray-600 leading-relaxed">{product.descripcion}</p>
             </div>
 

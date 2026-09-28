@@ -10,9 +10,9 @@ export const revalidate = 60
 
 // Metadata de marca para la landing. Canonical a la raíz.
 export const metadata = {
-  title: 'SARO Mayorista | Paletas de Padel, Accesorios y Ropa Deportiva al por Mayor',
+  title: 'SARO Tienda Oficial | Paletas de Pádel, Accesorios y Ropa',
   description:
-    'SARO: marca argentina de paletas de padel, accesorios de padel y ropa deportiva. Venta mayorista con precios exclusivos por cantidad, promos y envios a todo el pais. Entra al catalogo y arma tu pedido por WhatsApp.',
+    'Tienda oficial de SARO: paletas de pádel, accesorios y ropa deportiva. Armá tu pedido y cerralo por WhatsApp, con envíos a todo el país. ¿Tenés un comercio? Trabajá con nosotros.',
   alternates: { canonical: 'https://saro.com.ar/' },
 }
 

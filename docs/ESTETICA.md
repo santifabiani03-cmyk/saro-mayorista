@@ -214,6 +214,12 @@ competir.
   el canto imperfecto del modelo (ver `CLAUDE.md` §4.1). No poner giros de 360° completos.
 - **Accesibilidad de movimiento:** respetar `prefers-reduced-motion` siempre.
 - **Fondos:** página en `#FAFBFC`, superficies (cards/header/modales) en blanco puro.
+- **Fotos de paletas (encuadre estándar, septiembre 2026):** lienzo vertical 3:4
+  (1200×1600), fondo blanco, paleta centrada ocupando como mucho 76% del alto y 60%
+  del ancho. Así la card (foto "a sangre", centrada) y la ficha (recuadro 3:4 con la
+  foto entera) nunca cortan la punta ni los costados. El admin lo aplica solo al
+  subir fotos con categoría Paleta; la regla está en `src/utils/encuadrePaleta.js`.
+  Los primeros planos (paleta inclinada o cortada por el marco) quedan como vienen.
 
 ---
 

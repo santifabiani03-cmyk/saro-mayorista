@@ -1,11 +1,11 @@
 {
-  "name": "SARO Mayorista",
+  "name": "SARO",
   "short_name": "SARO",
-  "description": "Ropa deportiva y accesorios de padel al por mayor",
+  "description": "Paletas de pádel, accesorios y ropa deportiva",
   "start_url": "/",
   "display": "standalone",
   "background_color": "#f9fafb",
-  "theme_color": "#4A90D9",
+  "theme_color": "#2563EB",
   "icons": [
     {
       "src": "/assets/logo-icon.png",

@@ -8,17 +8,17 @@ const CATALOG_FILE = path.resolve('catalog/products.json')
 export const revalidate = 60
 
 export const metadata = {
-  title: 'Paletas de Padel al por Mayor | Catalogo SARO Mayorista',
+  title: 'Paletas de Pádel | Tienda Oficial SARO',
   description:
-    'Catalogo mayorista de paletas de padel y palas de padel SARO: modelos de control, potencia y polivalentes con tecnologia carbono, fibra de vidrio y goma EVA. Precios exclusivos por cantidad y envios a toda Argentina.',
+    'Paletas de pádel SARO para todos los niveles: modelos de control, potencia y polivalentes con tecnología de carbono, fibra de vidrio y goma EVA. Envíos a todo el país.',
   alternates: { canonical: 'https://saro.com.ar/paletas' },
   openGraph: {
     type: 'website',
-    title: 'Paletas de Padel al por Mayor | SARO',
+    title: 'Paletas de Pádel | Tienda Oficial SARO',
     description:
-      'Paletas de padel de control, potencia y polivalentes al por mayor. Precios mayoristas exclusivos. Envios a toda Argentina.',
+      'Paletas de pádel SARO de control, potencia y polivalentes. Envíos a todo el país.',
     url: 'https://saro.com.ar/paletas',
-    siteName: 'SARO Mayorista',
+    siteName: 'SARO',
     locale: 'es_AR',
     images: ['https://saro.com.ar/assets/logo-horizontal.png'],
   },

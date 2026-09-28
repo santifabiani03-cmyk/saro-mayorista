@@ -23,6 +23,7 @@ export default [
         'WebSocket', 'Worker', 'CanvasRenderingContext2D', 'ImageData', 'Path2D',
         'File', 'Response', 'Request', 'Headers', 'OffscreenCanvas', 'TextEncoder',
         'TextDecoder', 'ReadableStream', 'queueMicrotask', 'DragEvent', 'Notification',
+        'createImageBitmap',
       ].map(g => [g, 'readonly'])),
     },
     rules: {

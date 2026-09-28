@@ -34,10 +34,10 @@ export default function Header({ config }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
 
           {/* Logo */}
-          <a href="/" className="flex-shrink-0" aria-label="SARO Mayorista - Inicio">
+          <a href="/" className="flex-shrink-0" aria-label="SARO - Inicio">
             <Image
               src="/assets/logo-icon.png"
-              alt="SARO - Ropa deportiva y accesorios de padel mayorista"
+              alt="SARO - Paletas de pádel, accesorios y ropa deportiva"
               width={44}
               height={44}
               className="block sm:hidden h-11 w-auto object-contain"
@@ -45,7 +45,7 @@ export default function Header({ config }) {
             />
             <Image
               src="/assets/logo-horizontal.png"
-              alt="SARO Mayorista - Indumentaria deportiva y padel al por mayor"
+              alt="SARO - Paletas de pádel, accesorios y ropa deportiva"
               width={220}
               height={56}
               className="hidden sm:block h-14 w-auto object-contain"

@@ -35,15 +35,26 @@ function catalogoParaPrompt() {
     products = JSON.parse(fs.readFileSync(CATALOG_FILE, 'utf-8'))
   } catch { return '(catálogo no disponible)' }
 
+  const pesos = n => `$${Number(n).toLocaleString('es-AR')}`
+  // Mismas reglas que la tienda: las paletas se venden sólo al público y sólo
+  // si tienen precio minorista; el resto puede tener precio de tienda y/o el
+  // del catálogo mayorista (con compra mínima). Las promos son del mayorista.
   return products
     .filter(p => p.visible !== false)
+    .filter(p => p.categoria !== 'paleta' || Number(p.precioMinorista) > 0)
     .map(p => {
-      const partes = [`- ${p.nombre} | $${Number(p.precio).toLocaleString('es-AR')}`]
+      const minorista = Number(p.precioMinorista) > 0
+      const precios = p.categoria === 'paleta'
+        ? pesos(p.precioMinorista)
+        : minorista
+          ? `${pesos(p.precioMinorista)} | por mayor (catálogo mayorista, con compra mínima): ${pesos(p.precio)}`
+          : `sólo por mayor (catálogo mayorista, con compra mínima): ${pesos(p.precio)}`
+      const partes = [`- ${p.nombre.trim()} | ${precios}`]
       if (p.categoria) partes.push(`categoría: ${p.categoria}`)
       if (p.colores?.length) partes.push(`colores: ${p.colores.join(', ')}`)
       if (p.talles?.length && p.talles[0] !== 'Única') partes.push(`talles: ${p.talles.join(', ')}`)
-      if (p.promos?.length) {
-        partes.push('promos: ' + p.promos
+      if (p.promos?.length && p.categoria !== 'paleta') {
+        partes.push('promos por mayor: ' + p.promos
           .map(pr => `${pr.cantidad}u a $${Number(pr.precioTotal).toLocaleString('es-AR')}`)
           .join(' / '))
       }
