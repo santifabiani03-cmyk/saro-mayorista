@@ -32,3 +32,6 @@ out
 
 # Videos del admin (Remotion): carpeta pública armada (los renders van a out/)
 .remotion-public/
+
+# Copias locales de ideas archivadas (ej. el hero de scroll): no se suben
+/archivo/
