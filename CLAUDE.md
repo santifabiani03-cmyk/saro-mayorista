@@ -5,7 +5,7 @@
 > chats viejos ni preguntar nada. Prioriza ser exhaustivo. Si algo cambia, actualizá este
 > archivo y `docs/ESTETICA.md`.
 
-Última actualización: 2026-09-28.
+Última actualización: 2026-09-29.
 
 > ⚠️ **Cambio importante (agosto 2026): el sitio pasó de MAYORISTA a MINORISTA.**
 > La tienda principal es minorista (`/paletas` y `/ropa-y-accesorios`, precio `precioMinorista`).
@@ -70,8 +70,10 @@ MiCorreo de Correo Argentino) — pero el envío igual se cierra por WhatsApp.
 | Quitar fondo de fotos | @imgly/background-removal (corre en el navegador, gratis) |
 | Analytics | @vercel/analytics + @vercel/speed-insights + **Google Analytics 4** (`G-WSMCJDHZWH`, en `layout.jsx` con `next/script`) |
 | Envíos | **API MiCorreo** (Correo Argentino) para cotizar — ver §2.10 |
+| Videos del admin | **Remotion 4.0.529** (versión exacta en todos los paquetes) — vista previa en el admin, render en GitHub Actions. Ver §8 |
 
-No hay backend propio ni servidor aparte: todo corre dentro de Next.js sobre Vercel.
+No hay backend propio ni servidor aparte: todo corre dentro de Next.js sobre Vercel (salvo el
+render de los videos, que corre en GitHub Actions).
 
 ### 2.2 "Base de datos" = archivos JSON en GitHub
 
@@ -132,6 +134,7 @@ Pagina saro/
 │   ├── manifest.json         ← metadatos PWA (íconos, nombre)
 │   ├── favicon.png           ← "chip" navy con el logo blanco (ícono de pestaña)
 │   ├── models/paleta-opt.glb ← modelo 3D de la paleta (hero) — la lista está en Paleta3D.jsx
+│   ├── videos/               ← música, efectos, fuente Inter y capturas de los videos (§8)
 │   └── assets/               ← logos + fondo-cancha.webp + saro-wordmark.png + fotos de producto
 ├── src/
 │   ├── app/
@@ -159,8 +162,9 @@ Pagina saro/
 │   │   ├── CartSuggestions.jsx ← sugerencias para llegar al mínimo (sólo en modo mayorista)
 │   │   ├── IntroHero.jsx     ← la intro cinematográfica (texto + escena 3D + fondo de cancha)
 │   │   ├── Paleta3D.jsx      ← TODO el motor 3D de la paleta (Three.js)
-│   │   └── admin/            ← ProductForm, ProductList, SettingsPanel, etc.
+│   │   └── admin/            ← ProductForm, ProductList, SettingsPanel, VideosPanel, etc.
 │   ├── views/AdminPage.jsx   ← el panel admin completo (pestañas)
+│   ├── videos/               ← plantillas de video (Remotion) — ver §8
 │   └── utils/                ← helpers (colores, slug, export PDF, envio.js, analytics.js…)
 ├── package.json, next.config.mjs, tailwind.config.js, vercel.json
 └── (archivos locales que NO se deployan: lab.html, IMG_*.jpeg, .py, preview-vendedores.html,
@@ -187,6 +191,9 @@ Todas están en `src/app/api/<nombre>/route.js`:
 | `/api/cotizar-envio` | POST | Cotiza el envío con la **API MiCorreo** (CP + peso → precio a domicilio y a sucursal). Ver §2.10 | No |
 | `/feed.xml` | GET | **Feed de productos para Meta Ads y Google Merchant Center** (se arma solo desde el catálogo). Ver `docs/PUBLICIDAD.md` | No |
 | `/feed-img` | GET | Convierte las fotos del feed a JPG 1080×1080 con fondo blanco (sólo fotos de SARO) | No |
+| `/api/videos/render` | POST | Dispara el render de un video en GitHub Actions. Ver §8 | Sí (body) |
+| `/api/videos/estado` | GET | Estado del render (`?request_id=`): en cola, renderizando, listo o error | Sí (header `x-admin-pin`) |
+| `/api/videos/descargar` | GET | Link de descarga del MP4 (`?request_id=`) | Sí (header `x-admin-pin`) |
 
 ### 2.7 `public/config.json` (configuración de la tienda)
 
@@ -233,7 +240,10 @@ pongas en el código ni las commitees:
 
 - `ADMIN_PIN` — PIN del panel admin.
 - `GITHUB_TOKEN`, `GITHUB_OWNER`, `GITHUB_REPO` — para leer/escribir el repo (base de datos e
-  imágenes). Hay variantes `NEXT_PUBLIC_GITHUB_*` para uso en el navegador.
+  imágenes). Hay variantes `NEXT_PUBLIC_GITHUB_*` para uso en el navegador. Para los videos
+  (§8) el token además necesita **Actions: Read and write**.
+- `GITHUB_VIDEOS_TOKEN` — **opcional**. Si está, los videos usan este token en vez de
+  `GITHUB_TOKEN` (para no agrandar los permisos del de siempre).
 - `GEMINI_API_KEY` — la IA de Google para el admin.
 - **`MICORREO_USER`, `MICORREO_PASSWORD`** — credenciales de **API** de MiCorreo (para el
   endpoint `/token`). ⚠️ **No son** el email/clave de la cuenta: hay que **pedírselas a un
@@ -766,6 +776,11 @@ menor: en los planos abiertos la paleta queda flotando sola en el aire.
   `preview-vendedores.html`. ⚠️ Requeriría **base de datos real + autenticación** (hoy no hay
   ninguna de las dos) y define un **conflicto de canal** (fábrica vs. revendedores) a resolver.
 
+- **Videos (§8):** falta darle al token de GitHub el permiso **Actions: Read and write** (o
+  cargar `GITHUB_VIDEOS_TOKEN`), probar un render real en la Action y **confirmar la licencia de
+  Remotion**: es gratis para empresas de hasta 3 personas; si SARO tiene más, necesita la
+  licencia de empresa (https://www.remotion.pro). **Pendiente de confirmar.**
+
 ### 🔮 Ideas a futuro (no pedidas aún)
 Si algún día se quiere vender con pago online, gestionar stock de verdad o mandar mails, ahí sí
 haría falta sumar una **base de datos real** y una **pasarela de pagos** — es un cambio grande y
@@ -841,3 +856,132 @@ cambios del hero. Si se necesita trabajar sólo en publicidad, partir de
   Vercel lo buildea) + `curl` al dev server para chequear el HTML. Vercel es la verificación real.
 - **Secretos:** nunca pedirle al usuario que pegue credenciales en el chat. Van en `.env.local` /
   Vercel; el código las lee del entorno (así se hizo con OpenAI y MiCorreo).
+
+---
+
+## 8. Videos del admin (pestaña 🎬 Videos, septiembre 2026)
+
+Genera videos promocionales de los productos con **Remotion**: se eligen plantilla,
+productos y música, se ve una vista previa en vivo y se genera el MP4 para descargar.
+
+### 8.1 Cómo se usa (para smfab)
+
+1. `/admin` → pestaña **🎬 Videos**.
+2. Elegí la plantilla: **Colección** (1 a 8 paletas, vertical ~30 s), **Ficha** (1 producto,
+   vertical ~7 s) o **Presentación web** (16:9, recorrido por la web; los 1–2 productos
+   elegidos arman el mensaje de WhatsApp de ejemplo).
+3. Tildá los productos (el número indica el orden en el video) y elegí la música.
+4. Mirá la vista previa. Los precios son los del público (`precioMinorista`).
+5. **"Generar MP4"** → en unos minutos aparece **"Descargar MP4"** en "Videos de esta sesión".
+6. Opcional pero recomendado: **"Preparar foto para video"** en cada producto. Saca el fondo de
+   la foto con IA (en el navegador, gratis) y la guarda aparte; así el producto flota sobre el
+   fondo del video. Sin eso se muestra sobre una tarjeta blanca. **Después hay que tocar
+   "Publicar en sitio"** para que quede guardada.
+
+Sólo se pueden elegir productos **visibles, con foto y con precio minorista** (los mismos que ve
+el público). Los avisos en ámbar (sin foto recortada, sin descripción, descripción que parece de
+ropa) no impiden generar el video.
+
+### 8.2 Arquitectura
+
+| Pieza | Dónde |
+|---|---|
+| Plantillas (JSX, datos sólo por props) | `src/videos/Coleccion.jsx`, `Ficha.jsx`, `Web.jsx` + piezas en `comun.jsx`, `Paleta3D.jsx`, `audio.jsx` |
+| Catálogo de plantillas y músicas + validación del pedido (sin React: lo usan la API y el workflow) | `src/videos/catalogo.js` |
+| Componente y duración de cada plantilla | `src/videos/plantillas.js` |
+| Cómo se arman las props | `src/videos/props.js` |
+| Reglas de specs / nivel / enfoque / avisos (fuente única, "nada inventado") | `src/utils/videoProductos.js` |
+| Pestaña del admin | `src/components/admin/VideosPanel.jsx` |
+| Vista previa (`@remotion/player` con `next/dynamic`: no suma nada a las páginas públicas) | `src/components/admin/VistaPreviaVideo.jsx` |
+| Recorte de fondo para video | `src/utils/recorteVideo.js` |
+| API (`render`, `estado`, `descargar`, todas con PIN) | `src/app/api/videos/*` + helper `src/utils/videosGithub.js` |
+| Render del MP4 | `.github/workflows/render-video.yml` (GitHub Actions) |
+| Entrada del CLI de Remotion + config | `src/videos/remotion/index.jsx`, `remotion.config.js` |
+| Assets (música, efectos, fuente, capturas) | `public/videos/` — licencias en `public/videos/LICENCIAS.md` |
+
+**Flujo del render:** el admin arma las props con los productos elegidos → `POST
+/api/videos/render` valida (misma regla que el workflow) y dispara el workflow con
+`workflow_dispatch` (inputs: plantilla, props en JSON y un `request_id` tipo
+`coleccion-20260929-1530-k3x9`, que va en el nombre de la ejecución) → la Action renderiza con
+`--gl=swangle` (WebGL por software, para la paleta 3D) y sube el MP4 al release **`videos-admin`**
+→ el admin consulta `/api/videos/estado` cada 10 s y, cuando está listo, `/api/videos/descargar`
+le da el link.
+
+**Por qué un release y no un artifact ni un commit:**
+- **Nunca a `master`:** cada commit a master dispara `deploy.yml` y un deploy a producción.
+- El repo es **público**: los artifacts de una Action tampoco son privados (cualquier usuario de
+  GitHub logueado los baja), así que no suman privacidad. Y vienen en `.zip`.
+- Un asset de release se baja directo como `.mp4` sin pasar por Vercel (sus funciones responden
+  hasta 4,5 MB; un video pesa 5–25 MB). El workflow deja sólo los **últimos 30**.
+- Ojo: al ser público el repo, **los MP4 también lo son** (quien conozca el link o mire el
+  release). Son videos promocionales, pensados para publicarse.
+
+**Otras decisiones:**
+- `concurrency: render-video` → un render a la vez. El panel no deja pedir otro mientras hay
+  uno en curso (GitHub sólo guarda uno en espera y cancela el anterior).
+- `timeout-minutes: 30` en la Action; el panel da el render por perdido a los 40 min, o a los
+  5 min si GitHub ni lo empezó.
+- Las entradas del workflow se pasan por variables de entorno y se validan
+  (`scripts/videos/validar-pedido.mjs`) antes de usarlas: nunca se pegan en un script.
+- Remotion copia su carpeta pública entera en cada render. `public/` pesa cientos de MB, así
+  que el render usa `.remotion-public/` (sólo `videos/`, el `.glb` y el logo), que arma
+  `scripts/videos/preparar-public.mjs` con las **mismas rutas** que `public/`: así
+  `staticFile()` apunta a lo mismo en el admin y en el render.
+- **Preflight de Tailwind:** el admin carga Tailwind (`img { max-width: 100% }`, interlineado
+  1.5, `box-sizing`), que comprimía las paletas de costado. `Lienzo` (en `comun.jsx`) lo
+  neutraliza sólo dentro del video, y toda foto de producto va en una caja fija con
+  `object-fit: contain`. Medido: la proporción dibujada es igual a la original en la vista
+  previa y en el MP4.
+- La vista previa admite 5 audios a la vez: cada efecto de sonido tiene un largo acotado
+  (`LARGO_SFX` en `audio.jsx`); sin eso quedaban montados hasta el final y se rompía.
+- Criterio de audio acordado: música tranquila y pocos efectos (whoosh suave en transiciones,
+  golpe grave en logo y cierre; en la web un clic y el "enviado"). Picos medidos: 0,47–0,61.
+- La fuente Inter está en el repo (`public/videos/fuentes`): Google Fonts fallaba por red en el
+  render.
+- El repo es `"type": "module"`: `remotion.config.js` le dice a webpack que no exija la
+  extensión en los imports (Next no la pide).
+
+### 8.3 Campo nuevo del producto: `imagenVideo` (opcional)
+
+- `imagenVideo`: URL de la foto **sin fondo** (WebP con transparencia) que genera "Preparar foto
+  para video". Si no existe, el video usa la primera foto del producto sobre una tarjeta blanca.
+- `imagenVideoOrigen`: la foto de la que salió. Si después cambia la foto principal, el admin
+  avisa "Cambió la foto del producto: prepará de nuevo la del video".
+- Se guardan con "Publicar en sitio", como cualquier cambio del admin. No se usan en la web
+  pública ni en el feed de publicidad.
+- La foto se sube con `/api/upload-image` (el mismo mecanismo que las fotos de producto:
+  **commitea a `master` y dispara un deploy**, como ya pasaba al subir fotos).
+
+### 8.4 Variables y permisos del token
+
+- Usa `GITHUB_TOKEN`, `GITHUB_OWNER` y `GITHUB_REPO` (los de siempre), o `GITHUB_VIDEOS_TOKEN`
+  si está cargado.
+- El token es *fine-grained* y hoy **no puede disparar workflows** (verificado: 403). Hay que
+  darle **Repository permissions → Actions: Read and write** (GitHub → Settings → Developer
+  settings → Fine-grained tokens → el token del sitio), o crear uno nuevo con ese permiso (y
+  Contents: Read) y cargarlo en Vercel como `GITHUB_VIDEOS_TOKEN`. Sin eso, "Generar MP4"
+  muestra ese mismo mensaje.
+- El workflow usa el token propio de la Action (`permissions: contents: write`) para crear el
+  release y subir el MP4: no necesita secretos.
+
+### 8.5 Costos
+
+- **GitHub Actions es gratis para repos públicos** (runners estándar, sin límite de minutos). Un
+  render tarda unos minutos (instalar dependencias + render). Si el repo pasara a privado, el
+  plan gratis trae 2.000 min/mes.
+- **Licencia de Remotion:** gratis para empresas de hasta 3 personas. Si SARO tiene más,
+  necesita la licencia de empresa (https://www.remotion.pro). **Pendiente de confirmar** (§6).
+
+### 8.6 Cómo agregar una plantilla nueva
+
+1. Crear `src/videos/MiPlantilla.jsx`: un componente que recibe `{ productos, musica, ... }`,
+   envuelto en `<Lienzo>`, y una función `duracionMiPlantilla(props)` que devuelve los cuadros.
+   Fotos de producto siempre con `ImgProducto` / `PaletaFlotante` (caja fija + contain).
+2. Sumarla en `src/videos/catalogo.js` (`PLANTILLAS_META`: id, slug, nombre, tamaño, fps, min/max
+   de productos, si es sólo de paletas y música por defecto) y en `src/videos/plantillas.js`.
+3. Si necesita datos extra, agregarlos en `armarProps` (`src/videos/props.js`).
+4. Probar: `npm run videos:studio` (studio con el catálogo en vivo) y
+   `npm run videos:render -- MiPlantilla out/prueba.mp4 --gl=angle` (en Windows `angle`; en la
+   Action `swangle`). Revisar cuadros sueltos con `npx remotion still`.
+
+El admin, la API y el workflow la toman solos.

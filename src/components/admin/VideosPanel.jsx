@@ -17,6 +17,7 @@ const EN_CURSO = ['en_cola', 'renderizando']
 const CADA_MS = 10_000
 const SIN_ARRANCAR_MIN = 5 // si GitHub no lo tomó en este tiempo, se da por perdido
 const LIMITE_MIN = 40 // el workflow corta a los 30; esto es por si GitHub ni avisa
+const FALLOS_MAX = 6 // consultas fallidas seguidas (un minuto) antes de darlo por perdido
 
 const CATEGORIAS = { paleta: 'Paletas', padel: 'Accesorios', ropa: 'Ropa' }
 const ESTADOS = {
@@ -51,9 +52,10 @@ async function consultarEstado(h) {
     const json = await res.json().catch(() => ({}))
     if (res.status === 401) return { estado: 'error', mensaje: 'La sesión venció: salí y volvé a entrar con el PIN.' }
     if (!res.ok) {
-      // Un error pasajero se reintenta; si sigue fallando, se deja de consultar
-      if (minutos > SIN_ARRANCAR_MIN) return { estado: 'error', mensaje: json.error ?? `Error ${res.status}` }
-      return { detalle: `No se pudo consultar (${json.error ?? res.status}). Reintento en 10 s.` }
+      // Un error pasajero se reintenta; si falla un minuto seguido, se deja de consultar
+      const fallos = (h.fallos ?? 0) + 1
+      if (fallos >= FALLOS_MAX) return { estado: 'error', mensaje: json.error ?? `Error ${res.status}`, fallos }
+      return { detalle: `No se pudo consultar (${json.error ?? res.status}). Reintento en 10 s.`, fallos }
     }
     if (json.estado === 'en_cola' && !json.encontrado && minutos > SIN_ARRANCAR_MIN) {
       return { estado: 'error', mensaje: 'GitHub no arrancó el render. Probá generarlo de nuevo.' }
@@ -61,7 +63,7 @@ async function consultarEstado(h) {
     if (EN_CURSO.includes(json.estado) && minutos > LIMITE_MIN) {
       return { estado: 'error', mensaje: `Pasaron más de ${LIMITE_MIN} minutos sin terminar.`, logUrl: json.logUrl }
     }
-    return { estado: json.estado, detalle: json.detalle, mensaje: json.mensaje, logUrl: json.logUrl, bytes: json.bytes }
+    return { estado: json.estado, detalle: json.detalle, mensaje: json.mensaje, logUrl: json.logUrl, bytes: json.bytes, fallos: 0 }
   } catch {
     return { detalle: 'Sin conexión. Reintento en 10 s.' }
   }
@@ -120,13 +122,17 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
   useEffect(() => {
     if (!hayEnCurso) return
     let vivo = true
+    let ocupado = false // si una consulta tarda más de 10 s, no se le encima la siguiente
     const consultar = async () => {
+      if (ocupado) return
+      ocupado = true
       const pendientes = historialRef.current.filter(x => EN_CURSO.includes(x.estado))
       for (const h of pendientes) {
         const cambios = await consultarEstado(h)
-        if (!vivo) return
+        if (!vivo) break
         guardarHistorial(lista => lista.map(x => (x.requestId === h.requestId ? { ...x, ...cambios } : x)))
       }
+      ocupado = false
     }
     consultar()
     const t = setInterval(consultar, CADA_MS)
