@@ -755,6 +755,9 @@ menor: en los planos abiertos la paleta queda flotando sola en el aire.
 ## 6. Estado actual y pendientes
 
 ### ✅ Terminado y en producción (deployado)
+- **Pestaña 🎬 Videos del admin** (29/09/2026): plantillas Colección, Ficha y Presentación web
+  con Remotion, vista previa en vivo, recorte de fotos para video y MP4 renderizado en GitHub
+  Actions. Ver §8.
 - **Landing** en `/` (hero 3D con fondo de cancha, catálogos, cómo comprar, números, diseños
   personalizados, historia/trabajá, FAQ) + **catálogos separados** `/paletas` y
   `/ropa-y-accesorios`, con sitemap y canonicals propios.
@@ -810,10 +813,12 @@ menor: en los planos abiertos la paleta queda flotando sola en el aire.
   `preview-vendedores.html`. ⚠️ Requeriría **base de datos real + autenticación** (hoy no hay
   ninguna de las dos) y define un **conflicto de canal** (fábrica vs. revendedores) a resolver.
 
-- **Videos (§8):** falta darle al token de GitHub el permiso **Actions: Read and write** (o
-  cargar `GITHUB_VIDEOS_TOKEN`), probar un render real en la Action y **confirmar la licencia de
-  Remotion**: es gratis para empresas de hasta 3 personas; si SARO tiene más, necesita la
-  licencia de empresa (https://www.remotion.pro). **Pendiente de confirmar.**
+- **Videos (§8):** en producción desde el 29/09/2026 y probado con dos renders reales en la
+  Action. Falta que smfab le dé al token de GitHub el permiso **Actions: Read and write** (o
+  cargue `GITHUB_VIDEOS_TOKEN` en Vercel): hasta entonces "Generar MP4" muestra el aviso de
+  permisos. Y **confirmar la licencia de Remotion**: es gratis para empresas de hasta 3
+  personas; si SARO tiene más, necesita la licencia de empresa (https://www.remotion.pro).
+  **Pendiente de confirmar.**
 
 ### 🔮 Ideas a futuro (no pedidas aún)
 Si algún día se quiere vender con pago online, gestionar stock de verdad o mandar mails, ahí sí
@@ -1001,7 +1006,7 @@ le da el link.
 ### 8.5 Costos
 
 - **GitHub Actions es gratis para repos públicos** (runners estándar, sin límite de minutos). Un
-  render tarda unos minutos (instalar dependencias + render). Si el repo pasara a privado, el
+  render tarda: Colección de 5 paletas ~9 min (8 de render), Ficha ~2 min (medido el 29/09/2026). Si el repo pasara a privado, el
   plan gratis trae 2.000 min/mes.
 - **Licencia de Remotion:** gratis para empresas de hasta 3 personas. Si SARO tiene más,
   necesita la licencia de empresa (https://www.remotion.pro). **Pendiente de confirmar** (§6).
