@@ -1,0 +1,80 @@
+name: Render de video (admin)
+
+# Lo dispara la pestaña "🎬 Videos" del admin (POST /api/videos/render).
+# El MP4 queda en el release "videos-admin", NUNCA en master: un commit a master
+# dispara deploy.yml y un deploy a producción por cada video. Ver CLAUDE.md §8.
+run-name: "Video ${{ inputs.plantilla }} · ${{ inputs.request_id }}"
+
+on:
+  workflow_dispatch:
+    inputs:
+      plantilla:
+        description: Id de la plantilla (SaroColeccion, SaroFicha, SaroWeb)
+        required: true
+        type: string
+      props:
+        description: Props del video en JSON (las arma el admin)
+        required: true
+        type: string
+      request_id:
+        description: Identificador del pedido (también es el nombre del MP4)
+        required: true
+        type: string
+
+# Un render a la vez: si llega otro, espera su turno
+concurrency:
+  group: render-video
+  cancel-in-progress: false
+
+permissions:
+  contents: write # crear el release y subirle el MP4
+
+env:
+  RELEASE_TAG: videos-admin
+  GUARDAR_ULTIMOS: 30
+
+jobs:
+  render:
+    runs-on: ubuntu-latest
+    timeout-minutes: 30
+    env:
+      PLANTILLA: ${{ inputs.plantilla }}
+      PROPS: ${{ inputs.props }}
+      REQUEST_ID: ${{ inputs.request_id }}
+      GH_TOKEN: ${{ github.token }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Validar pedido
+        run: node scripts/videos/validar-pedido.mjs
+
+      - name: Instalar dependencias
+        run: npm ci --no-audit --no-fund
+
+      - name: Preparar Chrome
+        run: npx remotion browser ensure
+
+      # --gl=swangle: WebGL por software (el runner no tiene GPU) para la paleta 3D
+      - name: Renderizar video
+        run: npm run videos:render -- "$PLANTILLA" "out/$REQUEST_ID.mp4" --props=props.json --gl=swangle
+
+      - name: Revisar audio
+        run: |
+          ffmpeg -hide_banner -i "out/$REQUEST_ID.mp4" -af volumedetect -f null - 2>&1 | grep -E "mean_volume|max_volume" | tee volumen.txt
+          ls -lh "out/$REQUEST_ID.mp4"
+
+      - name: Subir MP4
+        run: |
+          gh release view "$RELEASE_TAG" > /dev/null 2>&1 || gh release create "$RELEASE_TAG" --prerelease \
+            --title "Videos del admin" \
+            --notes "MP4 generados desde la pestaña 🎬 Videos del admin. Se guardan los últimos $GUARDAR_ULTIMOS."
+          gh release upload "$RELEASE_TAG" "out/$REQUEST_ID.mp4" --clobber
+          # Poda: quedan sólo los más nuevos
+          gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" \
+            --jq ".assets | sort_by(.created_at) | reverse | .[$GUARDAR_ULTIMOS:] | .[].id" |
+            while read -r id; do gh api -X DELETE "repos/$GITHUB_REPOSITORY/releases/assets/$id"; done

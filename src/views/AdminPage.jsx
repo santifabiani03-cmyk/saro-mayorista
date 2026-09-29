@@ -1,11 +1,12 @@
 'use client'
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useRef } from 'react'
 import ProductForm from '../components/admin/ProductForm'
 import ProductList from '../components/admin/ProductList'
 import DemandDashboard from '../components/admin/DemandDashboard'
 import LabelCompiler from '../components/admin/LabelCompiler'
 import SettingsPanel from '../components/admin/SettingsPanel'
 import PublicidadPanel from '../components/admin/PublicidadPanel'
+import VideosPanel from '../components/admin/VideosPanel'
 import { exportCatalogPdf, uploadCatalogPdf } from '../utils/exportCatalogPdf'
 
 
@@ -107,6 +108,8 @@ export default function AdminPage() {
   const [tab, setTab]                   = useState('editar')
   const [listo, setListo]               = useState(false)
   const [products, setProducts]         = useState([])
+  const productsRef                     = useRef(products)
+  productsRef.current = products
   const [publishedSnap, setPublishedSnap] = useState(null) // snapshot de lo que está publicado
   const [baseProducts, setBaseProducts]   = useState(null) // base para three-way merge (lo que cargamos del server)
   const [editingProduct, setEditing]    = useState(null)
@@ -241,6 +244,13 @@ export default function AdminPage() {
       return publicitar === false ? resto : { ...resto, publicitar: false }
     })
     await persistProducts(newList)
+  }
+
+  // Cambios puntuales de un producto desde otras pestañas (ej. la foto para
+  // video). Usa la lista más reciente: el recorte tarda y mientras tanto pudiste
+  // editar otra cosa.
+  const handleUpdateFields = async (id, cambios) => {
+    await persistProducts(productsRef.current.map(p => p.id === id ? { ...p, ...cambios } : p))
   }
 
   const handleToggleSinStock = async (id) => {
@@ -450,6 +460,7 @@ export default function AdminPage() {
             { key: 'etiquetas', label: '🏷️ Etiquetas' },
             { key: 'demanda', label: '📊 Demanda' },
             { key: 'publicidad', label: '📣 Publicidad' },
+            { key: 'videos', label: '🎬 Videos' },
             { key: 'ajustes', label: '⚙️ Ajustes' },
           ].map(t => (
             <button
@@ -497,6 +508,12 @@ export default function AdminPage() {
             onEdit={handleEdit}
             saving={saving}
             isSynced={isSynced}
+          />
+        ) : tab === 'videos' ? (
+          <VideosPanel
+            products={products}
+            onUpdateProduct={handleUpdateFields}
+            onToast={showToast}
           />
         ) : tab === 'ajustes' ? (
           <SettingsPanel onToast={showToast} />
