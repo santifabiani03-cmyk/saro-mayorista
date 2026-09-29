@@ -8,11 +8,18 @@
     "build": "next build",
     "start": "next start",
     "lint": "next lint",
-    "check:orden": "npx --yes eslint@10 --config scripts/eslint-orden.mjs src"
+    "check:orden": "npx --yes eslint@10 --config scripts/eslint-orden.mjs src",
+    "videos:studio": "node scripts/videos/preparar-public.mjs && remotion studio",
+    "videos:render": "node scripts/videos/preparar-public.mjs && remotion render"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",
     "@imgly/background-removal": "^1.7.0",
+    "@react-three/fiber": "^9.8.1",
+    "@remotion/fonts": "4.0.529",
+    "@remotion/player": "4.0.529",
+    "@remotion/three": "4.0.529",
+    "@remotion/transitions": "4.0.529",
     "@vercel/analytics": "^2.0.1",
     "@vercel/speed-insights": "^2.0.0",
     "gsap": "^3.15.0",
@@ -22,10 +29,12 @@
     "pdfjs-dist": "^5.7.284",
     "react": "^19.2.6",
     "react-dom": "^19.2.6",
+    "remotion": "4.0.529",
     "sharp": "^0.34.5",
     "three": "^0.185.1"
   },
   "devDependencies": {
+    "@remotion/cli": "4.0.529",
     "autoprefixer": "^10.5.0",
     "postcss": "^8.5.6",
     "tailwindcss": "^3.4.19"
