@@ -21,8 +21,8 @@ export default function LabScrollPage() {
           en ScrollLab). La imagen de portada no necesita precarga: ya está en
           el HTML con prioridad alta. */}
       <link rel="preload" href="/models/paleta-lab.glb" as="fetch" crossOrigin="anonymous" />
-      <link rel="preload" href="/models/arbol.glb" as="fetch" crossOrigin="anonymous" media="(orientation: landscape)" />
-      <link rel="preload" href="/models/farola.glb" as="fetch" crossOrigin="anonymous" media="(orientation: landscape)" />
+      <link rel="preload" href="/models/arbol-lod.glb" as="fetch" crossOrigin="anonymous" media="(orientation: landscape)" />
+      <link rel="preload" href="/models/farola-lod.glb" as="fetch" crossOrigin="anonymous" media="(orientation: landscape)" />
       <ScrollLab whatsappNumber={config.whatsappNumber} />
     </>
   )

@@ -188,6 +188,34 @@ const SHOTS = {
   guion:  { zAmp: 0.9,  xBias:  0.0,  yAmp: -0.32, thrust: 1.4 },
 }
 
+/**
+ * Pose del swing para un tipo de golpe, de qué lado entra la pelota (`lado`) y
+ * en qué punto del swing (`prog`, 0 a 1). La usan la paleta (para moverse) y la
+ * pelota del lanzador (para saber hacia dónde sale): si cada una lo calculara
+ * por su cuenta, se volverían a separar.
+ *   carga 0–0.35 · golpe 0.35–0.60 (impacto en P_GOLPE) · vuelta 0.60–1
+ * El revés da media vuelta DURANTE LA CARGA, golpea con la otra cara quieta y
+ * completa la vuelta después. Antes giraba 360° seguido y el impacto caía a
+ * mitad del giro: la paleta estaba a 217° y rotando a más de 500° por segundo,
+ * como una hélice.
+ */
+function poseSwing(tiro, lado, prog) {
+  const w   = suave(seg(prog, 0, 0.35))     // carga
+  const sw  = suave(seg(prog, 0.35, 0.60))  // golpe
+  const rec = suave(seg(prog, 0.60, 1))     // vuelta
+  const pico = sw * (1 - rec)
+  let ry = tiro.yAmp * lado * suave(seg(prog, 0, 0.3)) * (1 - suave(seg(prog, 0.62, 1)))
+  if (tiro.flip) ry += Math.PI * lado * (suave(seg(prog, 0.05, 0.32)) + suave(seg(prog, 0.68, 0.98)))
+  return {
+    rz: (0.42 * w - 1.10 * sw + 0.70 * rec) * lado * tiro.zAmp,
+    rx: -0.30 * w * (1 - sw) + tiro.xBias * (0.35 * w + pico),
+    ry,
+    empuje: empujeDe(prog, tiro.thrust || 0),
+  }
+}
+// El codo (pivote del swing) queda debajo del mango; la cara, a este largo.
+const BRAZO = ALTO_PALETA / 2 + CODO
+
 // Dónde está la CARA en ese instante: adelantada por el empuje del tiro del
 // guion. La pelota tiene que salir de ahí, no del contacto en reposo.
 const CONTACTO_GUION = {
@@ -399,6 +427,30 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       // alternar entre dos ya armadas no cuesta nada.
       // El lienzo queda siempre a resolución completa: la cadena de movimiento
       // dibuja en capas más chicas y su último pase las estira al lienzo.
+      // Filtro de nitidez adaptativo (ver `nitidez` en hacerCompositor).
+      // `texel` es el tamaño de un píxel de la imagen chica, la que se estira.
+      const SHADER_NITIDEZ = {
+        uniforms: { tDiffuse: { value: null }, texel: { value: new THREE.Vector2(1, 1) }, fuerza: { value: 0.8 } },
+        vertexShader: 'varying vec2 vUv; void main(){ vUv = uv; gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0); }',
+        fragmentShader: `
+          uniform sampler2D tDiffuse; uniform vec2 texel; uniform float fuerza;
+          varying vec2 vUv;
+          void main() {
+            vec3 c = texture2D(tDiffuse, vUv).rgb;
+            vec3 n = texture2D(tDiffuse, vUv + vec2(0.0, texel.y)).rgb;
+            vec3 s = texture2D(tDiffuse, vUv - vec2(0.0, texel.y)).rgb;
+            vec3 e = texture2D(tDiffuse, vUv + vec2(texel.x, 0.0)).rgb;
+            vec3 o = texture2D(tDiffuse, vUv - vec2(texel.x, 0.0)).rgb;
+            vec3 mn = min(c, min(min(n, s), min(e, o)));
+            vec3 mx = max(c, max(max(n, s), max(e, o)));
+            // cuánto se puede realzar sin pasarse de negro o de blanco
+            vec3 amp = sqrt(clamp(min(mn, 1.0 - mx) / max(mx, vec3(1e-4)), 0.0, 1.0));
+            vec3 w = amp * (-1.0 / mix(8.0, 5.0, fuerza));
+            vec3 col = (c + (n + s + e + o) * w) / (1.0 + 4.0 * w);
+            gl_FragColor = vec4(clamp(col, 0.0, 1.0), 1.0);
+          }`,
+      }
+      const resolucionBase = dpr        // la de la pantalla (ya limitada a 2)
       const hacerCompositor = (pr) => {
         const c = new EffectComposer(renderer)
         c.addPass(new RenderPass(scene, camera))
@@ -429,13 +481,28 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         c.addPass(color)
         if (modoAA === 'smaa') c.addPass(new SMAAPass())
         if (modoAA === 'fxaa') c.addPass(new FXAAPass())
-        const k = { c, gtao: ao, bloom: brillo, grading: color, pr }
+        // Nitidez al estirar: cuando esta cadena dibuja a menos resolución que
+        // la pantalla (en movimiento, en equipos flojos), el último pase estira
+        // la imagen y queda borrosa — era el "bajón de calidad" en medio del
+        // scroll. Un filtro de nitidez adaptativo (la idea del CAS de AMD):
+        // realza los bordes según el contraste local, sin exagerar los que ya
+        // son fuertes. Una pasada más, muy barata. A resolución completa no
+        // hace falta y se apaga.
+        const nitidez = new ShaderPass(SHADER_NITIDEZ)
+        nitidez.setSize = (ancho, alto) => nitidez.uniforms.texel.value.set(1 / ancho, 1 / alto)
+        c.addPass(nitidez)
+        const k = { c, gtao: ao, bloom: brillo, grading: color, nitidez, pr }
         k.medir = () => {
           c.setSize(W(), H())
           ao.setSize(W(), H())
           brillo.setSize(W() / 2, H() / 2)   // media resolución
         }
-        k.resolucion = (nueva) => { k.pr = nueva; c.setPixelRatio(nueva); k.medir() }
+        k.resolucion = (nueva) => {
+          k.pr = nueva
+          nitidez.enabled = nueva < resolucionBase - 0.001
+          c.setPixelRatio(nueva)
+          k.medir()
+        }
         k.resolucion(pr)
         return k
       }
@@ -876,7 +943,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       }
 
       // Farolas: dan altura y marcan el perímetro
-      siSeVe(() => ponerModelo('/models/farola.glb', (base) => {
+      siSeVe(() => ponerModelo('/models/farola-lod.glb', (base) => {
         [0.06, 0.42, 0.78].forEach((f, i) => {
           const [x, z] = enArco(f, 106)
           const l = base.clone()
@@ -1343,7 +1410,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       // más oscuro. Sutiles: la textura ya trae el color.
       const TONOS_ARBOL = ['#ffffff', '#eef7dc', '#e2efd6', '#f6f3dc', '#dbe8d2']
       const bosque = { malla: null, datos: arboles }
-      siSeVe(() => loader.load('/models/arbol.glb', gltf => {
+      siSeVe(() => loader.load('/models/arbol-lod.glb', gltf => {
         if (disposed) return
         let malla = null
         gltf.scene.updateMatrixWorld(true)
@@ -2243,7 +2310,28 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       let proximoReves = 4 + Math.floor(Math.random() * 3)
       const puntero = new THREE.Vector2(0, 0)
 
-      const lanzar = () => {
+      // La cara de la paleta en el instante del impacto, con la misma pose que
+      // usa el swing (poseSwing): hacia dónde apunta la cara que mira a la
+      // pelota y hacia dónde se está moviendo.
+      const _euler = new THREE.Euler(), _quat = new THREE.Quaternion()
+      const centroCara = (tiro, lado, prog, normal) => {
+        const p = poseSwing(tiro, lado, prog)
+        _quat.setFromEuler(_euler.set(p.rx, p.ry, p.rz))
+        if (normal) normal.set(0, 0, 1).applyQuaternion(_quat)
+        return new THREE.Vector3(0, BRAZO, 0).applyQuaternion(_quat)
+          .add(new THREE.Vector3(Math.sin(p.rz) * BRAZO, -Math.cos(p.rz) * BRAZO, p.empuje))
+      }
+      const caraEnImpacto = (tiro, lado) => {
+        const normal = new THREE.Vector3()
+        centroCara(tiro, lado, P_GOLPE, normal)
+        if (normal.z < 0) normal.negate()           // la paleta tiene dos caras
+        const avance = centroCara(tiro, lado, P_GOLPE + 0.01)
+          .sub(centroCara(tiro, lado, P_GOLPE - 0.01)).normalize()
+        return { normal, avance }
+      }
+
+      // `forzado`: el tipo de golpe, sólo para __lab.probarGolpe
+      const lanzar = (forzado = null) => {
         if (!juego.activo || progRef.current.t > JUEGO_HASTA) return
         const ahora = performance.now() / 1000
         if (ahora - juego.ultimo < ESPERA) return      // no se acumulan clics
@@ -2262,33 +2350,49 @@ export default function ScrollLab({ whatsappNumber = '' }) {
         b.viva = true
         b.t = 0
         // b.dur lo fija el tipo de golpe, unas líneas más abajo
-        // sale hacia una dirección cualquiera, siempre alejándose de la paleta
-        const ang = Math.random() * Math.PI * 2
-        const vel = 13 + (1 - ritmo) * 7
-        b.v.set(Math.cos(ang) * 0.72, Math.sin(ang) * 0.72, 0.62).normalize().multiplyScalar(vel)
+        const lado = b.o.x <= CONTACTO.x ? 1 : -1    // de qué lado entra la pelota
 
-        // El tipo de golpe sale de hacia dónde se va la pelota, con un revés cada
-        // 4 a 6: el mismo criterio del hero público. Sube -> globo, baja ->
-        // remate, clics rápidos -> volea.
+        // Primero el TIPO de golpe, según cómo viene la pelota (como jugaría
+        // cualquiera): alta -> remate, baja -> globo, clics seguidos -> volea,
+        // si no drive; y un revés cada 4 a 6. Antes era al revés: se sorteaba
+        // hacia dónde salía la pelota y de ahí se deducía el golpe, así que la
+        // mitad de los drives la mandaban por detrás de la cara (atravesando la
+        // paleta) y en todos los golpes la mitad salía para el lado contrario
+        // al que miraba la cara.
         golpesDesdeReves++
-        const saleArriba = Math.sin(ang) > 0.45
-        const saleAbajo = Math.sin(ang) < -0.4
+        const alto = b.o.y - CONTACTO.y
         let dur = 0.34 + ritmo * 0.66
-        if (golpesDesdeReves >= proximoReves) {
+        if (forzado && SHOTS[forzado]) {
+          clic.tiro = SHOTS[forzado]
+          if (forzado === 'reves') dur = Math.max(dur, 1.15)
+        } else if (golpesDesdeReves >= proximoReves) {
           clic.tiro = SHOTS.reves
           golpesDesdeReves = 0
           proximoReves = 4 + Math.floor(Math.random() * 3)
           dur = Math.max(dur, 1.15)         // el revés va más lento, para verlo
         } else {
-          clic.tiro = saleAbajo ? SHOTS.remate
-            : saleArriba ? SHOTS.globo
-            : (ritmo < 0.3 ? SHOTS.volea
-              : [SHOTS.drive, SHOTS.volea, SHOTS.globo][Math.floor(Math.random() * 3)])
+          clic.tiro = alto > 1.6 ? SHOTS.remate
+            : alto < -1.6 ? SHOTS.globo
+            : ritmo < 0.3 ? SHOTS.volea
+            : SHOTS.drive
         }
+        // Después, hacia dónde sale: de la cara de la paleta en el impacto. Mezcla
+        // hacia dónde apunta (el rebote) con hacia dónde se mueve (el golpe), con
+        // una variación chica para que no salga siempre igual. Nunca por detrás
+        // de la cara.
+        const { normal, avance } = caraEnImpacto(clic.tiro, lado)
+        const vel = 13 + (1 - ritmo) * 7
+        b.v.copy(normal).multiplyScalar(0.6).addScaledVector(avance, 0.4)
+        b.v.x += (Math.random() - 0.5) * 0.18
+        b.v.y += (Math.random() - 0.5) * 0.18
+        b.v.normalize()
+        if (b.v.dot(normal) < 0.25) b.v.copy(normal)
+        b.v.multiplyScalar(vel)
+
         clic.activo = true
         clic.t = 0
         clic.dur = dur
-        clic.lado = b.o.x <= CONTACTO.x ? 1 : -1     // de qué lado entra la pelota
+        clic.lado = lado
         // La pelota tiene que llegar EN el golpe (P_GOLPE del swing), no al
         // final: si viaja el swing entero, la paleta ya volvió al reposo.
         b.dur = dur * P_GOLPE
@@ -2429,11 +2533,12 @@ export default function ScrollLab({ whatsappNumber = '' }) {
             progRef.current.t = 0
             puntero.set(-0.35, 0.1)
             juego.ultimo = -99
-            lanzar()
+            lanzar(tipo)
             if (!clic.activo) return 'no salio ninguna pelota'
-            clic.tiro = SHOTS[tipo] || SHOTS.drive
             const b = banco.find(x => x.viva)
-            b.zGolpe = CONTACTO.z + empujeDe(P_GOLPE, clic.tiro.thrust || 0)
+            // la salida tiene que ir por delante de la cara (nunca atravesarla)
+            const sale = b.v.clone().normalize()
+            const alFrente = +sale.dot(caraEnImpacto(clic.tiro, clic.lado).normal).toFixed(2)
             let sep = Infinity, cuando = 0
             const PASO = 1 / 240
             for (let i = 0; i < 480 && b.viva; i++) {
@@ -2445,7 +2550,8 @@ export default function ScrollLab({ whatsappNumber = '' }) {
               if (Math.abs(d) < Math.abs(sep)) { sep = d; cuando = clic.t }
             }
             b.viva = false; b.malla.visible = false; clic.activo = false
-            return { tipo, separacion: +sep.toFixed(3), radioPelota: 0.45,
+            return { tipo, separacion: +sep.toFixed(3), radioPelota: 0.45, alFrente,
+                     salida: sale.toArray().map(v => +v.toFixed(2)),
                      enProg: +cuando.toFixed(3),
                      veredicto: Math.abs(sep - 0.45) < 0.08 ? 'toca la cara'
                        : sep < 0 ? 'LA ATRAVIESA' : 'pasa de largo' }
@@ -2800,21 +2906,12 @@ export default function ScrollLab({ whatsappNumber = '' }) {
           tiro = clic.tiro
         }
 
-        const w   = suave(seg(prog, 0, 0.35))     // carga
-        const sw  = suave(seg(prog, 0.35, 0.60))  // golpe
-        const rec = suave(seg(prog, 0.60, 1))     // vuelta
-        const pico = sw * (1 - rec)
-
-        codo.rotation.z = (0.42 * w - 1.10 * sw + 0.70 * rec) * lado * tiro.zAmp
-        codo.rotation.x = -0.30 * w * (1 - sw) + tiro.xBias * (0.35 * w + pico)
-        codo.rotation.y = tiro.yAmp * lado * suave(seg(prog, 0, 0.3)) * (1 - suave(seg(prog, 0.62, 1)))
-        const empuje = empujeDe(prog, tiro.thrust || 0)
-        // el revés muestra la otra cara y vuelve
-        if (tiro.flip) codo.rotation.y += Math.PI * 2 * lado * suave(seg(prog, 0.1, 0.9))
+        const pose = poseSwing(tiro, lado, prog)
+        codo.rotation.set(pose.rx, pose.ry, pose.rz)
+        const empuje = pose.empuje
 
         // El codo corrige su posición según el ángulo para que la CARA quede en
         // el punto de impacto: si no, el arco la aleja justo cuando llega la pelota.
-        const BRAZO = ALTO_PALETA / 2 + CODO
         codo.position.set(
           IMPACTO.x + Math.sin(codo.rotation.z) * BRAZO,
           IMPACTO.y - Math.cos(codo.rotation.z) * BRAZO,
@@ -3079,6 +3176,7 @@ export default function ScrollLab({ whatsappNumber = '' }) {
       frame()
       if (inspeccion) {
         window.__lab.renderer = renderer
+        window.__lab.nitidez = compMov.nitidez   // para comparar con y sin el filtro
         window.__lab.led = texLona    // para las portadas: led.offset.x = 0 antes de ver(0)
         // Para comparar costos a mano: fijar(escalón, resolución) congela el
         // ajuste automático; soltar() lo devuelve.

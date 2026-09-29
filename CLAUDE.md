@@ -552,6 +552,26 @@ WhatsApp" + botones. Los tiempos están arriba de todo en `ScrollLab.jsx`
 - **Escala real.** 1 unidad ≈ 15,5 cm. La cancha mide 129 × 65 (20 × 10 m) y la
   red 5,67 (88 cm). Cuando la red medía 1,5 el pique no se leía como pádel.
 
+**Los golpes del lanzador (el juego de clics del arranque).** Cinco tipos
+(drive, volea, globo, remate y revés cada 4 a 6). Reglas físicas que se
+auditaron con la misma matemática del código (septiembre 2026):
+
+- **Primero el tipo de golpe, después la salida.** El golpe sale de cómo viene
+  la pelota: alta → remate, baja → globo, clics seguidos → volea, si no drive.
+  La dirección de salida se calcula desde la **cara de la paleta en el impacto**
+  (`caraEnImpacto`): 60% hacia dónde apunta la cara, 40% hacia dónde se mueve,
+  más una variación chica, y nunca por detrás de la cara. Antes se sorteaba la
+  salida y de ahí se deducía el golpe: la mitad de los drives mandaban la
+  pelota **a través de la paleta** y, en todos los golpes, la mitad salía para
+  el lado contrario al que miraba la cara.
+- **El revés no gira durante el impacto.** Da media vuelta en la carga, golpea
+  con la otra cara quieta y completa la vuelta después. Antes giraba 360°
+  seguido y el impacto caía a mitad del giro (217°, a más de 500° por segundo).
+- La pose del swing sale de **una sola función**, `poseSwing` (arriba del
+  archivo), que usan la paleta y la pelota. `__lab.probarGolpe('reves')`
+  devuelve si toca la cara, cuándo, y `alFrente` (debe ser > 0: la pelota sale
+  por delante de la cara).
+
 **Trampas que ya costaron caro** (no repetirlas):
 
 | Síntoma | Causa |
@@ -568,6 +588,7 @@ WhatsApp" + botones. Los tiempos están arriba de todo en `ScrollLab.jsx`
 | El texto ya está al costado pero la paleta sigue al centro | El corte del encuadre tiene que ser el **mismo** que el del CSS (`matchMedia('(min-width: 1024px)')`), no el ancho del lienzo |
 | Un tirón de ~150 ms al empezar a scrollear | Se cambiaba la resolución del compositor en ese cuadro: rearma todas sus capas (y las de la oclusión y el brillo, aunque estén apagados). Se resolvió con dos cadenas ya armadas; nunca cambiar la resolución en medio de la animación |
 | Medís cuadros por segundo "scrolleando" y la escena ni se movió | La página tiene scroll suave: `scrollTo(0, y)` en cada cuadro se cancela solo y no scrollea. Para medir: `scrollTo({ top: y, behavior: 'instant' })` y controlar `scrollY` al final |
+| El servidor de desarrollo da 404 o se queda "Compiling /lab-scroll" para siempre | Se le borró `.next` (o su caché) con el servidor andando. Detenerlo, borrar `.next` entero y arrancarlo de nuevo (la primera compilación de la maqueta tarda ~1 minuto) |
 | Un bucle de un millón de píxeles tarda 0,8 s (suelto tarda 0,08 s) | La función que arma la escena tiene 2.600 líneas y el navegador **no optimiza funciones tan grandes**: todo lo que corre adentro va lento. Los cálculos pesados van en funciones sueltas arriba del archivo (como `pintarCesped`) |
 
 **Assets 3D y Meshy.** Patrón confirmado con seis modelos: Meshy **rinde en
@@ -681,6 +702,19 @@ la página un instante. Cómo quedó:
   los árboles. Las notebooks con Windows escaladas al 150% dibujan 2,25
   veces más píxeles: con calidad completa andaban a ~19 cuadros por segundo,
   y ahora se estabilizan en 36-48.
+- **Nitidez al estirar (filtro tipo CAS):** en movimiento, en equipos flojos,
+  la cadena dibuja a menos resolución y el último pase estira la imagen: eso
+  era el "bajón de calidad en el medio del scroll". Un pase de nitidez
+  adaptativo (`SHADER_NITIDEZ`, la idea del CAS de AMD) realza los bordes según
+  el contraste local. Costo medido: nulo (54 cuadros por segundo con y sin).
+  Se prende sólo cuando la resolución es menor que la de la pantalla.
+  `__lab.nitidez.enabled` para comparar.
+- **Árboles y faroles livianos:** `arbol-lod.glb` (2.964 triángulos en vez de
+  9.152; `gltfpack -si 0.35 -sa`, el modo agresivo, porque la textura de Meshy
+  en retazos no dejaba simplificar de otra forma) y `farola-lod.glb` (4.636 en
+  vez de 30.610; `-si 0.15`). A la distancia en que se ven son iguales. El plano
+  general quedó con ~200 mil triángulos menos (de ~41 a ~50 cuadros por segundo
+  scrolleando en la placa Intel). Los originales siguen en `public/models/`.
 - **Textura del piso por píxeles** (`ImageData`) en vez de 90 mil trazos de
   canvas, calculada en `pintarCesped`, una función **suelta arriba de todo del
   archivo** (ver la trampa de la tabla: adentro del armado tardaba 0,8 s).
