@@ -63,12 +63,11 @@ jobs:
       - name: Renderizar video
         run: npm run videos:render -- "$PLANTILLA" "out/$REQUEST_ID.mp4" --props=props.json --gl=swangle
 
-      # Sólo informa el volumen (pico < -0,45 dB = sin saturar). Si el runner no
-      # trae ffmpeg, no frena el video.
+      # Sólo informa el pico de audio (< 0,95 = sin saturar); si falla, no frena el video
       - name: Revisar audio
         continue-on-error: true
         run: |
-          ffmpeg -hide_banner -i "out/$REQUEST_ID.mp4" -af volumedetect -f null - 2>&1 | grep -E "mean_volume|max_volume" | tee volumen.txt
+          node scripts/videos/revisar-audio.mjs "out/$REQUEST_ID.mp4"
           ls -lh "out/$REQUEST_ID.mp4"
 
       - name: Subir MP4

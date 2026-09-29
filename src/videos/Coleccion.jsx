@@ -206,7 +206,8 @@ const Linea = ({ productos }) => {
                 style={{ width: ancho, textAlign: 'center', opacity: e, transform: `translateY(${(1 - e) * 80}px)` }}
               >
                 <div style={{ height: altoImg + 20, display: 'flex', alignItems: 'flex-end', justifyContent: 'center' }}>
-                  <ImgProducto producto={p} ancho={ancho} alto={altoImg} />
+                  {/* Sin recortar, la tarjeta toma la proporción 3:4 de las fotos de paletas */}
+                  <ImgProducto producto={p} ancho={ancho} alto={p.recortada ? altoImg : Math.round((ancho * 4) / 3)} />
                 </div>
                 <div style={{ fontSize: 26, fontWeight: 700, marginTop: 18, lineHeight: 1.15 }}>{sinSaro(p.nombre)}</div>
                 <div style={{ fontSize: 30, fontWeight: 900, color: p.acento, marginTop: 6 }}>{pesos(p.precio)}</div>
