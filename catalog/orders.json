@@ -1262,5 +1262,29 @@
     ],
     "total": 150000,
     "totalItems": 1
+  },
+  {
+    "id": "o1790797886104",
+    "fecha": "2026-09-30T19:51:26.104Z",
+    "items": [
+      {
+        "productId": "p1786625892440",
+        "nombre": "CARAMELERA NOAC LISA",
+        "precio": 58000,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1782389218836",
+        "nombre": "TUBO PELOTAS x2 NOVA ",
+        "precio": 5800,
+        "color": "Amarillo Fluo",
+        "talle": "Única",
+        "cantidad": 12
+      }
+    ],
+    "total": 127600,
+    "totalItems": 13
   }
 ]
