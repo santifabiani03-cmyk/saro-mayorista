@@ -124,6 +124,15 @@ FAQ). Desde ahí se entra a **dos catálogos separados**: `/paletas` (solo palet
 = ficha (su botón "volver" apunta al catálogo según la categoría). ⚠️ `/catalogo` **ya existía**
 antes y redirige a un catálogo externo (`catalogo.saro.com.ar`) — NO es la grilla interna, no
 tocar. El sitemap lista `/`, `/paletas`, `/ropa-y-accesorios` y los productos.
+- **`catalogo.saro.com.ar` = el PDF del catálogo.** Es **GitHub Pages** sirviendo la carpeta
+  `docs/` de `master` (`docs/CNAME`): `docs/index.html` redirige a `docs/catalogo.pdf`. Ahí
+  apuntan `/catalogo` y el **QR del admin**. El PDF lo arma el admin en el navegador después de
+  cada "Publicar en sitio" y lo sube con `/api/upload-catalog`, **sólo si cambió algo de lo que
+  muestra** (nombre, categoría, género, colores, foto o qué productos están visibles; precio y
+  stock no aparecen). Para saberlo, la "huella" de lo publicado va en el mensaje del commit
+  (`[huella:…]`). ⚠️ Vercel corta los pedidos de más de **4,5 MB** y el PDF viaja en base64 (un
+  33 % más pesado): por eso fotos a 600 px, logos comprimidos, y si igual no entra se rearma solo
+  con fotos más chicas. Entre mayo y el 30/09/2026 no se actualizó por pasarse de ese límite.
 - **Escritura (admin):** cuando en el panel `/admin` editás productos y tocás **"Publicar en
   sitio"**, la web llama a `/api/publish`, que **guarda el `products.json` en la rama `datos`**
   usando un token de acceso (`GITHUB_TOKEN`). **No hay deploy:** la web lo toma en segundos.
@@ -212,7 +221,7 @@ Todas están en `src/app/api/<nombre>/route.js`:
 | `/api/orders` | GET | Devuelve los pedidos (para la demanda del admin) | Sí (en query) |
 | `/api/verify-pin` | POST | Valida el PIN del admin (con anti–fuerza bruta) | — |
 | `/api/upload-image` | POST | Sube una foto de producto a `fotos/` de la rama `datos` | Sí |
-| `/api/upload-catalog`| POST | Sube el PDF del catálogo a `docs/catalogo.pdf` de `master` (no dispara deploy: `paths-ignore` en `deploy.yml`) | Sí |
+| `/api/upload-catalog`| POST | Sube el PDF del catálogo a `docs/catalogo.pdf` de `master` (no dispara deploy: `paths-ignore` en `deploy.yml`). Sin `data` responde si hace falta subirlo (compara la huella). Ver §2.3 | Sí |
 | `/api/generate-description` | POST | IA (Gemini): genera descripción de producto | Sí |
 | `/api/generate-image` | POST | IA (Gemini): genera imagen de escena del producto | Sí |
 | `/api/update-config` | POST | Guarda `config.json` (compra mínima, teléfono) en la rama `datos` | Sí |
