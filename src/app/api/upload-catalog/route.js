@@ -10,9 +10,10 @@ const FILE_PATH = 'docs/catalogo.pdf'
 
 // La huella de lo que muestra el PDF (la calcula el admin) viaja en el mensaje
 // del commit, "… [huella:abc123]": así se sabe si el PDF publicado ya está al
-// día sin tener que bajarlo.
+// día sin tener que bajarlo. Sólo cuenta si el mensaje es de esta ruta: un
+// "Revert …" hecho a mano repite la huella del PDF que deshizo.
 const HUELLA_VALIDA = /^[0-9a-f]{16}$/
-const HUELLA_EN_MENSAJE = /\[huella:([0-9a-f]{16})\]/
+const HUELLA_EN_MENSAJE = /^actualizar catálogo PDF .*\[huella:([0-9a-f]{16})\]/
 
 function ghHeaders(token) {
   return {
