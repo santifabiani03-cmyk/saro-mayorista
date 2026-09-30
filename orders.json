@@ -1,0 +1,1314 @@
+[
+  {
+    "id": "o1779758005807",
+    "fecha": "2026-05-26T01:13:25.807Z",
+    "items": [
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 6
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 6
+      }
+    ],
+    "total": 42000,
+    "totalItems": 12
+  },
+  {
+    "id": "o1781356787188",
+    "fecha": "2026-06-13T13:19:47.188Z",
+    "items": [
+      {
+        "productId": "p1779916282248",
+        "nombre": "Saro MAX Carbono 12 k",
+        "precio": 180000,
+        "color": "Negro/Rojo",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 180000,
+    "totalItems": 1
+  },
+  {
+    "id": "o1782307612755",
+    "fecha": "2026-06-24T13:26:52.755Z",
+    "items": [
+      {
+        "productId": "p1779495548570",
+        "nombre": "Mochila Paletera",
+        "precio": 26000,
+        "color": "Rojo",
+        "talle": "Única",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1779495645178",
+        "nombre": "NECESER OBJ. PERSONALES ",
+        "precio": 13000,
+        "color": "Rojo",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779495645178",
+        "nombre": "NECESER OBJ. PERSONALES ",
+        "precio": 13000,
+        "color": "Rosa",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779495645178",
+        "nombre": "NECESER OBJ. PERSONALES ",
+        "precio": 13000,
+        "color": "Gris",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779452463276",
+        "nombre": "CARAMELERA NOAC PERFORADOS X60u. ",
+        "precio": 58000,
+        "color": "Multicolor",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 152500,
+    "totalItems": 7
+  },
+  {
+    "id": "o1786589777404",
+    "fecha": "2026-08-13T02:56:17.404Z",
+    "items": [
+      {
+        "productId": "p1782405898282",
+        "nombre": "COMBO TORNEO BOLSO GRANDE ",
+        "precio": 150000,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 2
+      }
+    ],
+    "total": 280000,
+    "totalItems": 2
+  },
+  {
+    "id": "o1787176902766",
+    "fecha": "2026-08-19T22:01:42.766Z",
+    "items": [
+      {
+        "productId": "p1779916282248",
+        "nombre": "Saro MAX Carbono 12 k",
+        "precio": 180000,
+        "color": "Negro/Rojo",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 180000,
+    "totalItems": 1
+  },
+  {
+    "id": "o1787226294441",
+    "fecha": "2026-08-20T11:44:54.441Z",
+    "items": [
+      {
+        "productId": "p1782389218836",
+        "nombre": "TUBO PELOTAS x2 NOVA ",
+        "precio": 5800,
+        "color": "Amarillo Fluo",
+        "talle": "Única",
+        "cantidad": 8
+      },
+      {
+        "productId": "p10",
+        "nombre": "Tubo pelotas NOAC x2u. ",
+        "precio": 6500,
+        "color": "Amarillo",
+        "talle": "Única",
+        "cantidad": 5
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "XL",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "XXL",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "LILA",
+        "talle": "XL",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Short Azul AERO",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "XL",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Blanco",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 204400,
+    "totalItems": 25
+  },
+  {
+    "id": "o1787226852743",
+    "fecha": "2026-08-20T11:54:12.743Z",
+    "items": [
+      {
+        "productId": "p1782389218836",
+        "nombre": "TUBO PELOTAS x2 NOVA ",
+        "precio": 5800,
+        "color": "Amarillo Fluo",
+        "talle": "Única",
+        "cantidad": 8
+      },
+      {
+        "productId": "p10",
+        "nombre": "Tubo pelotas NOAC x2u. ",
+        "precio": 6500,
+        "color": "Amarillo",
+        "talle": "Única",
+        "cantidad": 5
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "XL",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "XXL",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "LILA",
+        "talle": "XL",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Short Azul AERO",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "XL",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Blanco",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 204400,
+    "totalItems": 25
+  },
+  {
+    "id": "o1787695985100",
+    "fecha": "2026-08-25T22:13:05.100Z",
+    "items": [
+      {
+        "productId": "p1779916282248",
+        "nombre": "Saro MAX Carbono 12 k",
+        "precio": 180000,
+        "color": "Negro/Rojo",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 180000,
+    "totalItems": 1
+  },
+  {
+    "id": "o1787768051441",
+    "fecha": "2026-08-26T18:14:11.441Z",
+    "items": [
+      {
+        "productId": "p1779452463276",
+        "nombre": "CARAMELERA NOAC PERFORADOS X60u. ",
+        "precio": 60000,
+        "color": "Multicolor",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 3
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 3
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Gris",
+        "talle": "Única",
+        "cantidad": 3
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Rosa",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Azul",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Naranja",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Gris",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Short Azul AERO",
+        "talle": "L",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Azul",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Gris",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Rojo",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715980257",
+        "nombre": "REMERA DRY ELAST. FULLPRINT CAB.",
+        "precio": 15500,
+        "color": "Celeste",
+        "talle": "M",
+        "cantidad": 1
+      }
+    ],
+    "total": 252500,
+    "totalItems": 27
+  },
+  {
+    "id": "o1787768088184",
+    "fecha": "2026-08-26T18:14:48.184Z",
+    "items": [
+      {
+        "productId": "p1779452463276",
+        "nombre": "CARAMELERA NOAC PERFORADOS X60u. ",
+        "precio": 60000,
+        "color": "Multicolor",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 3
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 3
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Gris",
+        "talle": "Única",
+        "cantidad": 3
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Rosa",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Azul",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Naranja",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5000,
+        "color": "Gris",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Short Azul AERO",
+        "talle": "L",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Azul",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Gris",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Rojo",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715980257",
+        "nombre": "REMERA DRY ELAST. FULLPRINT CAB.",
+        "precio": 15500,
+        "color": "Celeste",
+        "talle": "M",
+        "cantidad": 1
+      }
+    ],
+    "total": 252500,
+    "totalItems": 27
+  },
+  {
+    "id": "o1787785529060",
+    "fecha": "2026-08-26T23:05:29.060Z",
+    "items": [
+      {
+        "productId": "p1779916282248",
+        "nombre": "Saro MAX Carbono 12 k",
+        "precio": 180000,
+        "color": "Negro/Rojo",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 180000,
+    "totalItems": 1
+  },
+  {
+    "id": "o1787925598976",
+    "fecha": "2026-08-28T13:59:58.976Z",
+    "items": [
+      {
+        "productId": "p1786625892440",
+        "nombre": "CARAMALERA NOAC LISA ",
+        "precio": 58000,
+        "color": "MULTICOLOR",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 6
+      },
+      {
+        "productId": "p1782389218836",
+        "nombre": "TUBO PELOTAS x2 NOVA ",
+        "precio": 5800,
+        "color": "Amarillo Fluo",
+        "talle": "Única",
+        "cantidad": 10
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Gris",
+        "talle": "Única",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Azul",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Short Azul AERO",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640675695",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO CLASICA ",
+        "precio": 13500,
+        "color": "Gris",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Gris",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Rojo",
+        "talle": "M",
+        "cantidad": 1
+      }
+    ],
+    "total": 301500,
+    "totalItems": 35
+  },
+  {
+    "id": "o1787925663955",
+    "fecha": "2026-08-28T14:01:03.955Z",
+    "items": [
+      {
+        "productId": "p1786625892440",
+        "nombre": "CARAMALERA NOAC LISA ",
+        "precio": 58000,
+        "color": "MULTICOLOR",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 6
+      },
+      {
+        "productId": "p1782389218836",
+        "nombre": "TUBO PELOTAS x2 NOVA ",
+        "precio": 5800,
+        "color": "Amarillo Fluo",
+        "talle": "Única",
+        "cantidad": 10
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Gris",
+        "talle": "Única",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Azul",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Short Azul AERO",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640675695",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO CLASICA ",
+        "precio": 13500,
+        "color": "Gris",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Gris",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715805040",
+        "nombre": "REMERA DRY ELAST. MULTIPUNRO CAB. ",
+        "precio": 13500,
+        "color": "Rojo",
+        "talle": "M",
+        "cantidad": 1
+      }
+    ],
+    "total": 301500,
+    "totalItems": 35
+  },
+  {
+    "id": "o1787929785300",
+    "fecha": "2026-08-28T15:09:45.300Z",
+    "items": [
+      {
+        "productId": "p1786625892440",
+        "nombre": "CARAMALERA NOAC LISA ",
+        "precio": 58000,
+        "color": "MULTICOLOR",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1779968140080",
+        "nombre": "Muñequera x par ",
+        "precio": 5500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 6
+      },
+      {
+        "productId": "p1782389218836",
+        "nombre": "TUBO PELOTAS x2 NOVA ",
+        "precio": 5800,
+        "color": "Amarillo Fluo",
+        "talle": "Única",
+        "cantidad": 10
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Gris",
+        "talle": "Única",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      }
+    ],
+    "total": 191000,
+    "totalItems": 26
+  },
+  {
+    "id": "o1788277948138",
+    "fecha": "2026-09-01T15:52:28.138Z",
+    "items": [
+      {
+        "productId": "p1779990539906",
+        "nombre": "Saro Nexus woman ",
+        "precio": 140000,
+        "color": "Rosa claro",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 140000,
+    "totalItems": 1
+  },
+  {
+    "id": "o1788354294344",
+    "fecha": "2026-09-02T13:04:54.344Z",
+    "items": [
+      {
+        "productId": "p1779452073976",
+        "nombre": "MEDIAS ALGODON 3/4 ",
+        "precio": 3500,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 4
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786640460659",
+        "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+        "precio": 8000,
+        "color": "Negro",
+        "talle": "XL",
+        "cantidad": 4
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "LILA",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "LILA",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Azul",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786640582410",
+        "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+        "precio": 13500,
+        "color": "Azul",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "S",
+        "cantidad": 2
+      },
+      {
+        "productId": "p1786712445285",
+        "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+        "precio": 7000,
+        "color": "Negro",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715433764",
+        "nombre": "CAMPERA ROMPEVIENTOS BASICA ESTAMPADA DAMA ",
+        "precio": 19500,
+        "color": "Blanco",
+        "talle": "M",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715433764",
+        "nombre": "CAMPERA ROMPEVIENTOS BASICA ESTAMPADA DAMA ",
+        "precio": 19500,
+        "color": "Blanco",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715433764",
+        "nombre": "CAMPERA ROMPEVIENTOS BASICA ESTAMPADA DAMA ",
+        "precio": 19500,
+        "color": "Blanco",
+        "talle": "XL",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715378297",
+        "nombre": "BUZO ENTRENAMIENTO LIVIANO DAMA ",
+        "precio": 16000,
+        "color": "Negro",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715378297",
+        "nombre": "BUZO ENTRENAMIENTO LIVIANO DAMA ",
+        "precio": 16000,
+        "color": "Naranja",
+        "talle": "S",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786715378297",
+        "nombre": "BUZO ENTRENAMIENTO LIVIANO DAMA ",
+        "precio": 16000,
+        "color": "Naranja",
+        "talle": "M",
+        "cantidad": 1
+      }
+    ],
+    "total": 273000,
+    "totalItems": 26
+  },
+  {
+    "id": "o1788927749806",
+    "fecha": "2026-09-09T04:22:29.806Z",
+    "items": [
+      {
+        "productId": "p1787355012462",
+        "nombre": "Flash Carbono 3k",
+        "precio": 150000,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 150000,
+    "totalItems": 1
+  },
+  {
+    "id": "o1790797886104",
+    "fecha": "2026-09-30T19:51:26.104Z",
+    "items": [
+      {
+        "productId": "p1786625892440",
+        "nombre": "CARAMELERA NOAC LISA",
+        "precio": 58000,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1782389218836",
+        "nombre": "TUBO PELOTAS x2 NOVA ",
+        "precio": 5800,
+        "color": "Amarillo Fluo",
+        "talle": "Única",
+        "cantidad": 12
+      }
+    ],
+    "total": 127600,
+    "totalItems": 13
+  },
+  {
+    "id": "o1790797908016",
+    "fecha": "2026-09-30T19:51:48.016Z",
+    "items": [
+      {
+        "productId": "p1786625892440",
+        "nombre": "CARAMELERA NOAC LISA",
+        "precio": 58000,
+        "color": "Blanco",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1782389218836",
+        "nombre": "TUBO PELOTAS x2 NOVA ",
+        "precio": 5800,
+        "color": "Amarillo Fluo",
+        "talle": "Única",
+        "cantidad": 12
+      }
+    ],
+    "total": 127600,
+    "totalItems": 13
+  }
+]

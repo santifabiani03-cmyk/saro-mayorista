@@ -1,0 +1,1628 @@
+[
+  {
+    "nombre": "Tubo pelotas NOAC x2u. ",
+    "precio": 6500,
+    "descripcion": "Tubo de pelotas NOAC x2 unidades, importadas. Este producto destaca por su excelente paño y presurización, garantizando un rendimiento óptimo en cada golpe. Ideal para entrenamientos y partidos de pádel.",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Amarillo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "promos": [],
+    "id": "p10",
+    "visible": true,
+    "sinStock": false,
+    "fechaActualizacion": "2026-05-27T03:40:17.218Z",
+    "_aiLoading": false,
+    "_aiCount": 1,
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/tubo-pelotas-noac-x2u-1779853140563.webp"
+    ]
+  },
+  {
+    "nombre": "MEDIAS ALGODÓN 3/4",
+    "precio": 3500,
+    "descripcion": "Medias algodón 3/4\nPACK X DOCENA $35.000 ",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Blanco",
+      "Negro",
+      "Gris"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "promos": [
+      {
+        "cantidad": 12,
+        "precioTotal": 35000
+      }
+    ],
+    "id": "p1779452073976",
+    "fechaPublicacion": "2026-05-22T12:14:33.976Z",
+    "visible": true,
+    "imagenes": [
+      "/assets/imagen-1779451998087.webp"
+    ],
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "CUBRE GRIP PERFORADO C/RELIEVE ",
+    "precio": 1700,
+    "descripcion": "CUBRE GRIP PERFORADO RELIEVE NOAC IMPORTADOS\n\nColores disponibles: ROJO-NEGRO-BLANCO-FUCSIA-AMARILLO-VERDE-NARANJA\n\n                          $1.800 c/u \n20u. x $33.000 \n40u. x $64.000 \n60u. x $93.000 \n100u. x $150.000 🔥",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Rojo",
+      "Negro",
+      "Blanco",
+      "Fucsia",
+      "Verde",
+      "Naranja"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "promos": [
+      {
+        "cantidad": 20,
+        "precioTotal": 32000
+      },
+      {
+        "cantidad": 40,
+        "precioTotal": 60000
+      },
+      {
+        "cantidad": 60,
+        "precioTotal": 87000
+      },
+      {
+        "cantidad": 100,
+        "precioTotal": 140000
+      }
+    ],
+    "id": "p1779452132920",
+    "fechaPublicacion": "2026-05-22T12:15:32.920Z",
+    "fechaActualizacion": "2026-08-14T13:04:41.102Z",
+    "visible": true,
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/cubre-grip-perforado-c-relieve-1779968166734.webp"
+    ]
+  },
+  {
+    "nombre": "CANASTO PLEGABLE ALUMINIO NOAC ",
+    "precio": 170000,
+    "descripcion": "-CAPACIDAD 150 🎾\n-RED DE CONTENCIÓN \n-FUNDA \n-BOLSILLO LATERAL OBJ PEQUEÑOS\n-RUEDAS SÚPER DESLIZANTES CON TRABA\n\n*No incluye pelotas*",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "promos": [],
+    "id": "p1779452295652",
+    "fechaPublicacion": "2026-05-22T12:18:15.652Z",
+    "visible": true,
+    "imagenes": [
+      "/assets/imagen-1779452173589.webp"
+    ],
+    "fechaActualizacion": "2026-06-25T12:01:06.350Z"
+  },
+  {
+    "nombre": "CARAMELERA NOAC PERFORADOS X60u. ",
+    "precio": 60000,
+    "descripcion": "Caramelera de cubre grips NOAC importados.\n60 unidades surtidas o todas blancas.",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Blanco",
+      "Multicolor"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "promos": [
+      {
+        "cantidad": 3,
+        "precioTotal": 172000
+      }
+    ],
+    "id": "p1779452463276",
+    "fechaPublicacion": "2026-05-22T12:21:03.276Z",
+    "visible": true,
+    "imagenes": [
+      "/assets/imagen-1779452345276.webp"
+    ],
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "TOALLA DE MANO MICROFIBRA ",
+    "precio": 4200,
+    "descripcion": "Toalla de mano de microfibra.\nSecado rápido\nIncluye estuche",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Gris",
+      "Rosa",
+      "Verde",
+      "Marino",
+      "Gris osc.",
+      "Violeta",
+      "Naranja",
+      "Surtido",
+      "Azul"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "promos": [
+      {
+        "cantidad": 10,
+        "precioTotal": 38000
+      }
+    ],
+    "id": "p1779452642845",
+    "fechaPublicacion": "2026-05-22T12:24:02.845Z",
+    "imagenes": [
+      "/assets/imagen-1779452499007.webp"
+    ],
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "Mochila Paletera",
+    "precio": 27000,
+    "descripcion": "Práctica, cómoda y funcional, la mochila paletera fue diseñada para acompañarte en cada entrenamiento o partido, ofreciendo el espacio justo con una estructura compacta pero amplia al mismo tiempo. \n\nCuenta con un compartimento delantero especial para transportar tu paleta de forma segura y accesible. Su interior amplio permite llevar indumentaria, accesorios y objetos personales sin perder comodidad al trasladarla.",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro",
+      "Gris"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1779495548570",
+    "visible": true,
+    "sinStock": false,
+    "fechaPublicacion": "2026-05-22T21:19:26.000Z",
+    "fechaActualizacion": "2026-08-13T12:59:03.265Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-paletera-1786625926376.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-paletera-1786625929921.webp"
+    ]
+  },
+  {
+    "nombre": "Bolso Mochila Ecocuero",
+    "precio": 45000,
+    "descripcion": "Cuenta con amplio espacio de guardado gracias a sus depósitos principales ideales para paletas y/o indumentaria deportiva. Además, incorpora un compartimento exclusivo para zapatillas, bolsillo delantero para objetos pequeños y un compartimento inferior a lo largo de toda la base del bolso, perfecto para organizar accesorios o prendas adicionales.\nFabricado en ecocuero resistente y lona reforzada, ofrece gran durabilidad y fácil limpieza. Su interior se encuentra completamente forrado para mayor protección y terminaciones de calidad.\nCaracterísticas:\n• Interior forrado\n• Tiradores tipo mochila acolchados\n• Agarre superior reforzado\n• Correa regulable\n• Compartimentos principales amplios\n• Depósito independiente para zapatillas\n• Bolsillo delantero para objetos pequeños\n• Compartimento inferior de largo completo\n• Materiales resistentes: ecocuero y lona reforzada\n\nIdeal para entrenamiento, competencia o uso diario deportivo.",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Rosa"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "promos": [],
+    "id": "p1779495592907",
+    "visible": true,
+    "sinStock": false,
+    "fechaPublicacion": "2026-05-22T21:20:20.000Z",
+    "_aiLoading": false,
+    "_aiCount": 1,
+    "fechaActualizacion": "2026-08-13T13:00:01.176Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968378771.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968383284.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968388897.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968393193.webp"
+    ]
+  },
+  {
+    "nombre": "NECESER OBJ. PERSONALES ",
+    "precio": 13000,
+    "descripcion": "Neceser deportivo para objetos personales más pequeños (celular, llaves, billetera, pelotas, etc.)\nMedidas Largo 28cm / Alto 13cm / Profundidad 13cm\n",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Rojo",
+      "Azul",
+      "Rosa",
+      "Gris"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "promos": [],
+    "id": "p1779495645178",
+    "visible": true,
+    "sinStock": false,
+    "fechaPublicacion": "2026-05-22T21:20:53.000Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/protectores-elastizados-1779973546168.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/protectores-elastizados-1779973541116.webp"
+    ]
+  },
+  {
+    "nombre": "Pelotas Nova Padel Pro",
+    "precio": 5800,
+    "descripcion": "- NOVA PRO - Tubo x2u. \nExcelente paño, compresión y durabilidad. \nImportadas.\n\nTambién disponible CAJA X 24u. ",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Amarillo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "promos": [],
+    "id": "p1779495661303",
+    "visible": true,
+    "sinStock": false,
+    "fechaPublicacion": "2026-05-22T21:21:10.000Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pelotas-nova-padel-pro-1779969106167.webp"
+    ],
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "Saro MAX Carbono 12k",
+    "precio": 180000,
+    "descripcion": "La paleta Saro MAX Carbono 12k es una paleta de pádel con formato redondo, diseñada para un equilibrio óptimo entre control y potencia en cada golpe. Su composición íntegra de carbono garantiza una alta durabilidad y resistencia, ideal para jugadores que buscan rendimiento constante. Ofrece una experiencia de juego superior, adaptándose a diversas situaciones en la cancha.",
+    "tags": [
+      "carbono",
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro/Rojo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 1,
+    "id": "p1779916282248",
+    "fechaPublicacion": "2026-05-27T21:11:22.249Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779989234833-encuadre.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779986492622.webp"
+    ]
+  },
+  {
+    "nombre": "Saro SR Junior ",
+    "precio": 75000,
+    "peso": 300,
+    "descripcion": "La paleta Saro SR Junior está diseñada específicamente para niños de entre 6 y 12 años.\nSu matriz especial ofrece un equilibrio óptimo para el desarrollo de jóvenes jugadores de pádel. Este modelo asegura un control adecuado y una experiencia de juego cómoda. Es una opción confiable para iniciarse en el deporte.\nEl peso puede variar entre 290 g y 310 g. ",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Blanco/Celeste",
+      "Azul",
+      "Rosa"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "id": "p1779922130410",
+    "fechaPublicacion": "2026-05-27T22:48:50.410Z",
+    "colorDefs": {
+      "Blanco/Celeste": [
+        "Blanco",
+        "Celeste"
+      ]
+    },
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "_aiLoading": false,
+    "_aiCount": 2,
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786728140732-encuadre.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786728160145-encuadre.webp"
+    ]
+  },
+  {
+    "nombre": "Muñequera x par ",
+    "precio": 5500,
+    "descripcion": "Muñequeras x par - Algodón\nSúper elastizadas",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Rosa",
+      "Blanco",
+      "Negro",
+      "Azul",
+      "Gris"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1779968140080",
+    "fechaPublicacion": "2026-05-28T11:35:40.080Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mu-equera-x-par-1787836390834.webp"
+    ]
+  },
+  {
+    "nombre": "Saro Nexus woman ",
+    "precio": 140000,
+    "descripcion": "Modelo pensado y diseñado para aquellos que buscan control de pelota sin perder pegada. Núcleo de Foam importado.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Rosa claro"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "id": "p1779990539906",
+    "fechaPublicacion": "2026-05-28T17:48:59.906Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-nexus-woman-1779992751622-encuadre.webp"
+    ],
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "Saro Radian Pro Carbono",
+    "precio": 140000,
+    "descripcion": "La paleta Saro Radian Pro Carbono presenta un formato diamante con peso en la punta, ideal para golpes de potencia. Su construcción con carbono 12k en las caras ofrece una alta durabilidad y resistencia al impacto. Este diseño asegura un rendimiento superior y una vida útil prolongada en la cancha.",
+    "tags": [
+      "stock_limitado",
+      "carbono"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 1,
+    "id": "p1780084771974",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780084512601-encuadre.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780084526132.jpg"
+    ],
+    "fechaPublicacion": "2026-05-29T19:59:31.974Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "Saro MAX 3.0 Carbono",
+    "precio": 180000,
+    "descripcion": "La paleta Saro MAX 3.0 Carbono presenta un formato redondo con el centro construido en carbono. Esta composición mejora significativamente el control en cada golpe, ofreciendo precisión en el juego. Es una opción ideal para jugadores que buscan maximizar la dirección y estabilidad en la cancha.",
+    "tags": [
+      "carbono"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro/Rojo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 1,
+    "id": "p1780099106807",
+    "fechaPublicacion": "2026-05-29T23:58:26.807Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780098751394-encuadre.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780098762369.jpg"
+    ],
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "Bolso mochila ELITE ",
+    "precio": 52000,
+    "descripcion": "El bolso mochila paletero ELITE es un accesorio versátil para el equipamiento deportivo. Cuenta con dos compartimentos laterales diseñados para paletas, junto con depósitos independientes para zapatillas y ropa. Incorpora tiradores de mochila regulables, una manija superior y un bolsillo específico para objetos personales pequeños.\nCompuesto por ecocuero resistente y fácil de limpiar, lona reforzada e interior forrado. ",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "",
+    "colores": [
+      "Rosa"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [
+      {
+        "cantidad": 4,
+        "precioTotal": 200000
+      }
+    ],
+    "_aiLoading": false,
+    "_aiCount": 1,
+    "id": "p1782388768791",
+    "fechaPublicacion": "2026-06-25T11:59:28.791Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388169727.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388108644.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388114714.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388111268.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388112957.webp"
+    ],
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "TUBO PELOTAS x2 NOVA ",
+    "precio": 5800,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "",
+    "colores": [
+      "Amarillo Fluo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1782389218836",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782389121983.webp"
+    ],
+    "fechaPublicacion": "2026-06-25T12:06:58.836Z"
+  },
+  {
+    "nombre": "Bolso mochila PREMIUM ",
+    "precio": 56000,
+    "descripcion": "Este bolso mochila PREMIUM combina ecocuero y lona reforzada para máxima durabilidad. Presenta doble asa de agarre acolchonada, un bolsillo lateral para objetos personales y compartimentos independientes para ropa y zapatillas. Incluye dos compartimentos laterales acolchados y reforzados, diseñados para transportar paletas de forma segura.",
+    "tags": [
+      "nuevo",
+      "destacado"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "",
+    "colores": [
+      "Naranja",
+      "Gris",
+      "Azul"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [
+      {
+        "cantidad": 4,
+        "precioTotal": 216000
+      },
+      {
+        "cantidad": 6,
+        "precioTotal": 312000
+      }
+    ],
+    "_aiLoading": false,
+    "_aiCount": 2,
+    "id": "p1782391159367",
+    "fechaPublicacion": "2026-06-25T12:39:19.367Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782390069890.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782390066839.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782390096005.webp"
+    ],
+    "fechaActualizacion": "2026-06-25T12:40:22.616Z"
+  },
+  {
+    "nombre": "COMBO TORNEO BOLSO GRANDE ",
+    "precio": 150000,
+    "descripcion": "COMBO PREMIOS BOLSO GRANDE 🎾🏆\n\nIncluye: 2u. BOLSO GRANDE LONA // 2u. REMERA DRY ELAST el mejor material del mercado // 4u. MEDIAS 3/4 // 4u. CUBRE GRIP RELIEVE // 4u. BOTELLAS ",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Negro",
+      "Gris"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "promos": [
+      {
+        "cantidad": 2,
+        "precioTotal": 290000
+      }
+    ],
+    "id": "p1782405898282",
+    "fechaPublicacion": "2026-06-25T16:44:58.283Z",
+    "fechaActualizacion": "2026-08-13T16:12:12.234Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782405816945.webp"
+    ]
+  },
+  {
+    "nombre": "CARAMELERA NOAC LISA",
+    "precio": 58000,
+    "descripcion": "",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "padel",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Blanco",
+      "MULTICOLOR"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [
+      {
+        "cantidad": 3,
+        "precioTotal": 168000
+      }
+    ],
+    "id": "p1786625892440",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786625815315.webp"
+    ],
+    "fechaPublicacion": "2026-08-13T12:58:12.440Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "MOCHILA RAQUETERA",
+    "precio": 42000,
+    "descripcion": "Esta mochila raquetera ofrece un diseño funcional y resistente. Cuenta con tiradores de mochila y espalda acolchonada para un transporte cómodo. Incluye un compartimento específico para computadora portátil y un bolsillo delantero independiente para objetos de fácil acceso. Sus bolsillos laterales complementan la capacidad de almacenamiento.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "",
+    "colores": [
+      "Azul",
+      "Rosa"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 1,
+    "id": "p1786626183132",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626041062.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626049326.webp"
+    ],
+    "fechaPublicacion": "2026-08-13T13:03:03.132Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "BOLSO MEDIANO LONA ",
+    "precio": 31000,
+    "descripcion": "Este bolso mochila paletero mediano ofrece una opción básica y económica para deportistas. Cuenta con dos compartimentos principales, ideales para llevar paletas, indumentaria y objetos personales. Además, incluye un bolsillo delantero con cierre, perfecto para guardar artículos pequeños esenciales. Es el compañero ideal para quienes priorizan llevar lo justo y necesario al deporte.",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro",
+      "Gris",
+      "Rosa",
+      "Azul",
+      "Celeste",
+      "Verde"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [
+      {
+        "cantidad": 4,
+        "precioTotal": 120000
+      }
+    ],
+    "_aiLoading": false,
+    "_aiCount": 2,
+    "id": "p1786626453330",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626251431.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626198103.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626211318.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626256299.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626260414.webp"
+    ],
+    "fechaPublicacion": "2026-08-13T13:07:33.330Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "BOLSO MOCHILA GRANDE LONA ",
+    "precio": 40000,
+    "descripcion": "Bolso paletero grande de lona, diseñado para transportar equipamiento deportivo completo. Incorpora tres compartimentos principales: dos para paletas y uno espacioso para objetos personales. Cuenta con un compartimento independiente e impermeable ideal para zapatillas o ropa húmeda. Incluye una correa regulable y reforzada para mayor comodidad, junto con una manija frontal para un transporte rápido y sencillo.",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro",
+      "Gris"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [
+      {
+        "cantidad": 4,
+        "precioTotal": 156000
+      }
+    ],
+    "_aiLoading": false,
+    "_aiCount": 3,
+    "id": "p1786626830320",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626667811.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626643468.webp"
+    ],
+    "fechaPublicacion": "2026-08-13T13:13:50.320Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "TOP LYCRA ESPALDA CRUZADA ",
+    "precio": 8000,
+    "descripcion": "",
+    "tags": [
+      "stock_limitado"
+    ],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro",
+      "Blanco"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1786640460659",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640424052.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640426768.webp"
+    ],
+    "fechaPublicacion": "2026-08-13T17:01:00.659Z"
+  },
+  {
+    "nombre": "CAMPERA ALGODÓN DOBLE NEO (SCUBA)",
+    "precio": 21000,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1786640518778",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640476927.webp"
+    ],
+    "fechaPublicacion": "2026-08-13T17:01:58.778Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
+    "precio": 13500,
+    "descripcion": "",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro",
+      "LILA",
+      "Azul",
+      "Short Azul AERO"
+    ],
+    "talles": [
+      "S",
+      "L",
+      "M",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1786640582410",
+    "fechaPublicacion": "2026-08-13T17:03:02.410Z",
+    "colorDefs": {
+      "LILA": [
+        "Fucsia"
+      ],
+      "Short Azul AERO": [
+        "Marino"
+      ]
+    },
+    "fechaActualizacion": "2026-08-14T13:06:35.743Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640534115.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pollera-lycra-c-short-y-bolsillo-abertura-pierna-1786640746515.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pollera-lycra-c-short-y-bolsillo-abertura-pierna-1786712736935.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pollera-lycra-c-short-y-bolsillo-abertura-pierna-1786712742065.webp"
+    ]
+  },
+  {
+    "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO CLÁSICA",
+    "precio": 13500,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Gris",
+      "NEGRA/SHORT LILA"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1786640675695",
+    "colorDefs": {
+      "NEGRA/SHORT LILA": [
+        "Negro"
+      ]
+    },
+    "fechaPublicacion": "2026-08-13T17:04:35.695Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640596225.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640619728.webp"
+    ],
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "SHORT C/CALZA DRY ELASTIZADO DAMA",
+    "precio": 13500,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro",
+      "Gris"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1786712282456",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712225912.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712237649.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T12:58:02.456Z"
+  },
+  {
+    "nombre": "SHORT CALZA LYCRA LISO DAMA ",
+    "precio": 7000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1786712445285",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712313630.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:00:45.285Z"
+  },
+  {
+    "nombre": "CALZA TÉRMICA RECTA DAMA",
+    "precio": 10000,
+    "descripcion": "",
+    "tags": [
+      "sale"
+    ],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Gris",
+      "Negro"
+    ],
+    "talles": [
+      "S",
+      "L",
+      "XXL",
+      "M",
+      "XL"
+    ],
+    "noStock": [
+      {
+        "color": "Gris",
+        "talle": "M"
+      },
+      {
+        "color": "Gris",
+        "talle": "XL"
+      }
+    ],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1786712548448",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712493455.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712495196.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:02:28.448Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "CAMISETA TÉRMICA DAMA",
+    "precio": 10000,
+    "descripcion": "",
+    "tags": [
+      "sale"
+    ],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro",
+      "Blanco",
+      "Gris"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [
+      {
+        "color": "Negro",
+        "talle": "S"
+      },
+      {
+        "color": "Blanco",
+        "talle": "XXL"
+      }
+    ],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715256504",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715207372.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715204272.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715209179.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:47:36.504Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "SHORT CON CALZA CABALLERO ",
+    "precio": 14500,
+    "descripcion": "",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1786715312225",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715285779.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:48:32.225Z"
+  },
+  {
+    "nombre": "BUZO ENTRENAMIENTO LIVIANO DAMA ",
+    "precio": 16000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro",
+      "Naranja"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "noStock": [
+      {
+        "color": "Negro",
+        "talle": "M"
+      }
+    ],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715378297",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715338319.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715340495.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:49:38.297Z"
+  },
+  {
+    "nombre": "CAMPERA ROMPEVIENTOS BASICA ESTAMPADA DAMA ",
+    "precio": 19500,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Blanco",
+      "Verde"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715433764",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715400682.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715398160.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:50:33.764Z"
+  },
+  {
+    "nombre": "BUZO MICROPOLAR LIVIANO OVERSIZE DAMA",
+    "precio": 18000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Rosa",
+      "Marino",
+      "Negro",
+      "Verde"
+    ],
+    "talles": [
+      "S/M",
+      "L/XL"
+    ],
+    "noStock": [
+      {
+        "color": "Rosa",
+        "talle": "S/M"
+      }
+    ],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715494561",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715450427.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715452312.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715454113.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715456868.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:51:34.561Z"
+  },
+  {
+    "nombre": "CAMPERA ELAST. MICROFRIZA DAMA ",
+    "precio": 20000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Gris",
+      "Tramado Blanco/Negro"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715591759",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715521074.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715523882.webp"
+    ],
+    "colorDefs": {
+      "Tramado Blanco/Negro": [
+        "Blanco",
+        "Negro"
+      ]
+    },
+    "fechaPublicacion": "2026-08-14T13:53:11.759Z"
+  },
+  {
+    "nombre": "JOGGER MICROFRIZA ELAST. C/CIERRE DAMA ",
+    "precio": 16500,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "S",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1786715676728",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/jogger-microfriza-elast-c-cierre-dama-1786715666298.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:54:36.728Z"
+  },
+  {
+    "nombre": "CAMISETA TÉRMICA C/DEDAL CAB.",
+    "precio": 15000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715721456",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715697068.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:55:21.456Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "REMERA DRY ELAST. MULTIPUNTO CAB.",
+    "precio": 13500,
+    "descripcion": "",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro",
+      "Gris",
+      "Azul",
+      "Rojo",
+      "Verde"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [
+      {
+        "color": "Verde",
+        "talle": "L"
+      },
+      {
+        "color": "Verde",
+        "talle": "XL"
+      }
+    ],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715805040",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715759694.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715762001.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715763794.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715765496.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715768236.webp"
+    ],
+    "fechaPublicacion": "2026-08-14T13:56:45.040Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "REMERA DRY ELAST. FULLPRINT CAB.",
+    "precio": 15500,
+    "descripcion": "",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Celeste",
+      "Rojo",
+      "Multicolor"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [
+      {
+        "color": "Multicolor",
+        "talle": "XXL"
+      },
+      {
+        "color": "Rojo",
+        "talle": "XXL"
+      }
+    ],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1786715980257",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715847362.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715849420.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715851123.webp"
+    ],
+    "colorDefs": {
+      "Multicolor": [
+        "Azul",
+        "Violeta"
+      ]
+    },
+    "fechaPublicacion": "2026-08-14T13:59:40.257Z"
+  },
+  {
+    "nombre": "Raptor Carbono 12k ",
+    "precio": 150000,
+    "precioMinorista": 190000,
+    "peso": 360,
+    "descripcion": "La Raptor Carbono 12k es una paleta de pádel diseñada para jugadores avanzados. Su construcción en carbono 12k ofrece una combinación óptima de potencia y control. La tecnología implementada asegura una gran durabilidad y estabilidad en cada golpe.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Rojo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 4,
+    "id": "p1787353287653",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353195821-encuadre.webp"
+    ],
+    "fechaPublicacion": "2026-08-21T23:01:27.653Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "Massive 12k",
+    "precio": 150000,
+    "precioMinorista": 190000,
+    "peso": 360,
+    "descripcion": "La paleta Massive 12k está diseñada para jugadores de pádel que buscan equilibrio y potencia. Su construcción incorpora carbono 12k en las caras, proporcionando una respuesta sólida en cada golpe. Ofrece un control preciso y una salida de bola eficiente, ideal para un juego versátil en la cancha.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 5,
+    "id": "p1787353465696",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353339545-encuadre.webp"
+    ],
+    "fechaPublicacion": "2026-08-21T23:04:25.696Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "Silver Carbono 12K ",
+    "precio": 150000,
+    "precioMinorista": 190000,
+    "peso": 360,
+    "descripcion": "La paleta Silver Carbono 12K presenta una construcción integral de carbono 12K, ofreciendo una combinación óptima de resistencia y ligereza. Su diseño de balance medio y amplio punto dulce facilita un control preciso y potencia equilibrada en cada golpe. Es una opción confiable para jugadores avanzados que buscan rendimiento y durabilidad en la cancha de pádel.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Rojo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 6,
+    "id": "p1787353539609",
+    "fechaPublicacion": "2026-08-21T23:05:39.609Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353488041-encuadre.webp"
+    ],
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "Vortice X",
+    "precio": 150000,
+    "precioMinorista": 190000,
+    "peso": 360,
+    "descripcion": "La paleta Vortice X está diseñada para jugadores de pádel que buscan rendimiento en cada golpe. Sus caras de carbono 12K ofrecen una respuesta sólida y una gran durabilidad. Es una opción confiable para un juego versátil en la cancha.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Azul"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 7,
+    "id": "p1787353757330",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353704421-encuadre.webp"
+    ],
+    "fechaPublicacion": "2026-08-21T23:09:17.330Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "Kids de 3 a 6 años",
+    "precio": 62000,
+    "precioMinorista": 75000,
+    "peso": 290,
+    "descripcion": "Esta paleta está diseñada para niños de 3 a 6 años, es un producto recreativo para los más pequeños de la casa.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Blanco"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 8,
+    "id": "p1787354132455",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787354001974-encuadre.webp"
+    ],
+    "fechaPublicacion": "2026-08-21T23:15:32.455Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "Flash Carbono 3k",
+    "precio": 150000,
+    "precioMinorista": 180000,
+    "peso": 360,
+    "descripcion": "La paleta de pádel Flash Carbono 3k está diseñada para jugadores que buscan control y potencia equilibrados. Su composición de carbono 3k en las caras ofrece una respuesta firme y duradera, optimizando cada golpe. Cuenta con un núcleo de goma EVA que proporciona una excelente salida de bola y absorción de vibraciones. Es una opción confiable para un juego dinámico y preciso en la cancha.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Blanco",
+      "Fucsia"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 10,
+    "id": "p1787355012462",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787354935277-encuadre.webp"
+    ],
+    "fechaPublicacion": "2026-08-21T23:30:12.463Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "Nexus Carbono 12k ",
+    "precio": 140000,
+    "precioMinorista": 175000,
+    "peso": 360,
+    "descripcion": "La paleta de pádel Saro Nexus 12K integra carbono para una estructura ligera y resistente. Su composición de carbono 12K optimiza la potencia y el control en cada golpe. Diseñada para jugadores que buscan alto rendimiento, ofrece durabilidad y una respuesta consistente en juego. Es una opción confiable para el pádel competitivo.",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Rojo/Negro"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 11,
+    "id": "p1787356327294",
+    "fechaPublicacion": "2026-08-21T23:52:07.295Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787356252259-encuadre.webp"
+    ],
+    "colorDefs": {
+      "Rojo/Negro": [
+        "Negro",
+        "Rojo"
+      ]
+    }
+  },
+  {
+    "nombre": "REMERÓN DRY ELAST. DAMA",
+    "precio": 12000,
+    "precioMinorista": 21000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro",
+      "Azul"
+    ],
+    "talles": [
+      "S/M",
+      "L/XL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1787835496022",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835427436.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835429219.webp"
+    ],
+    "fechaPublicacion": "2026-08-27T12:58:16.022Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "JOGGER SEMIRRECTO C/ELÁSTICO REGULABLE y REFLEX CAB.",
+    "precio": 17000,
+    "precioMinorista": 28000,
+    "descripcion": "Jogger sin friza, semirrecto elastizado con elástico regulable y reflex. Material Scuba. ",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "_aiLoading": false,
+    "id": "p1787835733397",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835519612.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835548097.webp"
+    ],
+    "fechaPublicacion": "2026-08-27T13:02:13.397Z",
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  }
+]
