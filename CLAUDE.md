@@ -139,7 +139,8 @@ tocar. El sitemap lista `/`, `/paletas`, `/ropa-y-accesorios` y los productos.
   Lo mismo con los Ajustes (`/api/update-config`) y las fotos (`/api/upload-image` → `fotos/`).
 - **Pedidos:** cuando un cliente manda el pedido, además de abrir WhatsApp, se llama a
   `/api/track-order` que **agrega el pedido a `orders.json` de la rama `datos`** (para la
-  sección "Demanda" del admin). Es un registro, no un sistema de gestión.
+  sección "Demanda" del admin). Es un registro, no un sistema de gestión. No guarda datos
+  personales (el nombre del cliente sólo va en el mensaje de WhatsApp: el repo es público).
 - **Publicar tiene "merge" de 3 vías:** `/api/publish` hace un merge para que si dos personas
   editan a la vez no se pisen los cambios (ver `src/app/api/publish/route.js`). Todos los
   guardados usan el `sha` de GitHub: si otro guardado se metió en el medio (dos pedidos
@@ -585,6 +586,11 @@ reemplazó y sigue igual.
 - **Datos fuera de `master` (30/09/2026):** catálogo, ajustes, pedidos y fotos nuevas pasaron a
   la rama `datos` (§2.2). Publicar, subir una foto, cambiar un ajuste o recibir un pedido ya
   **no dispara deploys**; los cambios se ven en segundos.
+- **Nombre del cliente en el pedido (30/09/2026):** al tocar "Enviar pedido por WhatsApp" o
+  "Copiar texto del pedido", el pie del carrito pide **nombre y apellido** (obligatorios) y
+  los pone arriba del mensaje (`👤 *Nombre Apellido*`). Se recuerdan en el navegador del
+  cliente (`localStorage`, clave `saro_cliente`). ⚠️ **No** se mandan a `/api/track-order`
+  a propósito: `orders.json` vive en un repo público.
 
 ### 🟡 Pendiente / a decidir con el dueño
 - **Publicidad (Meta/Google):** feed, Pixel de Meta, eventos y pestaña **📣 Publicidad** del admin

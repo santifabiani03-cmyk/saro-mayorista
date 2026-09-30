@@ -1,5 +1,5 @@
 'use client'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { useCart } from '../context/CartContext'
 import CartSuggestions from './CartSuggestions'
 import { pesoAproxKg, pesoParaCotizar } from '../utils/envio'
@@ -11,10 +11,40 @@ import { track, trackPedidoWhatsApp } from '../utils/analytics'
  */
 const ENVIO_HABILITADO = false
 
+// Nombre del cliente: se recuerda en su navegador para la próxima compra.
+// No se manda a /api/track-order: orders.json está en un repo público.
+const CLIENTE_KEY = 'saro_cliente'
+
 export default function Cart({ config }) {
   const { items, removeItem, updateQty, clearCart, total, totalItems, isOpen, setIsOpen } = useCart()
   const [copied, setCopied] = useState(false)
   const [yaEsCliente, setYaEsCliente] = useState(false)  // define qué compra mínima aplica
+
+  // ── Nombre del cliente: se pide al confirmar (enviar o copiar) ──
+  const [pasoNombre, setPasoNombre] = useState(null)  // null | 'enviar' | 'copiar'
+  const [nombre, setNombre] = useState('')
+  const [apellido, setApellido] = useState('')
+  // Sin * _ ~ `: en WhatsApp son formato y desarman las negritas del mensaje
+  const limpiar = s => s.replace(/[*_~`]/g, '').trim()
+  const nombreCompleto = `${limpiar(nombre)} ${limpiar(apellido)}`
+  const nombreOk = limpiar(nombre) !== '' && limpiar(apellido) !== ''
+
+  // Se lee después de montar (en el servidor no hay localStorage)
+  useEffect(() => {
+    try {
+      const saved = JSON.parse(localStorage.getItem(CLIENTE_KEY) ?? 'null')
+      if (saved) { setNombre(saved.nombre ?? ''); setApellido(saved.apellido ?? '') }
+    } catch {}
+  }, [])
+
+  // Al cerrar el carrito se vuelve al pie normal
+  useEffect(() => { if (!isOpen) setPasoNombre(null) }, [isOpen])
+
+  const guardarNombre = () => {
+    try {
+      localStorage.setItem(CLIENTE_KEY, JSON.stringify({ nombre: limpiar(nombre), apellido: limpiar(apellido) }))
+    } catch {}
+  }
 
   // ── Envío: el cliente elige cotizar o coordinarlo por WhatsApp ──
   const [modoEnvio, setModoEnvio] = useState(null)   // null | 'cotizar' | 'whatsapp'
@@ -70,6 +100,7 @@ export default function Cart({ config }) {
     })
 
     let msg = `*Hola!* 📋 Quiero hacer este pedido:\n`
+    if (nombreOk) msg += `👤 *${nombreCompleto}*\n`
     if (hayMayorista) {
       msg += `_(Pedido MAYORISTA — ${yaEsCliente ? 'ya soy cliente' : 'primera compra'})_\n`
     }
@@ -149,6 +180,21 @@ export default function Cart({ config }) {
       document.body.removeChild(ta)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
+    }
+  }
+
+  // Botón del paso "¿A nombre de quién?": guarda el nombre y hace lo que se
+  // había pedido. Tiene que correr en el mismo toque: si no, el navegador
+  // bloquea la ventana de WhatsApp.
+  const confirmarNombre = (e) => {
+    e.preventDefault()
+    if (!nombreOk) return
+    guardarNombre()
+    if (pasoNombre === 'copiar') {
+      copyMessage()
+    } else {
+      sendWhatsApp()
+      setPasoNombre(null)
     }
   }
 
@@ -430,37 +476,98 @@ export default function Cart({ config }) {
               </span>
             </div>
 
-            {/* Botón WhatsApp */}
-            <button
-              onClick={sendWhatsApp}
-              className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition duration-200 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/25 active:scale-[.98]"
-            >
-              <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 flex-shrink-0">
-                <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
-                <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.853L.054 23.446a.5.5 0 0 0 .612.612l5.598-1.479A11.947 11.947 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.686-.523-5.212-1.43l-.374-.22-3.878 1.023 1.023-3.877-.22-.374A9.955 9.955 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
-              </svg>
-              Enviar pedido por WhatsApp
-            </button>
+            {pasoNombre ? (
+              /* Paso de confirmación: a nombre de quién va el pedido */
+              <form onSubmit={confirmarNombre} className="space-y-3 animate-fade-in">
+                <p className="text-sm font-semibold text-gray-700">¿A nombre de quién va el pedido?</p>
+                <div className="grid grid-cols-2 gap-2">
+                  <input
+                    aria-label="Nombre"
+                    value={nombre}
+                    onChange={e => setNombre(e.target.value.slice(0, 40))}
+                    autoComplete="given-name"
+                    placeholder="Nombre"
+                    autoFocus={!nombre}
+                    className="min-w-0 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue"
+                  />
+                  <input
+                    aria-label="Apellido"
+                    value={apellido}
+                    onChange={e => setApellido(e.target.value.slice(0, 40))}
+                    autoComplete="family-name"
+                    placeholder="Apellido"
+                    className="min-w-0 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue"
+                  />
+                </div>
 
-            {/* Botón copiar mensaje */}
-            <button
-              onClick={copyMessage}
-              className="w-full py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition duration-200 bg-gray-50 hover:bg-gray-100 text-gray-600 border border-gray-200 active:scale-[.98]"
-            >
-              {copied
-                ? <><span>✅</span> ¡Copiado!</>
-                : <><span>📋</span> Copiar texto del pedido</>}
-            </button>
+                {pasoNombre === 'enviar' ? (
+                  <button
+                    type="submit"
+                    disabled={!nombreOk}
+                    className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition duration-200 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/25 active:scale-[.98] disabled:opacity-50 disabled:shadow-none disabled:hover:bg-emerald-500 disabled:active:scale-100"
+                  >
+                    <IconoWhatsApp />
+                    Enviar por WhatsApp
+                  </button>
+                ) : (
+                  <button
+                    type="submit"
+                    disabled={!nombreOk}
+                    className="w-full py-3 rounded-xl text-sm font-bold flex items-center justify-center gap-2 transition duration-200 bg-saro-dark hover:bg-saro-blue text-white active:scale-[.98] disabled:opacity-50 disabled:hover:bg-saro-dark disabled:active:scale-100"
+                  >
+                    {copied
+                      ? <><span>✅</span> ¡Copiado!</>
+                      : <><span>📋</span> Copiar texto del pedido</>}
+                  </button>
+                )}
 
-            <button
-              onClick={clearCart}
-              className="w-full py-1.5 text-xs text-gray-400 hover:text-red-500 transition-colors font-medium"
-            >
-              Vaciar carrito
-            </button>
+                <button
+                  type="button"
+                  onClick={() => setPasoNombre(null)}
+                  className="w-full py-1.5 text-xs text-gray-400 hover:text-gray-700 transition-colors font-medium"
+                >
+                  ← Volver
+                </button>
+              </form>
+            ) : (
+              <>
+                {/* Botón WhatsApp */}
+                <button
+                  onClick={() => setPasoNombre('enviar')}
+                  className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition duration-200 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/25 active:scale-[.98]"
+                >
+                  <IconoWhatsApp />
+                  Enviar pedido por WhatsApp
+                </button>
+
+                {/* Botón copiar mensaje */}
+                <button
+                  onClick={() => setPasoNombre('copiar')}
+                  className="w-full py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition duration-200 bg-gray-50 hover:bg-gray-100 text-gray-600 border border-gray-200 active:scale-[.98]"
+                >
+                  <span>📋</span> Copiar texto del pedido
+                </button>
+
+                <button
+                  onClick={clearCart}
+                  className="w-full py-1.5 text-xs text-gray-400 hover:text-red-500 transition-colors font-medium"
+                >
+                  Vaciar carrito
+                </button>
+              </>
+            )}
           </div>
         )}
       </div>
     </>
+  )
+}
+
+function IconoWhatsApp() {
+  return (
+    <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 flex-shrink-0">
+      <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z"/>
+      <path d="M12 0C5.373 0 0 5.373 0 12c0 2.127.558 4.122 1.532 5.853L.054 23.446a.5.5 0 0 0 .612.612l5.598-1.479A11.947 11.947 0 0 0 12 24c6.627 0 12-5.373 12-12S18.627 0 12 0zm0 22c-1.907 0-3.686-.523-5.212-1.43l-.374-.22-3.878 1.023 1.023-3.877-.22-.374A9.955 9.955 0 0 1 2 12C2 6.477 6.477 2 12 2s10 4.477 10 10-4.477 10-10 10z"/>
+    </svg>
   )
 }
