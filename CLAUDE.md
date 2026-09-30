@@ -5,7 +5,7 @@
 > chats viejos ni preguntar nada. Prioriza ser exhaustivo. Si algo cambia, actualizá este
 > archivo y `docs/ESTETICA.md`.
 
-Última actualización: 2026-09-29.
+Última actualización: 2026-09-30.
 
 > ⚠️ **Cambio importante (agosto 2026): el sitio pasó de MAYORISTA a MINORISTA.**
 > La tienda principal es minorista (`/paletas` y `/ropa-y-accesorios`, precio `precioMinorista`).
@@ -27,6 +27,7 @@
 | Repositorio | https://github.com/santifabiani03-cmyk/saro-mayorista (rama `master`) |
 | Carpeta local | `C:\Users\smfab\Desktop\Pagina saro` |
 | Hosting | Vercel (deploy automático al pushear a `master`) |
+| Datos vivos | Rama **`datos`** del mismo repo (catálogo, ajustes, pedidos, fotos). No dispara deploys. Ver §2.2 |
 | Dueño | smfab (Santiago Fabiani) |
 
 ---
@@ -75,25 +76,47 @@ MiCorreo de Correo Argentino) — pero el envío igual se cierra por WhatsApp.
 No hay backend propio ni servidor aparte: todo corre dentro de Next.js sobre Vercel (salvo el
 render de los videos, que corre en GitHub Actions).
 
-### 2.2 "Base de datos" = archivos JSON en GitHub
+### 2.2 "Base de datos" = archivos JSON en la rama `datos` de GitHub
 
-**No hay base de datos tradicional** (ni SQL ni nada). Los datos viven en **dos archivos de
-texto dentro del repo de GitHub**, y GitHub hace de base de datos:
+**No hay base de datos tradicional** (ni SQL ni nada). Los datos que cambian solos viven en
+**archivos de texto en la rama `datos` del repo** (no en `master`), y GitHub hace de base de
+datos. Es una rama "huérfana": no tiene código, sólo esto:
 
-| Archivo | Qué guarda | Rol |
+| Archivo (rama `datos`) | Qué guarda | Rol |
 |---|---|---|
-| `catalog/products.json` | Todos los productos: nombre, precio, descripción, categoría, colores, talles, stock, fotos, promos | La "tabla" de productos / catálogo / stock |
-| `catalog/orders.json` | Registro de los pedidos que se enviaron por WhatsApp | La "tabla" de pedidos (solo estadística) |
+| `products.json` | Todos los productos: nombre, precio, descripción, categoría, colores, talles, stock, fotos, promos | La "tabla" de productos / catálogo / stock |
+| `config.json` | Ajustes de la tienda (WhatsApp, compra mínima…) — ver §2.7 | Configuración |
+| `orders.json` | Registro de los pedidos que se enviaron por WhatsApp | La "tabla" de pedidos (solo estadística) |
+| `fotos/` | Fotos de producto que sube el admin desde el 30/09/2026 | Imágenes |
 
-Las **fotos de producto** también viven en GitHub (`public/assets/`) y se sirven por links
-directos tipo `https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/...webp`.
+**Por qué una rama aparte (30/09/2026):** antes todo esto estaba en `master`, y **cada push a
+`master` dispara un deploy a producción**. Cada pedido, cada foto (89 en 60 días), cada
+publicación y cada cambio de ajustes reconstruía la web entera, y los cambios tardaban 1–2 min
+en verse. La rama `datos` no dispara nada: la web la lee en el momento y el cambio se ve en
+segundos. Cada guardado queda como un commit en esa rama → **hay historial para deshacer**.
+Se evaluó Vercel Blob y se descartó: en el plan Hobby, si un mes se pasa del límite gratis
+(10 GB de transferencia, fácil con fotos y anuncios) **bloquea el almacenamiento 30 días**.
+
+**Todo el acceso a estos datos está en `src/utils/datos.js`.** Si algún día se pasan a una base
+de datos real, se cambia sólo ese archivo.
+
+Las **fotos** se sirven por links directos de GitHub:
+- nuevas: `https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/...webp`
+- viejas (hasta el 29/09/2026): `.../master/public/assets/...webp` — siguen andando, no se movieron.
+
+⚠️ `catalog/products.json`, `catalog/orders.json` y `public/config.json` **siguen en `master`
+pero quedaron congelados** (copia del 30/09/2026). Sólo se usan en desarrollo local cuando no
+hay credenciales de GitHub. En Vercel nunca se leen.
 
 ### 2.3 Cómo se lee y se publica (el flujo de datos)
 
-- **Lectura (tienda pública):** las páginas de catálogo (`/paletas` y `/ropa-y-accesorios`) leen
-  `catalog/products.json` del disco al construir la página y se refrescan solas cada 60 segundos
-  (ISR: `export const revalidate = 60`). La home (`/`) es la **landing** y lee el mismo JSON solo
-  para los contadores. También existe la API `/api/catalog` que devuelve el JSON.
+- **Lectura (tienda pública):** las páginas (`/`, `/paletas`, `/ropa-y-accesorios`, las fichas)
+  leen el catálogo y los ajustes de la rama `datos` con `leerCatalogo()` / `leerAjustes()`
+  (`src/utils/datos.js`). Next los guarda en caché con una etiqueta; al guardar desde el admin
+  se invalida (`revalidateTag`) y la próxima visita ya muestra lo nuevo. Además cada 5 min se
+  vuelven a leer igual, por si alguien edita la rama a mano. Las páginas tienen
+  `export const revalidate = 60` (ISR). `/api/catalog` devuelve el catálogo y `/api/config` los
+  ajustes (para el admin y el carrito).
 
 **Rutas públicas (actualizado):** `/` = landing de entrada (hero 3D + secciones de scroll +
 FAQ). Desde ahí se entra a **dos catálogos separados**: `/paletas` (solo paletas) y
@@ -102,14 +125,18 @@ FAQ). Desde ahí se entra a **dos catálogos separados**: `/paletas` (solo palet
 antes y redirige a un catálogo externo (`catalogo.saro.com.ar`) — NO es la grilla interna, no
 tocar. El sitemap lista `/`, `/paletas`, `/ropa-y-accesorios` y los productos.
 - **Escritura (admin):** cuando en el panel `/admin` editás productos y tocás **"Publicar en
-  sitio"**, la web llama a `/api/publish`, que **escribe el `products.json` actualizado
-  directamente en GitHub** usando un token de acceso (`GITHUB_TOKEN`). Vercel detecta el cambio
-  en GitHub y reconstruye la web sola.
+  sitio"**, la web llama a `/api/publish`, que **guarda el `products.json` en la rama `datos`**
+  usando un token de acceso (`GITHUB_TOKEN`). **No hay deploy:** la web lo toma en segundos.
+  Lo mismo con los Ajustes (`/api/update-config`) y las fotos (`/api/upload-image` → `fotos/`).
 - **Pedidos:** cuando un cliente manda el pedido, además de abrir WhatsApp, se llama a
-  `/api/track-order` que **agrega el pedido a `catalog/orders.json` en GitHub** (para la sección
-  "Demanda" del admin). Es un registro, no un sistema de gestión.
+  `/api/track-order` que **agrega el pedido a `orders.json` de la rama `datos`** (para la
+  sección "Demanda" del admin). Es un registro, no un sistema de gestión.
 - **Publicar tiene "merge" de 3 vías:** `/api/publish` hace un merge para que si dos personas
-  editan a la vez no se pisen los cambios (ver `src/app/api/publish/route.js`).
+  editan a la vez no se pisen los cambios (ver `src/app/api/publish/route.js`). Todos los
+  guardados usan el `sha` de GitHub: si otro guardado se metió en el medio (dos pedidos
+  simultáneos), GitHub lo rechaza y `actualizarArchivo` vuelve a leer y reintenta.
+- **Publicar una lista vacía se rechaza** si hay productos publicados (un admin que no llegó a
+  cargar el catálogo borraría todo).
 
 ### 2.4 Autenticación del admin
 
@@ -127,10 +154,10 @@ Pagina saro/
 ├── CLAUDE.md                 ← este archivo
 ├── docs/ESTETICA.md          ← guía visual ampliada (para diseño)
 ├── catalog/
-│   ├── products.json         ← catálogo + stock (la "base de datos")  ⚠️ NO TOCAR a mano
-│   └── orders.json           ← registro de pedidos                    ⚠️ NO TOCAR a mano
+│   ├── products.json         ← copia CONGELADA (30/09/2026). Lo vivo está en la rama `datos`
+│   └── orders.json           ← copia CONGELADA (30/09/2026). Lo vivo está en la rama `datos`
 ├── public/
-│   ├── config.json           ← config de la tienda (ver abajo)        ⚠️ lo maneja el admin
+│   ├── config.json           ← copia CONGELADA (30/09/2026). Lo vivo está en la rama `datos`
 │   ├── manifest.json         ← metadatos PWA (íconos, nombre)
 │   ├── favicon.png           ← "chip" navy con el logo blanco (ícono de pestaña)
 │   ├── models/paleta-opt.glb ← modelo 3D de la paleta (hero) — la lista está en Paleta3D.jsx
@@ -141,7 +168,7 @@ Pagina saro/
 │   │   ├── layout.jsx        ← <head>, fuentes, SEO, Analytics (Vercel + Google Analytics)
 │   │   ├── globals.css       ← estilos globales + animaciones del hero
 │   │   ├── (shop)/           ← LA TIENDA PÚBLICA (grupo de rutas)
-│   │   │   ├── layout.jsx    ← lee public/config.json y envuelve la tienda
+│   │   │   ├── layout.jsx    ← lee los ajustes (leerAjustes) y envuelve la tienda
 │   │   │   ├── page.jsx      ← LANDING de entrada (/) — Server Component + preload del .glb
 │   │   │   ├── Landing.jsx   ← la landing: HERO 3D + catálogos + cómo comprar + números +
 │   │   │   │                    personalizados + Historia/Trabajá + FAQ
@@ -165,7 +192,8 @@ Pagina saro/
 │   │   └── admin/            ← ProductForm, ProductList, SettingsPanel, VideosPanel, etc.
 │   ├── views/AdminPage.jsx   ← el panel admin completo (pestañas)
 │   ├── videos/               ← plantillas de video (Remotion) — ver §8
-│   └── utils/                ← helpers (colores, slug, export PDF, envio.js, analytics.js…)
+│   └── utils/                ← helpers (datos.js = lectura/guardado en la rama `datos`, colores,
+│                                slug, export PDF, envio.js, analytics.js…)
 ├── package.json, next.config.mjs, tailwind.config.js, vercel.json
 └── (archivos locales que NO se deployan: lab.html, IMG_*.jpeg, .py, preview-vendedores.html,
     scripts/ — ver §5.4)
@@ -177,16 +205,17 @@ Todas están en `src/app/api/<nombre>/route.js`:
 
 | Ruta | Método | Qué hace | Pide PIN |
 |---|---|---|---|
-| `/api/catalog` | GET | Devuelve el catálogo (`products.json`) | No |
-| `/api/publish` | POST | Guarda el catálogo editado en GitHub (con merge) | Sí |
-| `/api/track-order` | POST | Registra un pedido en `orders.json` | No (rate limit) |
+| `/api/catalog` | GET | Devuelve el catálogo (`products.json` de la rama `datos`) | No |
+| `/api/config` | GET | Devuelve los ajustes vigentes (`config.json` de la rama `datos`) | No |
+| `/api/publish` | POST | Guarda el catálogo editado en la rama `datos` (con merge). Devuelve el catálogo final | Sí |
+| `/api/track-order` | POST | Registra un pedido en `orders.json` de la rama `datos` | No (rate limit) |
 | `/api/orders` | GET | Devuelve los pedidos (para la demanda del admin) | Sí (en query) |
 | `/api/verify-pin` | POST | Valida el PIN del admin (con anti–fuerza bruta) | — |
-| `/api/upload-image` | POST | Sube una foto de producto a GitHub | Sí |
-| `/api/upload-catalog`| POST | Sube el PDF del catálogo | Sí |
+| `/api/upload-image` | POST | Sube una foto de producto a `fotos/` de la rama `datos` | Sí |
+| `/api/upload-catalog`| POST | Sube el PDF del catálogo a `docs/catalogo.pdf` de `master` (no dispara deploy: `paths-ignore` en `deploy.yml`) | Sí |
 | `/api/generate-description` | POST | IA (Gemini): genera descripción de producto | Sí |
 | `/api/generate-image` | POST | IA (Gemini): genera imagen de escena del producto | Sí |
-| `/api/update-config` | POST | Guarda `config.json` (compra mínima, teléfono) en GitHub | Sí |
+| `/api/update-config` | POST | Guarda `config.json` (compra mínima, teléfono) en la rama `datos` | Sí |
 | `/api/sitemap` | GET | Genera el sitemap XML para Google | No |
 | `/api/cotizar-envio` | POST | Cotiza el envío con la **API MiCorreo** (CP + peso → precio a domicilio y a sucursal). Ver §2.10 | No |
 | `/feed.xml` | GET | **Feed de productos para Meta Ads y Google Merchant Center** (se arma solo desde el catálogo). Ver `docs/PUBLICIDAD.md` | No |
@@ -195,9 +224,11 @@ Todas están en `src/app/api/<nombre>/route.js`:
 | `/api/videos/estado` | GET | Estado del render (`?request_id=`): en cola, renderizando, listo o error | Sí (header `x-admin-pin`) |
 | `/api/videos/descargar` | GET | Link de descarga del MP4 (`?request_id=`) | Sí (header `x-admin-pin`) |
 
-### 2.7 `public/config.json` (configuración de la tienda)
+### 2.7 `config.json` (configuración de la tienda)
 
-Es un archivo chico con la config editable desde el admin (pestaña **⚙️ Ajustes**):
+Es un archivo chico en la **rama `datos`** con la config editable desde el admin (pestaña
+**⚙️ Ajustes**). Los cambios se ven en la web en menos de un minuto, sin deploy. (El
+`public/config.json` de `master` es una copia congelada; `/config.json` en el sitio también.)
 
 ```json
 {
@@ -434,10 +465,11 @@ archivos con sufijo `-sr` o prefijo `c-sr` en `public/assets/` (ej. `c-sr-...web
 
 ### 5.1 Qué NO tocar / NO commitear nunca
 
-- ⚠️ **`catalog/products.json` y `catalog/orders.json`** — los edita el admin escribiendo
-  DIRECTO en GitHub. Tu copia local casi siempre está **vieja**. Si los commiteás, **pisás el
-  stock y los pedidos reales**. Nunca los agregues a un commit.
-- ⚠️ **`public/config.json`** — lo maneja el admin (pestaña Ajustes). Mismo riesgo.
+- ⚠️ **La rama `datos`** — la escribe el admin (y cada pedido). **Nunca** hacer push a `datos`
+  desde una copia local vieja: pisás el stock y los pedidos reales. Ver la excepción en §7.
+- ⚠️ **`catalog/products.json`, `catalog/orders.json` y `public/config.json` de `master`** —
+  quedaron congelados el 30/09/2026 y no hace falta tocarlos. Editarlos **no cambia nada** en
+  la web (los datos vivos están en la rama `datos`).
 - ⚠️ **Variables de entorno / secretos** — nunca en el código.
 
 ### 5.2 Cómo pushear/deployar SIN romper nada
@@ -541,6 +573,9 @@ reemplazó y sigue igual.
   viejo redirige al nuevo (`findBySlug` busca por el final del id).
 - **Catálogo corregido (28/09/2026):** typos en nombres y descripciones, "pala" → "paleta",
   tildes, 6 productos que no tenían categoría, descripción de Vortice X (era de indumentaria).
+- **Datos fuera de `master` (30/09/2026):** catálogo, ajustes, pedidos y fotos nuevas pasaron a
+  la rama `datos` (§2.2). Publicar, subir una foto, cambiar un ajuste o recibir un pedido ya
+  **no dispara deploys**; los cambios se ven en segundos.
 
 ### 🟡 Pendiente / a decidir con el dueño
 - **Publicidad (Meta/Google):** feed, Pixel de Meta, eventos y pestaña **📣 Publicidad** del admin
@@ -592,7 +627,7 @@ WhatsApp: no hay pagos online ni compras confirmadas automáticamente.
 **Qué quedó implementado:**
 
 - `GET /feed.xml` genera un RSS válido para Meta Commerce Manager y Google
-  Merchant Center a partir de `catalog/products.json`.
+  Merchant Center a partir del catálogo publicado (rama `datos`).
 - La regla del feed vive en `src/utils/feed.js`, y se reutiliza en
   `src/components/admin/PublicidadPanel.jsx` para que el admin y las plataformas
   muestren exactamente la misma selección.
@@ -637,12 +672,18 @@ cambios del hero. Si se necesita trabajar sólo en publicidad, partir de
 ## 7. Instrucciones para Claude (o quien retome)
 
 - Respondé siempre en **español rioplatense** (Argentina), y para alguien que **no programa**.
-- Antes de tocar el catálogo/stock/pedidos: releé §5. **No pisar `products.json`/`orders.json`/
-  `config.json`.** Si hay que cargar datos (pesos, precios, stock), **lo hace smfab desde
-  `/admin`** — no editar esos archivos desde el código. **Excepción** (sólo si smfab la pide,
-  como las correcciones del 28/09/2026): un script de parche que cambia campos puntuales y
-  verifica que el valor original siga igual, corrido sobre la versión fresca de
-  `/api/catalog` justo antes de pushear, en un commit aparte del código.
+- Antes de tocar el catálogo/stock/pedidos: releé §5. **Los datos vivos están en la rama
+  `datos`** (§2.2). Si hay que cargar datos (pesos, precios, stock), **lo hace smfab desde
+  `/admin`** — no editarlos desde el código. **Excepción** (sólo si smfab la pide, como las
+  correcciones del 28/09/2026): un script de parche que cambia campos puntuales y verifica que
+  el valor original siga igual, corrido sobre la versión fresca de la rama `datos`
+  (`git fetch origin datos`) y pusheado a `datos` enseguida. **No dispara deploy.** Como la
+  web guarda la lectura en caché, el cambio se ve a los 5 min como mucho (o al instante si
+  después se publica algo desde el admin). Si el push choca, alguien guardó en el medio:
+  volver a bajar la rama y rehacer el parche, nunca forzar.
+- **Deshacer un cambio de datos:** cada guardado es un commit en la rama `datos`. Para volver
+  atrás, un commit nuevo en `datos` que restaure la versión anterior del archivo (nunca
+  reescribir la historia de esa rama).
 - Antes de tocar el hero 3D: leé §4.1 y §4.3 y `docs/ESTETICA.md`. Es lo más delicado del proyecto.
 - Para cualquier cambio visual, respetá la paleta y convenciones de §3 y `docs/ESTETICA.md`.
 - Deploy = push a `master` (con el cuidado de §5.2). No hay otro paso.
@@ -744,8 +785,8 @@ le da el link.
   avisa "Cambió la foto del producto: prepará de nuevo la del video".
 - Se guardan con "Publicar en sitio", como cualquier cambio del admin. No se usan en la web
   pública ni en el feed de publicidad.
-- La foto se sube con `/api/upload-image` (el mismo mecanismo que las fotos de producto:
-  **commitea a `master` y dispara un deploy**, como ya pasaba al subir fotos).
+- La foto se sube con `/api/upload-image` (el mismo mecanismo que las fotos de producto): va a
+  `fotos/` de la rama `datos` y **no dispara deploy**.
 
 ### 8.4 Variables y permisos del token
 

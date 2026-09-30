@@ -9,7 +9,7 @@ Meta (Instagram/Facebook) y Google. Última actualización: 2026-09-21.
 
 | Pieza | Dónde | Qué hace |
 |---|---|---|
-| **Feed de productos** | `https://saro.com.ar/feed.xml` (`src/app/feed.xml/route.js`) | Lista de productos en el formato que leen Meta y Google. Se arma sola desde `catalog/products.json` cada vez que se publica desde el admin |
+| **Feed de productos** | `https://saro.com.ar/feed.xml` (`src/app/feed.xml/route.js`) | Lista de productos en el formato que leen Meta y Google. Se arma sola desde el catálogo publicado (rama `datos`): queda al día a los pocos minutos de publicar desde el admin |
 | **Regla del feed** | `src/utils/feed.js` | Entra un producto si: está visible, tiene **precio minorista**, tiene foto y no se apagó "Publicitar". Usa el precio minorista (el mismo de la ficha) |
 | **Fotos del feed** | `/feed-img?u=...` (`src/app/feed-img/route.js`) | Convierte las fotos WebP a JPG 1080×1080 con fondo blanco (Meta no toma bien WebP ni transparencias). Sólo acepta fotos de SARO |
 | **Pixel de Meta** | `src/components/MetaPixel.jsx` | Se activa sólo si existe `NEXT_PUBLIC_META_PIXEL_ID` en Vercel. No mide `/admin` ni `/lab*` |
