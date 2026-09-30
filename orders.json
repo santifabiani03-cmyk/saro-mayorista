@@ -1310,5 +1310,19 @@
     ],
     "total": 127600,
     "totalItems": 13
+  },
+  {
+    "id": "o1790808738597",
+    "fecha": "2026-09-30T22:52:18.601Z",
+    "items": [
+      {
+        "productId": "PRUEBA-TECNICA",
+        "nombre": "PRUEBA TECNICA - borrar",
+        "precio": 0,
+        "cantidad": 1
+      }
+    ],
+    "total": 0,
+    "totalItems": 1
   }
 ]
