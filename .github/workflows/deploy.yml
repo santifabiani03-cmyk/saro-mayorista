@@ -3,6 +3,12 @@ name: Deploy a Vercel
 on:
   push:
     branches: [master]
+    # El PDF del catálogo lo sube el admin después de cada publicación y nada
+    # de la web lo usa: no justifica reconstruirla. (El catálogo, los
+    # ajustes, los pedidos y las fotos ya no pasan por master: van a la rama
+    # "datos", que no dispara este workflow. Ver src/utils/datos.js.)
+    paths-ignore:
+      - docs/catalogo.pdf
 
 jobs:
   deploy:

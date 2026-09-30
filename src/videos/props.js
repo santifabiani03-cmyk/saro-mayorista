@@ -1,9 +1,9 @@
 import { esElegible, productoVideo } from '../utils/videoProductos'
 
-// El products.json que escribe el admin al publicar. Se lee de GitHub y no de
-// saro.com.ar/api/catalog porque esa ruta no permite pedidos desde otro origen
-// (el studio corre en localhost).
-const CATALOGO_VIVO = 'https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/catalog/products.json'
+// El products.json que escribe el admin al publicar (rama "datos", ver
+// src/utils/datos.js). Se lee de GitHub y no de saro.com.ar/api/catalog porque
+// esa ruta no permite pedidos desde otro origen (el studio corre en localhost).
+const CATALOGO_VIVO = 'https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/products.json'
 
 // Cómo se arman las props de cada plantilla. Lo usan el panel del admin (con los
 // productos que elegís) y el studio de Remotion (con el catálogo en vivo).

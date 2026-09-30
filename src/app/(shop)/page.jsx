@@ -1,9 +1,5 @@
-import fs from 'node:fs'
-import path from 'node:path'
 import Landing from './Landing'
-
-const CATALOG_FILE = path.resolve('catalog/products.json')
-const CONFIG_FILE = path.resolve('public/config.json')
+import { leerCatalogo, leerAjustes } from '../../utils/datos'
 
 // Revalidar cada 60 segundos (ISR) — los contadores siguen al catálogo
 export const revalidate = 60
@@ -16,9 +12,9 @@ export const metadata = {
   alternates: { canonical: 'https://saro.com.ar/' },
 }
 
-export default function HomePage() {
-  const products = JSON.parse(fs.readFileSync(CATALOG_FILE, 'utf-8'))
-  const config = JSON.parse(fs.readFileSync(CONFIG_FILE, 'utf-8'))
+export default async function HomePage() {
+  const products = await leerCatalogo()
+  const config = await leerAjustes()
   const visible = products.filter(p => p.visible !== false)
 
   // /paletas es minorista: sólo cuentan las que tienen precio minorista cargado.

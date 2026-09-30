@@ -571,7 +571,7 @@ async function uploadFile(file, productName) {
       body:    JSON.stringify({ name, data: base64, pin }),
     })
     const json = await res.json()
-    // Preferir la URL directa de GitHub (funciona al instante, sin esperar redeploy)
+    // URL directa de la foto (rama "datos" de GitHub): funciona al instante
     return json.rawUrl ?? json.path ?? null
   } catch { return null }
 }

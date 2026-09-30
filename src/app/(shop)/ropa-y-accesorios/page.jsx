@@ -1,8 +1,5 @@
-import fs from 'node:fs'
-import path from 'node:path'
 import CatalogView from '../CatalogView'
-
-const CATALOG_FILE = path.resolve('catalog/products.json')
+import { leerCatalogo } from '../../../utils/datos'
 
 // Revalidar cada 60 segundos (ISR)
 export const revalidate = 60
@@ -25,8 +22,8 @@ export const metadata = {
 }
 
 // Catálogo minorista (público general): muestra el precio minorista.
-export default function RopaYAccesoriosPage() {
-  const all = JSON.parse(fs.readFileSync(CATALOG_FILE, 'utf-8'))
+export default async function RopaYAccesoriosPage() {
+  const all = await leerCatalogo()
   const products = all.filter(p => p.categoria !== 'paleta')
   return <CatalogView products={products} kind="ropa" modo="minorista" />
 }

@@ -1,24 +1,9 @@
 import { NextResponse } from 'next/server'
+import { subirFoto } from '../../../utils/datos'
 
-const GITHUB_API = 'https://api.github.com'
-
-function ghHeaders(token) {
-  return {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-    'User-Agent': 'saro-admin',
-  }
-}
-
-async function getFileSha(owner, repo, filePath, token) {
-  const res = await fetch(
-    `${GITHUB_API}/repos/${owner}/${repo}/contents/${filePath}`,
-    { headers: ghHeaders(token) }
-  )
-  if (!res.ok) return null
-  const data = await res.json()
-  return data.sha ?? null
-}
+// Las fotos que sube el admin van a fotos/ de la rama "datos" (no dispara
+// deploy) y se sirven con su URL directa de GitHub. Las más viejas siguen en
+// public/assets de master: esas URLs no cambian.
 
 export async function POST(request) {
   const clean = val => (val ?? '').replace(/^﻿/, '').trim()
@@ -37,46 +22,16 @@ export async function POST(request) {
     return NextResponse.json({ error: 'No autorizado' }, { status: 401 })
   }
 
-  const token = clean(process.env.GITHUB_TOKEN)
-  const owner = clean(process.env.GITHUB_OWNER)
-  const repo = clean(process.env.GITHUB_REPO)
-
-  if (!token || !owner || !repo) {
-    return NextResponse.json(
-      { error: 'Faltan variables de entorno del servidor' },
-      { status: 500 }
-    )
-  }
-
   if (!name || !data) {
     return NextResponse.json({ error: 'Faltan name/data' }, { status: 400 })
   }
 
   const safe = name.toLowerCase().replace(/[^a-z0-9._-]/g, '-')
-  const filePath = `public/assets/${safe}`
 
   try {
-    const sha = await getFileSha(owner, repo, filePath, token)
-    const putBody = {
-      message: `agregar imagen: ${safe}`,
-      content: data,
-      ...(sha && { sha }),
-    }
-    const putRes = await fetch(
-      `${GITHUB_API}/repos/${owner}/${repo}/contents/${filePath}`,
-      {
-        method: 'PUT',
-        headers: ghHeaders(token),
-        body: JSON.stringify(putBody),
-      }
-    )
-    if (!putRes.ok) {
-      const err = await putRes.json().catch(() => ({}))
-      throw new Error(err.message ?? `GitHub API error ${putRes.status}`)
-    }
-    const putJson = await putRes.json()
-    const rawUrl = putJson.content?.download_url ?? null
-    return NextResponse.json({ ok: true, path: `/assets/${safe}`, rawUrl })
+    const url = await subirFoto(safe, data)
+    // El admin guarda rawUrl en el producto. path queda por compatibilidad.
+    return NextResponse.json({ ok: true, path: url, rawUrl: url })
   } catch (e) {
     return NextResponse.json(
       { error: e.message ?? 'Error desconocido' },

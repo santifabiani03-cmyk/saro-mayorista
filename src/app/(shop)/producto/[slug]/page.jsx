@@ -1,14 +1,7 @@
-import fs from 'node:fs'
-import path from 'node:path'
 import { notFound, permanentRedirect, redirect } from 'next/navigation'
 import { findBySlug, toSlug } from '../../../../utils/slug'
 import ProductClient from './ProductClient'
-
-const CATALOG_FILE = path.resolve('catalog/products.json')
-
-function getProducts() {
-  return JSON.parse(fs.readFileSync(CATALOG_FILE, 'utf-8'))
-}
+import { leerCatalogo } from '../../../../utils/datos'
 
 const getImages = p =>
   p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : []
@@ -24,7 +17,7 @@ export const revalidate = 60
 // --- Metadata dinámica para SEO (se renderiza en el server) ---
 export async function generateMetadata({ params }) {
   const { slug } = await params
-  const products = getProducts()
+  const products = await leerCatalogo()
   const product = findBySlug(products, slug)
 
   if (!product) {
@@ -80,7 +73,7 @@ export async function generateMetadata({ params }) {
 export default async function ProductoPage({ params, searchParams }) {
   const { slug } = await params
   const { modo } = (await searchParams) ?? {}
-  const products = getProducts()
+  const products = await leerCatalogo()
   const found = findBySlug(products, slug)
 
   if (!found) notFound()

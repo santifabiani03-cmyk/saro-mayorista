@@ -1,14 +1,12 @@
-import fs from 'node:fs'
-import path from 'node:path'
 import { NextResponse } from 'next/server'
 import { toSlug } from '../../../utils/slug'
+import { leerCatalogo } from '../../../utils/datos'
 
-const CATALOG_FILE = path.resolve('catalog/products.json')
 const BASE_URL = 'https://saro.com.ar'
 
 export async function GET() {
   try {
-    const data = JSON.parse(fs.readFileSync(CATALOG_FILE, 'utf-8'))
+    const data = await leerCatalogo()
     // Las paletas sólo se publican con precio minorista: sin él, la ficha
     // redirige a /paletas y no tiene sentido mandársela a Google.
     const visibleProducts = data.filter(p => p.visible !== false

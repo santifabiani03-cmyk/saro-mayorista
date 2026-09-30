@@ -1,15 +1,12 @@
-import fs from 'node:fs'
-import path from 'node:path'
 import { NextResponse } from 'next/server'
 import { SITE, armarFeed } from '../../utils/feed'
+import { leerCatalogo } from '../../utils/datos'
 
 // Feed de productos para Meta (Catálogo de Commerce Manager) y Google Merchant
 // Center. Los dos leen el mismo formato: RSS 2.0 con el espacio de nombres "g:".
-// Se arma solo desde catalog/products.json: cada vez que el admin publica, Vercel
-// reconstruye la web y el feed queda al día. Meta/Google lo vuelven a leer con
-// la frecuencia que se configure allá (ver docs/PUBLICIDAD.md).
-
-const CATALOG_FILE = path.resolve('catalog/products.json')
+// Se arma solo desde el catálogo publicado (rama "datos", ver utils/datos.js):
+// queda al día a los pocos minutos de publicar desde el admin. Meta/Google lo
+// vuelven a leer con la frecuencia que se configure allá (ver docs/PUBLICIDAD.md).
 
 const esc = v =>
   String(v)
@@ -30,7 +27,7 @@ function itemXml(item) {
 
 export async function GET() {
   try {
-    const productos = JSON.parse(fs.readFileSync(CATALOG_FILE, 'utf-8'))
+    const productos = await leerCatalogo()
     const { dentro } = armarFeed(productos)
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>

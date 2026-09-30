@@ -263,9 +263,8 @@ export default function AdminPage() {
   const handleDeploy = async () => {
     setDeploying(true)
     try {
-      // Llama al serverless /api/publish (tanto en dev como en prod)
-      // En dev: vite.config.js intercepta y guarda localmente
-      // En prod: Vercel serverless function usa GITHUB_TOKEN server-side → no hay error ISO-8859-1
+      // /api/publish guarda el catálogo en la rama "datos" de GitHub: no hay
+      // deploy, la web lo toma en menos de un minuto.
       const res  = await fetch('/api/publish', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
@@ -278,26 +277,12 @@ export default function AdminPage() {
       const json = await res.json()
       if (!json.ok) throw new Error(json.error ?? 'Error desconocido')
 
-      if (isDev) {
-        // En local también disparamos el deploy a Vercel
-        const deployRes  = await fetch('/api/deploy', { method: 'POST' })
-        const deployJson = await deployRes.json()
-        if (!deployJson.ok) throw new Error(deployJson.error ?? 'Error al deployar')
-      }
-
-      // Si el server hizo merge y el total cambió, recargar productos fusionados
-      if (json.merge && json.totalProducts !== products.length) {
-        // Recargar desde el server para tener la versión fusionada
-        try {
-          const fresh = await fetch('/api/catalog').then(r => r.json())
-          setProducts(fresh)
-          setPublishedSnap(fresh)
-          setBaseProducts(JSON.parse(JSON.stringify(fresh)))
-        } catch { /* fallback: usar lo que tenemos */ }
-      } else {
-        setPublishedSnap([...products])
-        setBaseProducts(JSON.parse(JSON.stringify(products)))
-      }
+      // El server devuelve lo que quedó publicado (con el merge aplicado, si
+      // otra persona había publicado en el medio): pasa a ser la nueva base.
+      const publicados = Array.isArray(json.products) ? json.products : products
+      if (JSON.stringify(publicados) !== JSON.stringify(products)) setProducts(publicados)
+      setPublishedSnap(publicados)
+      setBaseProducts(JSON.parse(JSON.stringify(publicados)))
 
       // Notificar merge si hubo cambios de otra persona
       const m = json.merge
@@ -309,8 +294,7 @@ export default function AdminPage() {
 
       // Subir catálogo PDF en background después de publicar.
       // Se usa la lista recién publicada (products puede estar desactualizado si hubo merge).
-      const listaPublicada = await fetch('/api/catalog').then(r => r.json()).catch(() => products)
-      uploadCatalogPdf(listaPublicada, () => {}).then(() => {
+      uploadCatalogPdf(publicados, () => {}).then(() => {
         showToast('📄 Catálogo PDF actualizado', 'ok', 3000)
       }).catch(e => {
         showToast('⚠️ Se publicó el sitio, pero el PDF del catálogo no se pudo actualizar: ' +

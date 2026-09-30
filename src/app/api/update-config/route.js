@@ -1,17 +1,9 @@
 import { NextResponse } from 'next/server'
-
-const GITHUB_API = 'https://api.github.com'
+import { revalidateTag } from 'next/cache'
+import { actualizarArchivo, ETIQUETAS } from '../../../utils/datos'
 
 function clean(val) {
   return (val ?? '').replace(/^﻿/, '').trim()
-}
-
-function ghHeaders(token) {
-  return {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-    'User-Agent': 'saro-admin',
-  }
 }
 
 export async function POST(request) {
@@ -59,51 +51,14 @@ export async function POST(request) {
     return NextResponse.json({ error: 'Compra mínima sugerida inválida' }, { status: 400 })
   }
 
-  const token = clean(process.env.GITHUB_TOKEN)
-  const owner = clean(process.env.GITHUB_OWNER)
-  const repo  = clean(process.env.GITHUB_REPO)
-
-  if (!token || !owner || !repo) {
-    return NextResponse.json({ error: 'Faltan variables de entorno del servidor' }, { status: 500 })
-  }
-
   try {
-    const fileRes = await fetch(
-      `${GITHUB_API}/repos/${owner}/${repo}/contents/public/config.json`,
-      { headers: ghHeaders(token) }
-    )
-
-    let sha
-    let current = {}
-    if (fileRes.ok) {
-      const file = await fileRes.json()
-      sha = file.sha
-      try {
-        current = JSON.parse(Buffer.from(file.content.replace(/\n/g, ''), 'base64').toString('utf-8'))
-      } catch { /* use empty */ }
-    }
-
-    const merged = { ...current, ...sanitized }
-    const json = JSON.stringify(merged, null, 2) + '\n'
-    const base64 = Buffer.from(json, 'utf-8').toString('base64')
-
-    const putRes = await fetch(
-      `${GITHUB_API}/repos/${owner}/${repo}/contents/public/config.json`,
-      {
-        method: 'PUT',
-        headers: ghHeaders(token),
-        body: JSON.stringify({
-          message: 'actualizar configuración de la tienda',
-          content: base64,
-          ...(sha && { sha }),
-        }),
-      }
-    )
-
-    if (!putRes.ok) {
-      const err = await putRes.json().catch(() => ({}))
-      throw new Error(err.message ?? `GitHub API error ${putRes.status}`)
-    }
+    // Se guarda en config.json de la rama "datos" (no dispara deploy) y las
+    // páginas lo vuelven a leer en la próxima visita.
+    const merged = await actualizarArchivo('ajustes', current => ({
+      ...(current && typeof current === 'object' ? current : {}),
+      ...sanitized,
+    }), 'actualizar configuración de la tienda')
+    revalidateTag(ETIQUETAS.ajustes)
 
     return NextResponse.json({ ok: true, config: merged })
   } catch (e) {

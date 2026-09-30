@@ -1,9 +1,6 @@
 import { NextResponse } from 'next/server'
-import fs from 'node:fs'
-import path from 'node:path'
 import { CONOCIMIENTO, INSTRUCCIONES } from '../../../utils/botKnowledge'
-
-const CATALOG_FILE = path.resolve('catalog/products.json')
+import { leerCatalogo } from '../../../utils/datos'
 
 // ── Límites (protegen el costo y evitan abuso) ──
 const MAX_MSG_CHARS = 500   // largo máximo de un mensaje del cliente
@@ -29,10 +26,10 @@ function rateLimited(ip) {
 }
 
 /** Catálogo compacto (sólo lo visible) para darle contexto al modelo. */
-function catalogoParaPrompt() {
+async function catalogoParaPrompt() {
   let products = []
   try {
-    products = JSON.parse(fs.readFileSync(CATALOG_FILE, 'utf-8'))
+    products = await leerCatalogo()
   } catch { return '(catálogo no disponible)' }
 
   const pesos = n => `$${Number(n).toLocaleString('es-AR')}`
@@ -130,7 +127,7 @@ export async function POST(request) {
     INSTRUCCIONES,
     '\n## INFORMACIÓN DE SARO\n' + CONOCIMIENTO,
     '\n## MOMENTO ACTUAL\n' + momentoActual(),
-    '\n## CATÁLOGO ACTUAL (los únicos productos y precios válidos)\n' + catalogoParaPrompt(),
+    '\n## CATÁLOGO ACTUAL (los únicos productos y precios válidos)\n' + await catalogoParaPrompt(),
   ].join('\n')
 
   const pedirAGemini = () =>

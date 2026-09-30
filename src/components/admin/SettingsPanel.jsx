@@ -14,7 +14,7 @@ export default function SettingsPanel({ onToast }) {
   const [phoneNumber, setPhoneNumber] = useState('')
 
   useEffect(() => {
-    fetch('/config.json')
+    fetch('/api/config', { cache: 'no-store' })
       .then(r => r.json())
       .then(data => {
         setConfig(data)
@@ -61,7 +61,7 @@ export default function SettingsPanel({ onToast }) {
       const json = await res.json()
       if (!json.ok) throw new Error(json.error ?? 'Error desconocido')
       setConfig(json.config)
-      onToast?.('✅ Configuración guardada. Se aplicará en el próximo deploy.')
+      onToast?.('✅ Configuración guardada. En menos de un minuto se ve en la web.')
     } catch (e) {
       onToast?.('❌ Error al guardar: ' + (e?.message ?? ''), 'error')
     } finally {
@@ -82,7 +82,7 @@ export default function SettingsPanel({ onToast }) {
       <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
         <div className="px-6 py-5 border-b border-gray-100">
           <h2 className="font-extrabold text-lg text-gray-900">Ajustes de la tienda</h2>
-          <p className="text-sm text-gray-400 mt-0.5">Los cambios se aplican en el próximo deploy</p>
+          <p className="text-sm text-gray-400 mt-0.5">Los cambios se ven en la web en menos de un minuto</p>
         </div>
 
         <div className="px-6 py-5 space-y-6">

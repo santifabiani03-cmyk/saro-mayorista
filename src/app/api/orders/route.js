@@ -1,13 +1,12 @@
-import fs from 'node:fs'
-import path from 'node:path'
 import { NextResponse } from 'next/server'
-
-const ORDERS_FILE = path.resolve('catalog/orders.json')
+import { leerArchivo } from '../../../utils/datos'
 
 function clean(val) {
   return (val ?? '').replace(/^﻿/, '').trim()
 }
 
+// Pedidos registrados (para la pestaña Demanda del admin). Se leen en el
+// momento de la rama "datos", sin caché: siempre incluyen el último pedido.
 export async function GET(request) {
   const correctPin = clean(process.env.ADMIN_PIN)
   const { searchParams } = new URL(request.url)
@@ -18,15 +17,12 @@ export async function GET(request) {
   }
 
   try {
-    if (!fs.existsSync(ORDERS_FILE)) {
-      return NextResponse.json([])
-    }
-    const data = fs.readFileSync(ORDERS_FILE, 'utf-8')
-    return new NextResponse(data, {
-      status: 200,
-      headers: { 'Content-Type': 'application/json; charset=utf-8' },
+    const { datos } = await leerArchivo('pedidos')
+    return NextResponse.json(Array.isArray(datos) ? datos : [], {
+      headers: { 'Cache-Control': 'no-store' },
     })
-  } catch {
-    return NextResponse.json([])
+  } catch (e) {
+    console.error('No se pudieron leer los pedidos:', e)
+    return NextResponse.json({ error: 'No se pudieron leer los pedidos' }, { status: 500 })
   }
 }

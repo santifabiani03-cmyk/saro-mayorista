@@ -1,4 +1,5 @@
 import { NextResponse } from 'next/server'
+import { actualizarArchivo } from '../../../utils/datos'
 
 // ── Rate limiting por IP para pedidos ──
 const ORDER_MAX      = 10          // máx pedidos por ventana
@@ -23,53 +24,7 @@ function checkOrderLimit(ip) {
   return true
 }
 
-const GITHUB_API = 'https://api.github.com'
-
-function ghHeaders(token) {
-  return {
-    Authorization: `Bearer ${token}`,
-    'Content-Type': 'application/json',
-    'User-Agent': 'saro-admin',
-  }
-}
-
-function clean(val) {
-  return (val ?? '').replace(/^﻿/, '').trim()
-}
-
-async function getFile(owner, repo, path, token) {
-  const res = await fetch(
-    `${GITHUB_API}/repos/${owner}/${repo}/contents/${path}`,
-    { headers: ghHeaders(token) }
-  )
-  if (!res.ok) return null
-  return res.json()
-}
-
-async function putFile(owner, repo, path, base64Content, message, token, sha) {
-  const body = { message, content: base64Content, ...(sha && { sha }) }
-  const res = await fetch(
-    `${GITHUB_API}/repos/${owner}/${repo}/contents/${path}`,
-    { method: 'PUT', headers: ghHeaders(token), body: JSON.stringify(body) }
-  )
-  if (!res.ok) {
-    const err = await res.json().catch(() => ({}))
-    throw new Error(err.message ?? `GitHub API error ${res.status}`)
-  }
-}
-
 export async function POST(request) {
-  const token = clean(process.env.GITHUB_TOKEN)
-  const owner = clean(process.env.GITHUB_OWNER)
-  const repo = clean(process.env.GITHUB_REPO)
-
-  if (!token || !owner || !repo) {
-    return NextResponse.json(
-      { error: 'Faltan variables de entorno' },
-      { status: 500 }
-    )
-  }
-
   // Rate limit: máx 10 pedidos cada 30 min por IP
   const ip = getClientIp(request)
   if (!checkOrderLimit(ip)) {
@@ -117,22 +72,12 @@ export async function POST(request) {
   }
 
   try {
-    const ORDERS_PATH = 'catalog/orders.json'
-    const file = await getFile(owner, repo, ORDERS_PATH, token)
-
-    let orders = []
-    if (file?.content) {
-      try {
-        const raw = Buffer.from(file.content.replace(/\n/g, ''), 'base64').toString('utf-8')
-        orders = JSON.parse(raw)
-      } catch { /* archivo corrupto, empezar de cero */ }
-    }
-
-    orders.push(order)
-
-    const json = JSON.stringify(orders, null, 2)
-    const base64 = Buffer.from(json, 'utf-8').toString('base64')
-    await putFile(owner, repo, ORDERS_PATH, base64, `pedido ${order.id}`, token, file?.sha)
+    // Se agrega a orders.json de la rama "datos" (no dispara deploy). Si entran
+    // dos pedidos a la vez, actualizarArchivo reintenta y no se pierde ninguno.
+    await actualizarArchivo('pedidos', orders => [
+      ...(Array.isArray(orders) ? orders : []),
+      order,
+    ], `pedido ${order.id}`)
 
     return NextResponse.json({ ok: true, orderId: order.id })
   } catch (e) {

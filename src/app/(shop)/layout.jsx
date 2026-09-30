@@ -1,10 +1,7 @@
-import fs from 'node:fs'
-import path from 'node:path'
 import ShopShell from './ShopShell'
+import { leerAjustes } from '../../utils/datos'
 
-export default function ShopLayout({ children }) {
-  const config = JSON.parse(
-    fs.readFileSync(path.resolve('public/config.json'), 'utf-8')
-  )
+export default async function ShopLayout({ children }) {
+  const config = await leerAjustes()
   return <ShopShell config={config}>{children}</ShopShell>
 }
