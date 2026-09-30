@@ -3,23 +3,27 @@ import { COLOR_MAP } from './colors'
 import orbitronBase64 from '../fonts/orbitron-base64'
 
 // Ancho máximo (px) al que se reducen las fotos antes de meterlas en el PDF.
-// Las cards del catálogo son chicas, así que con esto se ven bien y el archivo
-// queda liviano: con las fotos en tamaño original el PDF no se podía subir.
-const MAX_IMG_W = 700
+// Las cards miden 9 cm: a 600 px se ven igual que a 700 (comparado con zoom)
+// y el PDF pesa bastante menos. Con las fotos en tamaño original no se podía subir.
+const MAX_IMG_W = 600
+
+// Los logos son PNG con transparencia: sin compresión jsPDF los guarda crudos
+// y ocupaban ~1,9 MB, el 40 % del PDF. Comprimidos se ven igual.
+const COMPRESION_PNG = 'FAST'
 
 /**
  * Carga una imagen y la devuelve con esquinas superiores redondeadas.
  * Las esquinas redondeadas se rellenan con blanco para que se fundan
  * con el fondo blanco de la pagina.
  */
-function loadImageRounded(url, cornerPct = 3) {
+function loadImageRounded(url, cornerPct = 3, maxW = MAX_IMG_W) {
   return new Promise(resolve => {
     const img = new Image()
     img.crossOrigin = 'anonymous'
     img.onload = () => {
       // Se redimensiona: las fotos originales (1200px+) hacían un PDF tan pesado
       // que la subida fallaba. A este ancho la card se sigue viendo nítida.
-      const escala = Math.min(1, MAX_IMG_W / img.naturalWidth)
+      const escala = Math.min(1, maxW / img.naturalWidth)
       const w = Math.round(img.naturalWidth * escala)
       const h = Math.round(img.naturalHeight * escala)
       const r = Math.round(w * cornerPct / 100)
@@ -248,7 +252,7 @@ function drawColorCircles(doc, product, x, y, maxWidth) {
       const hexB = COLOR_MAP[partB.trim()] ?? '#e5e7eb'
       const swatchImg = makeSplitCircle(hexA, hexB)
       const diam = circleR * 2
-      doc.addImage(swatchImg, 'PNG', cx - circleR, cy - circleR, diam, diam)
+      doc.addImage(swatchImg, 'PNG', cx - circleR, cy - circleR, diam, diam, undefined, COMPRESION_PNG)
       doc.setDrawColor(180, 180, 180)
       doc.setLineWidth(0.2)
       doc.circle(cx, cy, circleR, 'S')
@@ -289,8 +293,9 @@ function drawColorCircles(doc, product, x, y, maxWidth) {
 /**
  * Exporta un catalogo PDF con los productos visibles.
  * Ropa separada por genero (Mujer, Hombre, Unisex), Padel y Paletas aparte.
+ * `anchoFotos`: ancho máximo de las fotos (px); más chico = PDF más liviano.
  */
-export async function exportCatalogPdf(products, onProgress, { skipDownload = false } = {}) {
+export async function exportCatalogPdf(products, onProgress, { skipDownload = false, anchoFotos = MAX_IMG_W } = {}) {
   const visible = products.filter(p => p.visible !== false)
   if (visible.length === 0) {
     alert('No hay productos visibles para exportar.')
@@ -403,7 +408,7 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
     const logoAspect = logoMain.width / logoMain.height
     const logoW = 100
     const logoH2 = logoW / logoAspect
-    doc.addImage(logoMain.dataUrl, 'PNG', pageW / 2 - logoW / 2, 75, logoW, logoH2)
+    doc.addImage(logoMain.dataUrl, 'PNG', pageW / 2 - logoW / 2, 75, logoW, logoH2, undefined, COMPRESION_PNG)
   }
 
   const logoBottom = logoMain ? 75 + (100 / (logoMain.width / logoMain.height)) + 12 : 130
@@ -485,7 +490,7 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
       const iconAspect = logoIcon.width / logoIcon.height
       const iconH2 = 12
       const iconW2 = iconH2 * iconAspect
-      doc.addImage(logoIcon.dataUrl, 'PNG', pageW - margin - iconW2 + 2, (sectionHeaderH - iconH2) / 2, iconW2, iconH2)
+      doc.addImage(logoIcon.dataUrl, 'PNG', pageW - margin - iconW2 + 2, (sectionHeaderH - iconH2) / 2, iconW2, iconH2, undefined, COMPRESION_PNG)
     }
 
     let y = startY
@@ -510,7 +515,7 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
           const iconAspect = logoIcon.width / logoIcon.height
           const iconH3 = 6
           const iconW3 = iconH3 * iconAspect
-          doc.addImage(logoIcon.dataUrl, 'PNG', pageW - margin - iconW3 + 2, 2, iconW3, iconH3)
+          doc.addImage(logoIcon.dataUrl, 'PNG', pageW - margin - iconW3 + 2, 2, iconW3, iconH3, undefined, COMPRESION_PNG)
         }
 
         y = contSY
@@ -562,7 +567,7 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
       } else {
         // ═══ CARD ESTÁNDAR (ropa / padel) ═══
         if (imgUrl) {
-          const imgData = await loadImageRounded(imgUrl, 4)
+          const imgData = await loadImageRounded(imgUrl, 4, anchoFotos)
           if (imgData) {
             doc.addImage(imgData.dataUrl, 'JPEG', x, y, cardW, iH)
           } else {
@@ -596,7 +601,7 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
         const wmAspect = logoCardWm.width / logoCardWm.height
         const wmH = 4.5
         const wmW = wmH * wmAspect
-        doc.addImage(logoCardWm.dataUrl, 'PNG', x + cardW - wmW - 2, y + 2, wmW, wmH)
+        doc.addImage(logoCardWm.dataUrl, 'PNG', x + cardW - wmW - 2, y + 2, wmW, wmH, undefined, COMPRESION_PNG)
       }
 
       // Siguiente posicion
@@ -632,40 +637,78 @@ export async function exportCatalogPdf(products, onProgress, { skipDownload = fa
   return { fileName, doc }
 }
 
+// Vercel corta con 413 los pedidos de más de 4,5 MB, antes de que lleguen a la
+// ruta. Lo que viaja es el PDF en base64 (un 33 % más pesado que el archivo),
+// así que se mide el pedido entero, con margen.
+const LIMITE_PEDIDO = 4_300_000
+
+// Si el PDF no entra, se rearma con fotos más chicas en vez de fallar: así no
+// se vuelve a romper cuando crezca el catálogo. Con 50 productos a 600 px el
+// pedido pesa ~3,6 MB.
+const ANCHOS_FOTOS = [MAX_IMG_W, 480, 380]
+
+// Subirlo cuando cambie el diseño del PDF: obliga a regenerarlo aunque los
+// productos sigan iguales.
+const VERSION_PDF = 2
+
 /**
- * Genera el catálogo PDF y lo sube a GitHub (sin descargar).
- * Se llama automáticamente después de publicar.
+ * Huella de lo que muestra el PDF: nombre, categoría, género, colores y la
+ * primera foto de cada producto visible (precio y stock no aparecen). Cada PDF
+ * subido queda para siempre en el historial del repo (~2,7 MB), así que si la
+ * huella no cambió no se sube otro igual.
+ */
+async function huellaCatalogo(visible) {
+  const datos = JSON.stringify([VERSION_PDF, visible.map(p => [
+    p.nombre, p.categoria, p.genero ?? null, p.colores ?? [], p.imagenes?.[0] ?? p.imagen ?? null,
+  ])])
+  const hash = await crypto.subtle.digest('SHA-256', new TextEncoder().encode(datos))
+  return [...new Uint8Array(hash).slice(0, 8)].map(b => b.toString(16).padStart(2, '0')).join('')
+}
+
+async function enviarCatalogo(cuerpo) {
+  const res = await fetch('/api/upload-catalog', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: cuerpo,
+  })
+  if (res.status === 413) throw new Error('El PDF es demasiado pesado para subirlo')
+  const json = await res.json().catch(() => ({}))
+  if (!res.ok || !json.ok) throw new Error(json.error ?? `Error ${res.status} al subir el catálogo`)
+  return json
+}
+
+/**
+ * Genera el catálogo PDF y lo sube a GitHub (sin descargar), sólo si cambió
+ * algo de lo que muestra. Se llama automáticamente después de publicar.
+ * Devuelve { ok, sinCambios } (sinCambios: el PDF publicado ya estaba al día).
  */
 export async function uploadCatalogPdf(products, onProgress) {
   const visible = products.filter(p => p.visible !== false)
   if (visible.length === 0) throw new Error('No hay productos visibles para el catálogo')
 
-  const result = await exportCatalogPdf(products, onProgress, { skipDownload: true })
-  if (!result?.doc) throw new Error('No se pudo generar el PDF')
+  const pin = sessionStorage.getItem('saro_admin_pin') ?? ''
+  const huella = await huellaCatalogo(visible)
 
-  onProgress?.('Subiendo catálogo…')
-  const pdfBase64 = result.doc.output('datauristring').split(',')[1]
+  // Se pregunta antes de armar el PDF, que tarda varios segundos
+  const consulta = await enviarCatalogo(JSON.stringify({ pin, huella }))
+  if (!consulta.necesario) return { ok: true, sinCambios: true }
 
-  // El servidor no acepta cuerpos muy grandes: si el PDF quedó pesado, avisamos
-  // en vez de fallar en silencio (era lo que dejaba el catálogo desactualizado).
-  const mb = (pdfBase64.length * 0.75) / 1048576
-  if (mb > 4) {
-    throw new Error(
-      `El PDF quedó en ${mb.toFixed(1)} MB y no se puede subir (máximo ~4 MB). ` +
-      `Probá reduciendo la cantidad de productos visibles o el peso de las fotos.`
-    )
+  let bytes = 0
+  for (const anchoFotos of ANCHOS_FOTOS) {
+    const result = await exportCatalogPdf(products, onProgress, { skipDownload: true, anchoFotos })
+    if (!result?.doc) throw new Error('No se pudo generar el PDF')
+
+    const data = result.doc.output('datauristring').split(',')[1]
+    const cuerpo = JSON.stringify({ data, pin, huella })
+    bytes = new Blob([cuerpo]).size
+    if (bytes > LIMITE_PEDIDO) continue
+
+    onProgress?.('Subiendo catálogo…')
+    return enviarCatalogo(cuerpo)
   }
 
-  const pin = sessionStorage.getItem('saro_admin_pin') ?? ''
-  const res = await fetch('/api/upload-catalog', {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    body: JSON.stringify({ data: pdfBase64, pin }),
-  })
-
-  if (res.status === 413) throw new Error('El PDF es demasiado pesado para subirlo')
-  const json = await res.json().catch(() => ({}))
-  if (!res.ok || !json.ok) throw new Error(json.error ?? `Error ${res.status} al subir el catálogo`)
-
-  return json
+  throw new Error(
+    `El PDF quedó en ${(bytes / 1e6).toFixed(1)} MB aun con las fotos más chicas y no se puede subir ` +
+    `(máximo ~${(LIMITE_PEDIDO / 1e6).toFixed(1)} MB). Hay que aliviar el diseño del PDF.`
+  )
 }

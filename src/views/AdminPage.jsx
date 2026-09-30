@@ -294,8 +294,9 @@ export default function AdminPage() {
 
       // Subir catálogo PDF en background después de publicar.
       // Se usa la lista recién publicada (products puede estar desactualizado si hubo merge).
-      uploadCatalogPdf(publicados, () => {}).then(() => {
-        showToast('📄 Catálogo PDF actualizado', 'ok', 3000)
+      // Si sólo cambiaron precios o stock (el PDF no los muestra) no se sube otro.
+      uploadCatalogPdf(publicados, () => {}).then(r => {
+        showToast(r?.sinCambios ? '📄 El catálogo PDF ya estaba al día' : '📄 Catálogo PDF actualizado', 'ok', 3000)
       }).catch(e => {
         showToast('⚠️ Se publicó el sitio, pero el PDF del catálogo no se pudo actualizar: ' +
           (e?.message ?? 'error desconocido'), 'error', 9000)
