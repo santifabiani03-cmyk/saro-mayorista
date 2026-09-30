@@ -351,6 +351,7 @@
   {
     "nombre": "Saro SR Junior ",
     "precio": 75000,
+    "precioMinorista": 99999,
     "peso": 300,
     "descripcion": "La paleta Saro SR Junior está diseñada específicamente para niños de entre 6 y 12 años.\nSu matriz especial ofrece un equilibrio óptimo para el desarrollo de jóvenes jugadores de pádel. Este modelo asegura un control adecuado y una experiencia de juego cómoda. Es una opción confiable para iniciarse en el deporte.\nEl peso puede variar entre 290 g y 310 g. ",
     "tags": [
@@ -378,7 +379,7 @@
         "Celeste"
       ]
     },
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "fechaActualizacion": "2026-09-30T23:17:47.654Z",
     "_aiLoading": false,
     "_aiCount": 2,
     "imagenes": [
