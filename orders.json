@@ -1310,5 +1310,21 @@
     ],
     "total": 127600,
     "totalItems": 13
+  },
+  {
+    "id": "o1790855668012",
+    "fecha": "2026-10-01T11:54:28.012Z",
+    "items": [
+      {
+        "productId": "p1779495548570",
+        "nombre": "Mochila Paletera",
+        "precio": 27000,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 2
+      }
+    ],
+    "total": 54000,
+    "totalItems": 2
   }
 ]
