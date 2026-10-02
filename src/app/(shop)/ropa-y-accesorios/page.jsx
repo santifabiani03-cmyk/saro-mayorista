@@ -1,5 +1,5 @@
 import CatalogView from '../CatalogView'
-import { leerCatálogo } from '../../../utils/datos'
+import { leerCatalogo } from '../../../utils/datos'
 
 // Revalidar cada 60 segundos (ISR)
 export const revalidate = 60
