@@ -621,9 +621,15 @@ reemplazó y sigue igual.
 - **Vortice X:** la descripción nueva sólo dice lo que se ve en la foto (caras de carbono 12K).
   Falta confirmar forma, balance y nivel de juego para completarla.
 - **"TUBO PELOTAS x2 NOVA"** no tiene descripción y parece repetido con "Pelotas Nova Padel Pro".
-- **Email `@saro.com.ar` (Zoho, plan gratis):** dominio verificado y MX cargados en el DNS de
-  Vercel. Falta **crear las casillas** (`ventas@`, `info@`, la personal) y el alias `consultas@`
-  → `info@`. La cuenta admin es `smfabiani11` (no se borra, es la dueña de la organización).
+- **Email `@saro.com.ar` (Zoho, plan gratis):** DNS completo en Vercel (01/10/2026): MX,
+  verificación, **SPF** (`v=spf1 include:zohomail.com ~all`), **DKIM** (selector `zmail`) y
+  **DMARC** (`p=none`, reportes a `administracion@`). Las casillas ya están creadas
+  (01/10/2026); los nombres y alias los va ajustando smfab desde mailadmin.zoho.com. La cuenta
+  admin `smfabiani11` no se borra (es la dueña de la organización). El plan gratis permite
+  **5 usuarios** (los alias no cuentan) y **no tiene IMAP/POP**: se lee en mail.zoho.com o en
+  la app Zoho Mail. ⚠️ Si se renombra o borra `administracion@`, actualizar el `rua=` del
+  registro `_dmarc` en Vercel. Pendiente: pasar DMARC a `p=quarantine` cuando el envío ande
+  bien unas semanas.
 - **Modelos 3D extra:** smfab va a pasar 2–3 `.glb` más para que el hero rote entre ellos (§4.3).
 - **Opiniones de clientes:** propuesto un carrusel administrable + botón "Dejá tu opinión en
   Google" (falta el link de la ficha). Traer reseñas automáticas de Google requiere Places API
