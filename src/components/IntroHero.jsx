@@ -180,14 +180,16 @@ export default function IntroHero({ productCount = 0, onExplore }) {
             <p className="intro-rise intro-rise-1 text-[11px] sm:text-xs font-bold uppercase tracking-[.32em] text-saro-blue mb-3">
               Tienda oficial · Argentina
             </p>
-            <p className="intro-rise intro-rise-2 text-4xl sm:text-6xl font-extrabold text-saro-dark leading-[1.05] tracking-tight max-w-4xl mx-auto">
+            {/* El título principal de la portada para Google (único <h1> de "/"). */}
+            <h1 className="intro-rise intro-rise-2 text-4xl sm:text-6xl font-extrabold text-saro-dark leading-[1.05] tracking-tight max-w-4xl mx-auto">
               El padel arranca<br className="hidden sm:block" /> en{' '}
               <img
                 src="/assets/saro-wordmark.png"
                 alt="SARO"
                 className="inline-block h-[0.6em] w-auto align-baseline"
               />
-            </p>
+              <span className="sr-only">: paletas de pádel, accesorios y ropa deportiva</span>
+            </h1>
           </div>
 
           {/* Bloque 2 */}

@@ -1,19 +1,19 @@
 import CatalogView from '../../CatalogView'
-import { leerCatalogo } from '../../../../utils/datos'
+import { leerCatálogo } from '../../../../utils/datos'
 
 // Revalidar cada 60 segundos (ISR)
 export const revalidate = 60
 
 export const metadata = {
-  title: 'Ropa Deportiva y Accesorios de Padel al por Mayor | SARO Mayorista',
+  title: 'Ropa Deportiva y Accesorios de Pádel al por Mayor | SARO Mayorista',
   description:
-    'Catalogo mayorista de ropa deportiva y accesorios de padel SARO: remeras, buzos, calzas, shorts, camperas, medias, grips, cubre grips, pelotas, bolsos y mochilas. Precios exclusivos por cantidad y envios a toda Argentina.',
+    'Catálogo mayorista de ropa deportiva y accesorios de pádel SARO: remeras, buzos, calzas, shorts, camperas, medias, grips, cubre grips, pelotas, bolsos y mochilas. Precios exclusivos por cantidad y envíos a toda Argentina.',
   alternates: { canonical: 'https://saro.com.ar/ropa-y-accesorios/mayorista' },
   openGraph: {
     type: 'website',
-    title: 'Ropa Deportiva y Accesorios de Padel al por Mayor | SARO',
+    title: 'Ropa Deportiva y Accesorios de Pádel al por Mayor | SARO',
     description:
-      'Ropa deportiva y accesorios de padel al por mayor: indumentaria, grips, pelotas, bolsos y mochilas. Precios mayoristas exclusivos. Envios a toda Argentina.',
+      'Ropa deportiva y accesorios de pádel al por mayor: indumentaria, grips, pelotas, bolsos y mochilas. Precios mayoristas exclusivos. Envíos a toda Argentina.',
     url: 'https://saro.com.ar/ropa-y-accesorios/mayorista',
     siteName: 'SARO Mayorista',
     locale: 'es_AR',

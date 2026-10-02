@@ -158,7 +158,7 @@ export default function Cart({ config }) {
     track('finalizar_pedido', {
       value: total,
       currency: 'ARS',
-      items: totalItems,
+      unidades: totalItems,
       envio: envioElegido ? envioElegido.tipo : (modoEnvio === 'whatsapp' ? 'a_coordinar' : 'sin_definir'),
     })
     window.open(`https://wa.me/${config.whatsappNumber}?text=${encodeURIComponent(buildMessage())}`, '_blank')

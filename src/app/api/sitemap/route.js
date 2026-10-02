@@ -4,6 +4,12 @@ import { leerCatalogo } from '../../../utils/datos'
 
 const BASE_URL = 'https://saro.com.ar'
 
+const imagenes = p => (p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : [])
+const absUrl = u => (u.startsWith('http') ? u : `${BASE_URL}${u.startsWith('/') ? '' : '/'}${u}`)
+const xmlEscape = s => String(s)
+  .replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;')
+  .replace(/"/g, '&quot;').replace(/'/g, '&apos;')
+
 export async function GET() {
   try {
     const data = await leerCatalogo()
@@ -47,17 +53,22 @@ export async function GET() {
       ...visibleProducts.map(
         p => {
           const lastmod = p.fechaActualizacion || p.fechaPublicacion
+          // Las fotos van al sitemap para que aparezcan en Google Imágenes.
+          const fotos = imagenes(p).slice(0, 5).map(u => `
+    <image:image>
+      <image:loc>${xmlEscape(absUrl(u))}</image:loc>
+    </image:image>`).join('')
           return `  <url>
     <loc>${BASE_URL}/producto/${toSlug(p.nombre, p.id)}</loc>${lastmod ? `\n    <lastmod>${new Date(lastmod).toISOString().split('T')[0]}</lastmod>` : ''}
     <changefreq>weekly</changefreq>
-    <priority>0.8</priority>
+    <priority>0.8</priority>${fotos}
   </url>`
         }
       ),
     ]
 
     const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9" xmlns:image="http://www.google.com/schemas/sitemap-image/1.1">
 ${urls.join('\n')}
 </urlset>`
 

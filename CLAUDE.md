@@ -5,7 +5,7 @@
 > chats viejos ni preguntar nada. Prioriza ser exhaustivo. Si algo cambia, actualizá este
 > archivo y `docs/ESTETICA.md`.
 
-Última actualización: 2026-09-30.
+Última actualización: 2026-10-01.
 
 > ⚠️ **Cambio importante (agosto 2026): el sitio pasó de MAYORISTA a MINORISTA.**
 > La tienda principal es minorista (`/paletas` y `/ropa-y-accesorios`, precio `precioMinorista`).
@@ -69,7 +69,7 @@ MiCorreo de Correo Argentino) — pero el envío igual se cierra por WhatsApp.
 | 3D del hero | **Three.js 0.185** (la paleta que gira/juega) |
 | Generación de PDF | jspdf + pdf-lib + pdfjs-dist (catálogo y etiquetas) |
 | Quitar fondo de fotos | @imgly/background-removal (corre en el navegador, gratis) |
-| Analytics | @vercel/analytics + @vercel/speed-insights + **Google Analytics 4** (`G-WSMCJDHZWH`, en `layout.jsx` con `next/script`) |
+| Analytics | @vercel/analytics + @vercel/speed-insights + **Google Analytics 4** (`G-WSMCJDHZWH`, en `src/components/GoogleAnalytics.jsx`; no mide `/admin`, `/lab*` ni navegadores con `?no-medir=1`) |
 | Envíos | **API MiCorreo** (Correo Argentino) para cotizar — ver §2.10 |
 | Videos del admin | **Remotion 4.0.529** (versión exacta en todos los paquetes) — vista previa en el admin, render en GitHub Actions. Ver §8 |
 
@@ -226,7 +226,7 @@ Todas están en `src/app/api/<nombre>/route.js`:
 | `/api/generate-description` | POST | IA (Gemini): genera descripción de producto | Sí |
 | `/api/generate-image` | POST | IA (Gemini): genera imagen de escena del producto | Sí |
 | `/api/update-config` | POST | Guarda `config.json` (compra mínima, teléfono) en la rama `datos` | Sí |
-| `/api/sitemap` | GET | Genera el sitemap XML para Google | No |
+| `/api/sitemap` | GET | Genera el sitemap XML para Google (con las fotos de cada producto). También responde en **`/sitemap.xml`** (rewrite en `next.config.mjs`), que es la dirección que figura en `robots.txt` | No |
 | `/api/cotizar-envio` | POST | Cotiza el envío con la **API MiCorreo** (CP + peso → precio a domicilio y a sucursal). Ver §2.10 | No |
 | `/feed.xml` | GET | **Feed de productos para Meta Ads y Google Merchant Center** (se arma solo desde el catálogo). Ver `docs/PUBLICIDAD.md` | No |
 | `/feed-img` | GET | Convierte las fotos del feed a JPG 1080×1080 con fondo blanco (sólo fotos de SARO) | No |
@@ -592,7 +592,21 @@ reemplazó y sigue igual.
   cliente (`localStorage`, clave `saro_cliente`). ⚠️ **No** se mandan a `/api/track-order`
   a propósito: `orders.json` vive en un repo público.
 
+- **SEO + Analytics (01/10/2026):** `/sitemap.xml` era un archivo viejo con 1 sola página;
+  ahora es el sitemap dinámico (todas las páginas + fotos). La portada tiene su `<h1>` real
+  (el titular del hero) y se sacó el `<h1>` del `<noscript>` que duplicaba títulos en todas
+  las páginas. Fichas con datos estructurados completos (url, sku, fotos, condición nueva) +
+  "miga de pan" (`BreadcrumbList`). GA4 ya no mide el admin ni al equipo (`?no-medir=1`), y
+  el pedido manda además `begin_checkout` con los productos (embudo de compras de GA4).
+
 ### 🟡 Pendiente / a decidir con el dueño
+- **Google Analytics / Search Console (lo hace smfab en los paneles, ver la conversación del
+  01/10/2026):** marcar `finalizar_pedido` y `trabaja_con_nosotros` como **eventos clave**;
+  retención de datos a **14 meses**; **vincular Search Console** con GA4; reenviar el
+  sitemap `https://saro.com.ar/sitemap.xml` en Search Console; entrar una vez a
+  `saro.com.ar/?no-medir=1` desde cada navegador propio (PC y celular).
+- **Redes sociales en Schema.org:** falta poner los links de Instagram/Facebook de SARO en
+  `sameAs` del bloque `Organization` (`layout.jsx`) para que Google los asocie a la marca.
 - **Publicidad (Meta/Google):** feed, Pixel de Meta, eventos y pestaña **📣 Publicidad** del admin
   ya hechos (ver **`docs/PUBLICIDAD.md`**). Falta que smfab cree la cuenta comercial de Meta y
   cargue `NEXT_PUBLIC_META_PIXEL_ID` en Vercel. Sólo salen en anuncios los productos con

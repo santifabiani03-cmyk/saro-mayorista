@@ -1,8 +1,7 @@
 User-agent: *
 Allow: /
-Allow: /producto/
 Allow: /api/sitemap
 Disallow: /admin
 Disallow: /api/
 
-Sitemap: https://saro.com.ar/api/sitemap
+Sitemap: https://saro.com.ar/sitemap.xml

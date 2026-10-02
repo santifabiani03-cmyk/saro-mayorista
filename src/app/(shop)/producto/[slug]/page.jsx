@@ -3,6 +3,10 @@ import { findBySlug, toSlug } from '../../../../utils/slug'
 import ProductClient from './ProductClient'
 import { leerCatalogo } from '../../../../utils/datos'
 
+// JSON para <script type="application/ld+json">: sin "<" literal, así un texto
+// cargado en el admin nunca puede cerrar la etiqueta antes de tiempo.
+const jsonLdHtml = o => JSON.stringify(o).replace(/</g, '\\u003c')
+
 const getImages = p =>
   p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : []
 
@@ -107,24 +111,35 @@ export default async function ProductoPage({ params, searchParams }) {
     : product.categoria === 'padel' ? 'Accesorio de pádel'
     : 'Ropa deportiva'
 
-  const prodImgUrl = imgs[0]
-    ? (imgs[0].startsWith('http') ? imgs[0] : `https://saro.com.ar${imgs[0]}`)
-    : undefined
+  const imgUrls = imgs.map(u => (u.startsWith('http') ? u : `https://saro.com.ar${u}`))
+  const url = `https://saro.com.ar/producto/${actual}`
 
-  // JSON-LD del producto (renderizado server-side para SEO)
+  // Catálogo al que pertenece (para la "miga de pan" de Google)
+  const catalogo = product.categoria === 'paleta'
+    ? { name: 'Paletas de pádel', item: 'https://saro.com.ar/paletas' }
+    : tieneMinorista
+      ? { name: 'Ropa y accesorios', item: 'https://saro.com.ar/ropa-y-accesorios' }
+      : { name: 'Ropa y accesorios por mayor', item: 'https://saro.com.ar/ropa-y-accesorios/mayorista' }
+
+  // JSON-LD del producto (renderizado server-side para SEO). Con esto Google
+  // puede mostrar precio y stock directamente en el resultado de búsqueda.
   const jsonLd = {
     '@context': 'https://schema.org',
     '@type': 'Product',
-    name: product.nombre,
+    name: product.nombre.trim(),
     description:
       product.descripcion || `${product.nombre.trim()} — ${catLabel} SARO`,
-    image: prodImgUrl,
+    image: imgUrls.length ? imgUrls : undefined,
+    url,
+    sku: product.id,
     brand: { '@type': 'Brand', name: 'SARO' },
     category: catLabel,
     offers: {
       '@type': 'Offer',
+      url,
       price: product.precio,
       priceCurrency: 'ARS',
+      itemCondition: 'https://schema.org/NewCondition',
       availability: product.sinStock
         ? 'https://schema.org/OutOfStock'
         : 'https://schema.org/InStock',
@@ -132,11 +147,25 @@ export default async function ProductoPage({ params, searchParams }) {
     },
   }
 
+  const breadcrumbLd = {
+    '@context': 'https://schema.org',
+    '@type': 'BreadcrumbList',
+    itemListElement: [
+      { '@type': 'ListItem', position: 1, name: 'Inicio', item: 'https://saro.com.ar/' },
+      { '@type': 'ListItem', position: 2, ...catalogo },
+      { '@type': 'ListItem', position: 3, name: product.nombre.trim(), item: url },
+    ],
+  }
+
   return (
     <>
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(jsonLd) }}
+      />
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: jsonLdHtml(breadcrumbLd) }}
       />
       <ProductClient product={product} />
     </>

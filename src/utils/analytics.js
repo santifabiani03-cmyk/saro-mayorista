@@ -8,6 +8,19 @@
  * con el `g:id` del feed (/feed.xml) para que Meta sepa qué producto vio cada
  * persona y se lo vuelva a mostrar en los anuncios de catálogo.
  */
+
+/** El admin y los laboratorios no son visitas de clientes: no se miden. */
+export const noMedirRuta = p => !!(p?.startsWith('/admin') || p?.startsWith('/lab'))
+
+/**
+ * Navegadores del equipo de SARO: entrando una vez a saro.com.ar/?no-medir=1
+ * ese navegador deja de contarse (con ?no-medir=0 vuelve a contarse). Así las
+ * visitas propias no inflan las estadísticas ni los públicos de los anuncios.
+ */
+export function noMedirEsteNavegador() {
+  try { return localStorage.getItem('saro_no_medir') === '1' } catch { return false }
+}
+
 export function track(evento, params = {}) {
   try {
     if (typeof window !== 'undefined' && typeof window.gtag === 'function') {
@@ -63,6 +76,20 @@ export function trackAgregarAlCarrito(p, cantidad) {
  */
 export function trackPedidoWhatsApp(items, total) {
   const ids = [...new Set(items.map(i => i.productId))]
+  // Evento estándar de GA4: completa el embudo de compras del panel
+  // (ver producto → agregar al carrito → iniciar compra).
+  track('begin_checkout', {
+    currency: 'ARS',
+    value: total,
+    items: items.map(i => ({
+      item_id: i.productId,
+      item_name: i.nombre,
+      item_brand: 'SARO',
+      item_variant: [i.color, i.talle].filter(Boolean).join(' / ') || undefined,
+      price: i.precio,
+      quantity: i.cantidad,
+    })),
+  })
   trackMeta('InitiateCheckout', {
     content_ids: ids,
     content_type: 'product',

@@ -24,9 +24,12 @@ Meta (Instagram/Facebook) y Google. Última actualización: 2026-09-21.
 | Entra a una página | `PageView` | (automático) |
 | Abre una ficha o el detalle de un producto | `ViewContent` | `view_item` |
 | Agrega al carrito | `AddToCart` | `add_to_cart` |
-| Manda el pedido por WhatsApp | `InitiateCheckout` | `finalizar_pedido` |
+| Manda el pedido por WhatsApp | `InitiateCheckout` | `finalizar_pedido` + `begin_checkout` (con los productos, para el embudo de compras de GA4) |
 | Toca un botón de WhatsApp (header, landing, chat, personalizados) | `Contact` | `contacto_whatsapp` |
 | Completa "Trabajá con nosotros" | `Lead` | `trabaja_con_nosotros` |
+
+No se mide el admin, ni `/lab*`, ni los navegadores del equipo que entraron una vez a
+`saro.com.ar/?no-medir=1` (con `?no-medir=0` vuelven a contarse). Vale para GA4 y Meta.
 
 El pedido va como `InitiateCheckout` y **no** como `Purchase`: la venta se cierra a
 mano por WhatsApp y la web no sabe si se concretó.

@@ -1,8 +1,8 @@
 import './globals.css'
-import Script from 'next/script'
 import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import MetaPixel from '../components/MetaPixel'
+import GoogleAnalytics from '../components/GoogleAnalytics'
 
 export const metadata = {
   title: 'SARO Tienda Oficial | Paletas de Pádel, Accesorios y Ropa',
@@ -59,6 +59,7 @@ export default function RootLayout({ children }) {
               name: 'SARO',
               url: 'https://saro.com.ar',
               logo: 'https://saro.com.ar/assets/logo-horizontal.png',
+              areaServed: { '@type': 'Country', name: 'Argentina' },
               description:
                 'SARO: marca argentina de paletas de pádel, accesorios y ropa deportiva. Tienda oficial con envíos a todo el país y venta mayorista para comercios.',
               contactPoint: {
@@ -121,7 +122,8 @@ export default function RootLayout({ children }) {
         />
         {/* Contenido para crawlers (visible antes de que cargue React) */}
         <noscript>
-          <h1>SARO — Tienda oficial de paletas de pádel, accesorios y ropa deportiva</h1>
+          {/* <p> y no <h1>: cada página ya tiene su propio título principal */}
+          <p><strong>SARO — Tienda oficial de paletas de pádel, accesorios y ropa deportiva</strong></p>
           <p>
             Paletas de pádel, accesorios de pádel, grips, bolsos, mochilas y ropa
             deportiva, con envíos a todo el país. ¿Tenés un comercio? Consultá por
@@ -132,17 +134,8 @@ export default function RootLayout({ children }) {
         <Analytics />
         <SpeedInsights />
 
-        {/* Google Analytics (gtag.js) */}
-        <Script
-          src="https://www.googletagmanager.com/gtag/js?id=G-WSMCJDHZWH"
-          strategy="afterInteractive"
-        />
-        <Script id="ga-gtag" strategy="afterInteractive">
-          {`window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-WSMCJDHZWH');`}
-        </Script>
+        {/* Google Analytics 4 (no mide el admin ni los navegadores del equipo) */}
+        <GoogleAnalytics />
 
         {/* Pixel de Meta (sólo si NEXT_PUBLIC_META_PIXEL_ID está cargado en Vercel) */}
         <MetaPixel />
