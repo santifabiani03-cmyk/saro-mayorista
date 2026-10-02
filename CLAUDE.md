@@ -600,10 +600,14 @@ reemplazó y sigue igual.
   el pedido manda además `begin_checkout` con los productos (embudo de compras de GA4).
 
 ### 🟡 Pendiente / a decidir con el dueño
-- **Google Analytics / Search Console (lo hace smfab en los paneles, ver la conversación del
-  01/10/2026):** marcar `finalizar_pedido` y `trabaja_con_nosotros` como **eventos clave**;
-  retención de datos a **14 meses**; **vincular Search Console** con GA4; reenviar el
-  sitemap `https://saro.com.ar/sitemap.xml` en Search Console; entrar una vez a
+- **Google Analytics / Search Console (hecho el 02/10/2026):** `finalizar_pedido` es evento
+  clave, retención de datos en 14 meses y Search Console vinculado con GA4. En Search Console
+  el sitemap ya estaba (`/api/sitemap`, 50 páginas); se pidió "Validar corrección" de 23
+  fichas que daban **error 5xx** a Googlebot (viejos: hoy responden bien) y la indexación de
+  `/`, `/paletas` y `/ropa-y-accesorios`. Al 01/10/2026 Google tenía **sólo 3 de 60 páginas
+  indexadas**: revisar en unas semanas (Search Console → Páginas). **Falta:** marcar
+  `trabaja_con_nosotros` con la estrella en GA4 → Administrar → Eventos cuando aparezca
+  (GA4 sólo deja marcar eventos que ya llegaron), y entrar una vez a
   `saro.com.ar/?no-medir=1` desde cada navegador propio (PC y celular).
 - **Redes sociales en Schema.org:** falta poner los links de Instagram/Facebook de SARO en
   `sameAs` del bloque `Organization` (`layout.jsx`) para que Google los asocie a la marca.
