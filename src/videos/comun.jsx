@@ -1,6 +1,5 @@
 import {
   AbsoluteFill,
-  Easing,
   Img,
   interpolate,
   spring,
@@ -248,14 +247,29 @@ export const PaletaFlotante = ({ producto, alto, ancho, delay = 0, y = 0 }) => {
 }
 
 /** Precio que cuenta hacia arriba hasta el valor real. */
+/**
+ * Precio que entra con un "pop". Antes contaba desde $0, pero en cualquier
+ * pausa se leía un precio falso ($80.000 para una paleta de $190.000); la
+ * revisión de Gemini lo marcó dos veces. Siempre se ve el precio real.
+ */
 export const PrecioAnimado = ({ valor, delay, tamano }) => {
   const frame = useCurrentFrame()
-  const p = interpolate(frame, [delay, delay + 24], [0, 1], { ...clamp, easing: Easing.out(Easing.cubic) })
-  // Redondea a miles mientras cuenta, así no "tiembla" el último dígito
-  const mostrado = p < 1 ? Math.round((valor * p) / 1000) * 1000 : valor
+  const { fps } = useVideoConfig()
+  const e = spring({ frame: frame - delay, fps, config: { damping: 10, mass: 0.6 } })
   return (
-    <span style={{ fontSize: tamano, fontWeight: 900, letterSpacing: -2, fontVariantNumeric: 'tabular-nums' }}>
-      {pesos(mostrado)}
+    <span
+      style={{
+        display: 'inline-block',
+        fontSize: tamano,
+        fontWeight: 900,
+        letterSpacing: -2,
+        fontVariantNumeric: 'tabular-nums',
+        opacity: interpolate(frame, [delay, delay + 4], [0, 1], clamp),
+        transform: `scale(${interpolate(e, [0, 1], [0.6, 1])})`,
+        transformOrigin: 'left bottom',
+      }}
+    >
+      {pesos(valor)}
     </span>
   )
 }

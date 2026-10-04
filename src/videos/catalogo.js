@@ -140,7 +140,7 @@ export const NIVELES_EFECTOS = [
   { id: 'ninguno', nombre: 'Sin efectos', detalle: 'Sólo la música' },
   { id: 'suave', nombre: 'Suaves', detalle: 'Whoosh en las transiciones y golpe en el logo' },
   { id: 'medio', nombre: 'Medios', detalle: 'Suma pops en los datos y campanita en el precio' },
-  { id: 'intenso', nombre: 'Intensos', detalle: 'Suma golpes de pelota, tic-tac y subida antes del cierre' },
+  { id: 'intenso', nombre: 'Intensos', detalle: 'Suma golpes de pelota, golpe en el precio y subida antes del cierre' },
 ]
 export const EFECTOS_DEFECTO = 'suave'
 

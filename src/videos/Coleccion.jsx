@@ -28,7 +28,8 @@ import { pesos, texto } from './textos'
 const ID = 'SaroColeccion'
 const T = 14
 const FPS = 30
-const DUR = { gancho: 80, producto: 100, linea: 110, beneficios: 100, cierre: 95 }
+// Beneficios: con 100 cuadros, la revisión de Gemini marcó que no daba para leerlos
+const DUR = { gancho: 80, producto: 115, linea: 110, beneficios: 130, cierre: 95 }
 
 // La grilla "Toda la línea" sólo tiene sentido con dos o más paletas
 const duraciones = ({ productos, musica }) =>

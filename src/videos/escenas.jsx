@@ -74,8 +74,9 @@ export const golpesGancho = () => [
 
 // ---------- Un producto: foto + nombre, specs y precio ----------
 
-// Cuadros (desde el inicio de la escena) en que entra cada cosa
-const E = { nombre: 3, extras: 10, chips: 16, chipCada: 5, precio: 26 }
+// Cuadros (desde el inicio de la escena) en que entra cada cosa: rápido, para
+// que quede tiempo de leer (la revisión de Gemini marcó que pasaba muy rápido)
+const E = { nombre: 3, extras: 8, chips: 12, chipCada: 4, precio: 20 }
 
 /**
  * `adelanto`: cuadros que la escena arranca "ya empezada" (para que el primer
@@ -219,8 +220,8 @@ export const golpesProducto = (p, adelanto = 0) =>
   [
     { f: E.nombre, sfx: 'swoosh', vol: 0.13, nivel: 'medio' },
     ...p.specs.slice(0, 6).map((_, i) => ({ f: E.chips + i * E.chipCada, sfx: 'pop', vol: 0.11, nivel: 'medio' })),
-    { f: E.precio + 24, sfx: 'ding', vol: 0.11, nivel: 'medio' },
-    ...Array.from({ length: 8 }, (_, k) => ({ f: E.precio + k * 3, sfx: 'tick', vol: 0.07, nivel: 'intenso' })),
+    { f: E.precio + 2, sfx: 'ding', vol: 0.11, nivel: 'medio' },
+    { f: E.precio, sfx: 'palmas', vol: 0.16, nivel: 'intenso' },
     ...(p.categoria === 'paleta' ? [{ f: 8, sfx: 'pelota', vol: 0.24, nivel: 'intenso' }] : []),
   ].map(g => ({ ...g, f: g.f - adelanto }))
 

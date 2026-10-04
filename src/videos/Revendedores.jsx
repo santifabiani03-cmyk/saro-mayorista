@@ -26,7 +26,8 @@ const BENEFICIOS_REVENDEDOR = [
 
 const NOMBRES_CATEGORIA = { paleta: 'Paletas', padel: 'Accesorios', ropa: 'Ropa' }
 
-const duraciones = ({ musica }) => alinearAlRitmo([85, 110, 115, 100], T, musica, FPS)
+// Los 4 beneficios necesitan tiempo para leerse (ver Coleccion.jsx)
+const duraciones = ({ musica }) => alinearAlRitmo([85, 110, 150, 100], T, musica, FPS)
 
 export const duracionRevendedores = props => duracionTotal(duraciones(props), T)
 

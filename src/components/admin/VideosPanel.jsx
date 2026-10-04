@@ -52,6 +52,103 @@ function Thumb({ p }) {
   )
 }
 
+/** Textos que propone Gemini: 3 opciones para usar con un clic, la publicación y avisos. */
+function Sugerencias({ datos, campos, onUsar, onCopiar }) {
+  if (!datos || datos.cargando) return null
+  if (datos.error) return <p className="text-xs text-red-600">❌ {datos.error}</p>
+  return (
+    <div className="rounded-xl border border-blue-100 bg-saro-light/60 p-3 space-y-2.5">
+      {datos.opciones?.length === 0 && <p className="text-xs text-gray-500">Gemini no propuso textos que respeten los límites. Probá de nuevo.</p>}
+      {datos.opciones?.map((o, i) => (
+        <div key={i} className="flex items-start gap-3 rounded-lg bg-white border border-gray-100 p-2.5">
+          <div className="flex-1 min-w-0 text-xs space-y-0.5">
+            {campos.map(c => (
+              <p key={c}>
+                <span className="text-gray-400">{CAMPOS_TEXTO[c].nombre}:</span> <span className="font-semibold text-gray-800">{o[c]}</span>
+              </p>
+            ))}
+          </div>
+          <button
+            type="button"
+            onClick={() => onUsar(o)}
+            className="flex-shrink-0 px-2.5 py-1 rounded-lg bg-saro-blue hover:bg-saro-mid text-white text-[11px] font-bold transition"
+          >
+            Usar
+          </button>
+        </div>
+      ))}
+      {datos.publicacion && (
+        <div className="rounded-lg bg-white border border-gray-100 p-2.5">
+          <div className="flex items-center justify-between mb-1">
+            <span className="text-[11px] font-semibold text-gray-500">Texto para la publicación</span>
+            <button type="button" onClick={() => onCopiar(datos.publicacion)} className="text-[11px] font-bold text-saro-blue hover:underline">
+              Copiar
+            </button>
+          </div>
+          <p className="text-xs text-gray-700 whitespace-pre-line">{datos.publicacion}</p>
+        </div>
+      )}
+      {datos.avisos?.map(a => (
+        <p key={a} className="text-[11px] text-amber-800">
+          ⚠️ {a}
+        </p>
+      ))}
+      <p className="text-[10px] text-gray-400">Lo propone Gemini con los datos de los productos. Revisalo antes de publicar.</p>
+    </div>
+  )
+}
+
+const VEREDICTOS = {
+  listo: { texto: '✅ Listo para publicar', clase: 'text-emerald-700' },
+  mejorable: { texto: '🟡 Se puede mejorar', clase: 'text-amber-700' },
+  corregir: { texto: '🔴 Conviene corregir', clase: 'text-red-600' },
+}
+
+/** Lo que vio Gemini en el MP4: veredicto, problemas con su segundo y textos mejores. */
+function Revision({ rev, titulo, onAplicar, onRepetir }) {
+  const v = VEREDICTOS[rev.veredicto] ?? VEREDICTOS.mejorable
+  const hayTextos = rev.textos && Object.keys(rev.textos).length > 0
+  return (
+    <div className="mt-1 rounded-xl border border-gray-100 bg-gray-50 p-2.5 space-y-1.5">
+      <p className={`font-bold ${v.clase}`}>
+        {v.texto}
+        {titulo && <span className="font-normal text-gray-400"> · {titulo}</span>}
+      </p>
+      {rev.resumen && <p className="text-gray-600 leading-snug">{rev.resumen}</p>}
+      {rev.problemas?.length > 0 && (
+        <ul className="space-y-1.5">
+          {rev.problemas.map((p, i) => (
+            <li key={i} className="leading-snug">
+              <span className="font-bold text-gray-700">
+                {p.segundo != null ? `${p.segundo}s` : '•'}
+                {p.tipo ? ` · ${p.tipo}` : ''}:
+              </span>{' '}
+              <span className="text-gray-600">{p.detalle}</span>
+              {p.sugerencia && <span className="block text-saro-blue">→ {p.sugerencia}</span>}
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="flex flex-wrap gap-2 pt-0.5">
+        {hayTextos && (
+          <button
+            type="button"
+            onClick={onAplicar}
+            className="px-2.5 py-1 rounded-lg bg-saro-blue hover:bg-saro-mid text-white text-[11px] font-bold transition"
+            title={Object.values(rev.textos).join(' · ')}
+          >
+            Aplicar textos sugeridos
+          </button>
+        )}
+        <button type="button" onClick={onRepetir} className="text-[11px] text-gray-400 hover:text-saro-blue underline">
+          Revisar de nuevo
+        </button>
+      </div>
+      <p className="text-[10px] text-gray-400">Es la opinión de Gemini: puede equivocarse. Lo de diseño fijo (zona segura, precio que cuenta) no se toca desde acá.</p>
+    </div>
+  )
+}
+
 /** Pide a la API el estado de un render y devuelve los campos a actualizar. */
 async function consultarEstado(h) {
   const minutos = (Date.now() - h.creado) / 60_000
@@ -96,6 +193,7 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
   const [enLote, setEnLote] = useState(false) // Ficha: una por producto
   const [verLote, setVerLote] = useState(0) // cuál ficha del lote se ve en la vista previa
   const [guia, setGuia] = useState(false)
+  const [sugerencias, setSugerencias] = useState({}) // { [plantilla]: { cargando } | { error } | { opciones, publicacion, avisos } }
   const [busqueda, setBusqueda] = useState('')
   const [categoria, setCategoria] = useState('todas')
   const [preparando, setPreparando] = useState(null) // { id, texto }
@@ -257,6 +355,9 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
           plantilla: lote ? `${meta.nombre} ×${pedido.lote.length}` : meta.nombre,
           productos: (lote ? pedido.lote.map(x => x.productos[0]) : props.productos).map(p => p.nombre).join(', '),
           nombres: lote ? pedido.lote.map(x => x.productos[0].nombre) : null,
+          // Para "Revisar con IA": con qué plantilla y props se hizo cada video
+          plantillaId,
+          videos: lote ? pedido.lote : [pedido],
           creado: Date.now(),
           estado: 'en_cola',
           detalle: 'Pedido enviado a GitHub',
@@ -267,6 +368,56 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
       setErrorRender({ mensaje: 'Error de conexión. Probá de nuevo.' })
     } finally {
       setEnviando(false)
+    }
+  }
+
+  // ── Gemini: guiar (sugerir textos) y corregir (revisar el MP4) ──
+  const sugerir = async () => {
+    setSugerencias(s => ({ ...s, [plantillaId]: { cargando: true } }))
+    try {
+      const res = await fetch('/api/videos/sugerir', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: pin(), plantilla: plantillaId, props }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok || !json.ok) throw new Error(json.error ?? `Error ${res.status}`)
+      setSugerencias(s => ({ ...s, [plantillaId]: json }))
+    } catch (e) {
+      setSugerencias(s => ({ ...s, [plantillaId]: { error: e.message } }))
+    }
+  }
+
+  const aplicarTextos = (id, nuevos) => {
+    setTextos(t => ({ ...t, [id]: { ...(t[id] ?? {}), ...nuevos } }))
+    if (id !== plantillaId) setPlantillaId(id)
+    onToast('✍️ Textos aplicados: mirá la vista previa y generá de nuevo.', 'ok', 6000)
+  }
+
+  const copiar = async texto => {
+    try {
+      await navigator.clipboard.writeText(texto)
+      onToast('📋 Copiado', 'ok', 2500)
+    } catch {
+      onToast('No se pudo copiar: seleccioná el texto a mano.', 'error')
+    }
+  }
+
+  // n = número de video dentro del pedido (1 si no es un lote)
+  const revisar = async (h, n = 1) => {
+    const cambiar = rev => guardarHistorial(l => l.map(x => (x.requestId === h.requestId ? { ...x, revisiones: { ...x.revisiones, [n]: rev } } : x)))
+    cambiar({ cargando: true })
+    try {
+      const res = await fetch('/api/videos/revisar', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ pin: pin(), plantilla: h.plantillaId, request_id: h.requestId, n, props: h.videos[n - 1] }),
+      })
+      const json = await res.json().catch(() => ({}))
+      if (!res.ok || !json.ok) throw new Error(json.error ?? `Error ${res.status}`)
+      cambiar(json)
+    } catch (e) {
+      cambiar({ error: e.message })
     }
   }
 
@@ -418,9 +569,25 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
           {/* Textos editables */}
           {meta.textos.length > 0 && (
             <div className="mt-5 space-y-3">
-              <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
-                Textos <span className="normal-case font-normal text-gray-400">(vacío = el de fábrica, en gris)</span>
-              </span>
+              <div className="flex items-center justify-between gap-2">
+                <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                  Textos <span className="normal-case font-normal text-gray-400">(vacío = el de fábrica, en gris)</span>
+                </span>
+                <button
+                  type="button"
+                  onClick={sugerir}
+                  disabled={!!problemaDelPedido(meta, props) || sugerencias[plantillaId]?.cargando}
+                  className="flex-shrink-0 px-3 py-1.5 rounded-lg border border-saro-blue text-saro-blue text-xs font-bold hover:bg-saro-light transition disabled:opacity-50"
+                >
+                  {sugerencias[plantillaId]?.cargando ? 'Pensando…' : '✨ Sugerir con IA'}
+                </button>
+              </div>
+              <Sugerencias
+                datos={sugerencias[plantillaId]}
+                campos={meta.textos}
+                onUsar={o => aplicarTextos(plantillaId, o)}
+                onCopiar={copiar}
+              />
               {meta.textos.map(campo => {
                 const def = CAMPOS_TEXTO[campo]
                 const valor = textosPropios[campo] ?? ''
@@ -681,6 +848,37 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
                         </a>
                       )}
                     </div>
+                    {/* Revisión con Gemini (los videos de antes de esta versión no guardaron sus datos) */}
+                    {h.estado === 'listo' &&
+                      h.videos?.map((_, i) => {
+                        const n = i + 1
+                        const rev = h.revisiones?.[n]
+                        return (
+                          <div key={n} className="pt-1">
+                            {!rev?.veredicto && (
+                              <button
+                                type="button"
+                                onClick={() => revisar(h, n)}
+                                disabled={rev?.cargando}
+                                className="px-2.5 py-1.5 rounded-lg border border-saro-blue text-saro-blue font-bold hover:bg-saro-light transition disabled:opacity-60"
+                              >
+                                {rev?.cargando
+                                  ? 'Gemini está mirando el video… (≈30 s)'
+                                  : `🔍 Revisar con IA${h.videos.length > 1 ? ` · ${h.nombres?.[i] ?? `ficha ${n}`}` : ''}`}
+                              </button>
+                            )}
+                            {rev?.error && <p className="text-red-600 mt-1">{rev.error}</p>}
+                            {rev?.veredicto && (
+                              <Revision
+                                rev={rev}
+                                titulo={h.videos.length > 1 ? h.nombres?.[i] : null}
+                                onAplicar={() => aplicarTextos(h.plantillaId, rev.textos)}
+                                onRepetir={() => revisar(h, n)}
+                              />
+                            )}
+                          </div>
+                        )
+                      })}
                   </li>
                 )
               })}

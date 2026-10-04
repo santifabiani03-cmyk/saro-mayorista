@@ -232,7 +232,9 @@ Todas están en `src/app/api/<nombre>/route.js`:
 | `/feed-img` | GET | Convierte las fotos del feed a JPG 1080×1080 con fondo blanco (sólo fotos de SARO) | No |
 | `/api/videos/render` | POST | Dispara el render de un video en GitHub Actions. Ver §8 | Sí (body) |
 | `/api/videos/estado` | GET | Estado del render (`?request_id=`): en cola, renderizando, listo o error | Sí (header `x-admin-pin`) |
-| `/api/videos/descargar` | GET | Link de descarga del MP4 (`?request_id=`) | Sí (header `x-admin-pin`) |
+| `/api/videos/descargar` | GET | Link de descarga del MP4 (`?request_id=`, `&n=` en un lote) | Sí (header `x-admin-pin`) |
+| `/api/videos/sugerir` | POST | IA (Gemini): textos para el video y la publicación con los datos reales | Sí (body) |
+| `/api/videos/revisar` | POST | IA (Gemini): mira el MP4 ya generado y lista problemas + textos mejores | Sí (body) |
 
 ### 2.7 `config.json` (configuración de la tienda)
 
@@ -769,6 +771,11 @@ vivo y se genera el MP4 (o un lote de MP4) para descargar.
    sombrea en rojo esa zona (sólo en la vista previa, no sale en el MP4).
 6. **"Generar MP4"** → en unos minutos aparece **"Descargar MP4"** en "Videos de esta sesión"
    (en un lote, un botón por ficha).
+   - **✨ Sugerir con IA** (al lado de "Textos"): Gemini propone 3 juegos de textos (se usan con
+     un clic), el texto de la publicación con hashtags (botón Copiar) y avisos sobre nombres.
+   - **🔍 Revisar con IA** (en cada video terminado): Gemini mira el MP4 (~30 s) y da un
+     veredicto, los problemas con el segundo en que aparecen y, si conviene, textos mejores
+     ("Aplicar textos sugeridos" los carga y hay que generar de nuevo).
 7. Para "Sin fondo": **"Preparar foto para video"** en cada producto (o **"Recortar las que
    faltan"**, que hace todas las elegidas de a una). Saca el fondo de la foto con IA (en el
    navegador, gratis) y la guarda aparte; así el producto flota sobre el fondo del video. El que
@@ -789,6 +796,7 @@ ropa) no impiden generar el video.
 | Música, efectos y niveles | `src/videos/audio.jsx` |
 | Cortes al ritmo de la música | `src/videos/pulso.js` (⚠️ no `ritmo.js`: en Windows choca con `Ritmo.jsx`) |
 | Textos de fábrica y editables | `src/videos/textos.js` |
+| Gemini: sugerir textos y revisar el MP4 | `src/utils/videosGemini.js` + `src/app/api/videos/sugerir`, `revisar` |
 | Catálogo de plantillas, formatos, músicas, niveles de efectos y fondos + validación del pedido (sin React: lo usan la API y el workflow) | `src/videos/catalogo.js` |
 | Componente y duración de cada plantilla | `src/videos/plantillas.js` |
 | Cómo se arman las props | `src/videos/props.js` |
@@ -843,8 +851,16 @@ le da el link.
 - **Niveles de efectos:** cada efecto dice desde qué nivel suena (`nivel` en la lista de
   golpes). "Suaves" = el criterio acordado en septiembre (whoosh en transiciones, golpe grave
   en logo y cierre; en la web clic y "enviado"); "Medios" suma pop en specs y tarjetas, swoosh
-  en títulos y campanita en el precio; "Intensos" suma golpes de pelota, tic-tac del precio y
+  en títulos y campanita en el precio; "Intensos" suma golpes de pelota, un golpe en el precio y
   la subida (riser) antes del cierre. Pico medido con intensos: 0,54.
+- **El precio entra con un "pop", sin contar desde $0:** contando, una pausa mostraba un precio
+  falso ($80.000 para una paleta de $190.000). Lo marcó dos veces la revisión de Gemini.
+- **Gemini (`videosGemini.js`):** `gemini-2.5-flash`, respuesta en JSON con esquema. Sólo recibe
+  los datos reales de los productos y, además de pedírselo, el servidor **descarta** textos con
+  números que no estén en esos datos, que se pasen del máximo o (el cierre) que repitan la
+  dirección. Para revisar, el servidor baja el MP4 del release y lo sube a la API de archivos
+  de Gemini (lo borra al terminar): el video no pasa por el navegador. Usa `GEMINI_API_KEY`.
+  Medido el 04/10/2026: sugerir ~3 s, revisar un MP4 de 10 MB ~15 s.
 - **Zona segura:** textos y precios van dentro de `useMarco().S`. En 9:16 es la guía de anuncios
   de Reels de Meta (libre el 14 % de arriba, el 35 % de abajo y el 6 % de los costados); en 4:5,
   márgenes del 5–6 %. Fuera de la zona sólo hay foto o decoración.
