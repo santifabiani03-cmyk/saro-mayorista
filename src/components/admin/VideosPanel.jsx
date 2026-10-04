@@ -1,8 +1,19 @@
 'use client'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import dynamic from 'next/dynamic'
-import { MUSICAS, PLANTILLAS_META, plantillaMeta, problemaDelPedido } from '../../videos/catalogo'
-import { armarProps, seleccionInicial } from '../../videos/props'
+import {
+  CAMPOS_TEXTO,
+  EFECTOS_DEFECTO,
+  FONDOS_FOTO,
+  FORMATOS,
+  MUSICAS,
+  NIVELES_EFECTOS,
+  PLANTILLAS_META,
+  plantillaMeta,
+  problemaDelPedido,
+} from '../../videos/catalogo'
+import { armarLote, armarProps, seleccionInicial } from '../../videos/props'
+import { textosDeFabrica } from '../../videos/textos'
 import { avisosVideo, esElegible, fotoOriginal, precioPublico } from '../../utils/videoProductos'
 import { recortarParaVideo } from '../../utils/recorteVideo'
 
@@ -16,7 +27,7 @@ const CLAVE_HISTORIAL = 'saro_videos_historial'
 const EN_CURSO = ['en_cola', 'renderizando']
 const CADA_MS = 10_000
 const SIN_ARRANCAR_MIN = 5 // si GitHub no lo tomó en este tiempo, se da por perdido
-const LIMITE_MIN = 40 // el workflow corta a los 30; esto es por si GitHub ni avisa
+const LIMITE_MIN = 50 // el workflow corta a los 40; esto es por si GitHub ni avisa
 const FALLOS_MAX = 6 // consultas fallidas seguidas (un minuto) antes de darlo por perdido
 
 const CATEGORIAS = { paleta: 'Paletas', padel: 'Accesorios', ropa: 'Ropa' }
@@ -77,6 +88,14 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
   const [plantillaId, setPlantillaId] = useState(PLANTILLAS_META[0].id)
   const [selecciones, setSelecciones] = useState({}) // { [plantilla]: ids en orden }
   const [musicas, setMusicas] = useState({}) // { [plantilla]: id de música }
+  const [formatos, setFormatos] = useState({}) // { [plantilla]: id de formato }
+  const [textos, setTextos] = useState({}) // { [plantilla]: { campo: texto } }
+  const [efectos, setEfectos] = useState(EFECTOS_DEFECTO)
+  const [fondo, setFondo] = useState('sin')
+  const [recortandoTodas, setRecortandoTodas] = useState(null) // "2 de 5", mientras recorta las que faltan
+  const [enLote, setEnLote] = useState(false) // Ficha: una por producto
+  const [verLote, setVerLote] = useState(0) // cuál ficha del lote se ve en la vista previa
+  const [guia, setGuia] = useState(false)
   const [busqueda, setBusqueda] = useState('')
   const [categoria, setCategoria] = useState('todas')
   const [preparando, setPreparando] = useState(null) // { id, texto }
@@ -86,6 +105,10 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
 
   const meta = plantillaMeta(plantillaId)
   const musica = musicas[plantillaId] ?? meta.musica
+  const formato = formatos[plantillaId] ?? meta.formatos[0]
+  const textosPropios = textos[plantillaId] ?? {}
+  const lote = enLote && !!meta.lote
+  const maximo = lote ? meta.lote : meta.max
 
   // Sólo cuentan los que siguen siendo elegibles (si le sacaste el precio a uno, sale solo)
   const ids = useMemo(() => {
@@ -93,11 +116,19 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
       products.filter(p => esElegible(p) && (!meta.soloPaletas || p.categoria === 'paleta')).map(p => p.id),
     )
     const elegidos = selecciones[plantillaId] ?? seleccionInicial(meta, products).map(p => p.id)
-    return elegidos.filter(id => elegibles.has(id))
-  }, [selecciones, plantillaId, meta, products])
+    return elegidos.filter(id => elegibles.has(id)).slice(0, maximo)
+  }, [selecciones, plantillaId, meta, products, maximo])
 
-  const props = useMemo(() => armarProps(meta, products, ids, musica), [meta, products, ids, musica])
-  const problema = problemaDelPedido(meta, props)
+  // Lo que se manda a generar (un video, o un lote de fichas) y lo que se ve
+  const pedido = useMemo(() => {
+    const opciones = { musica, efectos, formato, textos: textosPropios, fondo }
+    return lote ? armarLote(meta, products, ids, opciones) : armarProps(meta, products, ids, opciones)
+  }, [meta, products, ids, musica, efectos, formato, textosPropios, lote, fondo])
+  // Elegidos que todavía no tienen la foto recortada (con "Sin fondo" salen en tarjeta)
+  const sinRecorte = ids.map(id => products.find(p => p.id === id)).filter(p => p && !p.imagenVideo)
+  const props = lote ? pedido.lote[Math.min(verLote, pedido.lote.length - 1)] ?? { productos: [] } : pedido
+  const fabrica = textosDeFabrica(meta.id, props.productos)
+  const problema = problemaDelPedido(meta, pedido)
   const hayEnCurso = historial.some(h => EN_CURSO.includes(h.estado))
 
   // ── Historial (sessionStorage, como la pestaña activa) ──
@@ -154,16 +185,17 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
     if (!esElegible(p)) return
     if (ids.includes(p.id)) {
       setSelecciones(s => ({ ...s, [plantillaId]: ids.filter(x => x !== p.id) }))
-    } else if (meta.max === 1) {
+    } else if (maximo === 1) {
       setSelecciones(s => ({ ...s, [plantillaId]: [p.id] }))
-    } else if (ids.length >= meta.max) {
-      onToast(`${meta.nombre} usa hasta ${meta.max} productos. Sacá uno para sumar otro.`, 'error')
+    } else if (ids.length >= maximo) {
+      onToast(`${lote ? 'El lote' : meta.nombre} usa hasta ${maximo} productos. Sacá uno para sumar otro.`, 'error')
     } else {
       setSelecciones(s => ({ ...s, [plantillaId]: [...ids, p.id] }))
     }
   }
 
-  const prepararFoto = async p => {
+  /** Recorta el fondo de la foto y la guarda en el producto. Devuelve true si salió. */
+  const prepararFoto = async (p, { avisar = true } = {}) => {
     setPreparando({ id: p.id, texto: 'Empezando…' })
     try {
       const { base64, ext } = await recortarParaVideo(fotoOriginal(p), texto => setPreparando({ id: p.id, texto }))
@@ -178,12 +210,26 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
       const url = json.rawUrl ?? json.path
       if (!res.ok || !url) throw new Error(json.error ?? `No se pudo subir la foto (error ${res.status})`)
       await onUpdateProduct(p.id, { imagenVideo: url, imagenVideoOrigen: fotoOriginal(p) })
-      onToast('✅ Foto lista para video. Tocá "Publicar en sitio" para que quede guardada.', 'ok', 7000)
+      if (avisar) onToast('✅ Foto lista para video. Tocá "Publicar en sitio" para que quede guardada.', 'ok', 7000)
+      return true
     } catch (e) {
-      onToast(`❌ ${e?.message ?? 'No se pudo preparar la foto'}`, 'error', 8000)
+      onToast(`❌ ${p.nombre}: ${e?.message ?? 'No se pudo preparar la foto'}`, 'error', 8000)
+      return false
     } finally {
       setPreparando(null)
     }
+  }
+
+  // De a una (el recorte usa mucha memoria del navegador)
+  const prepararFaltantes = async () => {
+    const lista = [...sinRecorte]
+    let listas = 0
+    for (const [i, p] of lista.entries()) {
+      setRecortandoTodas(`${i + 1} de ${lista.length}`)
+      if (await prepararFoto(p, { avisar: false })) listas++
+    }
+    setRecortandoTodas(null)
+    if (listas) onToast(`✅ ${listas} foto(s) listas para video. Tocá "Publicar en sitio" para que queden guardadas.`, 'ok', 8000)
   }
 
   // ── Render ──
@@ -198,7 +244,7 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
       const res = await fetch('/api/videos/render', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify({ pin: pin(), plantilla: plantillaId, props }),
+        body: JSON.stringify({ pin: pin(), plantilla: plantillaId, props: pedido }),
       })
       const json = await res.json().catch(() => ({}))
       if (!res.ok || !json.ok) {
@@ -208,8 +254,9 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
       guardarHistorial(h => [
         {
           requestId: json.requestId,
-          plantilla: meta.nombre,
-          productos: props.productos.map(p => p.nombre).join(', '),
+          plantilla: lote ? `${meta.nombre} ×${pedido.lote.length}` : meta.nombre,
+          productos: (lote ? pedido.lote.map(x => x.productos[0]) : props.productos).map(p => p.nombre).join(', '),
+          nombres: lote ? pedido.lote.map(x => x.productos[0].nombre) : null,
           creado: Date.now(),
           estado: 'en_cola',
           detalle: 'Pedido enviado a GitHub',
@@ -223,9 +270,9 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
     }
   }
 
-  const descargar = async h => {
+  const descargar = async (h, n) => {
     try {
-      const res = await fetch(`/api/videos/descargar?request_id=${encodeURIComponent(h.requestId)}`, {
+      const res = await fetch(`/api/videos/descargar?request_id=${encodeURIComponent(h.requestId)}${n ? `&n=${n}` : ''}`, {
         headers: { 'x-admin-pin': pin() },
         cache: 'no-store',
       })
@@ -261,27 +308,167 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
               >
                 <p className="font-bold text-sm text-saro-dark">{t.nombre}</p>
                 <p className="text-[11px] font-semibold text-saro-blue mt-0.5">
-                  {t.formato} · {t.min === t.max ? `${t.max} producto` : `hasta ${t.max} productos`}
+                  {t.formatos.map(f => FORMATOS[f].nombre.split(' ').pop()).join(' / ')} ·{' '}
+                  {t.min === t.max ? `${t.max} producto` : `${t.min}–${t.max} productos`}
                 </p>
                 <p className="text-[11px] text-gray-500 mt-1.5 leading-snug">{t.descripcion}</p>
               </button>
             ))}
           </div>
 
-          <label className="block mt-5">
-            <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Música</span>
-            <select
-              value={musica}
-              onChange={e => setMusicas(m => ({ ...m, [plantillaId]: e.target.value }))}
-              className="w-full sm:w-80 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue"
-            >
-              {MUSICAS.map(m => (
-                <option key={m.id} value={m.id}>
-                  {m.nombre}
-                </option>
+          {/* Formato */}
+          {meta.formatos.length > 1 && (
+            <div className="mt-5">
+              <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Formato</span>
+              <div className="flex flex-wrap gap-2">
+                {meta.formatos.map(id => (
+                  <button
+                    key={id}
+                    type="button"
+                    onClick={() => setFormatos(f => ({ ...f, [plantillaId]: id }))}
+                    aria-pressed={formato === id}
+                    className={`px-3.5 py-2 rounded-xl border-2 text-left transition ${
+                      formato === id ? 'border-saro-blue bg-saro-light' : 'border-gray-100 hover:border-gray-200'
+                    }`}
+                  >
+                    <span className="block text-sm font-bold text-saro-dark">{FORMATOS[id].nombre}</span>
+                    <span className="block text-[11px] text-gray-500">{FORMATOS[id].uso}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
+          )}
+
+          <div className="grid sm:grid-cols-2 gap-3 mt-5">
+            <label className="block">
+              <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Música</span>
+              <select
+                value={musica}
+                onChange={e => setMusicas(m => ({ ...m, [plantillaId]: e.target.value }))}
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue"
+              >
+                {MUSICAS.map(m => (
+                  <option key={m.id} value={m.id}>
+                    {m.nombre}
+                    {m.animo ? ` · ${m.animo}` : ''}
+                    {m.id === meta.musica ? ' (recomendada)' : ''}
+                  </option>
+                ))}
+              </select>
+              <span className="block text-[11px] text-gray-400 mt-1">
+                {MUSICAS.find(m => m.id === musica)?.bpm
+                  ? 'Los cambios de escena caen sobre el ritmo.'
+                  : 'Sin música, las escenas duran lo de siempre.'}
+              </span>
+            </label>
+            <label className="block">
+              <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Efectos de sonido</span>
+              <select
+                value={efectos}
+                onChange={e => setEfectos(e.target.value)}
+                className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue"
+              >
+                {NIVELES_EFECTOS.map(n => (
+                  <option key={n.id} value={n.id}>
+                    {n.nombre}
+                  </option>
+                ))}
+              </select>
+              <span className="block text-[11px] text-gray-400 mt-1">{NIVELES_EFECTOS.find(n => n.id === efectos)?.detalle}</span>
+            </label>
+          </div>
+
+          {/* Fondo de las fotos de producto */}
+          <div className="mt-5">
+            <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">Fotos de producto</span>
+            <div className="flex flex-wrap gap-2">
+              {FONDOS_FOTO.map(f => (
+                <button
+                  key={f.id}
+                  type="button"
+                  onClick={() => setFondo(f.id)}
+                  aria-pressed={fondo === f.id}
+                  className={`px-3.5 py-2 rounded-xl border-2 text-left transition ${
+                    fondo === f.id ? 'border-saro-blue bg-saro-light' : 'border-gray-100 hover:border-gray-200'
+                  }`}
+                >
+                  <span className="block text-sm font-bold text-saro-dark">{f.nombre}</span>
+                  <span className="block text-[11px] text-gray-500">{f.detalle}</span>
+                </button>
               ))}
-            </select>
-          </label>
+            </div>
+            {fondo === 'sin' && sinRecorte.length > 0 && (
+              <div className="mt-2 flex flex-wrap items-center gap-2 rounded-xl bg-amber-50 border border-amber-200 px-3 py-2 text-[11px] text-amber-800">
+                <span className="flex-1 min-w-[12rem]">
+                  {sinRecorte.length === 1 ? '1 producto elegido no tiene' : `${sinRecorte.length} productos elegidos no tienen`} la
+                  foto recortada: {sinRecorte.length === 1 ? 'sale' : 'salen'} con fondo blanco igual.
+                </span>
+                <button
+                  type="button"
+                  onClick={prepararFaltantes}
+                  disabled={!!preparando || !!recortandoTodas}
+                  className="px-3 py-1.5 rounded-lg bg-amber-500 hover:bg-amber-600 text-white font-bold transition disabled:opacity-50"
+                >
+                  {recortandoTodas ? `Recortando ${recortandoTodas}…` : 'Recortar las que faltan'}
+                </button>
+              </div>
+            )}
+          </div>
+
+          {/* Textos editables */}
+          {meta.textos.length > 0 && (
+            <div className="mt-5 space-y-3">
+              <span className="block text-xs font-semibold text-gray-500 uppercase tracking-wider">
+                Textos <span className="normal-case font-normal text-gray-400">(vacío = el de fábrica, en gris)</span>
+              </span>
+              {meta.textos.map(campo => {
+                const def = CAMPOS_TEXTO[campo]
+                const valor = textosPropios[campo] ?? ''
+                return (
+                  <label key={campo} className="block">
+                    <span className="flex justify-between text-xs font-semibold text-gray-600 mb-1">
+                      {def.nombre}
+                      <span className={`font-normal ${valor.length > def.max - 5 ? 'text-amber-600' : 'text-gray-400'}`}>
+                        {valor.length}/{def.max}
+                      </span>
+                    </span>
+                    <input
+                      type="text"
+                      value={valor}
+                      maxLength={def.max}
+                      placeholder={fabrica[campo] ?? ''}
+                      onChange={e =>
+                        setTextos(t => ({ ...t, [plantillaId]: { ...(t[plantillaId] ?? {}), [campo]: e.target.value.replace(/\s+/g, ' ') } }))
+                      }
+                      className="w-full border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue placeholder:text-gray-400"
+                    />
+                    <span className="block text-[11px] text-gray-400 mt-0.5">{def.ayuda}</span>
+                  </label>
+                )
+              })}
+            </div>
+          )}
+
+          {/* Lote: una Ficha por producto */}
+          {meta.lote && (
+            <label className="mt-5 flex items-start gap-3 rounded-xl border border-gray-100 p-3.5 cursor-pointer hover:border-gray-200">
+              <input
+                type="checkbox"
+                checked={enLote}
+                onChange={e => {
+                  setEnLote(e.target.checked)
+                  setVerLote(0)
+                }}
+                className="w-4 h-4 mt-0.5 accent-saro-blue flex-shrink-0"
+              />
+              <span>
+                <span className="block text-sm font-bold text-saro-dark">Una ficha por producto (lote)</span>
+                <span className="block text-[11px] text-gray-500 leading-snug">
+                  Elegí hasta {meta.lote} productos y se genera un MP4 de cada uno, con la misma música, efectos y textos.
+                </span>
+              </span>
+            </label>
+          )}
         </div>
 
         {/* Productos */}
@@ -291,7 +478,7 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
               <h3 className="font-bold text-saro-dark">
                 Productos{' '}
                 <span className="text-saro-blue">
-                  ({ids.length}/{meta.max})
+                  ({ids.length}/{maximo})
                 </span>
               </h3>
               {meta.soloPaletas && <p className="text-[11px] text-gray-400">Esta plantilla es sólo de paletas</p>}
@@ -376,16 +563,44 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
       {/* Vista previa y render */}
       <aside className="space-y-5 lg:sticky lg:top-20">
         <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-4">
+          {lote && pedido.lote.length > 1 && (
+            <div className="flex flex-wrap gap-1.5 mb-3">
+              {pedido.lote.map((x, i) => (
+                <button
+                  key={x.productos[0].id}
+                  type="button"
+                  onClick={() => setVerLote(i)}
+                  title={x.productos[0].nombre}
+                  className={`px-2.5 py-1 rounded-lg text-[11px] font-bold border transition ${
+                    i === Math.min(verLote, pedido.lote.length - 1)
+                      ? 'bg-saro-blue border-saro-blue text-white'
+                      : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue'
+                  }`}
+                >
+                  Ficha {i + 1}
+                </button>
+              ))}
+            </div>
+          )}
           {props.productos.length > 0 ? (
-            <VistaPreviaVideo plantillaId={plantillaId} props={props} />
+            <VistaPreviaVideo plantillaId={plantillaId} props={guia ? { ...props, guia: true } : props} />
           ) : (
-            <div className="aspect-[9/16] rounded-2xl bg-gray-50 flex items-center justify-center text-center text-sm text-gray-400 p-6">
-              Elegí al menos un producto para ver la vista previa.
+            <div
+              className="rounded-2xl bg-gray-50 flex items-center justify-center text-center text-sm text-gray-400 p-6"
+              style={{ aspectRatio: `${FORMATOS[formato].ancho} / ${FORMATOS[formato].alto}` }}
+            >
+              Elegí al menos {meta.min > 1 ? `${meta.min} productos` : 'un producto'} para ver la vista previa.
             </div>
           )}
           <p className="text-[11px] text-gray-400 mt-2 text-center">
-            {meta.formato} · {meta.ancho}×{meta.alto}
+            {FORMATOS[formato].nombre} · {FORMATOS[formato].ancho}×{FORMATOS[formato].alto}
           </p>
+          {formato !== 'horizontal' && (
+            <label className="mt-2 flex items-center justify-center gap-2 text-[11px] text-gray-500 cursor-pointer">
+              <input type="checkbox" checked={guia} onChange={e => setGuia(e.target.checked)} className="accent-saro-blue" />
+              Mostrar lo que tapan Instagram y TikTok (no sale en el MP4)
+            </label>
+          )}
 
           <button
             type="button"
@@ -393,7 +608,13 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
             disabled={enviando || hayEnCurso || !!problema}
             className="mt-3 w-full py-3 rounded-xl bg-saro-blue hover:bg-saro-mid text-white text-sm font-bold transition btn-press disabled:opacity-50 disabled:cursor-not-allowed"
           >
-            {enviando ? 'Enviando…' : hayEnCurso ? 'Hay un video generándose…' : '🎞️ Generar MP4'}
+            {enviando
+              ? 'Enviando…'
+              : hayEnCurso
+                ? 'Hay un video generándose…'
+                : lote
+                  ? `🎞️ Generar ${pedido.lote.length} MP4`
+                  : '🎞️ Generar MP4'}
           </button>
           {problema && props.productos.length > 0 && <p className="mt-2 text-xs text-amber-700">{problema}</p>}
           {errorRender && (
@@ -404,7 +625,7 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
           )}
           <p className="mt-3 text-[11px] text-gray-400 leading-relaxed">
             El MP4 lo arma GitHub en unos minutos (podés seguir usando el admin). Queda disponible para descargar; se
-            guardan los últimos 30.
+            guardan los últimos 40.
           </p>
         </div>
 
@@ -429,8 +650,23 @@ export default function VideosPanel({ products, onUpdateProduct, onToast }) {
                     </p>
                     {EN_CURSO.includes(h.estado) && h.detalle && <p className="text-gray-400">{h.detalle}</p>}
                     {h.estado === 'error' && <p className="text-red-600">{h.mensaje}</p>}
+                    {h.estado === 'listo' && h.nombres && (
+                      <div className="flex flex-wrap gap-1.5">
+                        {h.nombres.map((nombre, i) => (
+                          <button
+                            key={i}
+                            type="button"
+                            onClick={() => descargar(h, i + 1)}
+                            title={nombre}
+                            className="px-2.5 py-1.5 rounded-lg bg-emerald-500 hover:bg-emerald-600 text-white font-bold transition btn-press max-w-[10rem] truncate"
+                          >
+                            ⬇ {nombre}
+                          </button>
+                        ))}
+                      </div>
+                    )}
                     <div className="flex items-center gap-3">
-                      {h.estado === 'listo' && (
+                      {h.estado === 'listo' && !h.nombres && (
                         <button
                           type="button"
                           onClick={() => descargar(h)}

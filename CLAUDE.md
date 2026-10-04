@@ -5,7 +5,7 @@
 > chats viejos ni preguntar nada. Prioriza ser exhaustivo. Si algo cambia, actualizá este
 > archivo y `docs/ESTETICA.md`.
 
-Última actualización: 2026-10-01.
+Última actualización: 2026-10-04.
 
 > ⚠️ **Cambio importante (agosto 2026): el sitio pasó de MAYORISTA a MINORISTA.**
 > La tienda principal es minorista (`/paletas` y `/ropa-y-accesorios`, precio `precioMinorista`).
@@ -553,6 +553,10 @@ reemplazó y sigue igual.
 ## 6. Estado actual y pendientes
 
 ### ✅ Terminado y en producción (deployado)
+- **Videos, segunda tanda (04/10/2026):** zona segura de Reels/TikTok, gancho desde el primer
+  cuadro, cortes al ritmo de la música, formato 4:5, textos editables, fotos extra en la Ficha,
+  lote de fichas, fondo de fotos a elección, 7 pistas CC0 nuevas, 3 niveles de efectos y 3
+  plantillas nuevas (Catálogo express, Comparativa, Revendedores). Ver §8.
 - **Pestaña 🎬 Videos del admin** (29/09/2026): plantillas Colección, Ficha y Presentación web
   con Remotion, vista previa en vivo, recorte de fotos para video y MP4 renderizado en GitHub
   Actions. Ver §8.
@@ -734,24 +738,42 @@ cambios del hero. Si se necesita trabajar sólo en publicidad, partir de
 
 ---
 
-## 8. Videos del admin (pestaña 🎬 Videos, septiembre 2026)
+## 8. Videos del admin (pestaña 🎬 Videos, septiembre 2026; ampliada el 04/10/2026)
 
-Genera videos promocionales de los productos con **Remotion**: se eligen plantilla,
-productos y música, se ve una vista previa en vivo y se genera el MP4 para descargar.
+Genera videos promocionales de los productos con **Remotion**: se eligen plantilla, formato,
+productos, música, nivel de efectos, fondo de las fotos y textos; se ve una vista previa en
+vivo y se genera el MP4 (o un lote de MP4) para descargar.
 
 ### 8.1 Cómo se usa (para smfab)
 
 1. `/admin` → pestaña **🎬 Videos**.
-2. Elegí la plantilla: **Colección** (1 a 8 paletas, vertical ~30 s), **Ficha** (1 producto,
-   vertical ~7 s) o **Presentación web** (16:9, recorrido por la web; los 1–2 productos
-   elegidos arman el mensaje de WhatsApp de ejemplo).
-3. Tildá los productos (el número indica el orden en el video) y elegí la música.
-4. Mirá la vista previa. Los precios son los del público (`precioMinorista`).
-5. **"Generar MP4"** → en unos minutos aparece **"Descargar MP4"** en "Videos de esta sesión".
-6. Opcional pero recomendado: **"Preparar foto para video"** en cada producto. Saca el fondo de
-   la foto con IA (en el navegador, gratis) y la guarda aparte; así el producto flota sobre el
-   fondo del video. Sin eso se muestra sobre una tarjeta blanca. **Después hay que tocar
-   "Publicar en sitio"** para que quede guardada.
+2. Elegí la plantilla:
+   - **Colección** (1 a 8 paletas, ~20–30 s): gancho con la paleta 3D, una escena por paleta,
+     la línea, "por qué SARO" y el cierre.
+   - **Ficha** (1 producto, ~7–10 s; con "Una ficha por producto (lote)" genera hasta 8 MP4 de
+     una vez). Si el producto tiene más fotos, suma la escena "En detalle".
+   - **Catálogo express** (3 a 12 productos de cualquier categoría): un producto por golpe de
+     la música, cortes secos.
+   - **Comparativa** (2–3 paletas): tabla con forma, balance, caras, núcleo, juego, nivel, peso
+     y precio. Sólo filas que alguna ficha dice; el dato que falta va "—".
+   - **Revendedores** (1–6 productos, **sin precios**): para tiendas y clubes, termina en
+     "Trabajá con nosotros". Pensada para prospección mayorista.
+   - **Presentación web** (16:9, recorrido por la web; los 1–2 productos arman el WhatsApp).
+3. Formato: **Vertical 9:16** (Reels, Historias, TikTok) o **Feed 4:5** (publicación y anuncios
+   del feed). La web sólo viene en 16:9.
+4. Música (9 pistas + sin música), **efectos de sonido** (Sin efectos / Suaves / Medios /
+   Intensos), **fotos de producto** (Sin fondo / Con fondo blanco) y **textos** (etiqueta,
+   frase gancho, frase de cierre; vacío = el de fábrica, que se ve en gris).
+5. Tildá los productos (el número indica el orden) y mirá la vista previa. Los precios son los
+   del público (`precioMinorista`). La casilla **"Mostrar lo que tapan Instagram y TikTok"**
+   sombrea en rojo esa zona (sólo en la vista previa, no sale en el MP4).
+6. **"Generar MP4"** → en unos minutos aparece **"Descargar MP4"** en "Videos de esta sesión"
+   (en un lote, un botón por ficha).
+7. Para "Sin fondo": **"Preparar foto para video"** en cada producto (o **"Recortar las que
+   faltan"**, que hace todas las elegidas de a una). Saca el fondo de la foto con IA (en el
+   navegador, gratis) y la guarda aparte; así el producto flota sobre el fondo del video. El que
+   no la tiene sale en tarjeta blanca igual. **Después hay que tocar "Publicar en sitio"** para
+   que quede guardada.
 
 Sólo se pueden elegir productos **visibles, con foto y con precio minorista** (los mismos que ve
 el público). Los avisos en ámbar (sin foto recortada, sin descripción, descripción que parece de
@@ -761,8 +783,13 @@ ropa) no impiden generar el video.
 
 | Pieza | Dónde |
 |---|---|
-| Plantillas (JSX, datos sólo por props) | `src/videos/Coleccion.jsx`, `Ficha.jsx`, `Web.jsx` + piezas en `comun.jsx`, `Paleta3D.jsx`, `audio.jsx` |
-| Catálogo de plantillas y músicas + validación del pedido (sin React: lo usan la API y el workflow) | `src/videos/catalogo.js` |
+| Plantillas (JSX, datos sólo por props) | `src/videos/Coleccion.jsx`, `Ficha.jsx`, `Ritmo.jsx` (Catálogo express), `Comparativa.jsx`, `Revendedores.jsx`, `Web.jsx` |
+| Escenas compartidas (gancho 3D, producto, galería, línea, beneficios, cierre) con sus efectos | `src/videos/escenas.jsx` |
+| Piezas comunes: zona segura (`useMarco`), guía de zonas, `Lienzo`, `Estudio`, fotos | `src/videos/comun.jsx`, `Paleta3D.jsx` |
+| Música, efectos y niveles | `src/videos/audio.jsx` |
+| Cortes al ritmo de la música | `src/videos/pulso.js` (⚠️ no `ritmo.js`: en Windows choca con `Ritmo.jsx`) |
+| Textos de fábrica y editables | `src/videos/textos.js` |
+| Catálogo de plantillas, formatos, músicas, niveles de efectos y fondos + validación del pedido (sin React: lo usan la API y el workflow) | `src/videos/catalogo.js` |
 | Componente y duración de cada plantilla | `src/videos/plantillas.js` |
 | Cómo se arman las props | `src/videos/props.js` |
 | Reglas de specs / nivel / enfoque / avisos (fuente única, "nada inventado") | `src/utils/videoProductos.js` |
@@ -770,7 +797,8 @@ ropa) no impiden generar el video.
 | Vista previa (`@remotion/player` con `next/dynamic`: no suma nada a las páginas públicas) | `src/components/admin/VistaPreviaVideo.jsx` |
 | Recorte de fondo para video | `src/utils/recorteVideo.js` |
 | API (`render`, `estado`, `descargar`, todas con PIN) | `src/app/api/videos/*` + helper `src/utils/videosGithub.js` |
-| Render del MP4 | `.github/workflows/render-video.yml` (GitHub Actions) |
+| Render del MP4 | `.github/workflows/render-video.yml` (GitHub Actions) → `scripts/videos/renderizar.mjs` (uno o un lote) |
+| Herramientas | `scripts/videos/cuadros.mjs` (PNG de cuadros sueltos con la guía, `npm run videos:cuadros`), `analizar-musica.py` (pulso/arranque/ganancia de una pista), `generar-sfx.py` (efectos) |
 | Entrada del CLI de Remotion + config | `src/videos/remotion/index.jsx`, `remotion.config.js` |
 | Assets (música, efectos, fuente, capturas) | `public/videos/` — licencias en `public/videos/LICENCIAS.md` |
 
@@ -787,15 +815,17 @@ le da el link.
 - El repo es **público**: los artifacts de una Action tampoco son privados (cualquier usuario de
   GitHub logueado los baja), así que no suman privacidad. Y vienen en `.zip`.
 - Un asset de release se baja directo como `.mp4` sin pasar por Vercel (sus funciones responden
-  hasta 4,5 MB; un video pesa 5–25 MB). El workflow deja sólo los **últimos 30**.
+  hasta 4,5 MB; un video pesa 5–25 MB). El workflow deja sólo los **últimos 40** (un lote cuenta
+  uno por ficha: `<request_id>-1.mp4`, `-2.mp4`…).
 - Ojo: al ser público el repo, **los MP4 también lo son** (quien conozca el link o mire el
   release). Son videos promocionales, pensados para publicarse.
 
 **Otras decisiones:**
 - `concurrency: render-video` → un render a la vez. El panel no deja pedir otro mientras hay
   uno en curso (GitHub sólo guarda uno en espera y cancela el anterior).
-- `timeout-minutes: 30` en la Action; el panel da el render por perdido a los 40 min, o a los
-  5 min si GitHub ni lo empezó.
+- `timeout-minutes: 40` en la Action; el panel da el render por perdido a los 50 min, o a los
+  5 min si GitHub ni lo empezó. Un lote de fichas va en **un solo** render (si fueran varios,
+  GitHub cancelaría los que esperan): ~1 min por ficha más la preparación.
 - Las entradas del workflow se pasan por variables de entorno y se validan
   (`scripts/videos/validar-pedido.mjs`) antes de usarlas: nunca se pegan en un script.
 - Remotion copia su carpeta pública entera en cada render. `public/` pesa cientos de MB, así
@@ -807,16 +837,33 @@ le da el link.
   neutraliza sólo dentro del video, y toda foto de producto va en una caja fija con
   `object-fit: contain`. Medido: la proporción dibujada es igual a la original en la vista
   previa y en el MP4.
-- La vista previa admite 5 audios a la vez: cada efecto de sonido tiene un largo acotado
-  (`LARGO_SFX` en `audio.jsx`); sin eso quedaban montados hasta el final y se rompía.
-- Criterio de audio acordado: música tranquila y pocos efectos (whoosh suave en transiciones,
-  golpe grave en logo y cierre; en la web un clic y el "enviado"). Picos medidos: 0,47–0,61.
+- Cada efecto de sonido tiene un largo acotado (`LARGO` en `audio.jsx`); sin eso quedaban
+  montados hasta el final. El Player tiene `numberOfSharedAudioTags={14}` (de fábrica son 5 y
+  con efectos intensos no alcanzaban).
+- **Niveles de efectos:** cada efecto dice desde qué nivel suena (`nivel` en la lista de
+  golpes). "Suaves" = el criterio acordado en septiembre (whoosh en transiciones, golpe grave
+  en logo y cierre; en la web clic y "enviado"); "Medios" suma pop en specs y tarjetas, swoosh
+  en títulos y campanita en el precio; "Intensos" suma golpes de pelota, tic-tac del precio y
+  la subida (riser) antes del cierre. Pico medido con intensos: 0,54.
+- **Zona segura:** textos y precios van dentro de `useMarco().S`. En 9:16 es la guía de anuncios
+  de Reels de Meta (libre el 14 % de arriba, el 35 % de abajo y el 6 % de los costados); en 4:5,
+  márgenes del 5–6 %. Fuera de la zona sólo hay foto o decoración.
+- **Gancho:** lo primero que se lee aparece desde el cuadro 0 (en Ficha la escena arranca "ya
+  empezada", `adelanto`), porque el primer segundo decide si la gente sigue mirando.
+- **Cortes al ritmo:** cada pista de `MUSICAS` tiene `bpm` (pulso de los golpes fuertes) y
+  `desde` (arranca justo sobre uno). `alinearAlRitmo` mueve cada cambio de escena al golpe más
+  cercano (desvío medido < 0,5 cuadro). `ganancia` iguala el volumen entre pistas. Medido con
+  `scripts/videos/analizar-musica.py`; en pistas de ritmo ambiguo (Parallel Universe) hay que
+  comparar candidatos y escuchar.
 - La fuente Inter está en el repo (`public/videos/fuentes`): Google Fonts fallaba por red en el
   render.
 - El repo es `"type": "module"`: `remotion.config.js` le dice a webpack que no exija la
   extensión en los imports (Next no la pide).
 
 ### 8.3 Campo nuevo del producto: `imagenVideo` (opcional)
+
+Con "Con fondo blanco" se ignora y va siempre la foto original en tarjeta
+(`productoVideo(p, fondo)` en `src/utils/videoProductos.js`).
 
 - `imagenVideo`: URL de la foto **sin fondo** (WebP con transparencia) que genera "Preparar foto
   para video". Si no existe, el video usa la primera foto del producto sobre una tarjeta blanca.
@@ -849,14 +896,18 @@ le da el link.
 
 ### 8.6 Cómo agregar una plantilla nueva
 
-1. Crear `src/videos/MiPlantilla.jsx`: un componente que recibe `{ productos, musica, ... }`,
-   envuelto en `<Lienzo>`, y una función `duracionMiPlantilla(props)` que devuelve los cuadros.
-   Fotos de producto siempre con `ImgProducto` / `PaletaFlotante` (caja fija + contain).
-2. Sumarla en `src/videos/catalogo.js` (`PLANTILLAS_META`: id, slug, nombre, tamaño, fps, min/max
-   de productos, si es sólo de paletas y música por defecto) y en `src/videos/plantillas.js`.
+1. Crear `src/videos/MiPlantilla.jsx`: un componente que recibe `{ productos, musica, efectos,
+   formato, textos, guia }`, envuelto en `<Lienzo guia={guia}>`, y una función
+   `duracionMiPlantilla(props)` que devuelve los cuadros. Reusar las escenas de `escenas.jsx`;
+   textos y precios siempre dentro de `useMarco().S`; fotos con `ImgProducto` / `PaletaFlotante`.
+   Duraciones pasadas por `alinearAlRitmo` y efectos con `<Efectos golpes elegido={efectos}>`.
+2. Sumarla en `src/videos/catalogo.js` (`PLANTILLAS_META`: id, slug (sólo letras), nombre,
+   formatos, fps, min/max, soloPaletas, música por defecto y campos de `textos`), en
+   `src/videos/plantillas.js` y su texto de fábrica en `textos.js`.
 3. Si necesita datos extra, agregarlos en `armarProps` (`src/videos/props.js`).
-4. Probar: `npm run videos:studio` (studio con el catálogo en vivo) y
+4. Probar: `npm run videos:cuadros -- carpeta '[["MiPlantilla","vertical",[0,60,-30]]]'`
+   (PNG con la guía de zonas), `npm run videos:studio` y
    `npm run videos:render -- MiPlantilla out/prueba.mp4 --gl=angle` (en Windows `angle`; en la
-   Action `swangle`). Revisar cuadros sueltos con `npx remotion still`.
+   Action `swangle`).
 
 El admin, la API y el workflow la toman solos.

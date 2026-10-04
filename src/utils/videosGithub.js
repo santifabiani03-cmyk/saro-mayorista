@@ -79,13 +79,21 @@ export async function pasoActual(runId) {
   return jobs.flatMap(j => j.steps ?? []).find(s => s.status === 'in_progress')?.name ?? null
 }
 
-/** El MP4 de ese pedido en el release, o null si no está (todavía, o ya se borró). */
-export async function buscarMp4(requestId) {
+/**
+ * Los MP4 de ese pedido en el release, en orden ([] si no están todavía, o ya
+ * se borraron). Un video suelto es "<request_id>.mp4"; un lote de fichas,
+ * "<request_id>-1.mp4", "<request_id>-2.mp4"…
+ */
+export async function buscarMp4s(requestId) {
   const res = await gh(`/releases/tags/${RELEASE_TAG}`)
-  if (res.status === 404) return null
+  if (res.status === 404) return []
   if (!res.ok) throw Object.assign(new Error(`GitHub respondió ${res.status}`), { status: res.status })
   const { assets = [] } = await res.json()
-  return assets.find(a => a.name === `${requestId}.mp4`) ?? null
+  const resto = a => a.name.slice(requestId.length) // "" + ".mp4", o "-2.mp4"
+  const numero = a => (resto(a) === '.mp4' ? 0 : Number(resto(a).slice(1, -4)))
+  return assets
+    .filter(a => a.name.startsWith(requestId) && /^(-\d+)?\.mp4$/.test(resto(a)))
+    .sort((a, b) => numero(a) - numero(b))
 }
 
 /** "coleccion-20260928-1942-k3x9" (fecha y hora de Argentina). */

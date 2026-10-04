@@ -9,6 +9,9 @@ import {
   useVideoConfig,
 } from 'remotion'
 import { loadFont } from '@remotion/fonts'
+import { pesos, sinSaro } from './textos'
+
+export { pesos, sinSaro }
 
 // Identidad: docs/ESTETICA.md. Fuente única Inter, guardada en el repo
 // (public/videos/fuentes) para no depender de Google Fonts al renderizar.
@@ -33,9 +36,6 @@ export const SARO = {
   gris: '#94A3B8',
 }
 
-const fmt = new Intl.NumberFormat('es-AR', { maximumFractionDigits: 0 })
-export const pesos = n => `$${fmt.format(n)}`
-
 export const clamp = { extrapolateLeft: 'clamp', extrapolateRight: 'clamp' }
 
 export const useEntrada = (delay = 0, damping = 200) => {
@@ -43,8 +43,6 @@ export const useEntrada = (delay = 0, damping = 200) => {
   const { fps } = useVideoConfig()
   return spring({ frame: frame - delay, fps, config: { damping } })
 }
-
-export const sinSaro = nombre => nombre.replace(/^Saro\s+/i, '')
 
 // El admin carga Tailwind, y su "preflight" cambia cosas globales: las imágenes
 // con max-width 100% (comprimía las paletas de costado), el interlineado 1.5 y
@@ -56,8 +54,63 @@ const RESET = `
 .saro-video svg { display: block; }
 `
 
-/** Raíz de cada plantilla. */
-export const Lienzo = ({ children }) => (
+/**
+ * Zona segura: el rectángulo donde van los textos y el precio para que no los
+ * tape la interfaz de Instagram, Facebook o TikTok (nombre de la cuenta, texto
+ * de la publicación, botones). En vertical se usa la guía de los anuncios de
+ * Reels de Meta, la más exigente: libre el 14 % de arriba, el 35 % de abajo y
+ * el 6 % de los costados. Lo de afuera puede tener foto o decoración.
+ */
+export function zonaSegura(ancho, alto) {
+  if (alto / ancho > 1.6) {
+    const top = Math.round(alto * 0.14)
+    const lado = Math.round(ancho * 0.06)
+    return { x: lado, y: top, w: ancho - 2 * lado, h: Math.round(alto * 0.65) - top }
+  }
+  const mx = Math.round(ancho * 0.06)
+  const my = Math.round(alto * 0.05)
+  return { x: mx, y: my, w: ancho - 2 * mx, h: alto - 2 * my }
+}
+
+/** Medidas del video actual: ancho, alto, zona segura (S) y si es vertical 9:16. */
+export function useMarco() {
+  const { width, height } = useVideoConfig()
+  return { W: width, H: height, S: zonaSegura(width, height), vertical: height / width > 1.6 }
+}
+
+/** Caja posicionada sobre la zona segura (todo lo de adentro, en flex columna). */
+export const EnZona = ({ children, style }) => {
+  const { S } = useMarco()
+  return (
+    <div style={{ position: 'absolute', left: S.x, top: S.y, width: S.w, height: S.h, display: 'flex', flexDirection: 'column', ...style }}>
+      {children}
+    </div>
+  )
+}
+
+/**
+ * Guía de la vista previa (no sale en el MP4): sombrea lo que tapa la interfaz
+ * de las redes. Se prende desde el admin.
+ */
+const GuiaZonas = () => {
+  const { W, H, S } = useMarco()
+  const franja = { position: 'absolute', background: 'rgba(239,68,68,0.28)', pointerEvents: 'none' }
+  const rotulo = { position: 'absolute', left: 0, right: 0, textAlign: 'center', fontSize: 28, fontWeight: 800, color: '#FECACA', letterSpacing: 2 }
+  return (
+    <AbsoluteFill style={{ zIndex: 50 }}>
+      <div style={{ ...franja, left: 0, top: 0, width: W, height: S.y }} />
+      <div style={{ ...franja, left: 0, top: S.y + S.h, width: W, height: H - S.y - S.h }}>
+        <div style={{ ...rotulo, top: 30 }}>LO TAPAN LAS REDES · SIN TEXTOS ACÁ</div>
+      </div>
+      <div style={{ ...franja, left: 0, top: S.y, width: S.x, height: S.h }} />
+      <div style={{ ...franja, left: S.x + S.w, top: S.y, width: W - S.x - S.w, height: S.h }} />
+      <div style={{ position: 'absolute', left: S.x, top: S.y, width: S.w, height: S.h, border: '3px dashed rgba(254,202,202,0.9)' }} />
+    </AbsoluteFill>
+  )
+}
+
+/** Raíz de cada plantilla. `guia` = mostrar la zona segura (sólo vista previa). */
+export const Lienzo = ({ children, guia = false }) => (
   <AbsoluteFill
     className="saro-video"
     style={{
@@ -70,6 +123,7 @@ export const Lienzo = ({ children }) => (
   >
     <style>{RESET}</style>
     {children}
+    {guia && <GuiaZonas />}
   </AbsoluteFill>
 )
 
@@ -149,14 +203,16 @@ export const PaletaFlotante = ({ producto, alto, ancho, delay = 0, y = 0 }) => {
   const flota = Math.sin(t / 18) * 14
   const giroY = interpolate(e, [0, 1], [-55, 0]) + Math.sin(t / 30) * 9
   const giroZ = interpolate(e, [0, 1], [-18, -4]) + Math.sin(t / 40) * 2
-  // Sin recortar, la tarjeta es más chica que la paleta suelta (y no se inclina tanto)
-  const caja = producto.recortada ? { ancho, alto } : { ancho: Math.round(alto * 0.62), alto: Math.round(alto * 0.8) }
+  // Sin recortar va en una tarjeta 0,775:1 que entra en el ancho y el 80 % del
+  // alto, centrada (y no se inclina tanto). Recortada ocupa toda la caja.
+  const tarjeta = Math.min(alto * 0.8, ancho / 0.775)
+  const caja = producto.recortada ? { ancho, alto } : { ancho: Math.round(tarjeta * 0.775), alto: Math.round(tarjeta) }
   return (
     <div
       style={{
         position: 'absolute',
         left: '50%',
-        top: y + (alto - caja.alto),
+        top: y + (producto.recortada ? 0 : (alto - caja.alto) / 2),
         width: caja.ancho,
         height: caja.alto,
         transform: 'translateX(-50%)',
@@ -235,7 +291,7 @@ export const IconoWhatsApp = ({ tamano, color = 'white' }) => (
   </svg>
 )
 
-export const BotonWhatsApp = ({ escala, tamano = 46 }) => (
+export const BotonWhatsApp = ({ escala, tamano = 46, texto = 'Pedí por WhatsApp' }) => (
   <div
     style={{
       display: 'inline-flex',
@@ -252,6 +308,6 @@ export const BotonWhatsApp = ({ escala, tamano = 46 }) => (
     }}
   >
     <IconoWhatsApp tamano={tamano * 1.1} />
-    Pedí por WhatsApp
+    {texto}
   </div>
 )

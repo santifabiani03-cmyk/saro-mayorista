@@ -40,20 +40,34 @@ const AZUL = '#2563EB'
 const texto = p => `${p.nombre ?? ''} ${p.descripcion ?? ''}`.toLowerCase()
 const descripcion = p => (p.descripcion ?? '').toLowerCase()
 
+/**
+ * Datos técnicos que SÍ dice la ficha, por campo (null = no lo dice). La
+ * comparativa los usa así; las demás plantillas, como lista (specsVideo).
+ */
+export function fichaTecnica(p) {
+  const t = texto(p)
+  const carbono = t.match(/carbono\s*(\d+)\s*k/)
+  const forma = ['redondo', 'diamante', 'lágrima', 'híbrido', 'hibrido'].find(f => t.includes(`formato ${f}`))
+  return {
+    carbono: carbono ? `Carbono ${carbono[1]}K` : null,
+    forma: forma ? `Formato ${forma === 'hibrido' ? 'híbrido' : forma}` : null,
+    nucleo: t.includes('goma eva') ? 'Núcleo EVA' : null,
+    balance: t.includes('balance medio') ? 'Balance medio' : null,
+    puntoDulce: /amplio punto dulce|punto dulce amplio/.test(t) ? 'Punto dulce amplio' : null,
+    peso: Number(p.peso) > 0 ? `${Math.round(Number(p.peso))} g` : null,
+  }
+}
+
 /** Especificaciones que SÍ dice la ficha. */
 export function specsVideo(p) {
-  const t = texto(p)
-  const out = []
-  const carbono = t.match(/carbono\s*(\d+)\s*k/)
-  if (carbono) out.push(`Carbono ${carbono[1]}K`)
-  for (const forma of ['redondo', 'diamante', 'lágrima', 'híbrido', 'hibrido']) {
-    if (t.includes(`formato ${forma}`)) out.push(`Formato ${forma}`)
-  }
-  if (t.includes('goma eva')) out.push('Núcleo EVA')
-  if (t.includes('balance medio')) out.push('Balance medio')
-  if (/amplio punto dulce|punto dulce amplio/.test(t)) out.push('Punto dulce amplio')
-  if (Number(p.peso) > 0) out.push(`${Math.round(Number(p.peso))} g`)
-  return out
+  return Object.values(fichaTecnica(p)).filter(Boolean)
+}
+
+/** Promo por cantidad cargada en el admin ("Llevando 12: $35.000"), o null. */
+export function promoVideo(p) {
+  const promo = (p.promos ?? []).find(x => Number(x?.cantidad) > 1 && Number(x?.precioTotal) > 0)
+  if (!promo) return null
+  return `Llevando ${Number(promo.cantidad)}: $${Number(promo.precioTotal).toLocaleString('es-AR')}`
 }
 
 export function nivelVideo(p) {
@@ -110,9 +124,13 @@ export function avisosVideo(p) {
   return a
 }
 
-/** Lo que recibe la plantilla por cada producto. */
-export function productoVideo(p) {
-  const recortada = !!p.imagenVideo
+/**
+ * Lo que recibe la plantilla por cada producto.
+ * `fondo`: 'sin' usa la foto recortada si existe (si no, va en tarjeta blanca);
+ * 'blanco' usa siempre la foto original sobre una tarjeta blanca.
+ */
+export function productoVideo(p, fondo = 'sin') {
+  const recortada = fondo !== 'blanco' && !!p.imagenVideo
   return {
     id: p.id,
     nombre: (p.nombre ?? '').trim(),
@@ -122,6 +140,10 @@ export function productoVideo(p) {
     talle: p.talles?.[0] ?? 'Única',
     nuevo: (p.tags ?? []).includes('nuevo'),
     specs: specsVideo(p),
+    ficha: fichaTecnica(p),
+    promo: promoVideo(p),
+    // Las otras fotos del producto (hasta 3), para la ficha
+    extras: (p.imagenes ?? []).slice(1, 4).filter(Boolean).map(absUrl),
     nivel: nivelVideo(p),
     enfoque: enfoqueVideo(p),
     acento: acentoVideo(p),

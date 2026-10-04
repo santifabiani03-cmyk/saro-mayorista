@@ -10,7 +10,8 @@
     "lint": "next lint",
     "check:orden": "npx --yes eslint@10 --config scripts/eslint-orden.mjs src",
     "videos:studio": "node scripts/videos/preparar-public.mjs && remotion studio",
-    "videos:render": "node scripts/videos/preparar-public.mjs && remotion render"
+    "videos:render": "node scripts/videos/preparar-public.mjs && remotion render",
+    "videos:cuadros": "node scripts/videos/preparar-public.mjs && node scripts/videos/cuadros.mjs"
   },
   "dependencies": {
     "@gsap/react": "^2.1.2",

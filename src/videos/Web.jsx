@@ -641,10 +641,16 @@ const golpesWeb = () => {
     ...golpesBase(DUR, T, 2),
     { f: ini[3] + 70, sfx: 'click', vol: 0.35 }, // clic en la primera paleta
     { f: ini[5] + ENVIADO, sfx: 'ding', vol: 0.18 }, // mensaje enviado
+    // Medios: los tres catálogos que se van marcando y los pasos de compra
+    ...[30, 55, 80].map(f => ({ f: ini[2] + f, sfx: 'pop', vol: 0.1, nivel: 'medio' })),
+    ...[0, 1, 2].map(i => ({ f: ini[5] + 20 + i * 28, sfx: 'pop', vol: 0.11, nivel: 'medio' })),
+    // Intensos: el tipeo de la dirección y el de las teclas del mensaje
+    ...Array.from({ length: 11 }, (_, i) => ({ f: 36 + i * 2.75, sfx: 'tick', vol: 0.09, nivel: 'intenso' })),
+    ...Array.from({ length: 15 }, (_, i) => ({ f: ini[5] + 30 + i * 6, sfx: 'tick', vol: 0.06, nivel: 'intenso' })),
   ]
 }
 
-export const Web = ({ productos, musica, totalPaletas = 0 }) => {
+export const Web = ({ productos, musica, efectos, guia, totalPaletas = 0 }) => {
   const escenas = [
     <Apertura key="apertura" />,
     <Hero key="hero" />,
@@ -655,9 +661,9 @@ export const Web = ({ productos, musica, totalPaletas = 0 }) => {
     <CierreWeb key="cierre" />,
   ]
   return (
-    <Lienzo>
+    <Lienzo guia={guia}>
       <Musica id={musica} />
-      <Efectos golpes={golpesWeb()} />
+      <Efectos golpes={golpesWeb()} elegido={efectos} />
       <TransitionSeries>
         {escenas.map((escena, i) => (
           <Fragment key={i}>

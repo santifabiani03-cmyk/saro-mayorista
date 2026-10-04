@@ -2,7 +2,7 @@
 // reglas que la API (src/videos/catalogo.js) y deja las props en props.json.
 // Las entradas llegan por variables de entorno, nunca pegadas en el script.
 import { writeFileSync } from 'node:fs'
-import { REQUEST_ID_VALIDO, plantillaMeta, problemaDelPedido } from '../../src/videos/catalogo.js'
+import { REQUEST_ID_VALIDO, plantillaMeta, problemaDelPedido, videosDelPedido } from '../../src/videos/catalogo.js'
 
 const { PLANTILLA, PROPS, REQUEST_ID } = process.env
 const fallar = motivo => {
@@ -21,4 +21,8 @@ const problema = problemaDelPedido(plantillaMeta(PLANTILLA), props)
 if (problema) fallar(problema)
 
 writeFileSync('props.json', JSON.stringify(props))
-console.log(`${PLANTILLA} con ${props.productos.length} producto(s): ${props.productos.map(p => p.nombre).join(', ')}`)
+const videos = videosDelPedido(props)
+console.log(`${PLANTILLA}: ${videos.length} video(s)`)
+for (const v of videos) {
+  console.log(`- ${v.formato ?? 'formato de fábrica'}, efectos ${v.efectos ?? 'de fábrica'}: ${v.productos.map(p => p.nombre).join(', ')}`)
+}

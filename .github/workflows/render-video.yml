@@ -9,15 +9,15 @@ on:
   workflow_dispatch:
     inputs:
       plantilla:
-        description: Id de la plantilla (SaroColeccion, SaroFicha, SaroWeb)
+        description: Id de la plantilla (SaroColeccion, SaroFicha, SaroRitmo, SaroComparativa, SaroRevendedores, SaroWeb)
         required: true
         type: string
       props:
-        description: Props del video en JSON (las arma el admin)
+        description: Props del video en JSON (las arma el admin). Un lote de fichas viene como {"lote":[...]}
         required: true
         type: string
       request_id:
-        description: Identificador del pedido (también es el nombre del MP4)
+        description: Identificador del pedido (también es el nombre del MP4; en un lote, <id>-1.mp4, <id>-2.mp4…)
         required: true
         type: string
 
@@ -31,12 +31,12 @@ permissions:
 
 env:
   RELEASE_TAG: videos-admin
-  GUARDAR_ULTIMOS: 30
+  GUARDAR_ULTIMOS: 40
 
 jobs:
   render:
     runs-on: ubuntu-latest
-    timeout-minutes: 30
+    timeout-minutes: 40
     env:
       PLANTILLA: ${{ inputs.plantilla }}
       PROPS: ${{ inputs.props }}
@@ -59,23 +59,24 @@ jobs:
       - name: Preparar Chrome
         run: npx remotion browser ensure
 
-      # --gl=swangle: WebGL por software (el runner no tiene GPU) para la paleta 3D
+      # --gl=swangle: WebGL por software (el runner no tiene GPU) para la paleta 3D.
+      # Un MP4 por video del pedido (uno solo, o uno por ficha en un lote).
       - name: Renderizar video
-        run: npm run videos:render -- "$PLANTILLA" "out/$REQUEST_ID.mp4" --props=props.json --gl=swangle
+        run: node scripts/videos/renderizar.mjs --gl=swangle
 
       # Sólo informa el pico de audio (< 0,95 = sin saturar); si falla, no frena el video
       - name: Revisar audio
         continue-on-error: true
         run: |
-          node scripts/videos/revisar-audio.mjs "out/$REQUEST_ID.mp4"
-          ls -lh "out/$REQUEST_ID.mp4"
+          for f in out/*.mp4; do node scripts/videos/revisar-audio.mjs "$f"; done
+          ls -lh out/*.mp4
 
       - name: Subir MP4
         run: |
           gh release view "$RELEASE_TAG" > /dev/null 2>&1 || gh release create "$RELEASE_TAG" --prerelease \
             --title "Videos del admin" \
             --notes "MP4 generados desde la pestaña 🎬 Videos del admin. Se guardan los últimos $GUARDAR_ULTIMOS."
-          gh release upload "$RELEASE_TAG" "out/$REQUEST_ID.mp4" --clobber
+          gh release upload "$RELEASE_TAG" out/*.mp4 --clobber
           # Poda: quedan sólo los más nuevos
           gh api "repos/$GITHUB_REPOSITORY/releases/tags/$RELEASE_TAG" \
             --jq ".assets | sort_by(.created_at) | reverse | .[$GUARDAR_ULTIMOS:] | .[].id" |

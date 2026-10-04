@@ -1,20 +1,20 @@
 import { NextResponse } from 'next/server'
 import { REQUEST_ID_VALIDO } from '../../../../videos/catalogo'
-import { MENSAJE_PERMISOS, buscarEjecucion, buscarMp4, faltaConfig, pasoActual, pinValido } from '../../../../utils/videosGithub'
+import { MENSAJE_PERMISOS, buscarEjecucion, buscarMp4s, faltaConfig, pasoActual, pinValido } from '../../../../utils/videosGithub'
 
 // Nombres de los pasos de render-video.yml, en palabras para el admin
 const PASOS = {
   'Validar pedido': 'Preparando',
   'Instalar dependencias': 'Preparando (instala lo necesario)',
   'Preparar Chrome': 'Preparando',
-  'Renderizar video': 'Renderizando el video',
+  'Renderizar video': 'Renderizando (el log dice cuál va, si es un lote)',
   'Revisar audio': 'Revisando el audio',
   'Subir MP4': 'Subiendo el MP4',
 }
 
 const ERRORES = {
-  cancelled: 'Se canceló: tardó más de 30 minutos, o alguien lo canceló en GitHub.',
-  timed_out: 'Tardó más de 30 minutos y se cortó.',
+  cancelled: 'Se canceló: tardó más de 40 minutos, o alguien lo canceló en GitHub.',
+  timed_out: 'Tardó más de 40 minutos y se cortó.',
 }
 
 /**
@@ -49,9 +49,10 @@ export async function GET(request) {
         mensaje: ERRORES[run.conclusion] ?? 'El render falló. El detalle está en el log.',
       })
     }
-    const mp4 = await buscarMp4(requestId)
-    if (!mp4) return NextResponse.json({ ...base, estado: 'error', mensaje: 'El render terminó pero no encontré el MP4.' })
-    return NextResponse.json({ ...base, estado: 'listo', bytes: mp4.size })
+    const mp4s = await buscarMp4s(requestId)
+    if (!mp4s.length) return NextResponse.json({ ...base, estado: 'error', mensaje: 'El render terminó pero no encontré el MP4.' })
+    const bytes = mp4s.reduce((t, a) => t + a.size, 0)
+    return NextResponse.json({ ...base, estado: 'listo', bytes, archivos: mp4s.length })
   } catch (e) {
     if (e.status === 401 || e.status === 403) {
       return NextResponse.json({ error: MENSAJE_PERMISOS, codigo: 'permisos' }, { status: 403 })

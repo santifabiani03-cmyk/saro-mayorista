@@ -1,3 +1,4 @@
+import { EFECTOS_DEFECTO } from './catalogo'
 import { esElegible, productoVideo } from '../utils/videoProductos'
 
 // El products.json que escribe el admin al publicar (rama "datos", ver
@@ -25,15 +26,38 @@ export const disponibles = (meta, catalogo) =>
 export function seleccionInicial(meta, catalogo) {
   const lista = disponibles(meta, catalogo)
   const paletas = lista.filter(p => p.categoria === 'paleta')
-  const cuantos = meta.id === 'SaroColeccion' ? Math.min(5, meta.max) : meta.max
-  return (paletas.length ? paletas : lista).slice(0, cuantos)
+  const cuantos = { SaroColeccion: 5, SaroRitmo: 8, SaroRevendedores: 4 }[meta.id] ?? meta.max
+  // Catálogo express y Revendedores muestran de todo: no sólo paletas
+  const base = meta.id === 'SaroRitmo' || meta.id === 'SaroRevendedores' ? lista : paletas.length ? paletas : lista
+  return base.slice(0, Math.min(cuantos, meta.max))
 }
 
-/** Props de una plantilla a partir de los ids elegidos (en ese orden). */
-export function armarProps(meta, catalogo, ids, musica = meta.musica) {
+/**
+ * Props de una plantilla a partir de los ids elegidos (en ese orden).
+ * `opciones`: { musica, efectos, formato, textos, fondo }; lo que falte va de fábrica.
+ * `fondo` no viaja en las props: ya queda resuelto en cada producto (imagen/recortada).
+ */
+export function armarProps(meta, catalogo, ids, opciones = {}) {
   const porId = new Map(catalogo.map(p => [p.id, p]))
-  const productos = ids.map(id => porId.get(id)).filter(Boolean).map(productoVideo)
-  const props = { productos, musica }
+  const productos = ids
+    .map(id => porId.get(id))
+    .filter(Boolean)
+    .map(p => productoVideo(p, opciones.fondo))
+  const textos = Object.fromEntries(
+    Object.entries(opciones.textos ?? {}).filter(([campo, v]) => meta.textos.includes(campo) && v?.trim()),
+  )
+  const props = {
+    productos,
+    musica: opciones.musica ?? meta.musica,
+    efectos: opciones.efectos ?? EFECTOS_DEFECTO,
+    formato: meta.formatos.includes(opciones.formato) ? opciones.formato : meta.formatos[0],
+    textos,
+  }
   if (meta.id === 'SaroWeb') props.totalPaletas = catalogo.filter(p => esElegible(p) && p.categoria === 'paleta').length
   return props
 }
+
+/** Un lote: las mismas opciones, un video por producto. */
+export const armarLote = (meta, catalogo, ids, opciones) => ({
+  lote: ids.map(id => armarProps(meta, catalogo, [id], opciones)),
+})

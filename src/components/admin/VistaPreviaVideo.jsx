@@ -1,5 +1,6 @@
 'use client'
 import { Player } from '@remotion/player'
+import { dimensiones } from '../../videos/catalogo'
 import { plantillaPorId } from '../../videos/plantillas'
 
 /**
@@ -9,19 +10,24 @@ import { plantillaPorId } from '../../videos/plantillas'
  */
 export default function VistaPreviaVideo({ plantillaId, props }) {
   const p = plantillaPorId(plantillaId)
+  const { ancho, alto } = dimensiones(p, props.formato)
   return (
     <Player
+      // Al cambiar de formato cambia el tamaño: se rearma el reproductor
+      key={`${plantillaId}-${ancho}x${alto}`}
       component={p.componente}
       inputProps={props}
       durationInFrames={p.duracion(props)}
-      compositionWidth={p.ancho}
-      compositionHeight={p.alto}
+      compositionWidth={ancho}
+      compositionHeight={alto}
       fps={p.fps}
       controls
       loop
       clickToPlay
+      // Con efectos "intensos" suenan varios a la vez (el valor de fábrica es 5)
+      numberOfSharedAudioTags={14}
       acknowledgeRemotionLicense
-      style={{ width: '100%', aspectRatio: `${p.ancho} / ${p.alto}`, borderRadius: 16, overflow: 'hidden' }}
+      style={{ width: '100%', aspectRatio: `${ancho} / ${alto}`, borderRadius: 16, overflow: 'hidden' }}
     />
   )
 }
