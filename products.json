@@ -57,7 +57,9 @@
     "fechaActualizacion": "2026-10-01T00:43:01.832Z",
     "imagenes": [
       "/assets/imagen-1779451998087.webp"
-    ]
+    ],
+    "imagenVideo": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/video-medias-algod-n-3-4-1791095565774.webp",
+    "imagenVideoOrigen": "/assets/imagen-1779451998087.webp"
   },
   {
     "nombre": "CUBRE GRIP PERFORADO C/RELIEVE ",
@@ -385,7 +387,9 @@
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786728140732-encuadre.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786728160145-encuadre.webp"
-    ]
+    ],
+    "imagenVideo": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/video-saro-sr-junior-1791095576184.webp",
+    "imagenVideoOrigen": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786728140732-encuadre.webp"
   },
   {
     "nombre": "Muñequera x par ",
@@ -1380,7 +1384,9 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353195821-encuadre.webp"
     ],
     "fechaPublicacion": "2026-08-21T23:01:27.653Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "imagenVideo": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/video-raptor-carbono-12k-1791095587581.webp",
+    "imagenVideoOrigen": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353195821-encuadre.webp"
   },
   {
     "nombre": "Massive 12k",
@@ -1410,7 +1416,9 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353339545-encuadre.webp"
     ],
     "fechaPublicacion": "2026-08-21T23:04:25.696Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "imagenVideo": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/video-massive-12k-1791095598634.webp",
+    "imagenVideoOrigen": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353339545-encuadre.webp"
   },
   {
     "nombre": "Silver Carbono 12K ",
@@ -1440,7 +1448,9 @@
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353488041-encuadre.webp"
     ],
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "imagenVideo": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/video-silver-carbono-12k-1791095733306.webp",
+    "imagenVideoOrigen": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353488041-encuadre.webp"
   },
   {
     "nombre": "Vortice X",
@@ -1470,7 +1480,9 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353704421-encuadre.webp"
     ],
     "fechaPublicacion": "2026-08-21T23:09:17.330Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "imagenVideo": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/video-vortice-x-1791095744075.webp",
+    "imagenVideoOrigen": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353704421-encuadre.webp"
   },
   {
     "nombre": "Kids de 3 a 6 años",
