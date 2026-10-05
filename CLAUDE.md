@@ -5,7 +5,7 @@
 > chats viejos ni preguntar nada. Prioriza ser exhaustivo. Si algo cambia, actualizá este
 > archivo y `docs/ESTETICA.md`.
 
-Última actualización: 2026-10-04.
+Última actualización: 2026-10-05.
 
 > ⚠️ **Cambio importante (agosto 2026): el sitio pasó de MAYORISTA a MINORISTA.**
 > La tienda principal es minorista (`/paletas` y `/ropa-y-accesorios`, precio `precioMinorista`).
@@ -649,12 +649,12 @@ reemplazó y sigue igual.
   `preview-vendedores.html`. ⚠️ Requeriría **base de datos real + autenticación** (hoy no hay
   ninguna de las dos) y define un **conflicto de canal** (fábrica vs. revendedores) a resolver.
 
-- **Videos (§8):** en producción desde el 29/09/2026 y probado con dos renders reales en la
-  Action. Falta que smfab le dé al token de GitHub el permiso **Actions: Read and write** (o
-  cargue `GITHUB_VIDEOS_TOKEN` en Vercel): hasta entonces "Generar MP4" muestra el aviso de
-  permisos. Y **confirmar la licencia de Remotion**: es gratis para empresas de hasta 3
-  personas; si SARO tiene más, necesita la licencia de empresa (https://www.remotion.pro).
-  **Pendiente de confirmar.**
+- **Videos (§8):** funcionando de punta a punta desde el admin (el token ya tiene permiso
+  para disparar el render; smfab lo probó el 05/10/2026). Falta **confirmar la licencia de
+  Remotion**: es gratis para empresas de hasta 3 personas; si SARO tiene más, necesita la
+  licencia de empresa (https://www.remotion.pro). **Pendiente de confirmar.** También conviene
+  que smfab revise los textos de la plantilla **Revendedores** ("15 años", "Personalizados para
+  clubes y eventos", "Catálogo mayorista en saro.com.ar") antes de mandarla a clientes.
 
 ### 🔮 Ideas a futuro (no pedidas aún)
 Si algún día se quiere vender con pago online, gestionar stock de verdad o mandar mails, ahí sí
@@ -894,19 +894,23 @@ Con "Con fondo blanco" se ignora y va siempre la foto original en tarjeta
 
 - Usa `GITHUB_TOKEN`, `GITHUB_OWNER` y `GITHUB_REPO` (los de siempre), o `GITHUB_VIDEOS_TOKEN`
   si está cargado.
-- El token es *fine-grained* y hoy **no puede disparar workflows** (verificado: 403). Hay que
-  darle **Repository permissions → Actions: Read and write** (GitHub → Settings → Developer
-  settings → Fine-grained tokens → el token del sitio), o crear uno nuevo con ese permiso (y
-  Contents: Read) y cargarlo en Vercel como `GITHUB_VIDEOS_TOKEN`. Sin eso, "Generar MP4"
-  muestra ese mismo mensaje.
+- El token es *fine-grained* y tiene **Repository permissions → Actions: Read and write**
+  (se lo dio smfab el 05/10/2026; antes daba 403 y "Generar MP4" mostraba el aviso de
+  permisos). Si algún día se cambia o vence el token, hay que volver a darle ese permiso
+  (GitHub → Settings → Developer settings → Fine-grained tokens → el token del sitio → Edit;
+  editar los permisos no cambia el valor, así que Vercel no se toca), o crear uno nuevo con
+  ese permiso (y Contents: Read) y cargarlo en Vercel como `GITHUB_VIDEOS_TOKEN` (con redeploy).
 - El workflow usa el token propio de la Action (`permissions: contents: write`) para crear el
   release y subir el MP4: no necesita secretos.
 
 ### 8.5 Costos
 
 - **GitHub Actions es gratis para repos públicos** (runners estándar, sin límite de minutos). Un
-  render tarda: Colección de 5 paletas ~9 min (8 de render), Ficha ~2 min (medido el 29/09/2026). Si el repo pasara a privado, el
-  plan gratis trae 2.000 min/mes.
+  render tarda: Colección de 5 paletas ~9 min (8 de render), Ficha ~2 min (medido el
+  29/09/2026); un lote de 2 fichas, 5,5 min en total (medido el 05/10/2026). Si el repo pasara
+  a privado, el plan gratis trae 2.000 min/mes.
+- **Gemini** (sugerir y revisar) usa la misma `GEMINI_API_KEY` del resto del admin; revisar un
+  video de 30 s gasta unos pocos miles de tokens.
 - **Licencia de Remotion:** gratis para empresas de hasta 3 personas. Si SARO tiene más,
   necesita la licencia de empresa (https://www.remotion.pro). **Pendiente de confirmar** (§6).
 
