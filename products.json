@@ -381,12 +381,13 @@
         "Celeste"
       ]
     },
-    "fechaActualizacion": "2026-10-01T00:42:36.453Z",
+    "fechaActualizacion": "2026-10-05T19:04:49.626Z",
     "_aiLoading": false,
     "_aiCount": 2,
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786728140732-encuadre.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786728160145-encuadre.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786728160145-encuadre.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-sr-junior-azul-1791227030187.webp"
     ],
     "imagenVideo": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/video-saro-sr-junior-1791095576184.webp",
     "imagenVideoOrigen": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-sr-junior-1786728140732-encuadre.webp"
@@ -457,7 +458,8 @@
     "genero": "",
     "parteCuerpo": "",
     "colores": [
-      "Negro"
+      "Negro",
+      "Rojo"
     ],
     "talles": [
       "Única"
@@ -470,10 +472,11 @@
     "id": "p1780084771974",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780084512601-encuadre.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780084526132.jpg"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780084526132.jpg",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-radian-roja-1791227030187.webp"
     ],
     "fechaPublicacion": "2026-05-29T19:59:31.974Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+    "fechaActualizacion": "2026-10-05T19:04:49.626Z"
   },
   {
     "nombre": "Saro MAX 3.0 Carbono",
@@ -1465,7 +1468,8 @@
     "genero": "",
     "parteCuerpo": "",
     "colores": [
-      "Azul"
+      "Azul",
+      "Blanco"
     ],
     "talles": [
       "Única"
@@ -1477,10 +1481,11 @@
     "_aiCount": 7,
     "id": "p1787353757330",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353704421-encuadre.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353704421-encuadre.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-vortice-blanca-1791227030187.webp"
     ],
     "fechaPublicacion": "2026-08-21T23:09:17.330Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "fechaActualizacion": "2026-10-05T19:04:49.626Z",
     "imagenVideo": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/video-vortice-x-1791095744075.webp",
     "imagenVideoOrigen": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787353704421-encuadre.webp"
   },
@@ -1528,7 +1533,8 @@
     "parteCuerpo": "",
     "colores": [
       "Blanco",
-      "Fucsia"
+      "Fucsia",
+      "Dorado"
     ],
     "talles": [
       "Única"
@@ -1540,10 +1546,11 @@
     "_aiCount": 10,
     "id": "p1787355012462",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787354935277-encuadre.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787354935277-encuadre.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-flash-dorada-1791227030187.webp"
     ],
     "fechaPublicacion": "2026-08-21T23:30:12.463Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+    "fechaActualizacion": "2026-10-05T19:04:49.626Z"
   },
   {
     "nombre": "Nexus Carbono 12k ",
@@ -1570,9 +1577,10 @@
     "_aiCount": 11,
     "id": "p1787356327294",
     "fechaPublicacion": "2026-08-21T23:52:07.295Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "fechaActualizacion": "2026-10-05T19:04:49.626Z",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787356252259-encuadre.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787356252259-encuadre.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-nexus-carbono-1791227030187.webp"
     ],
     "colorDefs": {
       "Rojo/Negro": [
@@ -1638,5 +1646,109 @@
     ],
     "fechaPublicacion": "2026-08-27T13:02:13.397Z",
     "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+  },
+  {
+    "nombre": "Flash Fibra",
+    "precio": 120000,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Gris/Azul"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "id": "p1791227089631",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-flash-fibra-1791227030187.webp"
+    ],
+    "fechaPublicacion": "2026-10-05T19:04:49.626Z",
+    "fechaActualizacion": "2026-10-05T19:04:49.626Z"
+  },
+  {
+    "nombre": "Gold PRO",
+    "precio": 120000,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro/Rojo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "id": "p1791227089632",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-gold-pro-1791227030187.webp"
+    ],
+    "fechaPublicacion": "2026-10-05T19:04:49.626Z",
+    "fechaActualizacion": "2026-10-05T19:04:49.626Z"
+  },
+  {
+    "nombre": "Karma",
+    "precio": 120000,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Blanco/Verde"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "id": "p1791227089633",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-karma-1791227030187.webp"
+    ],
+    "fechaPublicacion": "2026-10-05T19:04:49.626Z",
+    "fechaActualizacion": "2026-10-05T19:04:49.626Z"
+  },
+  {
+    "nombre": "Nexus Fiberglass",
+    "precio": 120000,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Dorado/Blanco"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "id": "p1791227089634",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-nexus-dorada-1791227030187.webp"
+    ],
+    "fechaPublicacion": "2026-10-05T19:04:49.626Z",
+    "fechaActualizacion": "2026-10-05T19:04:49.626Z"
   }
 ]
