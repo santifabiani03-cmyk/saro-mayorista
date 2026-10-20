@@ -322,11 +322,11 @@
   },
   {
     "nombre": "Saro MAX Carbono 12k",
-    "precio": 180000,
+    "precio": 140000,
+    "precioMinorista": 170000,
     "descripcion": "La paleta Saro MAX Carbono 12k es una paleta de pádel con formato redondo, diseñada para un equilibrio óptimo entre control y potencia en cada golpe. Su composición íntegra de carbono garantiza una alta durabilidad y resistencia, ideal para jugadores que buscan rendimiento constante. Ofrece una experiencia de juego superior, adaptándose a diversas situaciones en la cancha.",
     "tags": [
-      "carbono",
-      "nuevo"
+      "carbono"
     ],
     "categoria": "paleta",
     "genero": "",
@@ -344,7 +344,7 @@
     "_aiCount": 1,
     "id": "p1779916282248",
     "fechaPublicacion": "2026-05-27T21:11:22.249Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "fechaActualizacion": "2026-10-20T22:16:11.678Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779989234833-encuadre.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/paleta-max-carbono-pro-1779986492622.webp"
@@ -449,6 +449,7 @@
   {
     "nombre": "Saro Radian Pro Carbono",
     "precio": 140000,
+    "precioMinorista": 170000,
     "descripcion": "La paleta Saro Radian Pro Carbono presenta un formato diamante con peso en la punta, ideal para golpes de potencia. Su construcción con carbono 12k en las caras ofrece una alta durabilidad y resistencia al impacto. Este diseño asegura un rendimiento superior y una vida útil prolongada en la cancha.",
     "tags": [
       "stock_limitado",
@@ -470,13 +471,13 @@
     "_aiLoading": false,
     "_aiCount": 1,
     "id": "p1780084771974",
+    "fechaPublicacion": "2026-05-29T19:59:31.974Z",
+    "fechaActualizacion": "2026-10-20T22:15:14.994Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780084512601-encuadre.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1780084526132.jpg",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-radian-roja-1791227030187.webp"
-    ],
-    "fechaPublicacion": "2026-05-29T19:59:31.974Z",
-    "fechaActualizacion": "2026-10-05T19:04:49.626Z"
+    ]
   },
   {
     "nombre": "Saro MAX 3.0 Carbono",
@@ -1650,6 +1651,7 @@
   {
     "nombre": "Flash Fibra",
     "precio": 120000,
+    "precioMinorista": 160000,
     "descripcion": "",
     "tags": [
       "nuevo"
@@ -1667,15 +1669,16 @@
     "emoji": "🏓",
     "promos": [],
     "id": "p1791227089631",
+    "fechaPublicacion": "2026-10-05T19:04:49.626Z",
+    "fechaActualizacion": "2026-10-20T22:14:33.398Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-flash-fibra-1791227030187.webp"
-    ],
-    "fechaPublicacion": "2026-10-05T19:04:49.626Z",
-    "fechaActualizacion": "2026-10-05T19:04:49.626Z"
+    ]
   },
   {
     "nombre": "Gold PRO",
-    "precio": 120000,
+    "precio": 90000,
+    "precioMinorista": 120000,
     "descripcion": "",
     "tags": [
       "nuevo"
@@ -1693,41 +1696,16 @@
     "emoji": "🏓",
     "promos": [],
     "id": "p1791227089632",
+    "fechaPublicacion": "2026-10-05T19:04:49.626Z",
+    "fechaActualizacion": "2026-10-20T22:16:36.849Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-gold-pro-1791227030187.webp"
-    ],
-    "fechaPublicacion": "2026-10-05T19:04:49.626Z",
-    "fechaActualizacion": "2026-10-05T19:04:49.626Z"
-  },
-  {
-    "nombre": "Karma",
-    "precio": 120000,
-    "descripcion": "",
-    "tags": [
-      "nuevo"
-    ],
-    "categoria": "paleta",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [
-      "Blanco/Verde"
-    ],
-    "talles": [
-      "Única"
-    ],
-    "noStock": [],
-    "emoji": "🏓",
-    "promos": [],
-    "id": "p1791227089633",
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-karma-1791227030187.webp"
-    ],
-    "fechaPublicacion": "2026-10-05T19:04:49.626Z",
-    "fechaActualizacion": "2026-10-05T19:04:49.626Z"
+    ]
   },
   {
     "nombre": "Nexus Fiberglass",
     "precio": 120000,
+    "precioMinorista": 160000,
     "descripcion": "",
     "tags": [
       "nuevo"
@@ -1745,10 +1723,38 @@
     "emoji": "🏓",
     "promos": [],
     "id": "p1791227089634",
+    "fechaPublicacion": "2026-10-05T19:04:49.626Z",
+    "fechaActualizacion": "2026-10-20T22:15:37.801Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-nexus-dorada-1791227030187.webp"
+    ]
+  },
+  {
+    "nombre": "KL10 Carbono 12k ",
+    "precio": 135000,
+    "precioMinorista": 170000,
+    "descripcion": "La paleta KL10 Carbono 12k es una herramienta de alto rendimiento diseñada para jugadores exigentes. Su composición 100% carbono 12k proporciona una excelente potencia y control en cada golpe. Ofrece una durabilidad superior y una sensación de estabilidad en el juego, ideal para un desempeño competitivo en pádel.",
+    "tags": [
+      "nuevo"
     ],
-    "fechaPublicacion": "2026-10-05T19:04:49.626Z",
-    "fechaActualizacion": "2026-10-05T19:04:49.626Z"
+    "categoria": "paleta",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🏓",
+    "promos": [],
+    "_aiLoading": false,
+    "_aiCount": 1,
+    "id": "p1792534720147",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792534636884.webp"
+    ],
+    "fechaPublicacion": "2026-10-20T22:18:40.147Z"
   }
 ]
