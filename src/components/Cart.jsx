@@ -2,6 +2,7 @@
 import { useEffect, useState } from 'react'
 import { useCart } from '../context/CartContext'
 import CartSuggestions from './CartSuggestions'
+import Foto from './Foto'
 import { pesoAproxKg, pesoParaCotizar } from '../utils/envio'
 import { track, trackPedidoWhatsApp } from '../utils/analytics'
 
@@ -254,8 +255,9 @@ export default function Cart({ config }) {
                 {/* Thumbnail */}
                 <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 flex items-center justify-center">
                   {item.imagen
-                    ? <img
+                    ? <Foto
                         src={item.imagen}
+                        sizes="48px"
                         alt={item.nombre}
                         className="w-full h-full object-cover"
                         onError={e => { e.currentTarget.style.display = 'none'; e.currentTarget.nextSibling.style.display = 'flex' }}

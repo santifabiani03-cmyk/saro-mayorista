@@ -5,7 +5,7 @@
 > chats viejos ni preguntar nada. Prioriza ser exhaustivo. Si algo cambia, actualizá este
 > archivo y `docs/ESTETICA.md`.
 
-Última actualización: 2026-10-05.
+Última actualización: 2026-10-22.
 
 > ⚠️ **Cambio importante (agosto 2026): el sitio pasó de MAYORISTA a MINORISTA.**
 > La tienda principal es minorista (`/paletas` y `/ropa-y-accesorios`, precio `precioMinorista`).
@@ -104,6 +104,13 @@ Las **fotos** se sirven por links directos de GitHub:
 - nuevas: `https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/...webp`
 - viejas (hasta el 29/09/2026): `.../master/public/assets/...webp` — siguen andando, no se movieron.
 
+En la tienda **no se bajan así**: `src/components/Foto.jsx` las pide al optimizador de Vercel
+(`/_next/image`, calidad 85) en el ancho en que se muestran (tarjeta ~12–17 KB en vez de ~106 KB).
+Si la pantalla pide más de 828 px (zoom, ficha en pantallas nítidas) va la original tal cual, y si
+el optimizador falla vuelve sola a la original. Los orígenes permitidos están en
+`images.remotePatterns` de `next.config.mjs` (si cambia el repo o el dueño, actualizarlos ahí y en
+`REPO` de `Foto.jsx`). Medido el 22/10/2026: a tamaño real no se distingue de la original.
+
 ⚠️ `catalog/products.json`, `catalog/orders.json` y `public/config.json` **siguen en `master`
 pero quedaron congelados** (copia del 30/09/2026). Sólo se usan en desarrollo local cuando no
 hay credenciales de GitHub. En Vercel nunca se leen.
@@ -193,6 +200,7 @@ Pagina saro/
 │   ├── components/           ← piezas de UI reutilizables
 │   │   ├── Header.jsx, Cart.jsx, Footer (en ShopShell), Filters.jsx
 │   │   ├── ProductCard.jsx, ProductModal.jsx, ImageCarousel.jsx
+│   │   ├── Foto.jsx          ← <img> que pide la foto achicada al optimizador (§2.2)
 │   │   ├── FaqSection.jsx, HowToBuyModal.jsx
 │   │   ├── HistoriaTrabaja.jsx ← 2 pestañas: historia/política + form "Trabajá con nosotros"
 │   │   ├── GuiaPaletas.jsx   ← guía de compra desplegable (sólo en /paletas)
@@ -555,6 +563,13 @@ reemplazó y sigue igual.
 ## 6. Estado actual y pendientes
 
 ### ✅ Terminado y en producción (deployado)
+- **Rendimiento, etapa 1 (22/10/2026):** fotos optimizadas (`Foto.jsx`, ver §2.2), funciones de
+  Vercel en **São Paulo** (`"regions": ["gru1"]` en `vercel.json`; antes Washington) y hero 3D más
+  liviano: en el celular dibuja a 1,5× con sombra de 1024 px, y deja de dibujar cuando sale de
+  pantalla (`IntersectionObserver` en `Paleta3D.jsx`). Modelo y animación sin cambios.
+  Etapas siguientes propuestas: 2) experiencia (transiciones, fotos que aparecen difuminadas,
+  búsqueda instantánea); 3) Vercel Pro (US$20/mes: el plan Hobby es para uso no comercial) y,
+  con varios cientos de productos o login mayorista, una base de datos real.
 - **Videos, segunda tanda (04/10/2026):** zona segura de Reels/TikTok, gancho desde el primer
   cuadro, cortes al ritmo de la música, formato 4:5, textos editables, fotos extra en la Ficha,
   lote de fichas, fondo de fotos a elección, 7 pistas CC0 nuevas, 3 niveles de efectos y 3

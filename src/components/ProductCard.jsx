@@ -2,6 +2,10 @@
 
 import { COLOR_MAP, TAG_CONFIG, getProductTags, getSwatchStyle } from '../utils/colors'
 import ImageCarousel from './ImageCarousel'
+import Foto from './Foto'
+
+// Ancho de la tarjeta en la grilla (2 / 3 / 4 columnas, CatalogClient.jsx)
+const SIZES_TARJETA = '(min-width: 1024px) 300px, (min-width: 640px) 33vw, 50vw'
 
 const getImages = p => p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : []
 
@@ -14,7 +18,7 @@ function StandardCard({ product, onClick, tags, imgs, sinStock }) {
     >
       {/* Imagen / carrusel */}
       <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100/50 overflow-hidden">
-        <ImageCarousel images={imgs} emoji={product.emoji} compact altText={product.nombre} />
+        <ImageCarousel images={imgs} emoji={product.emoji} compact altText={product.nombre} sizes={SIZES_TARJETA} />
 
         {tags.length > 0 && (
           <div className="absolute top-2.5 left-2.5 flex flex-col gap-1 items-start">
@@ -27,8 +31,9 @@ function StandardCard({ product, onClick, tags, imgs, sinStock }) {
         )}
 
         {/* Logo SR */}
-        <img
+        <Foto
           src="/assets/logo-icon.png"
+          sizes="36px"
           alt=""
           className="absolute top-2.5 right-2.5 w-9 h-9 opacity-35 z-10 object-contain"
         />
@@ -104,8 +109,9 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
           3:4 con aire alrededor (utils/encuadrePaleta.js), así que centrada sólo
           se recorta margen, nunca la punta ni los costados. */}
       {imgs.length > 0 ? (
-        <img
+        <Foto
           src={imgs[0]}
+          sizes={SIZES_TARJETA}
           alt={product.nombre}
           className="absolute inset-0 w-full h-full object-cover object-center transition-transform duration-500 ease-out group-hover:scale-105"
           loading="lazy"
@@ -133,8 +139,9 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
       )}
 
       {/* Logo SR arriba derecha */}
-      <img
+      <Foto
         src="/assets/logo-icon.png"
+        sizes="36px"
         alt=""
         className="absolute top-2.5 right-2.5 w-9 h-9 opacity-35 z-10 object-contain"
       />

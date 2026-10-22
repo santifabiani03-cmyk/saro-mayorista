@@ -3,6 +3,7 @@
 import { useEffect, useState } from 'react'
 import { useCart } from '../context/CartContext'
 import { suggestFillers } from '../utils/cartSuggestions'
+import Foto from './Foto'
 
 /**
  * Bloque "Completa tu pedido": cuando al carrito le falta plata para llegar
@@ -54,8 +55,9 @@ export default function CartSuggestions({ gap }) {
           >
             <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 flex items-center justify-center">
               {s.product.imagenes?.[0]
-                ? <img
+                ? <Foto
                     src={s.product.imagenes[0]}
+                    sizes="36px"
                     alt={s.product.nombre}
                     className="w-full h-full object-cover"
                     loading="lazy"

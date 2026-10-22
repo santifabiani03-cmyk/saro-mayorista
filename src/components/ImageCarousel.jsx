@@ -1,5 +1,9 @@
 'use client'
 import { useState, useEffect, useCallback } from 'react'
+import Foto from './Foto'
+
+// Galería de la ficha y del modal: media columna de max-w-5xl en desktop.
+const SIZES_GALERIA = '(min-width: 768px) 480px, 100vw'
 
 /* ── Lightbox fullscreen ──────────────────────────────────────────── */
 function Lightbox({ images, startIdx, onClose }) {
@@ -58,8 +62,9 @@ function Lightbox({ images, startIdx, onClose }) {
           setTouchX(null)
         }}
       >
-        <img
+        <Foto
           src={images[idx]}
+          sizes="100vw"
           alt=""
           className="max-w-full max-h-full object-contain rounded-lg select-none"
           draggable={false}
@@ -98,7 +103,7 @@ function Lightbox({ images, startIdx, onClose }) {
                   ? 'border-white scale-110'
                   : 'border-transparent opacity-50 hover:opacity-80'}`}
             >
-              <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+              <Foto src={src} sizes="56px" alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
             </button>
           ))}
         </div>
@@ -117,6 +122,7 @@ function Lightbox({ images, startIdx, onClose }) {
  * thumbs=true   → muestra tira de miniaturas debajo (solo cuando compact=false).
  * entera=true   → recuadro vertical 3:4 y la foto completa sobre blanco, sin
  *                 recortar (paletas: en el cuadrado se les cortaba punta y mango).
+ * sizes          → ancho en que se muestra la foto (para bajarla en ese tamaño).
  */
 export default function ImageCarousel({
   images = [],
@@ -125,6 +131,7 @@ export default function ImageCarousel({
   thumbs  = false,
   altText = '',
   entera  = false,
+  sizes   = SIZES_GALERIA,
 }) {
   const [idx, setIdx]     = useState(0)
   const [touchX, setTouchX] = useState(null)
@@ -170,8 +177,9 @@ export default function ImageCarousel({
         setTouchX(null)
       }}
     >
-      <img
+      <Foto
         src={images[idx]}
+        sizes={sizes}
         alt={altText ? `${altText} - imagen ${idx + 1}` : ''}
         className={`w-full h-full ${entera ? 'object-contain bg-white' : 'object-cover'}
           ${compact ? 'transition-transform duration-200 group-hover:scale-105' : ''}`}
@@ -251,7 +259,7 @@ export default function ImageCarousel({
                   ? 'border-saro-blue scale-105'
                   : 'border-gray-100 opacity-60 hover:opacity-100 hover:border-gray-300'}`}
             >
-              <img src={src} alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
+              <Foto src={src} sizes="56px" alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
             </button>
           ))}
         </div>

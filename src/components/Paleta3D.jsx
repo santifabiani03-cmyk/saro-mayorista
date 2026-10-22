@@ -45,11 +45,15 @@ export default function Paleta3D({ progressRef, onReady }) {
       if (disposed || !mountRef.current) return
       const mount = mountRef.current
       const reduce = window.matchMedia('(prefers-reduced-motion: reduce)').matches
+      // En el celular se dibuja con menos píxeles y una sombra más chica: la
+      // sombra es muy difusa (radius 9) y a 1,5x la paleta se ve igual de nítida,
+      // pero la placa trabaja bastante menos y el scroll va más suelto.
+      const celular = window.matchMedia('(pointer: coarse)').matches || window.innerWidth < 768
       const W = () => mount.clientWidth || 1
       const H = () => mount.clientHeight || 1
 
       const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, preserveDrawingBuffer: true })
-      renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2))
+      renderer.setPixelRatio(Math.min(window.devicePixelRatio, celular ? 1.5 : 2))
       renderer.setSize(W(), H())
       renderer.shadowMap.enabled = true
       renderer.shadowMap.type = THREE.PCFSoftShadowMap
@@ -68,7 +72,7 @@ export default function Paleta3D({ progressRef, onReady }) {
       const key = new THREE.DirectionalLight(0xffffff, 1.6)
       key.position.set(5, 9, 7)
       key.castShadow = true
-      key.shadow.mapSize.set(2048, 2048)
+      key.shadow.mapSize.set(celular ? 1024 : 2048, celular ? 1024 : 2048)
       key.shadow.camera.near = 1
       key.shadow.camera.far = 30
       Object.assign(key.shadow.camera, { left: -12, right: 12, top: 12, bottom: -12 })
@@ -265,7 +269,9 @@ export default function Paleta3D({ progressRef, onReady }) {
       }
       window.addEventListener('pointerdown', onDown, { passive: true })
 
+      let enPantalla = true
       const animate = () => {
+        if (!enPantalla) { raf = 0; return }
         raf = requestAnimationFrame(animate)
         const now = performance.now()
         const t = (now - t0) / 1000
@@ -367,9 +373,19 @@ export default function Paleta3D({ progressRef, onReady }) {
       }
       animate()
 
+      // Cuando el hero sale de pantalla (bajando a los catálogos o al FAQ) se deja
+      // de dibujar; antes seguía a 60 cuadros por segundo sin que nadie lo viera.
+      // Al volver retoma donde estaba (el remate a medias se completa).
+      const io = new IntersectionObserver(([e]) => {
+        enPantalla = e.isIntersecting
+        if (enPantalla && !raf) { last = performance.now(); animate() }
+      })
+      io.observe(mount)
+
       cleanup = () => {
         cancelAnimationFrame(raf)
         ro.disconnect()
+        io.disconnect()
         window.removeEventListener('pointermove', onPointer)
         window.removeEventListener('pointerdown', onDown)
         pool.forEach(b => scene.remove(b.mesh))
