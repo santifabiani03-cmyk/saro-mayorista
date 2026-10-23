@@ -233,14 +233,17 @@
   },
   {
     "nombre": "Bolso Mochila Ecocuero",
-    "precio": 45000,
+    "precio": 47000,
+    "precioMinorista": 52000,
     "descripcion": "Cuenta con amplio espacio de guardado gracias a sus depósitos principales ideales para paletas y/o indumentaria deportiva. Además, incorpora un compartimento exclusivo para zapatillas, bolsillo delantero para objetos pequeños y un compartimento inferior a lo largo de toda la base del bolso, perfecto para organizar accesorios o prendas adicionales.\nFabricado en ecocuero resistente y lona reforzada, ofrece gran durabilidad y fácil limpieza. Su interior se encuentra completamente forrado para mayor protección y terminaciones de calidad.\nCaracterísticas:\n• Interior forrado\n• Tiradores tipo mochila acolchados\n• Agarre superior reforzado\n• Correa regulable\n• Compartimentos principales amplios\n• Depósito independiente para zapatillas\n• Bolsillo delantero para objetos pequeños\n• Compartimento inferior de largo completo\n• Materiales resistentes: ecocuero y lona reforzada\n\nIdeal para entrenamiento, competencia o uso diario deportivo.",
     "tags": [],
     "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "accesorio",
     "colores": [
-      "Rosa"
+      "Rosa",
+      "Negro",
+      "Azul"
     ],
     "talles": [
       "Única"
@@ -254,7 +257,7 @@
     "fechaPublicacion": "2026-05-22T21:20:20.000Z",
     "_aiLoading": false,
     "_aiCount": 1,
-    "fechaActualizacion": "2026-08-13T13:00:01.176Z",
+    "fechaActualizacion": "2026-10-23T12:29:31.441Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968378771.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968383284.webp",
@@ -517,7 +520,8 @@
     "genero": "unisex",
     "parteCuerpo": "",
     "colores": [
-      "Rosa"
+      "Rosa",
+      "Negro"
     ],
     "talles": [
       "Única"
@@ -534,14 +538,12 @@
     "_aiCount": 1,
     "id": "p1782388768791",
     "fechaPublicacion": "2026-06-25T11:59:28.791Z",
+    "fechaActualizacion": "2026-10-23T12:34:05.269Z",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388169727.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388108644.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388114714.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388111268.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388112957.webp"
-    ],
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388169727.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388114714.webp"
+    ]
   },
   {
     "nombre": "TUBO PELOTAS x2 NOVA ",
@@ -612,7 +614,7 @@
   },
   {
     "nombre": "COMBO TORNEO BOLSO GRANDE ",
-    "precio": 150000,
+    "precio": 160000,
     "descripcion": "COMBO PREMIOS BOLSO GRANDE 🎾🏆\n\nIncluye: 2u. BOLSO GRANDE LONA // 2u. REMERA DRY ELAST el mejor material del mercado // 4u. MEDIAS 3/4 // 4u. CUBRE GRIP RELIEVE // 4u. BOTELLAS ",
     "tags": [
       "destacado"
@@ -632,12 +634,12 @@
     "promos": [
       {
         "cantidad": 2,
-        "precioTotal": 290000
+        "precioTotal": 310000
       }
     ],
     "id": "p1782405898282",
     "fechaPublicacion": "2026-06-25T16:44:58.283Z",
-    "fechaActualizacion": "2026-08-13T16:12:12.234Z",
+    "fechaActualizacion": "2026-10-23T12:29:06.407Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782405816945.webp"
     ]
@@ -676,11 +678,10 @@
   },
   {
     "nombre": "MOCHILA RAQUETERA",
-    "precio": 42000,
+    "precio": 40000,
+    "precioMinorista": 52000,
     "descripcion": "Esta mochila raquetera ofrece un diseño funcional y resistente. Cuenta con tiradores de mochila y espalda acolchonada para un transporte cómodo. Incluye un compartimento específico para computadora portátil y un bolsillo delantero independiente para objetos de fácil acceso. Sus bolsillos laterales complementan la capacidad de almacenamiento.",
-    "tags": [
-      "nuevo"
-    ],
+    "tags": [],
     "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "",
@@ -697,12 +698,11 @@
     "_aiLoading": false,
     "_aiCount": 1,
     "id": "p1786626183132",
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626041062.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626049326.webp"
-    ],
     "fechaPublicacion": "2026-08-13T13:03:03.132Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+    "fechaActualizacion": "2026-10-23T12:27:15.074Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626041062.webp"
+    ]
   },
   {
     "nombre": "BOLSO MEDIANO LONA ",
@@ -742,7 +742,8 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626260414.webp"
     ],
     "fechaPublicacion": "2026-08-13T13:07:33.330Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "visible": false
   },
   {
     "nombre": "BOLSO MOCHILA GRANDE LONA ",
@@ -884,6 +885,7 @@
   {
     "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO CLÁSICA",
     "precio": 13500,
+    "precioMinorista": 20500,
     "descripcion": "",
     "tags": [],
     "categoria": "ropa",
@@ -900,7 +902,12 @@
       "XL",
       "XXL"
     ],
-    "noStock": [],
+    "noStock": [
+      {
+        "color": "Gris",
+        "talle": "L"
+      }
+    ],
     "emoji": "📦",
     "promos": [],
     "id": "p1786640675695",
@@ -910,11 +917,11 @@
       ]
     },
     "fechaPublicacion": "2026-08-13T17:04:35.695Z",
+    "fechaActualizacion": "2026-10-23T12:26:52.251Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640596225.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640619728.webp"
-    ],
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+    ]
   },
   {
     "nombre": "SHORT C/CALZA DRY ELASTIZADO DAMA",
@@ -975,6 +982,7 @@
   {
     "nombre": "CALZA TÉRMICA RECTA DAMA",
     "precio": 10000,
+    "precioMinorista": 17000,
     "descripcion": "",
     "tags": [
       "sale"
@@ -1006,12 +1014,12 @@
     "emoji": "🩳",
     "promos": [],
     "id": "p1786712548448",
+    "fechaPublicacion": "2026-08-14T13:02:28.448Z",
+    "fechaActualizacion": "2026-10-23T12:29:58.221Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712493455.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712495196.webp"
-    ],
-    "fechaPublicacion": "2026-08-14T13:02:28.448Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+    ]
   },
   {
     "nombre": "CAMISETA TÉRMICA DAMA",
@@ -1213,7 +1221,8 @@
         "Negro"
       ]
     },
-    "fechaPublicacion": "2026-08-14T13:53:11.759Z"
+    "fechaPublicacion": "2026-08-14T13:53:11.759Z",
+    "visible": false
   },
   {
     "nombre": "JOGGER MICROFRIZA ELAST. C/CIERRE DAMA ",
@@ -1677,7 +1686,7 @@
   },
   {
     "nombre": "Gold PRO",
-    "precio": 90000,
+    "precio": 95000,
     "precioMinorista": 120000,
     "descripcion": "",
     "tags": [
@@ -1697,7 +1706,7 @@
     "promos": [],
     "id": "p1791227089632",
     "fechaPublicacion": "2026-10-05T19:04:49.626Z",
-    "fechaActualizacion": "2026-10-20T22:16:36.849Z",
+    "fechaActualizacion": "2026-10-23T12:26:18.799Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/foto-gold-pro-1791227030187.webp"
     ]
@@ -1756,5 +1765,106 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792534636884.webp"
     ],
     "fechaPublicacion": "2026-10-20T22:18:40.147Z"
+  },
+  {
+    "nombre": "BIKER LYCRA VAPLEX C/BOLSILLO - CALADO LASER ",
+    "precio": 11000,
+    "precioMinorista": 20000,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Rosa",
+      "Celeste",
+      "Negro",
+      "CHOCOLATE"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1792758730422",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792758626802.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792758620059.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792758622319.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792758624626.webp"
+    ],
+    "colorDefs": {
+      "CHOCOLATE": [
+        "Bordó"
+      ]
+    },
+    "fechaPublicacion": "2026-10-23T12:32:10.422Z"
+  },
+  {
+    "nombre": "MUSCULOSA COSTURAS MULTIPUNTO DRY FIT CAB. ",
+    "precio": 12500,
+    "precioMinorista": 20500,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Azul",
+      "Negro"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1792758823045",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792758763879.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792758766010.webp"
+    ],
+    "fechaPublicacion": "2026-10-23T12:33:43.045Z"
+  },
+  {
+    "nombre": "SHORT MICROFIBRA C/CIERRE DAMA ",
+    "precio": 11000,
+    "precioMinorista": 18000,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1792758909719",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792758868161.webp"
+    ],
+    "fechaPublicacion": "2026-10-23T12:35:09.719Z"
   }
 ]
