@@ -13,7 +13,11 @@ export default function Header({ config }) {
   const pathname = usePathname()
   // En la landing el header flota transparente sobre el hero (sin barra de
   // compra mínima ni carrito). En el resto de las páginas es la barra sólida.
-  const isLanding = pathname === '/'
+  // Cuando Vercel regenera la portada en segundo plano (ISR), del lado del
+  // servidor la ruta llega como "/index": sin contarla, el servidor armaba el
+  // header de las páginas internas y el navegador el de la portada (error de
+  // React #418 y un parpadeo del header).
+  const isLanding = pathname === '/' || pathname === '/index'
   // Los catálogos minoristas no tienen compra mínima, así que ahí no se muestra el badge
   const esMinorista = pathname === '/ropa-y-accesorios' || pathname === '/paletas'
   // En las fichas queda oculto hasta saber que el producto es mayorista (así las
