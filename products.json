@@ -17,7 +17,7 @@
     "emoji": "🎾",
     "promos": [],
     "id": "p10",
-    "visible": true,
+    "visible": false,
     "sinStock": false,
     "fechaActualizacion": "2026-05-27T03:40:17.218Z",
     "_aiLoading": false,
@@ -286,7 +286,7 @@
     "emoji": "🎾",
     "promos": [],
     "id": "p1779495645178",
-    "visible": true,
+    "visible": false,
     "sinStock": false,
     "fechaPublicacion": "2026-05-22T21:20:53.000Z",
     "fechaActualizacion": "2026-09-28T22:28:08.155Z",
@@ -547,14 +547,13 @@
   },
   {
     "nombre": "TUBO PELOTAS x2 NOVA ",
-    "precio": 5800,
+    "precio": 6000,
+    "precioMinorista": 7500,
     "descripcion": "",
-    "tags": [
-      "nuevo"
-    ],
+    "tags": [],
     "categoria": "padel",
     "genero": "unisex",
-    "parteCuerpo": "",
+    "parteCuerpo": "accesorio",
     "colores": [
       "Amarillo Fluo"
     ],
@@ -562,13 +561,19 @@
       "Única"
     ],
     "noStock": [],
-    "emoji": "📦",
-    "promos": [],
+    "emoji": "🎾",
+    "promos": [
+      {
+        "cantidad": 24,
+        "precioTotal": 137000
+      }
+    ],
     "id": "p1782389218836",
+    "fechaPublicacion": "2026-06-25T12:06:58.836Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782389121983.webp"
     ],
-    "fechaPublicacion": "2026-06-25T12:06:58.836Z"
+    "fechaActualizacion": "2026-10-23T12:41:24.357Z"
   },
   {
     "nombre": "Bolso mochila PREMIUM ",
@@ -1866,5 +1871,44 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792758868161.webp"
     ],
     "fechaPublicacion": "2026-10-23T12:35:09.719Z"
+  },
+  {
+    "nombre": "REMERA DRY ELAST MULTIPUNTO C/TRANSPARENCIA DAMA ",
+    "precio": 12000,
+    "precioMinorista": 20000,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Verde",
+      "LAVANDA",
+      "Celeste"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1792759384677",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792759307212.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792759310081.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792759312222.webp"
+    ],
+    "colorDefs": {
+      "LAVANDA": [
+        "Fucsia"
+      ]
+    },
+    "fechaPublicacion": "2026-10-23T12:43:04.677Z"
   }
 ]
