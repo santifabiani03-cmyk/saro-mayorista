@@ -3,6 +3,7 @@
 import { useEffect, useRef, useState } from 'react'
 import Image from 'next/image'
 import dynamic from 'next/dynamic'
+import LogoTrazo from './LogoTrazo'
 
 const Paleta3D = dynamic(() => import('./Paleta3D'), { ssr: false })
 
@@ -216,11 +217,7 @@ export default function IntroHero({ productCount = 0, onExplore }) {
               }`}
               aria-hidden="true"
             >
-              <img
-                src="/assets/logo-icon.png"
-                alt=""
-                className="h-14 sm:h-16 w-auto opacity-40 animate-pulse"
-              />
+              <LogoTrazo modo="carga" grosor={4.2} className="h-14 sm:h-16 w-auto" />
             </div>
             <Paleta3D progressRef={progressRef} onReady={() => setPaletaReady(true)} />
           </div>

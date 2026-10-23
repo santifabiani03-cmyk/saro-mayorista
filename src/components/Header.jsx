@@ -1,7 +1,7 @@
 'use client'
 
 import { useState } from 'react'
-import Image from 'next/image'
+import LogoTrazo from './LogoTrazo'
 import { usePathname } from 'next/navigation'
 import { useCart } from '../context/CartContext'
 import HowToBuyModal from './HowToBuyModal'
@@ -34,23 +34,9 @@ export default function Header({ config }) {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
 
           {/* Logo */}
-          <a href="/" className="flex-shrink-0" aria-label="SARO - Inicio">
-            <Image
-              src="/assets/logo-icon.png"
-              alt="SARO - Paletas de pádel, accesorios y ropa deportiva"
-              width={44}
-              height={44}
-              className="block sm:hidden h-11 w-auto object-contain"
-              priority
-            />
-            <Image
-              src="/assets/logo-horizontal.png"
-              alt="SARO - Paletas de pádel, accesorios y ropa deportiva"
-              width={220}
-              height={56}
-              className="hidden sm:block h-14 w-auto object-contain"
-              priority
-            />
+          <a href="/" className="group flex-shrink-0" aria-label="SARO - Paletas de pádel, accesorios y ropa deportiva (inicio)">
+            <LogoTrazo variante="icono" grosor={5.7} className="block sm:hidden h-11 w-auto" />
+            <LogoTrazo variante="horizontal" grosor={6.4} className="hidden sm:block h-14 w-auto" />
           </a>
 
           <div className="flex items-center gap-2.5 sm:gap-3">

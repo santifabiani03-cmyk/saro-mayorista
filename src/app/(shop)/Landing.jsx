@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation'
 import IntroHero from '../../components/IntroHero'
 import FaqSection from '../../components/FaqSection'
 import HistoriaTrabaja from '../../components/HistoriaTrabaja'
+import LogoSello from '../../components/LogoSello'
 import { trackContacto } from '../../utils/analytics'
 
 export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCompraMinima }) {
@@ -342,6 +343,7 @@ export default function Landing({ stats, whatsappNumber, minPurchase, mostrarCom
           className="pointer-events-none absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[70vw] max-w-[640px] h-[70vw] max-h-[640px] rounded-full bg-saro-blue/25 blur-[130px]"
         />
         <div className="relative max-w-3xl mx-auto px-4 sm:px-6 text-center">
+          <LogoSello className="w-44 sm:w-56 mx-auto mb-10" />
           <div data-reveal className="reveal">
             <h2 className="text-3xl sm:text-5xl font-extrabold text-white tracking-tight leading-[1.08]">
               Entrá al catálogo y armá tu pedido

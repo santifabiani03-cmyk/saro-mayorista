@@ -371,6 +371,15 @@ rediseño) — es legacy; el azul de marca actual es `#2563EB`.
 | `logo-icon.png` | Solo el ícono "SR" (dos S espejadas) en celeste | Favicon, header mobile (`h-11`), footer (opacidad 40%), **marca de agua en las cards** (`w-9 h-9`, opacidad 35%), PIN gate, 404, PDF |
 | `logo.png` | Logo grande (versión pesada) | Header del admin (invertido a blanco) y logo principal del PDF |
 
+**Logo en vector (23/10/2026):** `src/components/logoSaro.js` tiene el icono SR y el logo horizontal
+como paths SVG, vectorizados de los PNG (coinciden 99,6 %; color `#7EABEA`, el mismo del PNG). Los
+usa `LogoTrazo.jsx`: el **header** dibuja el logo en SVG y, al pasar el mouse, un trazo fino azul lo
+recorre pieza por pieza; el **cargador del hero 3D** dibuja el contorno, lo rellena y repite (antes
+era el PNG titilando). `LogoSello.jsx` es el SR grande del **cierre oscuro de la portada**: se dibuja
+con el scroll, con un punto de luz en la punta, y al completarse se rellena y "sella" con un brillo.
+Todo en CSS (`globals.css`, "Logo con trazo") y respeta `prefers-reduced-motion`. Si cambia el logo,
+hay que volver a vectorizarlo: los PNG siguen siendo la fuente (PDF, admin, OG, Schema.org).
+
 Los logos son **celestes sobre transparente**. Sobre fondo oscuro se invierten a blanco con la
 clase `brightness-0 invert` (así se hace en el admin).
 
@@ -569,6 +578,11 @@ reemplazó y sigue igual.
 ## 6. Estado actual y pendientes
 
 ### ✅ Terminado y en producción (deployado)
+- **Logo animado (23/10/2026):** trazo en el header, cargador del 3D y sello con el scroll al
+  final de la portada (§3.3). Medido con la CPU frenada ×4: no agrega cuadros lentos.
+- **34 fichas con descripción nueva (23/10/2026):** estaban vacías o casi; se cargaron en la rama
+  `datos` con el parche de §7 (sólo el campo `descripcion`, commit `577bf13`). Faltan datos reales
+  de Flash Fibra, Gold PRO y Nexus Fiberglass (forma, balance, núcleo).
 - **Revendedores, fuente y SEO (23/10/2026):** página `/revendedores` (§2.3); Inter servida desde
   el sitio con `next/font` (`layout.jsx`; antes se pedía a Google en cada visita) y sin las precargas
   de logos que no se usaban; el `.glb` del hero se precarga con prioridad baja para no ganarle a la
