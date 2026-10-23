@@ -30,7 +30,7 @@
     "nombre": "MEDIAS ALGODÓN 3/4",
     "precio": 3500,
     "precioMinorista": 6000,
-    "descripcion": "Medias algodón 3/4\nPACK X DOCENA $35.000 ",
+    "descripcion": "Medias de algodón 3/4 unisex para pádel, en blanco, negro y gris. Se venden en pack por docena a $35.000.",
     "tags": [],
     "categoria": "padel",
     "genero": "unisex",
@@ -111,7 +111,7 @@
   {
     "nombre": "CANASTO PLEGABLE ALUMINIO NOAC ",
     "precio": 170000,
-    "descripcion": "-CAPACIDAD 150 🎾\n-RED DE CONTENCIÓN \n-FUNDA \n-BOLSILLO LATERAL OBJ PEQUEÑOS\n-RUEDAS SÚPER DESLIZANTES CON TRABA\n\n*No incluye pelotas*",
+    "descripcion": "Canasto plegable de aluminio Noac con capacidad para 150 pelotas, red de contención, funda, bolsillo lateral para objetos pequeños y ruedas deslizantes con traba. No incluye pelotas.",
     "tags": [
       "destacado"
     ],
@@ -138,7 +138,7 @@
   {
     "nombre": "CARAMELERA NOAC PERFORADOS X60u. ",
     "precio": 60000,
-    "descripcion": "Caramelera de cubre grips NOAC importados.\n60 unidades surtidas o todas blancas.",
+    "descripcion": "Caramelera Noac de cubre grips perforados importados, con 60 unidades surtidas o todas blancas. Deja los cubre grips a mano.",
     "tags": [],
     "categoria": "padel",
     "genero": "unisex",
@@ -169,7 +169,7 @@
   {
     "nombre": "TOALLA DE MANO MICROFIBRA ",
     "precio": 4200,
-    "descripcion": "Toalla de mano de microfibra.\nSecado rápido\nIncluye estuche",
+    "descripcion": "Toalla de mano de microfibra de secado rápido, incluye estuche. En gris, rosa, verde, marino, gris oscuro, violeta, naranja, surtido y azul.",
     "tags": [],
     "categoria": "padel",
     "genero": "unisex",
@@ -298,7 +298,7 @@
   {
     "nombre": "Pelotas Nova Padel Pro",
     "precio": 5800,
-    "descripcion": "- NOVA PRO - Tubo x2u. \nExcelente paño, compresión y durabilidad. \nImportadas.\n\nTambién disponible CAJA X 24u. ",
+    "descripcion": "Pelotas Nova Padel Pro en tubo por 2 unidades, importadas, con buen paño, compresión y durabilidad. También en caja por 24 unidades.",
     "tags": [
       "nuevo"
     ],
@@ -398,7 +398,7 @@
   {
     "nombre": "Muñequera x par ",
     "precio": 5500,
-    "descripcion": "Muñequeras x par - Algodón\nSúper elastizadas",
+    "descripcion": "Muñequeras por par de algodón súper elastizadas, para cubrir la muñeca durante el juego. En rosa, blanco, negro, azul y gris.",
     "tags": [],
     "categoria": "padel",
     "genero": "unisex",
@@ -549,7 +549,7 @@
     "nombre": "TUBO PELOTAS x2 NOVA ",
     "precio": 6000,
     "precioMinorista": 7500,
-    "descripcion": "",
+    "descripcion": "Tubo de pelotas Nova por 2 unidades, en amarillo fluo. Sirve para tener repuesto a mano en la cancha.",
     "tags": [],
     "categoria": "padel",
     "genero": "unisex",
@@ -652,7 +652,7 @@
   {
     "nombre": "CARAMELERA NOAC LISA",
     "precio": 58000,
-    "descripcion": "",
+    "descripcion": "Caramelera Noac lisa de la línea de cubre grips, en blanco y multicolor. Sirve para llevar los cubre grips a mano.",
     "tags": [
       "destacado"
     ],
@@ -786,7 +786,7 @@
   {
     "nombre": "TOP LYCRA ESPALDA CRUZADA ",
     "precio": 8000,
-    "descripcion": "",
+    "descripcion": "Top de lycra con espalda cruzada para mujer, en negro y blanco, para entrenar o jugar.",
     "tags": [
       "stock_limitado"
     ],
@@ -817,7 +817,7 @@
   {
     "nombre": "CAMPERA ALGODÓN DOBLE NEO (SCUBA)",
     "precio": 21000,
-    "descripcion": "",
+    "descripcion": "Campera de algodón doble neo (scuba) para hombre, en negro. Queda como capa de abrigo sobre el equipo.",
     "tags": [
       "nuevo"
     ],
@@ -846,7 +846,7 @@
   {
     "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
     "precio": 13500,
-    "descripcion": "",
+    "descripcion": "Pollera de lycra con short y bolsillo, con abertura en la pierna, para mujer. En negro, lila, azul y short azul aero.",
     "tags": [
       "destacado"
     ],
@@ -891,7 +891,7 @@
     "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO CLÁSICA",
     "precio": 13500,
     "precioMinorista": 20500,
-    "descripcion": "",
+    "descripcion": "Pollera de lycra clásica con short y bolsillo. En gris y negra con short lila.",
     "tags": [],
     "categoria": "ropa",
     "genero": "",
@@ -931,7 +931,7 @@
   {
     "nombre": "SHORT C/CALZA DRY ELASTIZADO DAMA",
     "precio": 13500,
-    "descripcion": "",
+    "descripcion": "Short con calza dry elastizado para mujer, en negro y gris. La tela dry seca rápido y la calza estira con el movimiento.",
     "tags": [],
     "categoria": "ropa",
     "genero": "femenino",
@@ -960,7 +960,7 @@
   {
     "nombre": "SHORT CALZA LYCRA LISO DAMA ",
     "precio": 7000,
-    "descripcion": "",
+    "descripcion": "Short calza de lycra lisa para mujer, en negro, elastizado y de calce ajustado.",
     "tags": [],
     "categoria": "ropa",
     "genero": "femenino",
@@ -988,7 +988,7 @@
     "nombre": "CALZA TÉRMICA RECTA DAMA",
     "precio": 10000,
     "precioMinorista": 17000,
-    "descripcion": "",
+    "descripcion": "Calza térmica recta para mujer, en gris y negro. Suma abrigo como primera capa en días frescos.",
     "tags": [
       "sale"
     ],
@@ -1029,7 +1029,7 @@
   {
     "nombre": "CAMISETA TÉRMICA DAMA",
     "precio": 10000,
-    "descripcion": "",
+    "descripcion": "Camiseta térmica para mujer, en negro, blanco y gris. Primera capa de abrigo para días fríos.",
     "tags": [
       "sale"
     ],
@@ -1072,7 +1072,7 @@
   {
     "nombre": "SHORT CON CALZA CABALLERO ",
     "precio": 14500,
-    "descripcion": "",
+    "descripcion": "Short con calza para hombre, en negro. La calza interna acompaña el movimiento y suma cobertura.",
     "tags": [
       "destacado"
     ],
@@ -1101,7 +1101,7 @@
   {
     "nombre": "BUZO ENTRENAMIENTO LIVIANO DAMA ",
     "precio": 16000,
-    "descripcion": "",
+    "descripcion": "Buzo de entrenamiento liviano para mujer, en negro y naranja. Para antes o después de la actividad.",
     "tags": [],
     "categoria": "ropa",
     "genero": "femenino",
@@ -1134,7 +1134,7 @@
   {
     "nombre": "CAMPERA ROMPEVIENTOS BASICA ESTAMPADA DAMA ",
     "precio": 19500,
-    "descripcion": "",
+    "descripcion": "Campera rompevientos básica estampada para mujer, en blanco y verde. Corta el viento sobre el equipo.",
     "tags": [],
     "categoria": "ropa",
     "genero": "femenino",
@@ -1162,7 +1162,7 @@
   {
     "nombre": "BUZO MICROPOLAR LIVIANO OVERSIZE DAMA",
     "precio": 18000,
-    "descripcion": "",
+    "descripcion": "Buzo micropolar liviano oversize para mujer, en rosa, marino, negro y verde. Calce holgado y abrigo suave.",
     "tags": [],
     "categoria": "ropa",
     "genero": "femenino",
@@ -1232,7 +1232,7 @@
   {
     "nombre": "JOGGER MICROFRIZA ELAST. C/CIERRE DAMA ",
     "precio": 16500,
-    "descripcion": "",
+    "descripcion": "Jogger de microfriza elastizado con cierre para mujer, en negro. Interior suave y abrigado.",
     "tags": [],
     "categoria": "ropa",
     "genero": "femenino",
@@ -1257,7 +1257,7 @@
   {
     "nombre": "CAMISETA TÉRMICA C/DEDAL CAB.",
     "precio": 15000,
-    "descripcion": "",
+    "descripcion": "Camiseta térmica con dedal para hombre, en negro. Primera capa de abrigo en días fríos.",
     "tags": [],
     "categoria": "ropa",
     "genero": "masculino",
@@ -1284,7 +1284,7 @@
   {
     "nombre": "REMERA DRY ELAST. MULTIPUNTO CAB.",
     "precio": 13500,
-    "descripcion": "",
+    "descripcion": "Remera dry elastizada multipunto para hombre, en negro, gris, azul, rojo y verde. La tela dry seca rápido y estira con el movimiento.",
     "tags": [
       "destacado"
     ],
@@ -1330,7 +1330,7 @@
   {
     "nombre": "REMERA DRY ELAST. FULLPRINT CAB.",
     "precio": 15500,
-    "descripcion": "",
+    "descripcion": "Remera dry elastizada fullprint para hombre, en celeste, rojo y multicolor. Estampado completo y tela de secado rápido.",
     "tags": [
       "destacado"
     ],
@@ -1509,7 +1509,7 @@
     "precio": 62000,
     "precioMinorista": 75000,
     "peso": 290,
-    "descripcion": "Esta paleta está diseñada para niños de 3 a 6 años, es un producto recreativo para los más pequeños de la casa.",
+    "descripcion": "Paleta Kids de 3 a 6 años, en blanco. Pensada para acercar a los más chicos al juego de forma recreativa.",
     "tags": [
       "nuevo"
     ],
@@ -1608,7 +1608,7 @@
     "nombre": "REMERÓN DRY ELAST. DAMA",
     "precio": 12000,
     "precioMinorista": 21000,
-    "descripcion": "",
+    "descripcion": "Remerón dry elastizado para mujer, en negro y azul. El calce largo cubre más y la tela dry seca rápido.",
     "tags": [],
     "categoria": "ropa",
     "genero": "femenino",
@@ -1636,7 +1636,7 @@
     "nombre": "JOGGER SEMIRRECTO C/ELÁSTICO REGULABLE y REFLEX CAB.",
     "precio": 17000,
     "precioMinorista": 28000,
-    "descripcion": "Jogger sin friza, semirrecto elastizado con elástico regulable y reflex. Material Scuba. ",
+    "descripcion": "Jogger semirrecto sin friza para hombre, en negro, de material scuba. Tiene elástico regulable y detalles reflex.",
     "tags": [],
     "categoria": "ropa",
     "genero": "masculino",
@@ -1666,7 +1666,7 @@
     "nombre": "Flash Fibra",
     "precio": 120000,
     "precioMinorista": 160000,
-    "descripcion": "",
+    "descripcion": "Paleta Flash Fibra con caras de fibra de vidrio, disponible en gris y azul.",
     "tags": [
       "nuevo"
     ],
@@ -1693,7 +1693,7 @@
     "nombre": "Gold PRO",
     "precio": 95000,
     "precioMinorista": 120000,
-    "descripcion": "",
+    "descripcion": "Paleta Gold Pro, disponible en negro y rojo.",
     "tags": [
       "nuevo"
     ],
@@ -1720,7 +1720,7 @@
     "nombre": "Nexus Fiberglass",
     "precio": 120000,
     "precioMinorista": 160000,
-    "descripcion": "",
+    "descripcion": "Paleta Nexus Fiberglass con caras de fibra de vidrio, disponible en dorado y blanco.",
     "tags": [
       "nuevo"
     ],
@@ -1775,7 +1775,7 @@
     "nombre": "BIKER LYCRA VAPLEX C/BOLSILLO - CALADO LASER ",
     "precio": 11000,
     "precioMinorista": 20000,
-    "descripcion": "",
+    "descripcion": "Biker de lycra Vaplex con bolsillo y calado laser, en rosa, celeste, negro y chocolate. El bolsillo suma espacio para objetos chicos.",
     "tags": [
       "nuevo"
     ],
@@ -1816,7 +1816,7 @@
     "nombre": "MUSCULOSA COSTURAS MULTIPUNTO DRY FIT CAB. ",
     "precio": 12500,
     "precioMinorista": 20500,
-    "descripcion": "",
+    "descripcion": "Musculosa con costuras multipunto dry fit para hombre, en azul y negro. La tela dry fit seca rápido.",
     "tags": [
       "nuevo"
     ],
@@ -1846,7 +1846,7 @@
     "nombre": "SHORT MICROFIBRA C/CIERRE DAMA ",
     "precio": 11000,
     "precioMinorista": 18000,
-    "descripcion": "",
+    "descripcion": "Short de microfibra con cierre para mujer, en negro. La microfibra seca rápido.",
     "tags": [
       "nuevo"
     ],
@@ -1876,7 +1876,7 @@
     "nombre": "REMERA DRY ELAST MULTIPUNTO C/TRANSPARENCIA DAMA ",
     "precio": 12000,
     "precioMinorista": 20000,
-    "descripcion": "",
+    "descripcion": "Remera dry elastizada multipunto con transparencia para mujer, en verde, lavanda y celeste. Detalle de transparencia y secado rápido.",
     "tags": [
       "nuevo"
     ],
