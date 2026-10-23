@@ -1,6 +1,7 @@
 'use client'
 
 import Image from 'next/image'
+import Link from 'next/link'
 import { CartProvider } from '../../context/CartContext'
 import Header from '../../components/Header'
 import Cart from '../../components/Cart'
@@ -43,6 +44,14 @@ export default function ShopShell({ config, children }) {
               en Argentina. Directo de fábrica, con la calidad SARO y envios a
               todo el pais.
             </p>
+            {/* Links reales a las secciones: los usa la gente y también Google
+                para descubrir y conectar las páginas del sitio. */}
+            <nav aria-label="Secciones" className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs font-semibold">
+              <Link href="/paletas" className="text-gray-500 hover:text-saro-blue transition-colors">Paletas</Link>
+              <Link href="/ropa-y-accesorios" className="text-gray-500 hover:text-saro-blue transition-colors">Ropa y accesorios</Link>
+              <Link href="/ropa-y-accesorios/mayorista" className="text-gray-500 hover:text-saro-blue transition-colors">Catálogo mayorista</Link>
+              <Link href="/revendedores" className="text-gray-500 hover:text-saro-blue transition-colors">Revendé SARO</Link>
+            </nav>
             <nav className="flex flex-wrap justify-center gap-x-2 gap-y-1.5 text-[10px] text-gray-300 font-medium">
               <span>Paletas de padel</span>
               <span className="text-gray-200">/</span>

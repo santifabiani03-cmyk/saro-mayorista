@@ -100,7 +100,8 @@ function Historia() {
   )
 }
 
-function Formulario({ whatsappNumber }) {
+// También lo usa la página /revendedores: mismo mensaje y mismos eventos.
+export function Formulario({ whatsappNumber }) {
   const [f, setF] = useState({ nombre: '', apellido: '', provincia: '', localidad: '', mensaje: '' })
   const on = k => e => setF(s => ({ ...s, [k]: e.target.value }))
   const valid = f.nombre.trim() && f.apellido.trim() && f.provincia && f.localidad.trim()
@@ -196,7 +197,16 @@ export default function HistoriaTrabaja({ whatsappNumber }) {
           <div className="overflow-hidden">
             <div className="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6 sm:p-8 lg:p-10">
               {active === 'hist' && <Historia />}
-              {active === 'trab' && <Formulario whatsappNumber={whatsappNumber} />}
+              {active === 'trab' && (
+                <>
+                  <Formulario whatsappNumber={whatsappNumber} />
+                  <p className="text-center text-xs text-gray-400 mt-4">
+                    <a href="/revendedores" className="font-semibold text-saro-blue hover:text-saro-mid">
+                      Conocé todo lo que ofrecemos a clubes y tiendas →
+                    </a>
+                  </p>
+                </>
+              )}
             </div>
           </div>
         </div>

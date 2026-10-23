@@ -33,8 +33,10 @@ export default async function HomePage() {
 
   return (
     <>
-      {/* Precarga del modelo 3D: empieza a bajar en paralelo, así la paleta aparece antes */}
-      <link rel="preload" href="/models/paleta-opt.glb" as="fetch" crossOrigin="anonymous" />
+      {/* Precarga del modelo 3D: empieza a bajar en paralelo, así la paleta aparece antes.
+          Prioridad baja: son 1,5 MB y no tienen que ganarle a la foto de fondo ni al
+          titular, que es lo primero que se ve (sobre todo con datos móviles). */}
+      <link rel="preload" href="/models/paleta-opt.glb" as="fetch" crossOrigin="anonymous" fetchPriority="low" />
       <Landing
         stats={stats}
         whatsappNumber={config.whatsappNumber}

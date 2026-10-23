@@ -5,7 +5,7 @@
 > chats viejos ni preguntar nada. Prioriza ser exhaustivo. Si algo cambia, actualizá este
 > archivo y `docs/ESTETICA.md`.
 
-Última actualización: 2026-10-22.
+Última actualización: 2026-10-23.
 
 > ⚠️ **Cambio importante (agosto 2026): el sitio pasó de MAYORISTA a MINORISTA.**
 > La tienda principal es minorista (`/paletas` y `/ropa-y-accesorios`, precio `precioMinorista`).
@@ -130,7 +130,12 @@ FAQ). Desde ahí se entra a **dos catálogos separados**: `/paletas` (solo palet
 `/ropa-y-accesorios` (todo lo que no es paleta: accesorios de pádel + ropa). `/producto/[slug]`
 = ficha (su botón "volver" apunta al catálogo según la categoría). ⚠️ `/catalogo` **ya existía**
 antes y redirige a un catálogo externo (`catalogo.saro.com.ar`) — NO es la grilla interna, no
-tocar. El sitemap lista `/`, `/paletas`, `/ropa-y-accesorios` y los productos.
+tocar. El sitemap lista `/`, `/paletas`, `/ropa-y-accesorios`, `/ropa-y-accesorios/mayorista`,
+`/revendedores` y los productos. **`/revendedores`** (23/10/2026) es la página para clubes y
+tiendas: el link para mandar en la prospección mayorista (beneficios, vidriera sin precios,
+personalizados, pasos y el mismo formulario "Trabajá con nosotros", que se exporta de
+`HistoriaTrabaja.jsx`). Sólo dice cosas confirmadas de la marca: no sumarle márgenes ni plazos
+sin que smfab los confirme. El pie de página tiene links reales a las 4 secciones.
 - **`catalogo.saro.com.ar` = el PDF del catálogo.** Es **GitHub Pages** sirviendo la carpeta
   `docs/` de `master` (`docs/CNAME`): `docs/index.html` redirige a `docs/catalogo.pdf`. Ahí
   apuntan `/catalogo` y el **QR del admin**. El PDF lo arma el admin en el navegador después de
@@ -191,6 +196,7 @@ Pagina saro/
 │   │   │   │                    personalizados + Historia/Trabajá + FAQ
 │   │   │   ├── paletas/page.jsx           ← catálogo SOLO paletas (/paletas)
 │   │   │   ├── ropa-y-accesorios/page.jsx ← catálogo ropa + accesorios (/ropa-y-accesorios)
+│   │   │   ├── revendedores/page.jsx      ← página para clubes y tiendas (/revendedores)
 │   │   │   ├── CatalogView.jsx    ← arma schema + catálogo + bloque SEO por catálogo
 │   │   │   ├── ShopShell.jsx ← header + carrito + footer
 │   │   │   ├── CatalogClient.jsx  ← grilla de productos, filtros, buscador (prop showFilters)
@@ -563,6 +569,10 @@ reemplazó y sigue igual.
 ## 6. Estado actual y pendientes
 
 ### ✅ Terminado y en producción (deployado)
+- **Revendedores, fuente y SEO (23/10/2026):** página `/revendedores` (§2.3); Inter servida desde
+  el sitio con `next/font` (`layout.jsx`; antes se pedía a Google en cada visita) y sin las precargas
+  de logos que no se usaban; el `.glb` del hero se precarga con prioridad baja para no ganarle a la
+  foto de fondo.
 - **Rendimiento, etapa 1 (22/10/2026):** fotos optimizadas (`Foto.jsx`, ver §2.2), funciones de
   Vercel en **São Paulo** (`"regions": ["gru1"]` en `vercel.json`; antes Washington) y hero 3D más
   liviano: en el celular dibuja a 1,5× con sombra de 1024 px, y deja de dibujar cuando sale de
@@ -750,6 +760,10 @@ cambios del hero. Si se necesita trabajar sólo en publicidad, partir de
 - **Verificación:** el visor de preview se cuelga con el hero 3D (WebGL) y el `next build` local
   a veces crashea por memoria (§5.5). Lo confiable es: `npx next build` (si compila y pasa tipos,
   Vercel lo buildea) + `curl` al dev server para chequear el HTML. Vercel es la verificación real.
+- **Sin relleno de IA** ("anti-slop"): nada de comentarios de relleno (`// por si acaso`), textos
+  genéricos que no aportan un dato ("ideal para completar tu equipo"), íconos de brillitos ni
+  botones clonados en la UI, ni `if` de caso especial pegados en medio de una función. Si un
+  archivo pasa de ~1000 líneas, proponé partirlo antes de seguir sumándole.
 - **Secretos:** nunca pedirle al usuario que pegue credenciales en el chat. Van en `.env.local` /
   Vercel; el código las lee del entorno (así se hizo con OpenAI y MiCorreo).
 

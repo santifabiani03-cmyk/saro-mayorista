@@ -50,6 +50,12 @@ export async function GET() {
     <changefreq>daily</changefreq>
     <priority>0.8</priority>
   </url>`,
+      `  <url>
+    <loc>${BASE_URL}/revendedores</loc>
+    <lastmod>${homeLastmod}</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>`,
       ...visibleProducts.map(
         p => {
           const lastmod = p.fechaActualizacion || p.fechaPublicacion

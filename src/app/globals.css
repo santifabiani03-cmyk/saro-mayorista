@@ -2,7 +2,7 @@
 @tailwind components;
 @tailwind utilities;
 
-* { font-family: 'Inter', system-ui, -apple-system, sans-serif; box-sizing: border-box; }
+* { font-family: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif; box-sizing: border-box; }
 
 body { margin: 0; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 

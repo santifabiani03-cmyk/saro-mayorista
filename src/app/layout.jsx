@@ -3,6 +3,18 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import MetaPixel from '../components/MetaPixel'
 import GoogleAnalytics from '../components/GoogleAnalytics'
+import { Inter } from 'next/font/google'
+
+// Inter servida desde el propio sitio (next/font la baja al compilar). Antes se
+// pedía a fonts.googleapis.com en cada visita: dos conexiones más y una hoja de
+// estilos que frenaba la primera pintada. `adjustFontFallback` ajusta la fuente
+// de respaldo para que el texto no salte cuando llega Inter.
+const inter = Inter({
+  subsets: ['latin'],
+  weight: ['400', '500', '600', '700', '800'],
+  display: 'swap',
+  variable: '--font-inter',
+})
 
 export const metadata = {
   title: 'SARO Tienda Oficial | Paletas de Pádel, Accesorios y Ropa',
@@ -47,7 +59,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es-AR">
+    <html lang="es-AR" className={inter.variable}>
       <head>
         {/* Structured Data: Organization */}
         <script
@@ -86,31 +98,9 @@ export default function RootLayout({ children }) {
           }}
         />
 
-        {/* Fonts */}
-        <link rel="preconnect" href="https://fonts.googleapis.com" />
-        <link
-          rel="preconnect"
-          href="https://fonts.gstatic.com"
-          crossOrigin="anonymous"
-        />
-        <link
-          rel="preload"
-          as="style"
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-        />
-        <link
-          href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&display=swap"
-          rel="stylesheet"
-        />
-
-        {/* Preload logos for fast LCP */}
-        <link rel="preload" as="image" href="/assets/logo-icon.png" />
-        <link
-          rel="preload"
-          as="image"
-          href="/assets/logo-horizontal.png"
-          media="(min-width: 640px)"
-        />
+        {/* Sin precarga de los logos: el header los pide achicados por
+            /_next/image, así que precargar el PNG original era una descarga
+            de más (el navegador avisaba que no se usaba). */}
       </head>
       <body>
         {/* Limpia service workers/caché viejos (evita ver por un instante la versión anterior de la página) */}
