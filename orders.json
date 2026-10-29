@@ -1326,5 +1326,37 @@
     ],
     "total": 54000,
     "totalItems": 2
+  },
+  {
+    "id": "o1793279581241",
+    "fecha": "2026-10-29T13:13:01.241Z",
+    "items": [
+      {
+        "productId": "p1792534720147",
+        "nombre": "KL10 Carbono 12k ",
+        "precio": 170000,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1786626183132",
+        "nombre": "MOCHILA RAQUETERA",
+        "precio": 52000,
+        "color": "Azul",
+        "talle": "Única",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1782389218836",
+        "nombre": "TUBO PELOTAS x2 NOVA ",
+        "precio": 7500,
+        "color": "Amarillo Fluo",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 229500,
+    "totalItems": 3
   }
 ]
