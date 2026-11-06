@@ -1746,7 +1746,7 @@
   {
     "nombre": "KL10 Carbono 12k ",
     "precio": 135000,
-    "precioMinorista": 170000,
+    "precioMinorista": 190000,
     "descripcion": "La paleta KL10 Carbono 12k es una herramienta de alto rendimiento diseñada para jugadores exigentes. Su composición 100% carbono 12k proporciona una excelente potencia y control en cada golpe. Ofrece una durabilidad superior y una sensación de estabilidad en el juego, ideal para un desempeño competitivo en pádel.",
     "tags": [
       "nuevo"
@@ -1766,10 +1766,11 @@
     "_aiLoading": false,
     "_aiCount": 1,
     "id": "p1792534720147",
+    "fechaPublicacion": "2026-10-20T22:18:40.147Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792534636884.webp"
     ],
-    "fechaPublicacion": "2026-10-20T22:18:40.147Z"
+    "fechaActualizacion": "2026-11-06T16:56:54.364Z"
   },
   {
     "nombre": "BIKER LYCRA VAPLEX C/BOLSILLO - CALADO LASER ",
