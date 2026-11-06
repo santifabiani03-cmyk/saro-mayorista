@@ -101,7 +101,7 @@ export default async function RevendedoresPage() {
           <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
               href="#sumate"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-wa-500 hover:bg-wa-600 text-white font-bold text-sm px-7 py-4 rounded-xl shadow-lg shadow-wa-500/25 transition duration-200 btn-press"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-wa-500 hover:bg-wa-600 text-white font-bold text-sm px-7 py-4 rounded-xl shadow-sm transition duration-200 btn-press"
             >
               Quiero revender SARO
             </a>

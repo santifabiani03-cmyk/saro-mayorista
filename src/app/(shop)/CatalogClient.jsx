@@ -119,7 +119,7 @@ export default function CatalogClient({ products, heading, showFilters = true, m
               }
               className={`flex items-center gap-1.5 text-sm px-3 py-2 rounded-xl border transition duration-200 flex-shrink-0 btn-press ${
                 priceSort
-                  ? 'border-saro-blue text-saro-blue bg-saro-light font-semibold shadow-sm shadow-saro-blue/10'
+                  ? 'border-saro-blue text-saro-blue bg-saro-light font-semibold shadow-sm'
                   : 'border-tinta-200 text-tinta-500 hover:border-tinta-300 bg-white'
               }`}
             >

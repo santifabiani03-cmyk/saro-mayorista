@@ -371,7 +371,7 @@ export default function AdminPage() {
                     ? 'bg-tinta-500 opacity-60 cursor-not-allowed'
                     : isSynced
                     ? 'bg-tinta-600 opacity-50 cursor-not-allowed'
-                    : 'bg-wa-500 hover:bg-wa-400 shadow-lg shadow-wa-900/30'
+                    : 'bg-wa-500 hover:bg-wa-400 shadow-sm'
                 }`}
               >
                 <span className="text-xs sm:text-base">{deploying ? '⏳' : '🚀'}</span>

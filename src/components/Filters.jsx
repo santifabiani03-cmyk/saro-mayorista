@@ -51,7 +51,7 @@ function Chip({ active, onClick, children }) {
       onClick={onClick}
       className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium border transition duration-200 whitespace-nowrap btn-press ${
         active
-          ? 'bg-saro-blue border-saro-blue text-white shadow-sm shadow-saro-blue/20'
+          ? 'bg-saro-blue border-saro-blue text-white shadow-sm'
           : 'bg-white border-tinta-200 text-tinta-600 hover:border-saro-blue/40 hover:text-saro-blue hover:shadow-sm'
       }`}
     >
@@ -164,7 +164,7 @@ export default function Filters({ products, filters, setFilters }) {
                         onClick={() => toggle('tag', k)}
                         className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition duration-200 whitespace-nowrap btn-press ${
                           filters.tag === k
-                            ? 'bg-saro-blue border-saro-blue text-white shadow-sm shadow-saro-blue/20'
+                            ? 'bg-saro-blue border-saro-blue text-white shadow-sm'
                             : 'bg-white border-tinta-200 text-tinta-600 hover:border-saro-blue/40 hover:text-saro-blue'
                         }`}
                       >

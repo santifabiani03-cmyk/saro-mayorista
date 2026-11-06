@@ -338,7 +338,7 @@ export default function Cart({ config }) {
                   onClick={() => { setModoEnvio('cotizar'); setEnvioElegido(null) }}
                   className={`py-2 rounded-lg text-xs font-bold border transition ${
                     modoEnvio === 'cotizar'
-                      ? 'bg-saro-blue border-saro-blue text-white shadow-sm shadow-saro-blue/20'
+                      ? 'bg-saro-blue border-saro-blue text-white shadow-sm'
                       : 'bg-white border-tinta-200 text-tinta-600 hover:border-saro-blue/40 hover:text-saro-blue'
                   }`}
                 >
@@ -506,7 +506,7 @@ export default function Cart({ config }) {
                   <button
                     type="submit"
                     disabled={!nombreOk}
-                    className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition duration-200 bg-wa-500 hover:bg-wa-600 text-white shadow-lg shadow-wa-500/25 active:scale-[.98] disabled:opacity-50 disabled:shadow-none disabled:hover:bg-wa-500 disabled:active:scale-100"
+                    className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition duration-200 bg-wa-500 hover:bg-wa-600 text-white shadow-sm active:scale-[.98] disabled:opacity-50 disabled:shadow-none disabled:hover:bg-wa-500 disabled:active:scale-100"
                   >
                     <IconoWhatsApp />
                     Enviar por WhatsApp
@@ -536,7 +536,7 @@ export default function Cart({ config }) {
                 {/* Botón WhatsApp */}
                 <button
                   onClick={() => setPasoNombre('enviar')}
-                  className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition duration-200 bg-wa-500 hover:bg-wa-600 text-white shadow-lg shadow-wa-500/25 active:scale-[.98]"
+                  className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition duration-200 bg-wa-500 hover:bg-wa-600 text-white shadow-sm active:scale-[.98]"
                 >
                   <IconoWhatsApp />
                   Enviar pedido por WhatsApp

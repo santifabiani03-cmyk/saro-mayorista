@@ -50,7 +50,8 @@ export default {
       },
       boxShadow: {
         'card': '0 1px 3px rgba(15,23,42,.04), 0 4px 12px rgba(15,23,42,.06)',
-        'card-hover': '0 8px 30px rgba(37,99,235,.12), 0 2px 8px rgba(15,23,42,.08)',
+        // Sombras neutras y cortas: nada de resplandor de color (06/11/2026).
+        'card-hover': '0 6px 16px rgba(13,22,40,.08), 0 2px 6px rgba(13,22,40,.06)',
         'float': '0 20px 60px rgba(15,23,42,.12), 0 4px 16px rgba(15,23,42,.06)',
       },
       animation: {

@@ -253,7 +253,7 @@ export default function ProductModal({ product, onClose }) {
             disabled={totalUnidades === 0}
             className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition duration-200 active:scale-[.98] ${
               totalUnidades > 0
-                ? 'bg-saro-blue hover:bg-saro-mid text-white shadow-md shadow-saro-blue/20'
+                ? 'bg-saro-blue hover:bg-saro-mid text-white shadow-sm'
                 : 'bg-tinta-100 text-tinta-400 cursor-not-allowed'
             }`}
           >

@@ -74,7 +74,7 @@ export default function HowToBuyModal({ onClose }) {
             {steps.map((step, idx) => (
               <div key={idx} className="flex gap-4">
                 <div className="flex flex-col items-center flex-shrink-0">
-                  <div className="w-10 h-10 rounded-xl bg-saro-blue flex items-center justify-center text-white font-extrabold text-sm shadow-md shadow-saro-blue/20">
+                  <div className="w-10 h-10 rounded-xl bg-saro-blue flex items-center justify-center text-white font-extrabold text-sm shadow-sm">
                     {step.number}
                   </div>
                   {idx < steps.length - 1 && (
@@ -102,7 +102,7 @@ export default function HowToBuyModal({ onClose }) {
             </div>
             <button
               onClick={onClose}
-              className="w-full mt-3 py-3 bg-saro-blue hover:bg-saro-mid text-white font-bold rounded-xl transition duration-200 text-sm shadow-md shadow-saro-blue/20 active:scale-[.98]"
+              className="w-full mt-3 py-3 bg-saro-blue hover:bg-saro-mid text-white font-bold rounded-xl transition duration-200 text-sm shadow-sm active:scale-[.98]"
             >
               ¡Entendido, voy a comprar!
             </button>
