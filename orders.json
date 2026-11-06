@@ -1358,5 +1358,21 @@
     ],
     "total": 229500,
     "totalItems": 3
+  },
+  {
+    "id": "o1793964302429",
+    "fecha": "2026-11-06T11:25:02.429Z",
+    "items": [
+      {
+        "productId": "p1792534720147",
+        "nombre": "KL10 Carbono 12k ",
+        "precio": 170000,
+        "color": "Negro",
+        "talle": "Única",
+        "cantidad": 1
+      }
+    ],
+    "total": 170000,
+    "totalItems": 1
   }
 ]
