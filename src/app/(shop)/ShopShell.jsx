@@ -28,7 +28,7 @@ export default function ShopShell({ config, children }) {
         <ChatWidget whatsappNumber={config.whatsappNumber} />
 
         {/* Footer */}
-        <footer className="bg-white border-t border-gray-100/80 mt-16 py-10 px-4">
+        <footer className="bg-white border-t border-tinta-100/80 mt-16 py-10 px-4">
           <div className="max-w-7xl mx-auto text-center space-y-5">
             <Image
               src="/assets/logo-icon.png"
@@ -38,7 +38,7 @@ export default function ShopShell({ config, children }) {
               className="h-10 w-auto mx-auto opacity-30"
               loading="lazy"
             />
-            <p className="text-xs text-gray-400 max-w-xl mx-auto leading-relaxed">
+            <p className="text-xs text-tinta-400 max-w-xl mx-auto leading-relaxed">
               SARO — Paletas de padel, palas de padel, accesorios de padel
               (grips, cubre grips, pelotas, bolsos, mochilas) y ropa deportiva
               en Argentina. Directo de fábrica, con la calidad SARO y envios a
@@ -47,26 +47,26 @@ export default function ShopShell({ config, children }) {
             {/* Links reales a las secciones: los usa la gente y también Google
                 para descubrir y conectar las páginas del sitio. */}
             <nav aria-label="Secciones" className="flex flex-wrap justify-center gap-x-5 gap-y-2 text-xs font-semibold">
-              <Link href="/paletas" className="text-gray-500 hover:text-saro-blue transition-colors">Paletas</Link>
-              <Link href="/ropa-y-accesorios" className="text-gray-500 hover:text-saro-blue transition-colors">Ropa y accesorios</Link>
-              <Link href="/ropa-y-accesorios/mayorista" className="text-gray-500 hover:text-saro-blue transition-colors">Catálogo mayorista</Link>
-              <Link href="/revendedores" className="text-gray-500 hover:text-saro-blue transition-colors">Revendé SARO</Link>
+              <Link href="/paletas" className="text-tinta-500 hover:text-saro-blue transition-colors">Paletas</Link>
+              <Link href="/ropa-y-accesorios" className="text-tinta-500 hover:text-saro-blue transition-colors">Ropa y accesorios</Link>
+              <Link href="/ropa-y-accesorios/mayorista" className="text-tinta-500 hover:text-saro-blue transition-colors">Catálogo mayorista</Link>
+              <Link href="/revendedores" className="text-tinta-500 hover:text-saro-blue transition-colors">Revendé SARO</Link>
             </nav>
-            <nav className="flex flex-wrap justify-center gap-x-2 gap-y-1.5 text-[10px] text-gray-300 font-medium">
+            <nav className="flex flex-wrap justify-center gap-x-2 gap-y-1.5 text-[10px] text-tinta-300 font-medium">
               <span>Paletas de padel</span>
-              <span className="text-gray-200">/</span>
+              <span className="text-tinta-200">/</span>
               <span>Palas de padel</span>
-              <span className="text-gray-200">/</span>
+              <span className="text-tinta-200">/</span>
               <span>Accesorios de padel</span>
-              <span className="text-gray-200">/</span>
+              <span className="text-tinta-200">/</span>
               <span>Grips y cubre grips</span>
-              <span className="text-gray-200">/</span>
+              <span className="text-tinta-200">/</span>
               <span>Bolsos de padel</span>
-              <span className="text-gray-200">/</span>
+              <span className="text-tinta-200">/</span>
               <span>Ropa deportiva</span>
-              <span className="text-gray-200">/</span>
+              <span className="text-tinta-200">/</span>
               <span>Indumentaria deportiva</span>
-              <span className="text-gray-200">/</span>
+              <span className="text-tinta-200">/</span>
               <span>Envíos a todo el país</span>
             </nav>
           </div>

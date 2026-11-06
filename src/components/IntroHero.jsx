@@ -42,7 +42,6 @@ export default function IntroHero({ productCount = 0, onExplore }) {
   const sectionRef = useRef(null)
   const stageRef   = useRef(null)
   const progressRef = useRef(0)
-  const glowRef    = useRef(null)
   const t1Ref      = useRef(null)
   const t2Ref      = useRef(null)
   const t3Ref      = useRef(null)
@@ -63,11 +62,6 @@ export default function IntroHero({ productCount = 0, onExplore }) {
       // progreso 0..1 a lo largo de la sección
       const p = Math.min(1, Math.max(0, -rect.top / (total || 1)))
       progressRef.current = p
-
-      // Glow sigue sutilmente el scroll
-      if (glowRef.current) {
-        glowRef.current.style.transform = `translateY(${p * 60}px) scale(${1 + p * 0.15})`
-      }
 
       const apply = (ref, s) => {
         if (!ref.current) return
@@ -93,15 +87,6 @@ export default function IntroHero({ productCount = 0, onExplore }) {
       if (raf) cancelAnimationFrame(raf)
     }
   }, [])
-
-  const particles = [
-    { l: '12%', d: '9s',  delay: '0s',   s: 6 },
-    { l: '28%', d: '12s', delay: '2s',   s: 4 },
-    { l: '44%', d: '10s', delay: '4s',   s: 5 },
-    { l: '63%', d: '13s', delay: '1s',   s: 4 },
-    { l: '78%', d: '11s', delay: '3s',   s: 6 },
-    { l: '90%', d: '14s', delay: '5s',   s: 3 },
-  ]
 
   return (
     <section
@@ -143,46 +128,21 @@ export default function IntroHero({ productCount = 0, onExplore }) {
           />
         </div>
 
-        {/* Glows ambientales */}
-        <div ref={glowRef} className="absolute inset-0 pointer-events-none">
-          <div className="intro-glow absolute top-[8%] left-1/2 -translate-x-1/2 w-[70vw] h-[70vw] max-w-[720px] max-h-[720px] rounded-full bg-saro-blue/20 blur-[120px]" />
-          <div className="intro-glow2 absolute bottom-[2%] right-[6%] w-[46vw] h-[46vw] max-w-[440px] max-h-[440px] rounded-full bg-saro-accent/15 blur-[110px]" />
-        </div>
-
         {/* Líneas de cancha muy sutiles */}
         <svg
           className="absolute inset-0 w-full h-full opacity-[.04] pointer-events-none"
           viewBox="0 0 800 500" preserveAspectRatio="xMidYMid slice" aria-hidden="true"
         >
-          <rect x="80" y="60" width="640" height="380" fill="none" stroke="#0F172A" strokeWidth="2" />
-          <line x1="400" y1="60" x2="400" y2="440" stroke="#0F172A" strokeWidth="2" />
-          <line x1="80" y1="250" x2="720" y2="250" stroke="#0F172A" strokeWidth="1.5" strokeDasharray="7 10" />
+          <rect x="80" y="60" width="640" height="380" fill="none" stroke="#0D1628" strokeWidth="2" />
+          <line x1="400" y1="60" x2="400" y2="440" stroke="#0D1628" strokeWidth="2" />
+          <line x1="80" y1="250" x2="720" y2="250" stroke="#0D1628" strokeWidth="1.5" strokeDasharray="7 10" />
         </svg>
-
-        {/* Partículas */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden">
-          {particles.map((pt, i) => (
-            <span
-              key={i}
-              className="intro-particle absolute bottom-[20%] rounded-full bg-saro-blue/30"
-              style={{
-                left: pt.l,
-                width: pt.s, height: pt.s,
-                animationDuration: pt.d,
-                animationDelay: pt.delay,
-              }}
-            />
-          ))}
-        </div>
 
         {/* Texto superior */}
         <div className="absolute inset-x-0 top-[8%] sm:top-[9%] px-6 text-center z-20">
           <div ref={t1Ref} className="will-change-[opacity,transform]">
-            <p className="intro-rise intro-rise-1 text-[11px] sm:text-xs font-bold uppercase tracking-[.32em] text-saro-blue mb-3">
-              Tienda oficial · Argentina
-            </p>
             {/* El título principal de la portada para Google (único <h1> de "/"). */}
-            <h1 className="intro-rise intro-rise-2 text-4xl sm:text-6xl font-extrabold text-saro-dark leading-[1.05] tracking-tight max-w-4xl mx-auto">
+            <h1 className="intro-rise text-4xl sm:text-6xl font-extrabold text-saro-dark leading-[1.05] tracking-tight max-w-4xl mx-auto">
               El padel arranca<br className="hidden sm:block" /> en{' '}
               <img
                 src="/assets/saro-wordmark.png"
@@ -198,9 +158,6 @@ export default function IntroHero({ productCount = 0, onExplore }) {
             ref={t2Ref}
             className="absolute inset-x-0 top-0 px-6 opacity-0 will-change-[opacity,transform]"
           >
-            <p className="text-[11px] sm:text-xs font-bold uppercase tracking-[.32em] text-saro-accent mb-3">
-              Tecnología carbono
-            </p>
             <h2 className="text-3xl sm:text-5xl font-extrabold text-saro-dark leading-[1.08] tracking-tight max-w-3xl mx-auto">
               Paletas profesionales<br className="hidden sm:block" /> para todos los niveles
             </h2>
@@ -231,7 +188,7 @@ export default function IntroHero({ productCount = 0, onExplore }) {
           <h2 className="text-2xl sm:text-4xl font-extrabold text-saro-dark leading-tight tracking-tight max-w-2xl mx-auto">
             Paletas, accesorios y ropa<br className="hidden sm:block" /> directo de fábrica
           </h2>
-          <p className="text-sm sm:text-base text-slate-500 mt-3 max-w-lg mx-auto">
+          <p className="text-sm sm:text-base text-tinta-500 mt-3 max-w-lg mx-auto">
             La calidad SARO en cada pieza, con envíos a todo el país.
           </p>
           <button
@@ -248,7 +205,7 @@ export default function IntroHero({ productCount = 0, onExplore }) {
         {/* Indicador de scroll */}
         <div
           ref={cueRef}
-          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1.5 text-slate-400"
+          className="absolute bottom-6 left-1/2 -translate-x-1/2 z-20 flex flex-col items-center gap-1.5 text-tinta-400"
         >
           <span className="text-[10px] font-semibold uppercase tracking-widest">Scrolleá</span>
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-5 h-5 intro-bob">

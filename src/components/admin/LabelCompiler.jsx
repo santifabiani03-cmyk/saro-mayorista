@@ -457,9 +457,9 @@ export default function LabelCompiler() {
     <div className="max-w-xl mx-auto space-y-6 overflow-hidden">
 
       {/* Contador de envíos */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
+      <div className="bg-white rounded-2xl border border-tinta-100 p-5 shadow-sm">
         <div className="flex items-center justify-between mb-3">
-          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Envíos compilados</span>
+          <span className="text-xs font-semibold text-tinta-400 uppercase tracking-wide">Envíos compilados</span>
           <div className="flex gap-1">
             {[
               { key: 'semana', label: '7 días' },
@@ -472,7 +472,7 @@ export default function LabelCompiler() {
                 className={`px-2.5 py-1 text-xs font-semibold rounded-lg transition-colors ${
                   statFilter === f.key
                     ? 'bg-saro-blue text-white'
-                    : 'text-gray-400 hover:text-gray-600 hover:bg-gray-50'
+                    : 'text-tinta-400 hover:text-tinta-600 hover:bg-tinta-50'
                 }`}
               >
                 {f.label}
@@ -483,18 +483,18 @@ export default function LabelCompiler() {
         <div className="flex items-end gap-6">
           <div>
             <p className="text-3xl font-extrabold text-saro-blue leading-none">{filteredStats.totalLabels}</p>
-            <p className="text-xs text-gray-400 mt-1">etiquetas</p>
+            <p className="text-xs text-tinta-400 mt-1">etiquetas</p>
           </div>
           <div>
-            <p className="text-xl font-bold text-gray-600 leading-none">{filteredStats.compilations}</p>
-            <p className="text-xs text-gray-400 mt-1">compilaciones</p>
+            <p className="text-xl font-bold text-tinta-600 leading-none">{filteredStats.compilations}</p>
+            <p className="text-xs text-tinta-400 mt-1">compilaciones</p>
           </div>
         </div>
       </div>
 
       <div>
-        <h2 className="text-xl font-extrabold text-gray-900">Compilador de Etiquetas</h2>
-        <p className="text-sm text-gray-400 mt-1">
+        <h2 className="text-xl font-extrabold text-tinta-900">Compilador de Etiquetas</h2>
+        <p className="text-sm text-tinta-400 mt-1">
           Subí uno o varios PDFs con etiquetas de envío y se agrupan para imprimir.
         </p>
       </div>
@@ -509,8 +509,8 @@ export default function LabelCompiler() {
           dragOver
             ? 'border-saro-blue bg-saro-light'
             : files.length > 0
-            ? 'border-green-300 bg-green-50'
-            : 'border-gray-200 hover:border-saro-blue hover:bg-gray-50'
+            ? 'border-wa-300 bg-wa-50'
+            : 'border-tinta-200 hover:border-saro-blue hover:bg-tinta-50'
         }`}
       >
         <input
@@ -522,12 +522,12 @@ export default function LabelCompiler() {
           onChange={e => { addFiles(e.target.files); e.target.value = '' }}
         />
         <span className="text-4xl block mb-3">{files.length > 0 ? '✅' : '📄'}</span>
-        <p className="font-bold text-gray-800 text-sm">
+        <p className="font-bold text-tinta-800 text-sm">
           {files.length > 0
             ? `${files.length} archivo${files.length > 1 ? 's' : ''} cargado${files.length > 1 ? 's' : ''}`
             : 'Arrastrá tus PDFs aquí'}
         </p>
-        <p className="text-xs text-gray-400 mt-1">
+        <p className="text-xs text-tinta-400 mt-1">
           {files.length > 0
             ? 'Tocá para agregar más'
             : 'o hacé click para seleccionar (uno o varios)'}
@@ -538,15 +538,15 @@ export default function LabelCompiler() {
       {files.length > 0 && (
         <div className="space-y-1.5">
           {files.map((f, idx) => (
-            <div key={`${f.name}-${idx}`} className="flex items-center justify-between bg-white border border-gray-100 rounded-xl px-4 py-2.5 shadow-sm">
+            <div key={`${f.name}-${idx}`} className="flex items-center justify-between bg-white border border-tinta-100 rounded-xl px-4 py-2.5 shadow-sm">
               <div className="min-w-0">
-                <p className="text-sm font-medium text-gray-800 truncate">{f.name}</p>
-                <p className="text-xs text-gray-400">{(f.size / 1024).toFixed(0)} KB</p>
+                <p className="text-sm font-medium text-tinta-800 truncate">{f.name}</p>
+                <p className="text-xs text-tinta-400">{(f.size / 1024).toFixed(0)} KB</p>
               </div>
               <button
                 type="button"
                 onClick={(e) => { e.stopPropagation(); removeFile(idx) }}
-                className="text-gray-300 hover:text-red-500 transition-colors ml-3 flex-shrink-0 text-lg leading-none"
+                className="text-tinta-300 hover:text-red-500 transition-colors ml-3 flex-shrink-0 text-lg leading-none"
                 title="Quitar archivo"
               >
                 ✕
@@ -556,7 +556,7 @@ export default function LabelCompiler() {
           <button
             type="button"
             onClick={() => { setFiles([]); setResult(null); setError(null) }}
-            className="text-xs text-gray-400 hover:text-red-500 transition-colors"
+            className="text-xs text-tinta-400 hover:text-red-500 transition-colors"
           >
             Quitar todos
           </button>
@@ -564,9 +564,9 @@ export default function LabelCompiler() {
       )}
 
       {/* Configuración */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-4 shadow-sm">
+      <div className="bg-white rounded-2xl border border-tinta-100 p-5 space-y-4 shadow-sm">
         <div className="flex items-center justify-between mb-1">
-          <span className="text-xs font-semibold text-gray-400 uppercase tracking-wide">Configuración</span>
+          <span className="text-xs font-semibold text-tinta-400 uppercase tracking-wide">Configuración</span>
           {!isDefault && (
             <button
               type="button"
@@ -579,13 +579,13 @@ export default function LabelCompiler() {
         </div>
         <div className="grid grid-cols-3 gap-2 sm:gap-4">
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+            <label className="block text-xs font-semibold text-tinta-500 uppercase tracking-wide mb-1.5">
               Por hoja
             </label>
             <select
               value={perPage}
               onChange={e => setPerPage(Number(e.target.value))}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-saro-blue"
+              className="w-full border border-tinta-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-saro-blue"
             >
               <option value={2}>2 (2×1)</option>
               <option value={3}>3 (3×1)</option>
@@ -593,7 +593,7 @@ export default function LabelCompiler() {
             </select>
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+            <label className="block text-xs font-semibold text-tinta-500 uppercase tracking-wide mb-1.5">
               Margen (mm)
             </label>
             <input
@@ -601,11 +601,11 @@ export default function LabelCompiler() {
               value={marginMm}
               onChange={e => setMarginMm(Number(e.target.value))}
               min={0} max={30} step={0.5}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-saro-blue"
+              className="w-full border border-tinta-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-saro-blue"
             />
           </div>
           <div>
-            <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+            <label className="block text-xs font-semibold text-tinta-500 uppercase tracking-wide mb-1.5">
               Separación (mm)
             </label>
             <input
@@ -613,14 +613,14 @@ export default function LabelCompiler() {
               value={gapMm}
               onChange={e => setGapMm(Number(e.target.value))}
               min={0} max={20} step={0.5}
-              className="w-full border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-saro-blue"
+              className="w-full border border-tinta-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-saro-blue"
             />
           </div>
         </div>
 
         {/* Tamaño de las etiquetas que vienen solas (una por PDF) */}
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+          <label className="block text-xs font-semibold text-tinta-500 uppercase tracking-wide mb-1.5">
             Tamaño de etiquetas individuales
           </label>
           <div className="flex items-center gap-3">
@@ -633,7 +633,7 @@ export default function LabelCompiler() {
             />
             <span className="text-sm font-bold text-saro-blue w-12 text-right">{individualScalePct}%</span>
           </div>
-          <p className="text-[11px] text-gray-400 mt-1.5">
+          <p className="text-[11px] text-tinta-400 mt-1.5">
             Sólo afecta a los PDFs que traen una única etiqueta a página completa: las achica
             para despegarlas del borde. Las que vienen varias en un PDF no se tocan.
           </p>
@@ -641,7 +641,7 @@ export default function LabelCompiler() {
 
         {/* Recorte del cuadro vacío al pie de la etiqueta */}
         <div>
-          <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wide mb-1.5">
+          <label className="block text-xs font-semibold text-tinta-500 uppercase tracking-wide mb-1.5">
             Recorte inferior
           </label>
           <div className="grid grid-cols-3 gap-2">
@@ -658,14 +658,14 @@ export default function LabelCompiler() {
                 className={`py-2 rounded-xl text-xs font-bold border transition ${
                   cropMode === o.key
                     ? 'bg-saro-blue border-saro-blue text-white'
-                    : 'bg-white border-gray-200 text-gray-500 hover:border-saro-blue/40 hover:text-saro-blue'
+                    : 'bg-white border-tinta-200 text-tinta-500 hover:border-saro-blue/40 hover:text-saro-blue'
                 }`}
               >
                 {o.label}
               </button>
             ))}
           </div>
-          <p className="text-[11px] text-gray-400 mt-1.5">
+          <p className="text-[11px] text-tinta-400 mt-1.5">
             En automático detecta, etiqueta por etiqueta, si abajo hay un cuadro vacío para
             recortar. Si alguna sale cortada, probá con <strong>Nunca</strong>.
           </p>
@@ -677,7 +677,7 @@ export default function LabelCompiler() {
           disabled={files.length === 0 || processing}
           className={`w-full py-3 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition ${
             files.length === 0 || processing
-              ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+              ? 'bg-tinta-200 text-tinta-400 cursor-not-allowed'
               : 'bg-saro-dark hover:bg-saro-blue text-white shadow-lg'
           }`}
         >
@@ -700,24 +700,24 @@ export default function LabelCompiler() {
 
       {/* Resultado */}
       {result && (
-        <div className="bg-green-50 border border-green-200 rounded-2xl p-5">
-          <p className="font-bold text-green-800 text-sm mb-3">✅ Compilado correctamente</p>
+        <div className="bg-wa-50 border border-wa-200 rounded-2xl p-5">
+          <p className="font-bold text-wa-800 text-sm mb-3">✅ Compilado correctamente</p>
           <div className="grid grid-cols-3 gap-3">
             <div className="bg-white rounded-xl p-3 text-center">
               <p className="text-2xl font-extrabold text-saro-blue">{result.totalLabels}</p>
-              <p className="text-xs text-gray-500 mt-0.5">Envíos</p>
+              <p className="text-xs text-tinta-500 mt-0.5">Envíos</p>
             </div>
             <div className="bg-white rounded-xl p-3 text-center">
-              <p className="text-2xl font-extrabold text-gray-800">{result.sheets}</p>
-              <p className="text-xs text-gray-500 mt-0.5">Hojas</p>
+              <p className="text-2xl font-extrabold text-tinta-800">{result.sheets}</p>
+              <p className="text-xs text-tinta-500 mt-0.5">Hojas</p>
             </div>
             <div className="bg-white rounded-xl p-3 text-center">
-              <p className="text-2xl font-extrabold text-gray-800">{result.totalLabels > 1 ? result.layout : '1'}</p>
-              <p className="text-xs text-gray-500 mt-0.5">Por hoja</p>
+              <p className="text-2xl font-extrabold text-tinta-800">{result.totalLabels > 1 ? result.layout : '1'}</p>
+              <p className="text-xs text-tinta-500 mt-0.5">Por hoja</p>
             </div>
           </div>
           {cropMode === 'auto' && (
-            <p className="text-xs text-green-700/80 mt-3">
+            <p className="text-xs text-wa-700/80 mt-3">
               {result.recortadas === 0
                 ? 'Ninguna tenía cuadro vacío al pie: se imprimen completas.'
                 : result.recortadas === result.totalLabels

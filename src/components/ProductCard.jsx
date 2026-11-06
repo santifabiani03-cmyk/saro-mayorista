@@ -14,10 +14,10 @@ function StandardCard({ product, onClick, tags, imgs, sinStock }) {
   return (
     <div
       onClick={onClick}
-      className="bg-white rounded-2xl shadow-card border border-gray-100/80 overflow-hidden cursor-pointer group hover:shadow-card-hover hover:-translate-y-1 transition duration-300 ease-out"
+      className="bg-white rounded-2xl shadow-card border border-tinta-100/80 overflow-hidden cursor-pointer group hover:shadow-card-hover hover:-translate-y-1 transition duration-300 ease-out"
     >
       {/* Imagen / carrusel */}
-      <div className="relative aspect-square bg-gradient-to-br from-gray-50 to-gray-100/50 overflow-hidden">
+      <div className="relative aspect-square bg-gradient-to-br from-tinta-50 to-tinta-100/50 overflow-hidden">
         <ImageCarousel images={imgs} emoji={product.emoji} compact altText={product.nombre} sizes={SIZES_TARJETA} />
 
         {tags.length > 0 && (
@@ -39,7 +39,7 @@ function StandardCard({ product, onClick, tags, imgs, sinStock }) {
         />
 
         {sinStock && (
-          <span className="absolute top-2 right-2 bg-gray-800/80 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded-full z-20">
+          <span className="absolute top-2 right-2 bg-tinta-800/80 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded-full z-20">
             Sin stock
           </span>
         )}
@@ -47,10 +47,10 @@ function StandardCard({ product, onClick, tags, imgs, sinStock }) {
 
       {/* Info */}
       <div className="p-3.5 space-y-2">
-        <p className="font-semibold text-gray-900 text-sm leading-tight line-clamp-2 tracking-tight">
+        <p className="font-semibold text-tinta-900 text-sm leading-tight line-clamp-2 tracking-tight">
           {product.nombre}
         </p>
-        <p className="text-[11px] text-gray-400 capitalize font-medium">
+        <p className="text-[11px] text-tinta-400 capitalize font-medium">
           {product.categoria} · {product.genero}
         </p>
 
@@ -60,12 +60,12 @@ function StandardCard({ product, onClick, tags, imgs, sinStock }) {
             <span
               key={c}
               title={c}
-              className="w-3.5 h-3.5 rounded-full border border-white shadow-sm flex-shrink-0 ring-1 ring-gray-200/60"
+              className="w-3.5 h-3.5 rounded-full border border-white shadow-sm flex-shrink-0 ring-1 ring-tinta-200/60"
               style={getSwatchStyle(c, product.colorDefs)}
             />
           ))}
           {product.colores.length > 6 && (
-            <span className="text-[10px] text-gray-400 font-medium">+{product.colores.length - 6}</span>
+            <span className="text-[10px] text-tinta-400 font-medium">+{product.colores.length - 6}</span>
           )}
         </div>
 
@@ -87,7 +87,7 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
   return (
     <div
       onClick={onClick}
-      className="relative bg-white rounded-2xl shadow-card border border-gray-100/80 overflow-hidden cursor-pointer group hover:shadow-card-hover hover:-translate-y-1 transition duration-300 ease-out"
+      className="relative bg-white rounded-2xl shadow-card border border-tinta-100/80 overflow-hidden cursor-pointer group hover:shadow-card-hover hover:-translate-y-1 transition duration-300 ease-out"
     >
       {/* Estructura invisible: replica la altura de StandardCard */}
       <div className="invisible" aria-hidden="true">
@@ -119,13 +119,13 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
           onError={e => { e.currentTarget.style.opacity = '0.3' }}
         />
       ) : (
-        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-gray-50 to-gray-100">
+        <div className="absolute inset-0 flex items-center justify-center bg-gradient-to-b from-tinta-50 to-tinta-100">
           <span className="text-7xl select-none">🏓</span>
         </div>
       )}
 
       {/* Fondo gradiente sutil por si la imagen no carga */}
-      <div className="absolute inset-0 bg-gradient-to-b from-gray-50 via-white to-gray-100 -z-10" />
+      <div className="absolute inset-0 bg-gradient-to-b from-tinta-50 via-white to-tinta-100 -z-10" />
 
       {/* Tags arriba izquierda */}
       {tags.length > 0 && (
@@ -147,7 +147,7 @@ function PaletaCard({ product, onClick, tags, imgs, sinStock }) {
       />
 
       {sinStock && (
-        <span className="absolute top-2 right-2 bg-gray-800/80 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded-full z-10">
+        <span className="absolute top-2 right-2 bg-tinta-800/80 backdrop-blur-sm text-white text-[10px] font-semibold px-2 py-0.5 rounded-full z-10">
           Sin stock
         </span>
       )}

@@ -32,7 +32,7 @@ export default function Header({ config }) {
         className={
           isLanding
             ? 'absolute top-0 inset-x-0 z-30'
-            : 'bg-white/80 backdrop-blur-xl border-b border-gray-100/60 sticky top-0 z-30 shadow-sm'
+            : 'bg-white/80 backdrop-blur-xl border-b border-tinta-100/60 sticky top-0 z-30 shadow-sm'
         }
       >
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
@@ -47,7 +47,7 @@ export default function Header({ config }) {
 
             {/* Badge mínimo de compra (no en la landing, y solo si está activado) */}
             {!isLanding && verCompraMinima && (
-              <div className="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-saro-light to-blue-50 text-saro-dark px-3.5 py-2 rounded-full text-sm font-medium border border-blue-100/60">
+              <div className="hidden sm:flex items-center gap-1.5 bg-gradient-to-r from-saro-light to-saro-light text-saro-dark px-3.5 py-2 rounded-full text-sm font-medium border border-saro-line/60">
                 <span className="text-saro-blue font-bold text-xs tracking-tight">Compra mín. sugerida:</span>
                 <span className="font-extrabold text-saro-dark">
                   ${(config.suggestedMinPurchase ?? config.minPurchase).toLocaleString('es-AR')}
@@ -70,7 +70,7 @@ export default function Header({ config }) {
               onClick={() => trackContacto('header')}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center w-10 h-10 rounded-xl bg-emerald-500 hover:bg-emerald-600 transition duration-200 shadow-md shadow-emerald-500/20 btn-press"
+              className="flex items-center justify-center w-10 h-10 rounded-xl bg-wa-500 hover:bg-wa-600 transition duration-200 shadow-md shadow-wa-500/20 btn-press"
               title="Contactar por WhatsApp"
             >
               <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5 text-white">
@@ -101,7 +101,7 @@ export default function Header({ config }) {
 
         {/* Badge móvil mínimo (no en la landing, y solo si está activado) */}
         {!isLanding && verCompraMinima && (
-          <div className="sm:hidden bg-gradient-to-r from-saro-light to-blue-50 px-4 py-2 text-center text-xs text-saro-dark font-medium border-t border-blue-100/40">
+          <div className="sm:hidden bg-gradient-to-r from-saro-light to-saro-light px-4 py-2 text-center text-xs text-saro-dark font-medium border-t border-saro-line/40">
             Compra mín. sugerida: <strong className="text-saro-blue">${(config.suggestedMinPurchase ?? config.minPurchase).toLocaleString('es-AR')}</strong>
           </div>
         )}

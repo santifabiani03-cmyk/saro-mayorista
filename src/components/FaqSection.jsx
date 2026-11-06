@@ -28,14 +28,14 @@ const faqs = [
 function FaqItem({ faq }) {
   const [open, setOpen] = useState(false)
   return (
-    <div className="border-b border-gray-100/80 last:border-0">
+    <div className="border-b border-tinta-100/80 last:border-0">
       <button
         onClick={() => setOpen(o => !o)}
         className="w-full flex items-center justify-between py-4 text-left gap-4 group"
       >
-        <span className="text-sm font-semibold text-gray-800 group-hover:text-saro-blue transition-colors">{faq.q}</span>
+        <span className="text-sm font-semibold text-tinta-800 group-hover:text-saro-blue transition-colors">{faq.q}</span>
         <svg
-          className={`w-4 h-4 text-gray-400 flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+          className={`w-4 h-4 text-tinta-400 flex-shrink-0 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
           viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
           strokeLinecap="round" strokeLinejoin="round"
         >
@@ -44,7 +44,7 @@ function FaqItem({ faq }) {
       </button>
       <div className={`grid transition duration-200 ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
         <div className="overflow-hidden">
-          <p className="text-sm text-gray-500 leading-relaxed pb-4 pr-8">
+          <p className="text-sm text-tinta-500 leading-relaxed pb-4 pr-8">
             {faq.a}
           </p>
         </div>
@@ -57,18 +57,18 @@ export default function FaqSection() {
   const [expanded, setExpanded] = useState(false)
 
   return (
-    <section className="bg-white rounded-2xl shadow-card border border-gray-100/80 overflow-hidden">
+    <section className="bg-white rounded-2xl shadow-card border border-tinta-100/80 overflow-hidden">
       {/* Header colapsable */}
       <button
         onClick={() => setExpanded(e => !e)}
-        className="w-full flex items-center justify-between p-5 sm:p-6 text-left hover:bg-gray-50/50 transition-colors"
+        className="w-full flex items-center justify-between p-5 sm:p-6 text-left hover:bg-tinta-50/50 transition-colors"
       >
         <div>
-          <h2 className="text-lg font-bold text-gray-900 tracking-tight">Preguntas frecuentes</h2>
-          <p className="text-sm text-gray-400 mt-0.5">Todo lo que necesitás saber para comprar en SARO</p>
+          <h2 className="text-lg font-bold text-tinta-900 tracking-tight">Preguntas frecuentes</h2>
+          <p className="text-sm text-tinta-400 mt-0.5">Todo lo que necesitás saber para comprar en SARO</p>
         </div>
         <svg
-          className={`w-5 h-5 text-gray-400 flex-shrink-0 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
+          className={`w-5 h-5 text-tinta-400 flex-shrink-0 transition-transform duration-300 ${expanded ? 'rotate-180' : ''}`}
           viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
           strokeLinecap="round" strokeLinejoin="round"
         >
@@ -83,7 +83,7 @@ export default function FaqSection() {
         }`}
       >
         <div className="overflow-hidden">
-          <div className="px-5 sm:px-6 pb-5 sm:pb-6 border-t border-gray-100/80">
+          <div className="px-5 sm:px-6 pb-5 sm:pb-6 border-t border-tinta-100/80">
             {faqs.map((faq, i) => (
               <FaqItem key={i} faq={faq} />
             ))}

@@ -216,16 +216,16 @@ export default function Cart({ config }) {
         }`}
       >
         {/* Header */}
-        <div className="flex items-center justify-between px-5 py-4 border-b border-gray-100/80 flex-shrink-0">
-          <h2 className="font-bold text-lg text-gray-900 tracking-tight">
+        <div className="flex items-center justify-between px-5 py-4 border-b border-tinta-100/80 flex-shrink-0">
+          <h2 className="font-bold text-lg text-tinta-900 tracking-tight">
             Tu pedido
             {totalItems > 0 && (
-              <span className="ml-2 text-sm font-normal text-gray-400">({totalItems} unidades)</span>
+              <span className="ml-2 text-sm font-normal text-tinta-400">({totalItems} unidades)</span>
             )}
           </h2>
           <button
             onClick={() => setIsOpen(false)}
-            className="text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl p-2 text-lg leading-none transition-colors"
+            className="text-tinta-400 hover:text-tinta-700 hover:bg-tinta-100 rounded-xl p-2 text-lg leading-none transition-colors"
           >
             ✕
           </button>
@@ -234,11 +234,11 @@ export default function Cart({ config }) {
         {/* Lista de items */}
         <div className="flex-1 overflow-y-auto px-4 py-3 space-y-2">
           {items.length === 0 ? (
-            <div className="flex flex-col items-center justify-center h-full gap-3 text-gray-400 py-16">
-              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-16 h-16 text-gray-200">
+            <div className="flex flex-col items-center justify-center h-full gap-3 text-tinta-400 py-16">
+              <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.5" className="w-16 h-16 text-tinta-200">
                 <path strokeLinecap="round" strokeLinejoin="round" d="M2.25 3h1.386c.51 0 .955.343 1.087.835l.383 1.437M7.5 14.25a3 3 0 00-3 3h15.75m-12.75-3h11.218c1.121-2.3 2.1-4.684 2.924-7.138a60.114 60.114 0 00-16.536-1.84M7.5 14.25L5.106 5.272M6 20.25a.75.75 0 11-1.5 0 .75.75 0 011.5 0zm12.75 0a.75.75 0 11-1.5 0 .75.75 0 011.5 0z" />
               </svg>
-              <p className="text-sm font-medium text-gray-400">Tu carrito está vacío</p>
+              <p className="text-sm font-medium text-tinta-400">Tu carrito está vacío</p>
               <button
                 onClick={() => setIsOpen(false)}
                 className="text-xs text-saro-blue hover:text-saro-mid font-medium transition-colors"
@@ -250,10 +250,10 @@ export default function Cart({ config }) {
             items.map((item, idx) => (
               <div
                 key={`${item.productId}-${item.color}-${item.talle}-${idx}`}
-                className="flex items-center gap-3 bg-gray-50/80 rounded-xl p-3 border border-gray-100/60"
+                className="flex items-center gap-3 bg-tinta-50/80 rounded-xl p-3 border border-tinta-100/60"
               >
                 {/* Thumbnail */}
-                <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-gray-100 flex items-center justify-center">
+                <div className="w-12 h-12 rounded-xl overflow-hidden flex-shrink-0 bg-tinta-100 flex items-center justify-center">
                   {item.imagen
                     ? <Foto
                         src={item.imagen}
@@ -269,20 +269,20 @@ export default function Cart({ config }) {
                   >{item.emoji}</span>
                 </div>
                 <div className="flex-1 min-w-0">
-                  <p className="font-semibold text-sm text-gray-900 truncate">{item.nombre}</p>
-                  <p className="text-xs text-gray-500 mt-0.5">{item.color} · {item.talle}</p>
+                  <p className="font-semibold text-sm text-tinta-900 truncate">{item.nombre}</p>
+                  <p className="text-xs text-tinta-500 mt-0.5">{item.color} · {item.talle}</p>
                   {/* Selector de cantidad */}
                   <div className="flex items-center gap-1.5 mt-1.5">
                     <button
                       onClick={() => updateQty(item.productId, item.color, item.talle, -1)}
-                      className="w-6 h-6 rounded-lg bg-white border border-gray-200 hover:bg-red-50 hover:border-red-200 hover:text-red-600 text-gray-600 text-xs font-bold flex items-center justify-center transition-colors"
+                      className="w-6 h-6 rounded-lg bg-white border border-tinta-200 hover:bg-red-50 hover:border-red-200 hover:text-red-600 text-tinta-600 text-xs font-bold flex items-center justify-center transition-colors"
                     >
                       −
                     </button>
                     <span className="text-sm font-bold w-5 text-center tabular-nums">{item.cantidad}</span>
                     <button
                       onClick={() => updateQty(item.productId, item.color, item.talle, 1)}
-                      className="w-6 h-6 rounded-lg bg-white border border-gray-200 hover:bg-green-50 hover:border-green-200 hover:text-green-700 text-gray-600 text-xs font-bold flex items-center justify-center transition-colors"
+                      className="w-6 h-6 rounded-lg bg-white border border-tinta-200 hover:bg-wa-50 hover:border-wa-200 hover:text-wa-700 text-tinta-600 text-xs font-bold flex items-center justify-center transition-colors"
                     >
                       +
                     </button>
@@ -300,7 +300,7 @@ export default function Cart({ config }) {
                       .sort((a, b) => b.cantidad - a.cantidad)[0]
                     if (best) {
                       return (
-                        <span className="text-[10px] text-emerald-600 font-semibold">
+                        <span className="text-[10px] text-wa-600 font-semibold">
                           promo {best.cantidad}u
                         </span>
                       )
@@ -309,7 +309,7 @@ export default function Cart({ config }) {
                   })()}
                   <button
                     onClick={() => removeItem(item.productId, item.color, item.talle)}
-                    className="text-xs text-gray-400 hover:text-red-500 transition-colors font-medium"
+                    className="text-xs text-tinta-400 hover:text-red-500 transition-colors font-medium"
                   >
                     Quitar
                   </button>
@@ -326,10 +326,10 @@ export default function Cart({ config }) {
 
             {/* ── Envío (oculto hasta tener las credenciales de MiCorreo) ── */}
             {ENVIO_HABILITADO && (
-            <div className="rounded-xl border border-gray-100 bg-[#FAFBFC] p-3.5 space-y-3">
+            <div className="rounded-xl border border-tinta-100 bg-[#FAFBFC] p-3.5 space-y-3">
               <div className="flex items-center justify-between">
-                <span className="text-sm font-semibold text-gray-700">Envío</span>
-                <span className="text-xs text-gray-400 font-medium">Peso aprox.: {pesoKg} kg</span>
+                <span className="text-sm font-semibold text-tinta-700">Envío</span>
+                <span className="text-xs text-tinta-400 font-medium">Peso aprox.: {pesoKg} kg</span>
               </div>
 
               {/* Elección: cotizar o coordinar por WhatsApp */}
@@ -339,7 +339,7 @@ export default function Cart({ config }) {
                   className={`py-2 rounded-lg text-xs font-bold border transition ${
                     modoEnvio === 'cotizar'
                       ? 'bg-saro-blue border-saro-blue text-white shadow-sm shadow-saro-blue/20'
-                      : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue/40 hover:text-saro-blue'
+                      : 'bg-white border-tinta-200 text-tinta-600 hover:border-saro-blue/40 hover:text-saro-blue'
                   }`}
                 >
                   Cotizar envío
@@ -349,7 +349,7 @@ export default function Cart({ config }) {
                   className={`py-2 rounded-lg text-xs font-bold border transition ${
                     modoEnvio === 'whatsapp'
                       ? 'bg-saro-dark border-saro-dark text-white shadow-sm'
-                      : 'bg-white border-gray-200 text-gray-600 hover:border-gray-300'
+                      : 'bg-white border-tinta-200 text-tinta-600 hover:border-tinta-300'
                   }`}
                 >
                   Acordar por WhatsApp
@@ -366,7 +366,7 @@ export default function Cart({ config }) {
                       inputMode="numeric"
                       autoComplete="postal-code"
                       placeholder="Tu código postal"
-                      className="flex-1 border border-gray-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-saro-blue"
+                      className="flex-1 border border-tinta-200 rounded-lg px-3 py-2 text-sm focus:outline-none focus:border-saro-blue"
                     />
                     <button
                       onClick={cotizar}
@@ -386,15 +386,15 @@ export default function Cart({ config }) {
                       className={`w-full flex items-center justify-between gap-2 px-3 py-2.5 rounded-lg border text-left transition ${
                         envioElegido?.tipo === r.tipo
                           ? 'border-saro-blue bg-saro-light'
-                          : 'border-gray-200 bg-white hover:border-saro-blue/40'
+                          : 'border-tinta-200 bg-white hover:border-saro-blue/40'
                       }`}
                     >
                       <span className="text-xs">
-                        <span className="font-semibold text-gray-700">
+                        <span className="font-semibold text-tinta-700">
                           {r.tipo === 'sucursal' ? 'A sucursal' : 'A domicilio'}
                         </span>
                         {r.diasMin && (
-                          <span className="block text-[11px] text-gray-400">{r.diasMin} a {r.diasMax} días hábiles</span>
+                          <span className="block text-[11px] text-tinta-400">{r.diasMin} a {r.diasMax} días hábiles</span>
                         )}
                       </span>
                       <span className="font-extrabold text-saro-blue text-sm">
@@ -404,7 +404,7 @@ export default function Cart({ config }) {
                   ))}
 
                   {rates?.length > 0 && (
-                    <p className="text-[11px] text-gray-400 leading-snug">
+                    <p className="text-[11px] text-tinta-400 leading-snug">
                       Valores estimados de Correo Argentino. Se confirman al cerrar el pedido.
                     </p>
                   )}
@@ -417,15 +417,15 @@ export default function Cart({ config }) {
             {showMin && (
               <>
                 {/* La compra mínima cambia según sea la primera compra o no */}
-                <div className="rounded-xl border border-gray-100 bg-[#FAFBFC] p-3 space-y-2">
-                  <p className="text-[11px] font-semibold text-gray-500">Tu compra mínima</p>
+                <div className="rounded-xl border border-tinta-100 bg-[#FAFBFC] p-3 space-y-2">
+                  <p className="text-[11px] font-semibold text-tinta-500">Tu compra mínima</p>
                   <div className="grid grid-cols-2 gap-2">
                     <button
                       onClick={() => setYaEsCliente(false)}
                       className={`py-2 px-1 rounded-lg text-[11px] font-bold border transition leading-tight ${
                         !yaEsCliente
                           ? 'bg-saro-blue border-saro-blue text-white'
-                          : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue/40'
+                          : 'bg-white border-tinta-200 text-tinta-600 hover:border-saro-blue/40'
                       }`}
                     >
                       Primera compra
@@ -436,7 +436,7 @@ export default function Cart({ config }) {
                       className={`py-2 px-1 rounded-lg text-[11px] font-bold border transition leading-tight ${
                         yaEsCliente
                           ? 'bg-saro-blue border-saro-blue text-white'
-                          : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue/40'
+                          : 'bg-white border-tinta-200 text-tinta-600 hover:border-saro-blue/40'
                       }`}
                     >
                       Ya soy cliente
@@ -446,17 +446,17 @@ export default function Cart({ config }) {
                 </div>
 
                 <div className="space-y-1.5">
-                  <div className="flex justify-between text-xs text-gray-500">
+                  <div className="flex justify-between text-xs text-tinta-500">
                     <span className="font-medium">
                       {canSend
                         ? '✅ Mínimo alcanzado'
                         : `Faltan $${remaining.toLocaleString('es-AR')} para el mínimo sugerido`}
                     </span>
-                    <span className="font-semibold text-gray-400">${minPurchase.toLocaleString('es-AR')}</span>
+                    <span className="font-semibold text-tinta-400">${minPurchase.toLocaleString('es-AR')}</span>
                   </div>
-                  <div className="h-2 bg-gray-100 rounded-full overflow-hidden">
+                  <div className="h-2 bg-tinta-100 rounded-full overflow-hidden">
                     <div
-                      className={`h-full rounded-full transition duration-500 ease-out ${canSend ? 'bg-gradient-to-r from-emerald-400 to-emerald-500' : 'bg-gradient-to-r from-saro-blue/70 to-saro-blue'}`}
+                      className={`h-full rounded-full transition duration-500 ease-out ${canSend ? 'bg-gradient-to-r from-wa-400 to-wa-500' : 'bg-gradient-to-r from-saro-blue/70 to-saro-blue'}`}
                       style={{ width: `${progress}%` }}
                     />
                   </div>
@@ -470,9 +470,9 @@ export default function Cart({ config }) {
 
         {/* Pie fijo: total + acciones (compacto, para no tapar los productos) */}
         {items.length > 0 && (
-          <div className="px-5 py-3.5 border-t border-gray-100/80 space-y-3 flex-shrink-0 bg-white">
+          <div className="px-5 py-3.5 border-t border-tinta-100/80 space-y-3 flex-shrink-0 bg-white">
             <div className="flex items-center justify-between">
-              <span className="font-semibold text-gray-700">Total</span>
+              <span className="font-semibold text-tinta-700">Total</span>
               <span className="text-2xl font-extrabold text-saro-dark tracking-tight">
                 ${total.toLocaleString('es-AR')}
               </span>
@@ -481,7 +481,7 @@ export default function Cart({ config }) {
             {pasoNombre ? (
               /* Paso de confirmación: a nombre de quién va el pedido */
               <form onSubmit={confirmarNombre} className="space-y-3 animate-fade-in">
-                <p className="text-sm font-semibold text-gray-700">¿A nombre de quién va el pedido?</p>
+                <p className="text-sm font-semibold text-tinta-700">¿A nombre de quién va el pedido?</p>
                 <div className="grid grid-cols-2 gap-2">
                   <input
                     aria-label="Nombre"
@@ -490,7 +490,7 @@ export default function Cart({ config }) {
                     autoComplete="given-name"
                     placeholder="Nombre"
                     autoFocus={!nombre}
-                    className="min-w-0 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue"
+                    className="min-w-0 border border-tinta-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue"
                   />
                   <input
                     aria-label="Apellido"
@@ -498,7 +498,7 @@ export default function Cart({ config }) {
                     onChange={e => setApellido(e.target.value.slice(0, 40))}
                     autoComplete="family-name"
                     placeholder="Apellido"
-                    className="min-w-0 border border-gray-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue"
+                    className="min-w-0 border border-tinta-200 rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue"
                   />
                 </div>
 
@@ -506,7 +506,7 @@ export default function Cart({ config }) {
                   <button
                     type="submit"
                     disabled={!nombreOk}
-                    className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition duration-200 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/25 active:scale-[.98] disabled:opacity-50 disabled:shadow-none disabled:hover:bg-emerald-500 disabled:active:scale-100"
+                    className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition duration-200 bg-wa-500 hover:bg-wa-600 text-white shadow-lg shadow-wa-500/25 active:scale-[.98] disabled:opacity-50 disabled:shadow-none disabled:hover:bg-wa-500 disabled:active:scale-100"
                   >
                     <IconoWhatsApp />
                     Enviar por WhatsApp
@@ -526,7 +526,7 @@ export default function Cart({ config }) {
                 <button
                   type="button"
                   onClick={() => setPasoNombre(null)}
-                  className="w-full py-1.5 text-xs text-gray-400 hover:text-gray-700 transition-colors font-medium"
+                  className="w-full py-1.5 text-xs text-tinta-400 hover:text-tinta-700 transition-colors font-medium"
                 >
                   ← Volver
                 </button>
@@ -536,7 +536,7 @@ export default function Cart({ config }) {
                 {/* Botón WhatsApp */}
                 <button
                   onClick={() => setPasoNombre('enviar')}
-                  className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition duration-200 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/25 active:scale-[.98]"
+                  className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition duration-200 bg-wa-500 hover:bg-wa-600 text-white shadow-lg shadow-wa-500/25 active:scale-[.98]"
                 >
                   <IconoWhatsApp />
                   Enviar pedido por WhatsApp
@@ -545,14 +545,14 @@ export default function Cart({ config }) {
                 {/* Botón copiar mensaje */}
                 <button
                   onClick={() => setPasoNombre('copiar')}
-                  className="w-full py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition duration-200 bg-gray-50 hover:bg-gray-100 text-gray-600 border border-gray-200 active:scale-[.98]"
+                  className="w-full py-2.5 rounded-xl text-sm font-medium flex items-center justify-center gap-2 transition duration-200 bg-tinta-50 hover:bg-tinta-100 text-tinta-600 border border-tinta-200 active:scale-[.98]"
                 >
                   <span>📋</span> Copiar texto del pedido
                 </button>
 
                 <button
                   onClick={clearCart}
-                  className="w-full py-1.5 text-xs text-gray-400 hover:text-red-500 transition-colors font-medium"
+                  className="w-full py-1.5 text-xs text-tinta-400 hover:text-red-500 transition-colors font-medium"
                 >
                   Vaciar carrito
                 </button>

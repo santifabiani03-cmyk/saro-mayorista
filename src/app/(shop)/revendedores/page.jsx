@@ -101,7 +101,7 @@ export default async function RevendedoresPage() {
           <div className="mt-9 flex flex-col sm:flex-row items-center justify-center gap-3">
             <a
               href="#sumate"
-              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white font-bold text-sm px-7 py-4 rounded-xl shadow-lg shadow-emerald-500/25 transition duration-200 btn-press"
+              className="w-full sm:w-auto inline-flex items-center justify-center gap-2 bg-wa-500 hover:bg-wa-600 text-white font-bold text-sm px-7 py-4 rounded-xl shadow-lg shadow-wa-500/25 transition duration-200 btn-press"
             >
               Quiero revender SARO
             </a>
@@ -122,12 +122,12 @@ export default async function RevendedoresPage() {
         </h2>
         <div className="mt-10 grid sm:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-5">
           {BENEFICIOS.map(b => (
-            <div key={b.titulo} className="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6">
+            <div key={b.titulo} className="bg-white rounded-2xl border border-tinta-100/80 shadow-card p-6">
               <div className="w-11 h-11 rounded-xl bg-saro-light text-saro-blue flex items-center justify-center">
                 <Icono d={b.icono} />
               </div>
               <h3 className="mt-4 font-bold text-saro-dark tracking-tight">{b.titulo}</h3>
-              <p className="mt-1.5 text-sm text-gray-500 leading-relaxed">{b.texto}</p>
+              <p className="mt-1.5 text-sm text-tinta-500 leading-relaxed">{b.texto}</p>
             </div>
           ))}
         </div>
@@ -135,7 +135,7 @@ export default async function RevendedoresPage() {
 
       {/* ── Vidriera (sin precios) ── */}
       {muestra.length > 0 && (
-        <section className="bg-white border-y border-gray-100/80">
+        <section className="bg-white border-y border-tinta-100/80">
           <div className="max-w-6xl mx-auto px-4 sm:px-6 py-16 sm:py-20">
             <div className="flex flex-col sm:flex-row sm:items-end sm:justify-between gap-3">
               <div>
@@ -150,7 +150,7 @@ export default async function RevendedoresPage() {
             </div>
             <ul className="mt-8 grid grid-cols-2 sm:grid-cols-4 gap-3 sm:gap-5">
               {muestra.map(p => (
-                <li key={p.id} className="rounded-2xl border border-gray-100/80 bg-gradient-to-br from-gray-50 to-gray-100/50 overflow-hidden">
+                <li key={p.id} className="rounded-2xl border border-tinta-100/80 bg-gradient-to-br from-tinta-50 to-tinta-100/50 overflow-hidden">
                   <div className="aspect-square">
                     <Foto
                       src={fotoDe(p)}
@@ -173,10 +173,10 @@ export default async function RevendedoresPage() {
 
       {/* ── Personalizados ── */}
       <section className="max-w-4xl mx-auto px-4 sm:px-6 pt-16 sm:pt-24">
-        <div className="rounded-3xl bg-gradient-to-br from-saro-light to-blue-50 border border-blue-100/60 p-8 sm:p-10">
+        <div className="rounded-3xl bg-gradient-to-br from-saro-light to-saro-light border border-saro-line/60 p-8 sm:p-10">
           <p className="text-[11px] font-bold uppercase tracking-[.28em] text-saro-blue mb-2">Para clubes y eventos</p>
           <h2 className="text-2xl sm:text-3xl font-extrabold text-saro-dark tracking-tight">Diseños personalizados</h2>
-          <p className="text-sm sm:text-base text-gray-600 mt-3 leading-relaxed">
+          <p className="text-sm sm:text-base text-tinta-600 mt-3 leading-relaxed">
             Hacemos <strong className="text-saro-dark font-semibold">ropa y paletas personalizadas</strong> con
             el diseño, los colores y la marca de tu club o evento. Lo coordinamos juntos por WhatsApp.
           </p>
@@ -190,12 +190,12 @@ export default async function RevendedoresPage() {
         </h2>
         <ol className="mt-10 grid sm:grid-cols-3 gap-4 sm:gap-5">
           {PASOS.map((p, i) => (
-            <li key={p.titulo} className="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6">
+            <li key={p.titulo} className="bg-white rounded-2xl border border-tinta-100/80 shadow-card p-6">
               <span className="w-9 h-9 rounded-full bg-saro-dark text-white text-sm font-bold flex items-center justify-center">
                 {i + 1}
               </span>
               <h3 className="mt-4 font-bold text-saro-dark tracking-tight">{p.titulo}</h3>
-              <p className="mt-1.5 text-sm text-gray-500 leading-relaxed">{p.texto}</p>
+              <p className="mt-1.5 text-sm text-tinta-500 leading-relaxed">{p.texto}</p>
             </li>
           ))}
         </ol>
@@ -203,7 +203,7 @@ export default async function RevendedoresPage() {
 
       {/* ── Formulario ── */}
       <section id="sumate" className="max-w-4xl mx-auto px-4 sm:px-6 pb-20 sm:pb-28 scroll-mt-24">
-        <div className="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6 sm:p-10">
+        <div className="bg-white rounded-2xl border border-tinta-100/80 shadow-card p-6 sm:p-10">
           <h2 className="text-2xl sm:text-3xl font-extrabold text-saro-dark tracking-tight text-center mb-2">
             Armemos el acuerdo
           </h2>

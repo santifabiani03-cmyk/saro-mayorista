@@ -32,10 +32,10 @@ const PROVINCIAS = {
 }
 
 const inputCls =
-  'w-full border border-gray-200 rounded-xl px-4 py-3 text-sm text-saro-dark placeholder:text-gray-400 focus:outline-none focus:border-saro-blue focus:ring-2 focus:ring-saro-blue/10 transition'
-const labelCls = 'block text-xs font-semibold text-gray-600 mb-1.5'
+  'w-full border border-tinta-200 rounded-xl px-4 py-3 text-sm text-saro-dark placeholder:text-tinta-400 focus:outline-none focus:border-saro-blue focus:ring-2 focus:ring-saro-blue/10 transition'
+const labelCls = 'block text-xs font-semibold text-tinta-600 mb-1.5'
 
-function Tab({ active, onClick, subtitle, title, accent }) {
+function Tab({ active, onClick, subtitle, title }) {
   return (
     <button
       type="button"
@@ -43,16 +43,16 @@ function Tab({ active, onClick, subtitle, title, accent }) {
       className={`w-full text-left rounded-2xl border p-5 sm:p-6 transition duration-200 ${
         active
           ? 'bg-white border-saro-blue/40 shadow-card-hover'
-          : 'bg-white border-gray-100/80 shadow-card hover:-translate-y-0.5 hover:shadow-card-hover'
+          : 'bg-white border-tinta-100/80 shadow-card hover:-translate-y-0.5 hover:shadow-card-hover'
       }`}
     >
       <div className="flex items-center justify-between gap-3">
         <div>
-          <p className={`text-[11px] font-bold uppercase tracking-[.28em] mb-1 ${accent}`}>{subtitle}</p>
           <h3 className="text-lg sm:text-xl font-extrabold text-saro-dark tracking-tight">{title}</h3>
+          {subtitle && <p className="text-sm text-tinta-500 mt-1">{subtitle}</p>}
         </div>
         <svg
-          className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${active ? 'rotate-180 text-saro-blue' : 'text-gray-400'}`}
+          className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${active ? 'rotate-180 text-saro-blue' : 'text-tinta-400'}`}
           viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
           strokeLinecap="round" strokeLinejoin="round"
         >
@@ -65,7 +65,7 @@ function Tab({ active, onClick, subtitle, title, accent }) {
 
 function Historia() {
   return (
-    <div className="grid md:grid-cols-2 gap-8 lg:gap-12 text-sm text-gray-500 leading-relaxed">
+    <div className="grid md:grid-cols-2 gap-8 lg:gap-12 text-sm text-tinta-500 leading-relaxed">
       <div className="space-y-3">
         <h4 className="text-base font-bold text-saro-dark">Nuestra historia</h4>
         <p>
@@ -82,7 +82,7 @@ function Historia() {
           crecimiento con presencia en torneos como forma de estar cerca de los jugadores y los clubes.
         </p>
       </div>
-      <div className="space-y-3 md:border-l md:border-gray-100/80 md:pl-8 lg:pl-12">
+      <div className="space-y-3 md:border-l md:border-tinta-100/80 md:pl-8 lg:pl-12">
         <h4 className="text-base font-bold text-saro-dark">Nuestra política</h4>
         <p>
           Aunque nacimos y crecimos de la mano del pádel, no nos definimos únicamente por ese deporte: nuestro objetivo
@@ -121,7 +121,7 @@ export function Formulario({ whatsappNumber }) {
 
   return (
     <div className="max-w-2xl mx-auto">
-      <p className="text-sm text-gray-500 leading-relaxed mb-5 text-center">
+      <p className="text-sm text-tinta-500 leading-relaxed mb-5 text-center">
         Si querés revender SARO o comprar por mayor, dejanos tus datos y te contactamos para armar un acuerdo.
       </p>
       <form onSubmit={enviar} className="space-y-4">
@@ -166,7 +166,7 @@ export function Formulario({ whatsappNumber }) {
         <button
           type="submit"
           disabled={!valid}
-          className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition duration-200 bg-emerald-500 hover:bg-emerald-600 text-white shadow-lg shadow-emerald-500/25 active:scale-[.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
+          className="w-full py-3.5 rounded-xl font-bold text-sm flex items-center justify-center gap-2 transition duration-200 bg-wa-500 hover:bg-wa-600 text-white shadow-lg shadow-wa-500/25 active:scale-[.98] disabled:opacity-50 disabled:cursor-not-allowed disabled:shadow-none"
         >
           <svg viewBox="0 0 24 24" fill="currentColor" className="w-5 h-5">
             <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347z" />
@@ -188,19 +188,19 @@ export default function HistoriaTrabaja({ whatsappNumber }) {
       <div className="max-w-5xl mx-auto px-4 sm:px-6">
         {/* Pestañas */}
         <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 sm:gap-4">
-          <Tab active={active === 'hist'} onClick={() => toggle('hist')} subtitle="La marca" title="Nuestra historia y política" accent="text-saro-blue" />
-          <Tab active={active === 'trab'} onClick={() => toggle('trab')} subtitle="¿Tenés un comercio?" title="Trabajá con nosotros" accent="text-saro-accent" />
+          <Tab active={active === 'hist'} onClick={() => toggle('hist')} title="Nuestra historia y política" />
+          <Tab active={active === 'trab'} onClick={() => toggle('trab')} subtitle="¿Tenés un comercio?" title="Trabajá con nosotros" />
         </div>
 
         {/* Panel: ocupa todo el ancho, se despliega debajo */}
         <div className={`grid transition duration-300 ease-in-out ${active ? 'grid-rows-[1fr] opacity-100 mt-3 sm:mt-4' : 'grid-rows-[0fr] opacity-0'}`}>
           <div className="overflow-hidden">
-            <div className="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6 sm:p-8 lg:p-10">
+            <div className="bg-white rounded-2xl border border-tinta-100/80 shadow-card p-6 sm:p-8 lg:p-10">
               {active === 'hist' && <Historia />}
               {active === 'trab' && (
                 <>
                   <Formulario whatsappNumber={whatsappNumber} />
-                  <p className="text-center text-xs text-gray-400 mt-4">
+                  <p className="text-center text-xs text-tinta-400 mt-4">
                     <a href="/revendedores" className="font-semibold text-saro-blue hover:text-saro-mid">
                       Conocé todo lo que ofrecemos a clubes y tiendas →
                     </a>

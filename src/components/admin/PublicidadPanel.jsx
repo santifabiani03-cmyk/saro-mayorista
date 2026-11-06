@@ -13,7 +13,7 @@ function Switch({ on, onClick, disabled, label }) {
       aria-label={label}
       onClick={onClick}
       disabled={disabled}
-      className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 disabled:opacity-50 ${on ? 'bg-saro-blue' : 'bg-gray-300'}`}
+      className={`relative w-11 h-6 rounded-full transition-colors flex-shrink-0 disabled:opacity-50 ${on ? 'bg-saro-blue' : 'bg-tinta-300'}`}
     >
       <span className={`absolute top-0.5 left-0.5 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${on ? 'translate-x-5' : ''}`} />
     </button>
@@ -23,7 +23,7 @@ function Switch({ on, onClick, disabled, label }) {
 function Thumb({ p }) {
   const src = p.imagenes?.[0] ?? p.imagen
   return (
-    <div className="w-12 h-12 rounded-lg bg-gray-100 overflow-hidden flex items-center justify-center flex-shrink-0">
+    <div className="w-12 h-12 rounded-lg bg-tinta-100 overflow-hidden flex items-center justify-center flex-shrink-0">
       {src ? <img src={src} alt="" className="w-full h-full object-cover" /> : <span className="text-xl">{p.emoji}</span>}
     </div>
   )
@@ -50,9 +50,9 @@ export default function PublicidadPanel({ products, onTogglePublicitar, onEdit, 
   return (
     <div className="max-w-4xl mx-auto space-y-5">
       {/* Link del feed */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm p-5 sm:p-6">
+      <div className="bg-white rounded-2xl border border-tinta-100 shadow-sm p-5 sm:p-6">
         <h2 className="text-lg font-extrabold text-saro-dark tracking-tight">📣 Productos en publicidad</h2>
-        <p className="text-sm text-gray-500 mt-1 leading-relaxed">
+        <p className="text-sm text-tinta-500 mt-1 leading-relaxed">
           Este link tiene tus productos listos para Meta (Instagram/Facebook) y Google. Se carga una sola vez
           en cada plataforma y se actualiza solo cada vez que tocás <strong>"Publicar en sitio"</strong>.
         </p>
@@ -69,17 +69,17 @@ export default function PublicidadPanel({ products, onTogglePublicitar, onEdit, 
         </div>
 
         <div className="grid grid-cols-3 gap-3 mt-5">
-          <div className="rounded-xl bg-emerald-50 border border-emerald-100 p-3 text-center">
-            <p className="text-2xl font-extrabold text-emerald-600">{dentro.length}</p>
-            <p className="text-[11px] font-semibold text-emerald-700">en los anuncios</p>
+          <div className="rounded-xl bg-wa-50 border border-wa-100 p-3 text-center">
+            <p className="text-2xl font-extrabold text-wa-600">{dentro.length}</p>
+            <p className="text-[11px] font-semibold text-wa-700">en los anuncios</p>
           </div>
           <div className="rounded-xl bg-amber-50 border border-amber-100 p-3 text-center">
             <p className="text-2xl font-extrabold text-amber-600">{conAvisos}</p>
             <p className="text-[11px] font-semibold text-amber-700">para mejorar</p>
           </div>
-          <div className="rounded-xl bg-gray-50 border border-gray-100 p-3 text-center">
-            <p className="text-2xl font-extrabold text-gray-500">{fuera.length}</p>
-            <p className="text-[11px] font-semibold text-gray-500">fuera</p>
+          <div className="rounded-xl bg-tinta-50 border border-tinta-100 p-3 text-center">
+            <p className="text-2xl font-extrabold text-tinta-500">{fuera.length}</p>
+            <p className="text-[11px] font-semibold text-tinta-500">fuera</p>
           </div>
         </div>
 
@@ -91,17 +91,17 @@ export default function PublicidadPanel({ products, onTogglePublicitar, onEdit, 
       </div>
 
       {/* En los anuncios */}
-      <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-        <div className="px-5 py-4 border-b border-gray-100">
+      <div className="bg-white rounded-2xl border border-tinta-100 shadow-sm overflow-hidden">
+        <div className="px-5 py-4 border-b border-tinta-100">
           <h3 className="font-bold text-saro-dark">En los anuncios ({dentro.length})</h3>
-          <p className="text-xs text-gray-400 mt-0.5">Así se ven el título y el precio en Meta y Google.</p>
+          <p className="text-xs text-tinta-400 mt-0.5">Así se ven el título y el precio en Meta y Google.</p>
         </div>
-        <ul className="divide-y divide-gray-50">
+        <ul className="divide-y divide-tinta-50">
           {dentro.map(({ producto: p, item, avisos }) => (
             <li key={p.id} className="px-5 py-3 flex items-center gap-3">
               <Thumb p={p} />
               <div className="flex-1 min-w-0">
-                <p className="text-sm font-semibold text-gray-900 truncate">{item.title}</p>
+                <p className="text-sm font-semibold text-tinta-900 truncate">{item.title}</p>
                 <p className="text-xs font-bold text-saro-blue">${Number(p.precioMinorista).toLocaleString('es-AR')}</p>
                 {avisos.map(a => (
                   <button key={a} onClick={() => onEdit(p)} className="block text-left text-[11px] text-amber-700 hover:underline">
@@ -113,27 +113,27 @@ export default function PublicidadPanel({ products, onTogglePublicitar, onEdit, 
             </li>
           ))}
           {dentro.length === 0 && (
-            <li className="px-5 py-8 text-center text-sm text-gray-400">Todavía no hay productos en los anuncios.</li>
+            <li className="px-5 py-8 text-center text-sm text-tinta-400">Todavía no hay productos en los anuncios.</li>
           )}
         </ul>
       </div>
 
       {/* Fuera */}
       {fuera.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 shadow-sm overflow-hidden">
-          <div className="px-5 py-4 border-b border-gray-100">
+        <div className="bg-white rounded-2xl border border-tinta-100 shadow-sm overflow-hidden">
+          <div className="px-5 py-4 border-b border-tinta-100">
             <h3 className="font-bold text-saro-dark">Fuera de los anuncios ({fuera.length})</h3>
-            <p className="text-xs text-gray-400 mt-0.5">
+            <p className="text-xs text-tinta-400 mt-0.5">
               Para sumar uno, tocá el motivo y corregilo (casi siempre es cargar el precio minorista).
             </p>
           </div>
-          <ul className="divide-y divide-gray-50">
+          <ul className="divide-y divide-tinta-50">
             {fuera.map(({ producto: p, motivo }) => (
               <li key={p.id} className={`px-5 py-3 flex items-center gap-3 ${p.visible === false ? 'opacity-60' : ''}`}>
                 <Thumb p={p} />
                 <div className="flex-1 min-w-0">
-                  <p className="text-sm font-semibold text-gray-700 truncate">{p.nombre}</p>
-                  <button onClick={() => onEdit(p)} className="text-left text-[11px] text-gray-500 hover:text-saro-blue hover:underline">
+                  <p className="text-sm font-semibold text-tinta-700 truncate">{p.nombre}</p>
+                  <button onClick={() => onEdit(p)} className="text-left text-[11px] text-tinta-500 hover:text-saro-blue hover:underline">
                     {motivo}
                   </button>
                 </div>

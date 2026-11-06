@@ -51,9 +51,9 @@ export default function CartSuggestions({ gap }) {
         {sugerencias.map(s => (
           <div
             key={s.product.id}
-            className="flex items-center gap-2.5 bg-white rounded-lg p-2 border border-gray-100/80"
+            className="flex items-center gap-2.5 bg-white rounded-lg p-2 border border-tinta-100/80"
           >
-            <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0 bg-gray-100 flex items-center justify-center">
+            <div className="w-9 h-9 rounded-lg overflow-hidden flex-shrink-0 bg-tinta-100 flex items-center justify-center">
               {s.product.imagenes?.[0]
                 ? <Foto
                     src={s.product.imagenes[0]}
@@ -67,10 +67,10 @@ export default function CartSuggestions({ gap }) {
             </div>
 
             <div className="flex-1 min-w-0">
-              <p className="text-xs font-semibold text-gray-900 truncate leading-tight">
+              <p className="text-xs font-semibold text-tinta-900 truncate leading-tight">
                 {s.product.nombre.trim()}
               </p>
-              <p className="text-[11px] text-gray-500 mt-0.5 tabular-nums">
+              <p className="text-[11px] text-tinta-500 mt-0.5 tabular-nums">
                 {s.qty}u · +${s.subtotal.toLocaleString('es-AR')}
               </p>
             </div>

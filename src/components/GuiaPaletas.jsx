@@ -43,11 +43,11 @@ export default function GuiaPaletas() {
 
   return (
     <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-8">
-      <div className="bg-white rounded-2xl border border-gray-100/80 shadow-card overflow-hidden">
+      <div className="bg-white rounded-2xl border border-tinta-100/80 shadow-card overflow-hidden">
         <button
           type="button"
           onClick={() => setOpen(o => !o)}
-          className="w-full flex items-center justify-between gap-4 p-5 sm:p-6 text-left hover:bg-gray-50/50 transition-colors"
+          className="w-full flex items-center justify-between gap-4 p-5 sm:p-6 text-left hover:bg-tinta-50/50 transition-colors"
         >
           <div>
             <p className="text-[11px] font-bold uppercase tracking-[.28em] text-saro-blue mb-1">
@@ -58,7 +58,7 @@ export default function GuiaPaletas() {
             </h2>
           </div>
           <svg
-            className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${open ? 'rotate-180 text-saro-blue' : 'text-gray-400'}`}
+            className={`w-5 h-5 flex-shrink-0 transition-transform duration-300 ${open ? 'rotate-180 text-saro-blue' : 'text-tinta-400'}`}
             viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
             strokeLinecap="round" strokeLinejoin="round"
           >
@@ -68,19 +68,19 @@ export default function GuiaPaletas() {
 
         <div className={`grid transition duration-300 ease-in-out ${open ? 'grid-rows-[1fr] opacity-100' : 'grid-rows-[0fr] opacity-0'}`}>
           <div className="overflow-hidden">
-            <div className="px-5 sm:px-6 pb-6 pt-5 border-t border-gray-100/80 space-y-8">
+            <div className="px-5 sm:px-6 pb-6 pt-5 border-t border-tinta-100/80 space-y-8">
 
               {/* Peso y perfil según nivel */}
               <div>
                 <h3 className="text-base font-bold text-saro-dark mb-1">Peso y perfil según tu nivel</h3>
-                <p className="text-sm text-gray-500 mb-4">
+                <p className="text-sm text-tinta-500 mb-4">
                   Si dudás entre dos niveles, elegí el más bajo: es más fácil progresar con una paleta que
                   dominás que pelear con una que te queda grande.
                 </p>
                 <div className="overflow-x-auto -mx-1">
                   <table className="w-full min-w-[520px] text-sm">
                     <thead>
-                      <tr className="text-left text-[11px] uppercase tracking-wider text-gray-400 border-b border-gray-100">
+                      <tr className="text-left text-[11px] uppercase tracking-wider text-tinta-400 border-b border-tinta-100">
                         <th className="py-2 px-2 font-semibold">Nivel</th>
                         <th className="py-2 px-2 font-semibold">Peso</th>
                         <th className="py-2 px-2 font-semibold">Forma</th>
@@ -88,9 +88,9 @@ export default function GuiaPaletas() {
                         <th className="py-2 px-2 font-semibold">Núcleo</th>
                       </tr>
                     </thead>
-                    <tbody className="text-gray-600">
+                    <tbody className="text-tinta-600">
                       {NIVELES.map(n => (
-                        <tr key={n.nivel} className="border-b border-gray-50 last:border-0">
+                        <tr key={n.nivel} className="border-b border-tinta-50 last:border-0">
                           <td className="py-2.5 px-2 font-semibold text-saro-dark whitespace-nowrap">{n.nivel}</td>
                           <td className="py-2.5 px-2 whitespace-nowrap font-medium text-saro-blue">{n.peso}</td>
                           <td className="py-2.5 px-2 whitespace-nowrap">{n.forma}</td>
@@ -108,7 +108,7 @@ export default function GuiaPaletas() {
                 <h3 className="text-base font-bold text-saro-dark mb-4">La forma define tu juego</h3>
                 <div className="grid sm:grid-cols-3 gap-4">
                   {FORMAS.map(f => (
-                    <div key={f.nombre} className="rounded-xl border border-gray-100 bg-[#FAFBFC] p-4">
+                    <div key={f.nombre} className="rounded-xl border border-tinta-100 bg-[#FAFBFC] p-4">
                       <span className="inline-flex items-center justify-center w-10 h-10 rounded-lg bg-saro-light text-saro-blue mb-3">
                         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.6" className="w-5 h-5">
                           {f.icon}
@@ -117,7 +117,7 @@ export default function GuiaPaletas() {
                       </span>
                       <h4 className="font-bold text-saro-dark text-sm">{f.nombre}</h4>
                       <p className="text-[11px] font-semibold text-saro-blue mt-0.5">{f.punto}</p>
-                      <p className="text-sm text-gray-500 mt-2 leading-relaxed">{f.para}</p>
+                      <p className="text-sm text-tinta-500 mt-2 leading-relaxed">{f.para}</p>
                     </div>
                   ))}
                 </div>
@@ -132,7 +132,7 @@ export default function GuiaPaletas() {
                       <span className="text-saro-blue mt-1.5 flex-shrink-0">
                         <svg viewBox="0 0 8 8" className="w-1.5 h-1.5" fill="currentColor"><circle cx="4" cy="4" r="4" /></svg>
                       </span>
-                      <p className="text-gray-500 leading-relaxed">
+                      <p className="text-tinta-500 leading-relaxed">
                         <strong className="text-saro-dark font-semibold">{m.t}:</strong> {m.d}
                       </p>
                     </div>
@@ -140,7 +140,7 @@ export default function GuiaPaletas() {
                 </div>
               </div>
 
-              <p className="text-xs text-gray-400 border-t border-gray-100/80 pt-4">
+              <p className="text-xs text-tinta-400 border-t border-tinta-100/80 pt-4">
                 ¿Seguís con dudas? Escribinos por WhatsApp y te ayudamos a elegir la paleta según tu nivel y tu juego.
               </p>
 

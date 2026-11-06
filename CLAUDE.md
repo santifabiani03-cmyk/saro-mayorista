@@ -5,7 +5,7 @@
 > chats viejos ni preguntar nada. Prioriza ser exhaustivo. Si algo cambia, actualizá este
 > archivo y `docs/ESTETICA.md`.
 
-Última actualización: 2026-10-23.
+Última actualización: 2026-11-06.
 
 > ⚠️ **Cambio importante (agosto 2026): el sitio pasó de MAYORISTA a MINORISTA.**
 > La tienda principal es minorista (`/paletas` y `/ropa-y-accesorios`, precio `precioMinorista`).
@@ -343,22 +343,29 @@ Definidos en `tailwind.config.js` bajo el nombre `saro`. Se usan como clases Tai
 
 | Nombre | Hex | Uso principal |
 |---|---|---|
-| `saro-blue` | **#2563EB** | Azul de marca. Acentos, links, precios, botones primarios, "SARO" |
-| `saro-mid` | **#1E40AF** | Azul medio. Hover del azul, degradés |
-| `saro-dark` | **#0F172A** | Navy casi negro. Textos fuertes, fondo del intro/hero, botón carrito |
-| `saro-light`| **#EFF6FF** | Celeste muy claro. Fondos de badges/chips suaves |
-| `saro-accent`| **#F59E0B** | Ámbar. Detalle/acento (badge del carrito, eyebrow del hero) |
+| `saro-blue` | **#1F5FE0** | Azul de marca. Acentos, links, precios, botones primarios, "SARO" |
+| `saro-mid` | **#1B3E9E** | Azul medio. Hover del azul, degradés |
+| `saro-dark` | **#0D1628** | Navy casi negro. Textos fuertes, fondo del intro/hero, botón carrito |
+| `saro-light`| **#EEF4FE** | Celeste muy claro. Fondos de badges/chips suaves |
+| `saro-accent`| **#F2A516** | Ámbar. Detalle/acento (badge del carrito, eyebrow del hero) |
 
-Otros que aparecen mucho: **verde WhatsApp** = `emerald-500 / green-500` (botones de WhatsApp),
-grises `gray-100/400/500` para textos secundarios y bordes, fondo de página **`#FAFBFC`** (casi
-blanco). Nota: el **celeste del logo** (imágenes PNG) es un tono más claro (~`#7EA8E8`), no es
-el `saro-blue`. ⚠️ El `manifest.json` tiene un `theme_color` viejo `#4A90D9` (color previo al
-rediseño) — es legacy; el azul de marca actual es `#2563EB`.
+Otros: **verde WhatsApp** = `wa-500` (#13874D, hover `wa-600`) y **grises `tinta-*`** (neutros
+teñidos de navy, misma luminosidad que los de fábrica) para textos secundarios y bordes. Desde el
+06/11/2026 **no se usan colores de fábrica de Tailwind** (`gray`, `slate`, `emerald`…): todo está
+en `tailwind.config.js`. Fondo de página **`#FAFBFC`** (casi blanco). Nota: el **celeste del
+logo** (imágenes PNG) es un tono más claro (~`#7EA8E8`), no es el `saro-blue`. El
+`theme_color` de `manifest.json` es `#1F5FE0`.
+
+**Lo que se sacó a propósito (06/11/2026, análisis de "web hecha con IA"):** etiquetas chicas en
+mayúsculas arriba de los títulos, manchas difuminadas de fondo, partículas, la fila de 3 pasos
+numerados ("Cómo comprar" ahora muestra el mensaje real de WhatsApp, `MensajePedido.jsx`) y el
+"aparecer al scrollear" de cada bloque (en la portada sólo se animan los contadores). No volver a
+ponerlos.
 
 ### 3.2 Tipografía
 
-- **Única fuente: Inter** (Google Fonts), pesos 400, 500, 600, 700, 800. Cargada en
-  `layout.jsx` y aplicada global en `globals.css`.
+- **Títulos: Archivo** (h1, h2, h3 y `font-display`; h1/h2 ensanchados con `wdth` 112). **Texto: Inter**
+  (400–800). Las dos con `next/font` en `layout.jsx`; la regla de títulos está en `globals.css`.
 - Jerarquía típica: títulos `font-extrabold` (800) con `tracking-tight`; subtítulos `font-bold`
   (700); cuerpo `font-medium`/`normal`; textos chicos `text-xs`/`text-[11px]` en gris.
 - El hero usa tamaños grandes: `text-4xl sm:text-6xl` en el titular.

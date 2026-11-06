@@ -4,6 +4,11 @@
 
 * { font-family: var(--font-inter), 'Inter', system-ui, -apple-system, sans-serif; box-sizing: border-box; }
 
+/* Títulos en Archivo (ver layout.jsx). h1/h2 ensanchados: le dan el aire de
+   marca deportiva; h3 queda en ancho normal porque va en tarjetas angostas. */
+h1, h2, h3, .font-display { font-family: var(--font-titulo), 'Archivo', system-ui, sans-serif; }
+h1, h2, .font-display { font-variation-settings: 'wdth' 112; letter-spacing: -0.015em; }
+
 body { margin: 0; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
 
 /* Navegación por teclado
@@ -11,7 +16,7 @@ body { margin: 0; -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: 
    estaba parado. Se usa :focus-visible para que el anillo aparezca al usar el
    teclado y no al hacer clic con el mouse. El azul es el de la marca. */
 :focus-visible {
-  outline: 2px solid #2563EB;
+  outline: 2px solid #1F5FE0;
   outline-offset: 2px;
   border-radius: 4px;
 }
@@ -35,7 +40,7 @@ html { scroll-behavior: smooth; }
   left: 1rem;
   top: 1rem;
   padding: 0.75rem 1.25rem;
-  background: #0F172A;
+  background: #0D1628;
   color: #fff;
   border-radius: 0.75rem;
   font-weight: 600;
@@ -69,17 +74,6 @@ html { scroll-behavior: smooth; }
 .btn-press:active { transform: scale(.97); }
 
 /* ── Intro cinematográfica ─────────────────────────── */
-@keyframes glowPulse {
-  0%, 100% { opacity: .5;  transform: translate(0, 0) scale(1); }
-  50%      { opacity: .85; transform: translate(3%, -5%) scale(1.12); }
-}
-@keyframes glowPulse2 {
-  0%, 100% { opacity: .35; transform: translate(0, 0) scale(1); }
-  50%      { opacity: .65; transform: translate(-4%, 5%) scale(1.15); }
-}
-.intro-glow  { animation: glowPulse 9s ease-in-out infinite; }
-.intro-glow2 { animation: glowPulse2 12s ease-in-out infinite; }
-
 /* Flotación idle de la paleta (independiente del scroll) */
 @keyframes floaty {
   0%, 100% { transform: translateY(0) rotate(0deg); }
@@ -87,22 +81,12 @@ html { scroll-behavior: smooth; }
 }
 .intro-floaty { animation: floaty 6s ease-in-out infinite; }
 
-/* Partículas ambientales */
-@keyframes drift {
-  0%   { transform: translateY(0) translateX(0); opacity: 0; }
-  10%  { opacity: .6; }
-  90%  { opacity: .6; }
-  100% { transform: translateY(-120px) translateX(20px); opacity: 0; }
-}
-.intro-particle { animation: drift linear infinite; }
-
 @keyframes introRise {
   from { opacity: 0; transform: translateY(20px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 .intro-rise   { animation: introRise .8s cubic-bezier(.16,1,.3,1) both; }
-.intro-rise-1 { animation-delay: .1s; }
-.intro-rise-2 { animation-delay: .25s; }
+.intro-rise   { animation-delay: .1s; }
 
 @keyframes bob {
   0%, 100% { transform: translateY(0); }
@@ -117,21 +101,10 @@ html { scroll-behavior: smooth; }
 }
 .card-in { animation: cardIn .5s cubic-bezier(.16,1,.3,1) both; }
 
-/* ── Reveals de scroll de la landing (IntersectionObserver) ── */
-.reveal {
-  opacity: 0;
-  transform: translateY(24px);
-  transition: opacity .7s cubic-bezier(.16,1,.3,1), transform .7s cubic-bezier(.16,1,.3,1);
-  will-change: opacity, transform;
-}
-.reveal.in { opacity: 1; transform: none; }
-
 @media (prefers-reduced-motion: reduce) {
-  .intro-glow, .intro-glow2, .intro-floaty, .intro-particle,
-  .intro-rise, .intro-rise-1, .intro-rise-2, .intro-bob, .card-in {
+  .intro-floaty, .intro-rise, .intro-bob, .card-in {
     animation: none !important;
   }
-  .reveal { opacity: 1; transform: none; transition: none; }
 }
 
 /* ── Logo con trazo (LogoTrazo.jsx / LogoSello.jsx) ──
@@ -139,7 +112,7 @@ html { scroll-behavior: smooth; }
    completa sin importar el tamaño. --i es el número de pieza: escalona el
    arranque para que el logo se dibuje de izquierda a derecha. */
 .logo-trazo .logo-linea {
-  stroke: #2563EB;
+  stroke: #1F5FE0;
   stroke-dasharray: 1;
   stroke-dashoffset: 1;
   stroke-linejoin: round;

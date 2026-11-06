@@ -54,15 +54,15 @@ export default function HowToBuyModal({ onClose }) {
         <div className="bg-white rounded-2xl shadow-float w-full max-w-md max-h-[90vh] overflow-y-auto">
 
           {/* Header del modal */}
-          <div className="sticky top-0 bg-white rounded-t-2xl px-6 pt-6 pb-4 border-b border-gray-100/80">
+          <div className="sticky top-0 bg-white rounded-t-2xl px-6 pt-6 pb-4 border-b border-tinta-100/80">
             <div className="flex items-center justify-between">
               <div>
                 <h2 className="text-xl font-extrabold text-saro-dark tracking-tight">¿Cómo comprar?</h2>
-                <p className="text-sm text-gray-400 mt-0.5">Seguí estos pasos y tu pedido llega rápido</p>
+                <p className="text-sm text-tinta-400 mt-0.5">Seguí estos pasos y tu pedido llega rápido</p>
               </div>
               <button
                 onClick={onClose}
-                className="text-gray-400 hover:text-gray-700 hover:bg-gray-100 rounded-xl p-1.5 text-xl leading-none transition-colors"
+                className="text-tinta-400 hover:text-tinta-700 hover:bg-tinta-100 rounded-xl p-1.5 text-xl leading-none transition-colors"
               >
                 ✕
               </button>
@@ -85,9 +85,9 @@ export default function HowToBuyModal({ onClose }) {
                 <div className="pb-5 min-w-0">
                   <div className="flex items-center gap-2 mb-1">
                     <span className="text-lg">{step.icon}</span>
-                    <p className="font-bold text-gray-900 text-sm">{step.title}</p>
+                    <p className="font-bold text-tinta-900 text-sm">{step.title}</p>
                   </div>
-                  <p className="text-sm text-gray-500 leading-relaxed">{step.desc}</p>
+                  <p className="text-sm text-tinta-500 leading-relaxed">{step.desc}</p>
                 </div>
               </div>
             ))}
@@ -95,7 +95,7 @@ export default function HowToBuyModal({ onClose }) {
 
           {/* Footer */}
           <div className="px-6 pb-6">
-            <div className="bg-saro-light rounded-xl px-4 py-3 text-center border border-blue-100/40">
+            <div className="bg-saro-light rounded-xl px-4 py-3 text-center border border-saro-line/40">
               <p className="text-sm text-saro-dark font-medium">
                 ¿Tenés alguna duda? Escribinos directo por WhatsApp
               </p>

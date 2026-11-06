@@ -580,7 +580,7 @@ async function uploadFile(file, productName) {
 
 function Label({ children, required }) {
   return (
-    <label className="block text-xs font-semibold text-gray-500 uppercase tracking-wider mb-1.5">
+    <label className="block text-xs font-semibold text-tinta-500 uppercase tracking-wider mb-1.5">
       {children}{required && <span className="text-red-400 ml-0.5">*</span>}
     </label>
   )
@@ -601,7 +601,7 @@ function RadioGroup({ options, value, onChange }) {
           className={`px-3 py-1.5 rounded-full text-sm font-medium border transition ${
             value === val
               ? 'bg-saro-blue border-saro-blue text-white'
-              : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue'
+              : 'bg-white border-tinta-200 text-tinta-600 hover:border-saro-blue'
           }`}
         >
           {label}
@@ -718,7 +718,7 @@ function MultiImageUploader({ images, onChange, productName, applyLogo, encuadra
             onDragOver={e => onThumbDragOver(e, i)}
             onDrop={e => onThumbDrop(e, i)}
             onDragEnd={onThumbDragEnd}
-            className={`relative aspect-square rounded-xl overflow-hidden bg-gray-100 group transition
+            className={`relative aspect-square rounded-xl overflow-hidden bg-tinta-100 group transition
               ${dragIdx === i ? 'opacity-40 scale-95' : ''}
               ${overIdx === i && dragIdx !== null && dragIdx !== i ? 'ring-2 ring-saro-blue ring-offset-1' : ''}
               ${dragIdx !== null ? 'cursor-grabbing' : 'cursor-grab'}`}
@@ -772,7 +772,7 @@ function MultiImageUploader({ images, onChange, productName, applyLogo, encuadra
 
         {/* Placeholders de carga */}
         {Array.from({ length: pending }).map((_, i) => (
-          <div key={`loading-${i}`} className="aspect-square rounded-xl bg-gray-100 flex items-center justify-center">
+          <div key={`loading-${i}`} className="aspect-square rounded-xl bg-tinta-100 flex items-center justify-center">
             <span className="text-2xl animate-pulse">⏳</span>
           </div>
         ))}
@@ -781,7 +781,7 @@ function MultiImageUploader({ images, onChange, productName, applyLogo, encuadra
         <button
           type="button"
           onClick={() => inputRef.current.click()}
-          className="aspect-square rounded-xl border-2 border-dashed border-gray-200 hover:border-saro-blue hover:bg-saro-light text-gray-400 hover:text-saro-blue transition flex flex-col items-center justify-center gap-1 select-none"
+          className="aspect-square rounded-xl border-2 border-dashed border-tinta-200 hover:border-saro-blue hover:bg-saro-light text-tinta-400 hover:text-saro-blue transition flex flex-col items-center justify-center gap-1 select-none"
         >
           <span className="text-2xl leading-none">+</span>
           <span className="text-xs font-medium">Agregar</span>
@@ -789,12 +789,12 @@ function MultiImageUploader({ images, onChange, productName, applyLogo, encuadra
       </div>
 
       {images.length === 0 && pending === 0 && (
-        <p className="text-xs text-gray-400 text-center mt-2">
+        <p className="text-xs text-tinta-400 text-center mt-2">
           Clic en + o arrastrá imágenes aquí · JPG, PNG, WEBP
         </p>
       )}
       {images.length > 1 && (
-        <p className="text-[10px] text-gray-400 text-center mt-1">
+        <p className="text-[10px] text-tinta-400 text-center mt-1">
           Arrastrá para reordenar · La primera imagen es la principal del catálogo
         </p>
       )}
@@ -955,8 +955,8 @@ function AiSceneSection({ images, onChange, productName }) {
                     : 'border-violet-100 bg-white/60 hover:border-violet-300'
                 }`}
               >
-                <span className="text-sm">{s.icon} <span className="font-semibold text-xs text-gray-800">{s.label}</span></span>
-                <span className="text-[10px] text-gray-400 leading-tight">{s.desc}</span>
+                <span className="text-sm">{s.icon} <span className="font-semibold text-xs text-tinta-800">{s.label}</span></span>
+                <span className="text-[10px] text-tinta-400 leading-tight">{s.desc}</span>
               </button>
             ))}
           </div>
@@ -982,7 +982,7 @@ function AiSceneSection({ images, onChange, productName }) {
                   <img src={r.dataUrl} alt="Imagen generada por IA" className="w-full aspect-square object-cover" />
                   <div className="p-1.5">
                     {r.added ? (
-                      <p className="text-center text-[11px] font-semibold text-green-600 py-1">✅ Agregada</p>
+                      <p className="text-center text-[11px] font-semibold text-wa-600 py-1">✅ Agregada</p>
                     ) : (
                       <button
                         type="button"
@@ -1265,7 +1265,7 @@ function ColorPicker({ selected, onChange }) {
               className={`flex items-center gap-1.5 px-2.5 py-1 rounded-full text-xs font-medium border transition ${
                 active
                   ? 'border-saro-blue bg-saro-light text-saro-dark ring-2 ring-saro-blue/20'
-                  : 'border-gray-200 text-gray-600 hover:border-gray-400'
+                  : 'border-tinta-200 text-tinta-600 hover:border-tinta-400'
               }`}
             >
               <span className="w-3 h-3 rounded-full border border-white shadow-sm flex-shrink-0"
@@ -1284,7 +1284,7 @@ function ColorPicker({ selected, onChange }) {
             type="text" aria-label="Nombre del color personalizado" placeholder="Color personalizado…"
             value={customName} onChange={e => setCustomName(e.target.value)}
             onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addCustom())}
-            className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-saro-blue"
+            className="flex-1 text-sm border border-tinta-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-saro-blue"
           />
           <button
             type="button" onClick={addCustom} disabled={!customName.trim()}
@@ -1296,8 +1296,8 @@ function ColorPicker({ selected, onChange }) {
 
         {/* Mini-paleta para elegir el color del círculo (aparece al escribir nombre) */}
         {customName.trim() && (
-          <div className="bg-gray-50 rounded-xl p-3 space-y-2 border border-gray-100">
-            <p className="text-xs text-gray-500">Elegí 1 o 2 colores para el círculo de <strong>"{customName.trim()}"</strong>:</p>
+          <div className="bg-tinta-50 rounded-xl p-3 space-y-2 border border-tinta-100">
+            <p className="text-xs text-tinta-500">Elegí 1 o 2 colores para el círculo de <strong>"{customName.trim()}"</strong>:</p>
             <div className="flex flex-wrap gap-1.5">
               {baseColors.map(c => {
                 const picked = customBasePick.includes(c)
@@ -1307,7 +1307,7 @@ function ColorPicker({ selected, onChange }) {
                     className={`w-6 h-6 rounded-full border-2 transition ${
                       picked
                         ? 'border-saro-blue ring-2 ring-saro-blue/30 scale-110'
-                        : 'border-gray-200 hover:border-gray-400'
+                        : 'border-tinta-200 hover:border-tinta-400'
                     }`}
                     style={{ backgroundColor: COLOR_MAP[c] ?? '#e5e7eb' }}
                   />
@@ -1316,13 +1316,13 @@ function ColorPicker({ selected, onChange }) {
             </div>
             {customBasePick.length > 0 && (
               <div className="flex items-center gap-2 pt-1">
-                <span className="text-xs text-gray-400">Preview:</span>
-                <span className="w-5 h-5 rounded-full border border-gray-300"
+                <span className="text-xs text-tinta-400">Preview:</span>
+                <span className="w-5 h-5 rounded-full border border-tinta-300"
                   style={customBasePick.length === 2
                     ? { background: `linear-gradient(135deg, ${COLOR_MAP[customBasePick[0]]} 50%, ${COLOR_MAP[customBasePick[1]]} 50%)` }
                     : { backgroundColor: COLOR_MAP[customBasePick[0]] ?? '#e5e7eb' }
                   } />
-                <span className="text-xs font-medium text-gray-700">{customName.trim()}</span>
+                <span className="text-xs font-medium text-tinta-700">{customName.trim()}</span>
               </div>
             )}
           </div>
@@ -1331,30 +1331,30 @@ function ColorPicker({ selected, onChange }) {
 
       {/* ── Lista de colores personalizados ── */}
       {customList.length > 0 && (
-        <div className="border border-gray-100 rounded-xl overflow-hidden">
-          <div className="bg-gray-50 px-3 py-1.5 border-b border-gray-100">
-            <p className="text-xs font-semibold text-gray-400 uppercase tracking-wider">
+        <div className="border border-tinta-100 rounded-xl overflow-hidden">
+          <div className="bg-tinta-50 px-3 py-1.5 border-b border-tinta-100">
+            <p className="text-xs font-semibold text-tinta-400 uppercase tracking-wider">
               Colores personalizados
             </p>
           </div>
-          <div className="divide-y divide-gray-50">
+          <div className="divide-y divide-tinta-50">
             {customList.map(c => {
               const checked  = selected.includes(c)
               const isPinned = pinned.includes(c)
               return (
-                <div key={c} className={`flex items-center gap-2 px-3 py-2 transition-colors ${checked ? 'bg-white' : 'bg-gray-50/50 opacity-60'}`}>
+                <div key={c} className={`flex items-center gap-2 px-3 py-2 transition-colors ${checked ? 'bg-white' : 'bg-tinta-50/50 opacity-60'}`}>
                   {/* Checkbox */}
                   <button type="button" onClick={() => toggleCheck(c)}
                     title={checked ? 'Quitar del producto' : 'Incluir en producto'}
                     className={`w-5 h-5 rounded-md border-2 flex items-center justify-center text-xs font-bold transition flex-shrink-0 ${
-                      checked ? 'bg-saro-blue border-saro-blue text-white' : 'bg-white border-gray-300 text-transparent hover:border-saro-blue'
+                      checked ? 'bg-saro-blue border-saro-blue text-white' : 'bg-white border-tinta-300 text-transparent hover:border-saro-blue'
                     }`}
                   >✓</button>
 
                   {/* Swatch + nombre */}
-                  <span className="w-4 h-4 rounded-full border border-gray-200 flex-shrink-0"
+                  <span className="w-4 h-4 rounded-full border border-tinta-200 flex-shrink-0"
                     style={getCustomSwatch(c)} />
-                  <span className={`text-sm flex-1 ${checked ? 'text-gray-800 font-medium' : 'text-gray-400'}`}>{c}</span>
+                  <span className={`text-sm flex-1 ${checked ? 'text-tinta-800 font-medium' : 'text-tinta-400'}`}>{c}</span>
 
                   {/* Pin con indicador visual */}
                   <button type="button" onClick={() => togglePin(c)}
@@ -1362,7 +1362,7 @@ function ColorPicker({ selected, onChange }) {
                     className={`px-1.5 py-0.5 rounded-md text-xs font-medium transition flex items-center gap-1 ${
                       isPinned
                         ? 'bg-amber-100 text-amber-600 border border-amber-200'
-                        : 'text-gray-300 hover:text-amber-400 hover:bg-gray-100 border border-transparent'
+                        : 'text-tinta-300 hover:text-amber-400 hover:bg-tinta-100 border border-transparent'
                     }`}
                   >
                     📌{isPinned && <span>Fijo</span>}
@@ -1371,7 +1371,7 @@ function ColorPicker({ selected, onChange }) {
                   {/* Eliminar */}
                   <button type="button" onClick={() => removeColor(c)}
                     title="Eliminar color"
-                    className="p-1 rounded-md text-gray-300 hover:text-red-500 hover:bg-red-50 transition-colors text-sm"
+                    className="p-1 rounded-md text-tinta-300 hover:text-red-500 hover:bg-red-50 transition-colors text-sm"
                   >✕</button>
                 </div>
               )
@@ -1382,7 +1382,7 @@ function ColorPicker({ selected, onChange }) {
 
       {/* Resumen */}
       {selected.length > 0 && (
-        <p className="text-xs text-gray-500">
+        <p className="text-xs text-tinta-500">
           Seleccionados: <strong>{selected.join(', ')}</strong>
         </p>
       )}
@@ -1417,7 +1417,7 @@ function TallePicker({ selected, onChange }) {
             className={`px-3 py-1 rounded-lg text-sm font-medium border transition ${
               selected.includes(t)
                 ? 'bg-saro-blue border-saro-blue text-white'
-                : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue'
+                : 'bg-white border-tinta-200 text-tinta-600 hover:border-saro-blue'
             }`}
           >
             {t}
@@ -1432,12 +1432,12 @@ function TallePicker({ selected, onChange }) {
           value={custom}
           onChange={e => setCustom(e.target.value)}
           onKeyDown={e => e.key === 'Enter' && (e.preventDefault(), addCustom())}
-          className="flex-1 text-sm border border-gray-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-saro-blue"
+          className="flex-1 text-sm border border-tinta-200 rounded-lg px-3 py-1.5 focus:outline-none focus:border-saro-blue"
         />
         <button
           type="button"
           onClick={addCustom}
-          className="px-3 py-1.5 text-sm bg-gray-100 hover:bg-saro-light text-gray-700 rounded-lg font-medium"
+          className="px-3 py-1.5 text-sm bg-tinta-100 hover:bg-saro-light text-tinta-700 rounded-lg font-medium"
         >
           + Agregar
         </button>
@@ -1462,26 +1462,26 @@ function NoStockMatrix({ colores, talles, noStock, onChange }) {
   }
 
   return (
-    <div className="overflow-x-auto rounded-xl border border-gray-100">
+    <div className="overflow-x-auto rounded-xl border border-tinta-100">
       <table className="text-sm w-full min-w-max">
-        <thead className="bg-gray-50">
+        <thead className="bg-tinta-50">
           <tr>
-            <th className="text-left px-3 py-2 text-gray-500 font-medium text-xs">Color \ Talle</th>
+            <th className="text-left px-3 py-2 text-tinta-500 font-medium text-xs">Color \ Talle</th>
             {talles.map(t => (
-              <th key={t} className="px-3 py-2 text-center text-gray-500 font-medium text-xs">{t}</th>
+              <th key={t} className="px-3 py-2 text-center text-tinta-500 font-medium text-xs">{t}</th>
             ))}
           </tr>
         </thead>
         <tbody>
           {colores.map((color, ci) => (
-            <tr key={color} className={ci % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'}>
+            <tr key={color} className={ci % 2 === 0 ? 'bg-white' : 'bg-tinta-50/40'}>
               <td className="px-3 py-2">
                 <div className="flex items-center gap-1.5">
                   <span
-                    className="w-3 h-3 rounded-full border border-gray-200"
+                    className="w-3 h-3 rounded-full border border-tinta-200"
                     style={getSwatchStyle(color)}
                   />
-                  <span className="text-xs text-gray-700">{color}</span>
+                  <span className="text-xs text-tinta-700">{color}</span>
                 </div>
               </td>
               {talles.map(talle => (
@@ -1492,7 +1492,7 @@ function NoStockMatrix({ colores, talles, noStock, onChange }) {
                     className={`w-6 h-6 rounded-md border text-xs font-bold transition ${
                       isOut(color, talle)
                         ? 'bg-red-500 border-red-500 text-white'
-                        : 'bg-white border-gray-200 text-gray-300 hover:border-red-300'
+                        : 'bg-white border-tinta-200 text-tinta-300 hover:border-red-300'
                     }`}
                     title={isOut(color, talle) ? 'Sin stock' : 'Con stock'}
                   >
@@ -1532,7 +1532,7 @@ function PromoEditor({ promos, onChange, precioBase }) {
   return (
     <div className="space-y-3">
       {sorted.length === 0 ? (
-        <p className="text-xs text-gray-400">Sin promos. Agregá descuentos por cantidad para este producto.</p>
+        <p className="text-xs text-tinta-400">Sin promos. Agregá descuentos por cantidad para este producto.</p>
       ) : (
         <div className="space-y-2">
           {sorted.map(p => {
@@ -1542,34 +1542,34 @@ function PromoEditor({ promos, onChange, precioBase }) {
             const base  = Number(precioBase) || 0
             const ahorro = base > 0 && ppu > 0 ? Math.round((1 - ppu / base) * 100) : 0
             return (
-              <div key={p._idx} className="flex items-center gap-2 bg-gray-50 rounded-xl p-2.5">
+              <div key={p._idx} className="flex items-center gap-2 bg-tinta-50 rounded-xl p-2.5">
                 <div className="flex items-center gap-1.5 flex-1">
                   <input
                     type="number" min="1" aria-label="Cantidad de la promoción" placeholder="Cant."
                     value={p.cantidad}
                     onChange={e => updatePromo(p._idx, 'cantidad', e.target.value)}
-                    className="w-20 text-sm border border-gray-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-saro-blue text-center"
+                    className="w-20 text-sm border border-tinta-200 rounded-lg px-2 py-1.5 focus:outline-none focus:border-saro-blue text-center"
                   />
-                  <span className="text-xs text-gray-400">u. ×</span>
+                  <span className="text-xs text-tinta-400">u. ×</span>
                   <div className="relative flex-1">
-                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-gray-400">$</span>
+                    <span className="absolute left-2 top-1/2 -translate-y-1/2 text-xs text-tinta-400">$</span>
                     <input
                       type="number" min="0" aria-label="Precio total de la promoción" placeholder="Precio total"
                       value={p.precioTotal}
                       onChange={e => updatePromo(p._idx, 'precioTotal', e.target.value)}
-                      className="w-full text-sm border border-gray-200 rounded-lg pl-5 pr-2 py-1.5 focus:outline-none focus:border-saro-blue"
+                      className="w-full text-sm border border-tinta-200 rounded-lg pl-5 pr-2 py-1.5 focus:outline-none focus:border-saro-blue"
                     />
                   </div>
                 </div>
                 {ppu > 0 && (
-                  <span className="text-xs text-gray-500 whitespace-nowrap">
+                  <span className="text-xs text-tinta-500 whitespace-nowrap">
                     ${Math.round(ppu).toLocaleString('es-AR')}/u
-                    {ahorro > 0 && <span className="text-green-600 font-bold ml-1">-{ahorro}%</span>}
+                    {ahorro > 0 && <span className="text-wa-600 font-bold ml-1">-{ahorro}%</span>}
                   </span>
                 )}
                 <button
                   type="button" onClick={() => removePromo(p._idx)}
-                  className="p-1 text-gray-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
+                  className="p-1 text-tinta-300 hover:text-red-500 hover:bg-red-50 rounded-md transition-colors"
                 >✕</button>
               </div>
             )
@@ -1676,10 +1676,10 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     <form onSubmit={handleSubmit} className="space-y-8">
       {/* Título del form */}
       <div>
-        <h2 className="text-xl font-bold text-gray-900">
+        <h2 className="text-xl font-bold text-tinta-900">
           {initial ? `Editando: ${initial.nombre}` : 'Nuevo producto'}
         </h2>
-        <p className="text-sm text-gray-500 mt-0.5">
+        <p className="text-sm text-tinta-500 mt-0.5">
           Completá el formulario y guardá. Usá "Publicar en sitio" para que los cambios sean visibles.
         </p>
       </div>
@@ -1693,24 +1693,24 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
             <div className="flex items-center gap-2 mb-1.5">
               <Label>Imágenes del producto</Label>
               <div className="relative group">
-                <span className="w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-[10px] font-bold flex items-center justify-center cursor-help select-none">i</span>
-                <div className="absolute top-0 left-full ml-2 w-72 bg-gray-900 text-white text-[11px] leading-relaxed rounded-xl px-3 py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition z-50 pointer-events-none">
+                <span className="w-4 h-4 rounded-full bg-tinta-200 text-tinta-500 text-[10px] font-bold flex items-center justify-center cursor-help select-none">i</span>
+                <div className="absolute top-0 left-full ml-2 w-72 bg-tinta-900 text-white text-[11px] leading-relaxed rounded-xl px-3 py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition z-50 pointer-events-none">
                   <p className="font-semibold mb-1.5">Imágenes del producto</p>
                   <p>• Subí una o más fotos (JPG, PNG, WEBP). La primera es la imagen principal que se muestra en el catálogo.</p>
                   <p className="mt-1">• Arrastrá para reordenar o hacé clic en + para agregar más.</p>
-                  <hr className="border-gray-700 my-1.5" />
+                  <hr className="border-tinta-700 my-1.5" />
                   <p className="font-semibold mb-1">🪄 Herramienta de fondo</p>
                   <p>• Seleccioná imágenes y quitá el fondo con IA. Podés elegir fondo gris degradado o blanco puro.</p>
                   <p className="mt-1">• Corre 100% en tu navegador, es gratis y sin límites. La primera vez descarga el modelo (~30MB, queda cacheado).</p>
-                  <hr className="border-gray-700 my-1.5" />
+                  <hr className="border-tinta-700 my-1.5" />
                   <p className="font-semibold mb-1">SR Logo</p>
                   <p>• Si está activado el checkbox, al subir cada imagen se aplica automáticamente el logo SR (marca de agua sutil) en la esquina superior derecha.</p>
                   <p className="mt-1">• También se re-aplica después de quitar el fondo con IA.</p>
-                  <hr className="border-gray-700 my-1.5" />
+                  <hr className="border-tinta-700 my-1.5" />
                   <p className="font-semibold mb-1">🏓 Fotos de paletas</p>
                   <p>• Si la categoría es Paleta, cada foto se encuadra sola: fondo blanco, formato vertical y aire a los costados, para que no se corte en el catálogo. Elegí la categoría antes de subir.</p>
                   <p className="mt-1">• Las fotos de primer plano o con fondo con textura se suben como vienen.</p>
-                  <div className="absolute top-3 -left-1 w-2 h-2 bg-gray-900 rotate-45"></div>
+                  <div className="absolute top-3 -left-1 w-2 h-2 bg-tinta-900 rotate-45"></div>
                 </div>
               </div>
             </div>
@@ -1729,9 +1729,9 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               type="checkbox"
               checked={applyLogo}
               onChange={e => setApplyLogo(e.target.checked)}
-              className="w-4 h-4 rounded border-gray-300 text-saro-blue focus:ring-saro-blue"
+              className="w-4 h-4 rounded border-tinta-300 text-saro-blue focus:ring-saro-blue"
             />
-            <span className="text-xs text-gray-600">Grabar logo <span className="font-bold text-saro-blue">SR</span> en la imagen (el logo ya se muestra en la card automáticamente)</span>
+            <span className="text-xs text-tinta-600">Grabar logo <span className="font-bold text-saro-blue">SR</span> en la imagen (el logo ya se muestra en la card automáticamente)</span>
           </label>
 
           {/* ── Herramienta de fondo IA ── */}
@@ -1762,7 +1762,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               onChange={e => set('nombre', e.target.value)}
               aria-label="Nombre del producto"
               placeholder="Ej: Remera Training Pro"
-              className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue ${errors.nombre ? 'border-red-400' : 'border-gray-200'}`}
+              className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue ${errors.nombre ? 'border-red-400' : 'border-tinta-200'}`}
             />
             {errors.nombre && <p className="text-xs text-red-500">{errors.nombre}</p>}
           </Field>
@@ -1776,11 +1776,11 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               onChange={e => set('precio', e.target.value)}
               aria-label="Precio mayorista"
               placeholder="18500"
-              className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue ${errors.precio ? 'border-red-400' : 'border-gray-200'}`}
+              className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue ${errors.precio ? 'border-red-400' : 'border-tinta-200'}`}
             />
             {errors.precio && <p className="text-xs text-red-500">{errors.precio}</p>}
             {form.precio && !isNaN(+form.precio) && (
-              <p className="text-xs text-gray-500">${(+form.precio).toLocaleString('es-AR')}</p>
+              <p className="text-xs text-tinta-500">${(+form.precio).toLocaleString('es-AR')}</p>
             )}
           </Field>
 
@@ -1793,22 +1793,22 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               onChange={e => set('precioMinorista', e.target.value)}
               aria-label="Precio minorista"
               placeholder="Ej: 25000"
-              className="w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue border-gray-200"
+              className="w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue border-tinta-200"
             />
             {form.precioMinorista && !isNaN(+form.precioMinorista) && (
-              <p className="text-xs text-gray-500">${(+form.precioMinorista).toLocaleString('es-AR')}</p>
+              <p className="text-xs text-tinta-500">${(+form.precioMinorista).toLocaleString('es-AR')}</p>
             )}
-            <p className="text-xs text-gray-400">
+            <p className="text-xs text-tinta-400">
               Si lo dejás vacío, el producto no aparece en el catálogo minorista.
             </p>
           </Field>
 
           {/* Publicidad: si sale en los anuncios de Meta/Google (feed /feed.xml) */}
           <Field>
-            <div className="flex items-center justify-between gap-4 bg-gray-50 rounded-xl p-3 border border-gray-100">
+            <div className="flex items-center justify-between gap-4 bg-tinta-50 rounded-xl p-3 border border-tinta-100">
               <div>
                 <Label>📣 Publicitar este producto</Label>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <p className="text-xs text-tinta-400 mt-0.5">
                   {!(Number(form.precioMinorista) > 0)
                     ? 'Sin precio minorista no puede salir en los anuncios.'
                     : form.publicitar === false
@@ -1822,7 +1822,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                 aria-checked={form.publicitar !== false}
                 aria-label="Publicitar este producto"
                 onClick={() => set('publicitar', form.publicitar === false)}
-                className={`relative w-12 h-7 rounded-full transition-colors flex-shrink-0 ${form.publicitar !== false ? 'bg-saro-blue' : 'bg-gray-300'}`}
+                className={`relative w-12 h-7 rounded-full transition-colors flex-shrink-0 ${form.publicitar !== false ? 'bg-saro-blue' : 'bg-tinta-300'}`}
               >
                 <span className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${form.publicitar !== false ? 'translate-x-5' : ''}`} />
               </button>
@@ -1839,9 +1839,9 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               onChange={e => set('peso', e.target.value)}
               aria-label="Peso en gramos"
               placeholder="Ej: 400"
-              className="w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue border-gray-200"
+              className="w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue border-tinta-200"
             />
-            <p className="text-xs text-gray-400">Para calcular el costo de envío. Dejalo vacío si no aplica.</p>
+            <p className="text-xs text-tinta-400">Para calcular el costo de envío. Dejalo vacío si no aplica.</p>
           </Field>
 
           <Field>
@@ -1857,7 +1857,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                     className={`px-3 py-1.5 rounded-full text-xs font-semibold border-2 transition ${
                       active
                         ? `${v.cls} border-transparent shadow-sm`
-                        : 'bg-white border-gray-200 text-gray-500 hover:border-gray-400'
+                        : 'bg-white border-tinta-200 text-tinta-500 hover:border-tinta-400'
                     }`}
                   >
                     {v.label}
@@ -1866,7 +1866,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               })}
             </div>
             {form.tags.length === 0 && (
-              <p className="text-xs text-gray-400">Sin etiqueta</p>
+              <p className="text-xs text-tinta-400">Sin etiqueta</p>
             )}
           </Field>
 
@@ -1878,7 +1878,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               onChange={e => set('descripcion', e.target.value)}
               aria-label="Descripción del producto"
               placeholder="Escribí palabras clave y usá ✨ para generar, o dejalo vacío y la IA usa el nombre"
-              className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue resize-none ${errors.descripcion ? 'border-red-400' : 'border-gray-200'}`}
+              className={`w-full border rounded-xl px-3 py-2.5 text-sm focus:outline-none focus:border-saro-blue resize-none ${errors.descripcion ? 'border-red-400' : 'border-tinta-200'}`}
             />
             <div className="flex items-center gap-2 flex-wrap">
               <button
@@ -1924,19 +1924,19 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                   <><span>✨</span> Generar con IA</>
                 )}
               </button>
-              <span className="text-[10px] text-gray-400 tabular-nums">
+              <span className="text-[10px] text-tinta-400 tabular-nums">
                 {form._aiCount ?? getAiUsage().count}/{AI_DAILY_LIMIT} hoy
               </span>
               <div className="relative group">
-                <span className="w-4 h-4 rounded-full bg-gray-200 text-gray-500 text-[10px] font-bold flex items-center justify-center cursor-help select-none">i</span>
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-gray-900 text-white text-[11px] leading-relaxed rounded-xl px-3 py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition z-50 pointer-events-none">
+                <span className="w-4 h-4 rounded-full bg-tinta-200 text-tinta-500 text-[10px] font-bold flex items-center justify-center cursor-help select-none">i</span>
+                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 bg-tinta-900 text-white text-[11px] leading-relaxed rounded-xl px-3 py-2.5 shadow-xl opacity-0 invisible group-hover:opacity-100 group-hover:visible transition z-50 pointer-events-none">
                   <p className="font-semibold mb-1.5">✨ Generador con IA</p>
                   <p>• Escribí palabras clave en la descripción y tocá ✨ para que la IA las desarrolle en un texto atractivo.</p>
                   <p className="mt-1">• Si dejás la descripción vacía, la IA genera a partir del nombre del producto.</p>
                   <p className="mt-1">• Siempre podés editar el resultado antes de guardar.</p>
-                  <hr className="border-gray-700 my-1.5" />
-                  <p className="text-gray-400">Usa la API gratuita de Google Gemini. Límite aprox: {AI_DAILY_LIMIT} usos por día. Si se agota, vuelve a estar disponible al día siguiente.</p>
-                  <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-gray-900 rotate-45 -mt-1"></div>
+                  <hr className="border-tinta-700 my-1.5" />
+                  <p className="text-tinta-400">Usa la API gratuita de Google Gemini. Límite aprox: {AI_DAILY_LIMIT} usos por día. Si se agota, vuelve a estar disponible al día siguiente.</p>
+                  <div className="absolute top-full left-1/2 -translate-x-1/2 w-2 h-2 bg-tinta-900 rotate-45 -mt-1"></div>
                 </div>
               </div>
             </div>
@@ -1947,8 +1947,8 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
         <div className="lg:col-span-2 space-y-6">
 
           {/* Filtros */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-5">
-            <h3 className="font-semibold text-gray-800 text-sm">Filtros de catálogo</h3>
+          <div className="bg-white rounded-2xl border border-tinta-100 p-5 space-y-5">
+            <h3 className="font-semibold text-tinta-800 text-sm">Filtros de catálogo</h3>
 
             <Field>
               <Label>Categoría</Label>
@@ -1965,7 +1965,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                     className={`flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-sm font-medium border transition ${
                       form.categoria === opt.val
                         ? 'bg-saro-blue border-saro-blue text-white shadow-sm'
-                        : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue hover:text-saro-blue'
+                        : 'bg-white border-tinta-200 text-tinta-600 hover:border-saro-blue hover:text-saro-blue'
                     }`}
                   >
                     {opt.icon}
@@ -2006,13 +2006,13 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
             )}
 
             <div className="flex items-center gap-3 pt-1">
-              <span className="text-xs text-gray-500">Emoji automático:</span>
+              <span className="text-xs text-tinta-500">Emoji automático:</span>
               <span className="text-2xl">{form.emoji}</span>
               <input
                 type="text"
                 value={form.emoji}
                 onChange={e => set('emoji', e.target.value)}
-                className="w-12 text-center border border-gray-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-saro-blue"
+                className="w-12 text-center border border-tinta-200 rounded-lg px-2 py-1 text-sm focus:outline-none focus:border-saro-blue"
                 maxLength={2}
                 title="Podés cambiarlo manualmente"
               />
@@ -2020,8 +2020,8 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
           </div>
 
           {/* Colores */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
-            <h3 className="font-semibold text-gray-800 text-sm">
+          <div className="bg-white rounded-2xl border border-tinta-100 p-5 space-y-3">
+            <h3 className="font-semibold text-tinta-800 text-sm">
               Colores disponibles
               {errors.colores && <span className="ml-2 text-red-500 font-normal text-xs">{errors.colores}</span>}
             </h3>
@@ -2032,8 +2032,8 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
           </div>
 
           {/* Talles */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
-            <h3 className="font-semibold text-gray-800 text-sm">
+          <div className="bg-white rounded-2xl border border-tinta-100 p-5 space-y-3">
+            <h3 className="font-semibold text-tinta-800 text-sm">
               Talles disponibles
               {errors.talles && <span className="ml-2 text-red-500 font-normal text-xs">{errors.talles}</span>}
             </h3>
@@ -2045,10 +2045,10 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
 
           {/* Sin stock */}
           {form.colores.length > 0 && form.talles.length > 0 && (
-            <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
+            <div className="bg-white rounded-2xl border border-tinta-100 p-5 space-y-3">
               <div>
-                <h3 className="font-semibold text-gray-800 text-sm">Sin stock</h3>
-                <p className="text-xs text-gray-400 mt-0.5">
+                <h3 className="font-semibold text-tinta-800 text-sm">Sin stock</h3>
+                <p className="text-xs text-tinta-400 mt-0.5">
                   Marcá con ✕ rojo las combinaciones color/talle que no tenés disponibles.
                 </p>
               </div>
@@ -2062,10 +2062,10 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
           )}
 
           {/* Promos por cantidad */}
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 space-y-3">
+          <div className="bg-white rounded-2xl border border-tinta-100 p-5 space-y-3">
             <div>
-              <h3 className="font-semibold text-gray-800 text-sm">🔥 Promos por cantidad</h3>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <h3 className="font-semibold text-tinta-800 text-sm">🔥 Promos por cantidad</h3>
+              <p className="text-xs text-tinta-400 mt-0.5">
                 Definí precios especiales para compras por cantidad (ej: 20u × $33.000).
               </p>
             </div>
@@ -2092,7 +2092,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               <p className="text-saro-blue font-extrabold text-lg">
                 {form.precio ? `$${(+form.precio).toLocaleString('es-AR')}` : '$0'}
               </p>
-              <p className="text-xs text-gray-500 capitalize">
+              <p className="text-xs text-tinta-500 capitalize">
                 {form.categoria} · {form.genero} · {form.parteCuerpo}
               </p>
             </div>
@@ -2104,7 +2104,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               <button
                 type="button"
                 onClick={onCancel}
-                className="px-6 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium text-sm"
+                className="px-6 py-2.5 rounded-xl border border-tinta-200 text-tinta-600 hover:bg-tinta-50 font-medium text-sm"
               >
                 Cancelar
               </button>
@@ -2114,7 +2114,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
               disabled={busy}
               className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition ${
                 busy
-                  ? 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                  ? 'bg-tinta-100 text-tinta-400 cursor-not-allowed'
                   : 'bg-saro-blue hover:bg-saro-dark text-white shadow-sm'
               }`}
             >

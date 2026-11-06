@@ -70,7 +70,7 @@ function PinGate({ onAuth }) {
           onError={e => { e.target.style.display = 'none' }}
         />
         <h1 className="font-extrabold text-xl text-saro-dark mb-1">Panel Admin</h1>
-        <p className="text-sm text-gray-400 mb-6">Ingresá el código de acceso</p>
+        <p className="text-sm text-tinta-400 mb-6">Ingresá el código de acceso</p>
 
         <form onSubmit={handleSubmit} className="space-y-4">
           <input
@@ -81,7 +81,7 @@ function PinGate({ onAuth }) {
             placeholder="••••••••"
             autoFocus
             className={`w-full border-2 rounded-xl px-4 py-3 text-center text-lg tracking-widest font-mono focus:outline-none transition-colors ${
-              error ? 'border-red-400 bg-red-50' : 'border-gray-200 focus:border-saro-blue'
+              error ? 'border-red-400 bg-red-50' : 'border-tinta-200 focus:border-saro-blue'
             }`}
           />
           {error && (
@@ -328,7 +328,7 @@ export default function AdminPage() {
   if (!authed) return <PinGate onAuth={() => setAuthed(true)} />
 
   return (
-    <div className="min-h-screen bg-gray-50 font-sans">
+    <div className="min-h-screen bg-tinta-50 font-sans">
 
       {/* Header */}
       <header className="bg-saro-dark text-white shadow-lg">
@@ -349,8 +349,8 @@ export default function AdminPage() {
                 <div className="flex items-center gap-2">
                   <p className="font-extrabold text-sm sm:text-lg leading-none">Panel Admin</p>
                   {publishedSnap !== null && (
-                    <span className={`flex items-center gap-1 text-[10px] sm:text-xs font-semibold ${isSynced ? 'text-green-400' : 'text-yellow-400'}`}>
-                      <span className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full flex-shrink-0 ${isSynced ? 'bg-green-400' : 'bg-yellow-400 animate-pulse'}`} />
+                    <span className={`flex items-center gap-1 text-[10px] sm:text-xs font-semibold ${isSynced ? 'text-wa-400' : 'text-yellow-400'}`}>
+                      <span className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full flex-shrink-0 ${isSynced ? 'bg-wa-400' : 'bg-yellow-400 animate-pulse'}`} />
                       <span className="hidden sm:inline">{isSynced ? 'En vivo' : 'Sin publicar'}</span>
                     </span>
                   )}
@@ -368,10 +368,10 @@ export default function AdminPage() {
                 disabled={deploying || isSynced}
                 className={`flex items-center gap-1 sm:gap-1.5 px-2.5 sm:px-3 py-1.5 sm:py-2 text-white text-[11px] sm:text-sm font-bold rounded-lg sm:rounded-xl transition ${
                   deploying
-                    ? 'bg-gray-500 opacity-60 cursor-not-allowed'
+                    ? 'bg-tinta-500 opacity-60 cursor-not-allowed'
                     : isSynced
-                    ? 'bg-gray-600 opacity-50 cursor-not-allowed'
-                    : 'bg-green-500 hover:bg-green-400 shadow-lg shadow-green-900/30'
+                    ? 'bg-tinta-600 opacity-50 cursor-not-allowed'
+                    : 'bg-wa-500 hover:bg-wa-400 shadow-lg shadow-wa-900/30'
                 }`}
               >
                 <span className="text-xs sm:text-base">{deploying ? '⏳' : '🚀'}</span>
@@ -385,7 +385,7 @@ export default function AdminPage() {
                   onClick={() => setShowShare(s => !s)}
                   className={`flex items-center gap-1 px-2 sm:px-3 py-1.5 sm:py-2 text-[11px] sm:text-sm font-bold rounded-lg sm:rounded-xl transition ${
                     exporting
-                      ? 'bg-gray-500 opacity-60 text-white'
+                      ? 'bg-tinta-500 opacity-60 text-white'
                       : 'bg-white/15 hover:bg-white/25 text-white'
                   }`}
                 >
@@ -395,26 +395,26 @@ export default function AdminPage() {
                 {showShare && (
                   <>
                     <div className="fixed inset-0 z-30" onClick={() => setShowShare(false)} />
-                    <div className="absolute right-0 top-full mt-1 z-40 bg-white rounded-xl shadow-xl border border-gray-100 py-1.5 w-52 overflow-hidden">
+                    <div className="absolute right-0 top-full mt-1 z-40 bg-white rounded-xl shadow-xl border border-tinta-100 py-1.5 w-52 overflow-hidden">
                       <button
                         onClick={() => { setShowShare(false); handleExportPdf() }}
                         disabled={exporting}
-                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-tinta-700 hover:bg-tinta-50 transition-colors text-left"
                       >
                         <span>📄</span>
                         <div>
                           <p className="font-semibold text-xs">Exportar PDF</p>
-                          <p className="text-[10px] text-gray-400">Descargar catálogo</p>
+                          <p className="text-[10px] text-tinta-400">Descargar catálogo</p>
                         </div>
                       </button>
                       <button
                         onClick={() => { setShowShare(false); setShowQr(true) }}
-                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-gray-700 hover:bg-gray-50 transition-colors text-left"
+                        className="w-full flex items-center gap-2.5 px-4 py-2.5 text-sm text-tinta-700 hover:bg-tinta-50 transition-colors text-left"
                       >
                         <span>📱</span>
                         <div>
                           <p className="font-semibold text-xs">QR catálogo</p>
-                          <p className="text-[10px] text-gray-400">Link permanente al PDF</p>
+                          <p className="text-[10px] text-tinta-400">Link permanente al PDF</p>
                         </div>
                       </button>
                     </div>
@@ -437,7 +437,7 @@ export default function AdminPage() {
 
 
       {/* Tabs */}
-      <div className="bg-white border-b border-gray-200 sticky top-0 z-20 shadow-sm">
+      <div className="bg-white border-b border-tinta-200 sticky top-0 z-20 shadow-sm">
         <div className="max-w-6xl mx-auto px-3 sm:px-5 flex gap-0.5 sm:gap-1 overflow-x-auto scrollbar-hide">
           {[
             { key: 'editar', label: `📋 Publicados (${products.length})` },
@@ -454,7 +454,7 @@ export default function AdminPage() {
               className={`px-4 sm:px-5 py-3.5 text-xs sm:text-sm font-semibold border-b-2 transition-colors whitespace-nowrap flex-shrink-0 ${
                 tab === t.key
                   ? 'border-saro-blue text-saro-blue'
-                  : 'border-transparent text-gray-500 hover:text-gray-800'
+                  : 'border-transparent text-tinta-500 hover:text-tinta-800'
               }`}
             >
               {t.label}
@@ -466,7 +466,7 @@ export default function AdminPage() {
       {/* Toast */}
       {toast && (
         <div className={`fixed top-4 right-4 z-50 px-5 py-3 rounded-xl shadow-xl text-sm font-medium transition ${
-          toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-gray-900 text-white'
+          toast.type === 'error' ? 'bg-red-500 text-white' : 'bg-tinta-900 text-white'
         }`}>
           {toast.msg}
         </div>
@@ -545,17 +545,17 @@ export default function AdminPage() {
       {showQr && (
         <div className="fixed inset-0 z-50 bg-black/60 backdrop-blur-sm flex items-center justify-center p-4" onClick={() => setShowQr(false)}>
           <div className="bg-white rounded-2xl p-6 sm:p-8 max-w-sm w-full text-center shadow-2xl" onClick={e => e.stopPropagation()}>
-            <h3 className="font-extrabold text-lg text-gray-900 mb-1">QR del Catálogo</h3>
-            <p className="text-sm text-gray-400 mb-4">Escaneá para ver el catálogo actualizado</p>
+            <h3 className="font-extrabold text-lg text-tinta-900 mb-1">QR del Catálogo</h3>
+            <p className="text-sm text-tinta-400 mb-4">Escaneá para ver el catálogo actualizado</p>
             <img
               src={`https://api.qrserver.com/v1/create-qr-code/?size=300x300&data=${encodeURIComponent('https://catalogo.saro.com.ar')}&color=2d3748&bgcolor=ffffff`}
               alt="QR Catálogo SARO"
               className="w-48 h-48 sm:w-56 sm:h-56 mx-auto rounded-xl"
             />
-            <p className="text-[10px] text-gray-300 mt-3">Se actualiza cada vez que publicás cambios</p>
+            <p className="text-[10px] text-tinta-300 mt-3">Se actualiza cada vez que publicás cambios</p>
             <button
               onClick={() => setShowQr(false)}
-              className="mt-4 px-6 py-2 rounded-xl bg-gray-100 hover:bg-gray-200 text-gray-600 text-sm font-medium transition-colors"
+              className="mt-4 px-6 py-2 rounded-xl bg-tinta-100 hover:bg-tinta-200 text-tinta-600 text-sm font-medium transition-colors"
             >
               Cerrar
             </button>
@@ -568,7 +568,7 @@ export default function AdminPage() {
         href="https://vercel.com/santifabiani03-9326s-projects/saro-mayorista/analytics"
         target="_blank"
         rel="noopener noreferrer"
-        className="fixed bottom-3 right-4 text-[10px] text-gray-300 hover:text-gray-500 transition-colors hidden sm:inline"
+        className="fixed bottom-3 right-4 text-[10px] text-tinta-300 hover:text-tinta-500 transition-colors hidden sm:inline"
         title="Vercel Analytics"
       >
         analytics ↗

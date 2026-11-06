@@ -17,11 +17,11 @@
 
 | Nombre interno | HEX | Muestra mental | Para qué se usa |
 |---|---|---|---|
-| `saro-blue` | **#2563EB** | Azul vivo | **Color estrella.** Acentos, links, precios, botones primarios, la palabra "SARO", íconos activos, bordes de foco |
-| `saro-mid` | **#1E40AF** | Azul más oscuro | Estados hover del azul, degradés que van de blue→mid |
-| `saro-dark` | **#0F172A** | Navy casi negro | Textos importantes, fondo del hero/intro, botón del carrito, pedestales |
-| `saro-light` | **#EFF6FF** | Celeste muy claro | Fondos suaves de badges, chips, cajas informativas (ej. "compra mín. sugerida") |
-| `saro-accent` | **#F59E0B** | Ámbar / dorado | Detalle de contraste: burbuja del contador del carrito, eyebrow "VENTA MAYORISTA", número de stock en accesos rápidos |
+| `saro-blue` | **#1F5FE0** | Azul vivo | **Color estrella.** Acentos, links, precios, botones primarios, la palabra "SARO", íconos activos, bordes de foco |
+| `saro-mid` | **#1B3E9E** | Azul más oscuro | Estados hover del azul, degradés que van de blue→mid |
+| `saro-dark` | **#0D1628** | Navy casi negro | Textos importantes, fondo del hero/intro, botón del carrito, pedestales |
+| `saro-light` | **#EEF4FE** | Celeste muy claro | Fondos suaves de badges, chips, cajas informativas (ej. "compra mín. sugerida") |
+| `saro-accent` | **#F2A516** | Ámbar / dorado | Detalle de contraste: burbuja del contador del carrito, eyebrow "VENTA MAYORISTA", número de stock en accesos rápidos |
 
 ### 1.2 Colores de apoyo (grises y funcionales)
 
@@ -29,9 +29,9 @@
 |---|---|---|
 | Fondo general de la página | **#FAFBFC** | Blanco "roto", casi blanco |
 | Blanco puro (cards, header, modales) | **#FFFFFF** | |
-| Texto secundario / labels | grises `#6B7280`–`#94A3B8` | (`text-gray-400/500`) |
-| Bordes de línea | `#F3F4F6` al ~80% de opacidad | muy suaves |
-| Verde WhatsApp | **#10B981 / #22C55E** | (`emerald-500`/`green-500`) solo para botones de WhatsApp |
+| Texto secundario / labels | grises `tinta` `#8E949D`–`#6C727C` | (`text-tinta-400/500`). Neutros propios teñidos de navy: **no usar `gray-*`/`slate-*` de Tailwind** |
+| Bordes de línea | `tinta-100` (`#F1F4F9`) al ~80% de opacidad | muy suaves |
+| Verde WhatsApp | **#13874D** (`wa-500`, hover `wa-600`) | solo para WhatsApp. 4,6:1 con texto blanco (el `emerald-500` de antes daba 2,5:1) |
 | Rojo alertas ("sin stock", errores) | `#EF4444` y fondos `#FEF2F2` | uso puntual |
 
 ### 1.3 El celeste del LOGO ≠ el azul de marca ⚠️
@@ -44,14 +44,14 @@ cosas distintas y conviven bien (logo celeste + acentos azul vivo).
 ### 1.4 Inconsistencia conocida (legacy) 🐛
 
 `public/manifest.json` tiene `theme_color: "#4A90D9"`. Ese era el **azul viejo**, previo al
-rediseño. El azul de marca actual es **#2563EB**. Si algún día se prolija, actualizar el
+rediseño. El azul de marca actual es **#1F5FE0**. Si algún día se prolija, actualizar el
 manifest a #2563EB. No es urgente (solo afecta el color de la barra del navegador en PWA).
 
 ---
 
 ## 2. Tipografía
 
-- **Fuente única: Inter.** (Google Fonts). No se usa ninguna otra. Se carga en `layout.jsx`.
+- **Dos fuentes (06/11/2026):** **Archivo** para títulos (h1, h2, h3 y la clase `font-display`; h1/h2 ensanchados con `wdth` 112) e **Inter** para todo el texto corrido. Las dos se cargan con `next/font` en `layout.jsx`; la regla está en `globals.css`.
 - **Pesos disponibles:** 400 (regular), 500 (medium), 600 (semibold), 700 (bold), 800 (extrabold).
 - **Suavizado:** activado (`-webkit-font-smoothing: antialiased`) para que se vea prolija.
 
@@ -207,8 +207,11 @@ competir.
 - **Marca de agua SR en cards:** quedó en `w-9 h-9 opacity-35`, **igual en cards de accesorios/
   ropa y en cards de paletas** (se probó más grande y más oscura en paletas y se volvió a este
   valor por pedido del dueño). No agrandar sin confirmar.
-- **Azul de marca = #2563EB** en todos los acentos nuevos (no usar el viejo #4A90D9).
-- **Una sola tipografía (Inter).** No sumar fuentes.
+- **Azul de marca = #1F5FE0** en todos los acentos nuevos (no usar el viejo #4A90D9 ni el #2563EB de Tailwind).
+- **Paleta propia, nada de colores de fábrica de Tailwind** (06/11/2026): `saro-*`, `tinta-*` (grises) y `wa-*` (WhatsApp), en `tailwind.config.js`.
+- **Sin etiquetas chicas en mayúsculas arriba de los títulos**, sin manchas difuminadas de fondo y sin partículas: lo marcó un análisis de "web hecha con IA".
+- **Animar sólo lo que comunica:** nada de "aparecer al scrollear" en cada bloque. En la portada sólo se animan los contadores.
+- **Dos tipografías: Archivo (títulos) + Inter (texto).** No sumar más.
 - **El logo no se recolorea:** celeste sobre claro, blanco sobre oscuro.
 - **Hero 3D:** la paleta se mantiene **mayormente de frente** y con giro acotado para no exponer
   el canto imperfecto del modelo (ver `CLAUDE.md` §4.1). No poner giros de 360° completos.
@@ -226,8 +229,8 @@ competir.
 ## 7. Checklist rápido para un cambio visual nuevo
 
 Antes de dar por bueno un cambio de diseño, revisá:
-- [ ] ¿Usé los colores `saro-*` correctos (azul #2563EB para acentos)?
-- [ ] ¿La tipografía es Inter con la jerarquía de §2?
+- [ ] ¿Usé los colores `saro-*` / `tinta-*` / `wa-*` (azul #1F5FE0 para acentos) y ningún `gray-*` de fábrica?
+- [ ] ¿Títulos en Archivo y texto en Inter, con la jerarquía de §2?
 - [ ] ¿Los radios/sombras siguen §5.1 y §5.2?
 - [ ] ¿El logo se usa en la variante y tamaño correctos (§3)?
 - [ ] ¿Se ve bien en **mobile y desktop**?

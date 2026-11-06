@@ -3,7 +3,7 @@ import { Analytics } from '@vercel/analytics/react'
 import { SpeedInsights } from '@vercel/speed-insights/next'
 import MetaPixel from '../components/MetaPixel'
 import GoogleAnalytics from '../components/GoogleAnalytics'
-import { Inter } from 'next/font/google'
+import { Inter, Archivo } from 'next/font/google'
 
 // Inter servida desde el propio sitio (next/font la baja al compilar). Antes se
 // pedía a fonts.googleapis.com en cada visita: dos conexiones más y una hoja de
@@ -14,6 +14,15 @@ const inter = Inter({
   weight: ['400', '500', '600', '700', '800'],
   display: 'swap',
   variable: '--font-inter',
+})
+
+// Títulos: Archivo, una grotesca de raíz deportiva con eje de ancho (wdth). Los
+// h1/h2 la usan ensanchada (globals.css) y el texto corrido sigue en Inter.
+const archivo = Archivo({
+  subsets: ['latin'],
+  axes: ['wdth'],
+  display: 'swap',
+  variable: '--font-titulo',
 })
 
 export const metadata = {
@@ -59,7 +68,7 @@ export const metadata = {
 
 export default function RootLayout({ children }) {
   return (
-    <html lang="es-AR" className={inter.variable}>
+    <html lang="es-AR" className={`${inter.variable} ${archivo.variable}`}>
       <head>
         {/* Structured Data: Organization */}
         <script

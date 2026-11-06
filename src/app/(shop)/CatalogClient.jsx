@@ -55,7 +55,7 @@ export default function CatalogClient({ products, heading, showFilters = true, m
                 <span className={`inline-flex items-center gap-1.5 mt-1.5 px-2.5 py-1 rounded-full text-[11px] font-bold ${
                   modo === 'mayorista'
                     ? 'bg-saro-dark text-white'
-                    : 'bg-saro-light text-saro-blue border border-blue-100'
+                    : 'bg-saro-light text-saro-blue border border-saro-line'
                 }`}>
                   {modo === 'mayorista' ? 'Precios mayoristas' : 'Precios minoristas'}
                 </span>
@@ -80,7 +80,7 @@ export default function CatalogClient({ products, heading, showFilters = true, m
         )}
 
         <div className="flex items-center justify-between gap-3">
-          <p className="text-sm text-gray-500 flex-shrink-0 font-medium">
+          <p className="text-sm text-tinta-500 flex-shrink-0 font-medium">
             {filtered.length === totalVisible
               ? `${totalVisible} productos`
               : `${filtered.length} de ${totalVisible} productos`}
@@ -90,7 +90,7 @@ export default function CatalogClient({ products, heading, showFilters = true, m
             {/* Buscador compacto */}
             <div className="relative">
               <svg
-                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-gray-400 pointer-events-none"
+                className="absolute left-2.5 top-1/2 -translate-y-1/2 w-3.5 h-3.5 text-tinta-400 pointer-events-none"
                 fill="none" viewBox="0 0 24 24" stroke="currentColor" strokeWidth="2"
               >
                 <path strokeLinecap="round" strokeLinejoin="round" d="M21 21l-5.197-5.197m0 0A7.5 7.5 0 105.196 5.196a7.5 7.5 0 0010.607 10.607z" />
@@ -101,12 +101,12 @@ export default function CatalogClient({ products, heading, showFilters = true, m
                 value={search}
                 onChange={e => setSearch(e.target.value)}
                 placeholder="Buscar..."
-                className="w-32 sm:w-40 pl-8 pr-7 py-2 bg-white border border-gray-200 rounded-xl text-xs text-gray-700 placeholder-gray-400 focus:outline-none focus:border-saro-blue focus:ring-2 focus:ring-saro-blue/10 focus:bg-white focus:w-48 sm:focus:w-56 transition-all duration-200"
+                className="w-32 sm:w-40 pl-8 pr-7 py-2 bg-white border border-tinta-200 rounded-xl text-xs text-tinta-700 placeholder-tinta-400 focus:outline-none focus:border-saro-blue focus:ring-2 focus:ring-saro-blue/10 focus:bg-white focus:w-48 sm:focus:w-56 transition-all duration-200"
               />
               {search && (
                 <button
                   onClick={() => setSearch('')}
-                  className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-gray-200 hover:bg-gray-300 text-gray-500 text-[10px] flex items-center justify-center transition-colors leading-none"
+                  className="absolute right-2 top-1/2 -translate-y-1/2 w-4 h-4 rounded-full bg-tinta-200 hover:bg-tinta-300 text-tinta-500 text-[10px] flex items-center justify-center transition-colors leading-none"
                 >
                   x
                 </button>
@@ -120,18 +120,18 @@ export default function CatalogClient({ products, heading, showFilters = true, m
               className={`flex items-center gap-1.5 text-sm px-3 py-2 rounded-xl border transition duration-200 flex-shrink-0 btn-press ${
                 priceSort
                   ? 'border-saro-blue text-saro-blue bg-saro-light font-semibold shadow-sm shadow-saro-blue/10'
-                  : 'border-gray-200 text-gray-500 hover:border-gray-300 bg-white'
+                  : 'border-tinta-200 text-tinta-500 hover:border-tinta-300 bg-white'
               }`}
             >
               <span>Precio</span>
               <svg viewBox="0 0 10 14" className="w-3 h-3.5" fill="currentColor">
                 <path
                   d="M5 0l4 5H1z"
-                  className={priceSort === 'asc' ? 'text-saro-blue' : 'text-gray-300'}
+                  className={priceSort === 'asc' ? 'text-saro-blue' : 'text-tinta-300'}
                 />
                 <path
                   d="M5 14l-4-5h8z"
-                  className={priceSort === 'desc' ? 'text-saro-blue' : 'text-gray-300'}
+                  className={priceSort === 'desc' ? 'text-saro-blue' : 'text-tinta-300'}
                 />
               </svg>
             </button>
@@ -166,9 +166,9 @@ export default function CatalogClient({ products, heading, showFilters = true, m
             })()}
           </div>
         ) : (
-          <div className="flex flex-col items-center justify-center py-24 text-gray-400 gap-4">
+          <div className="flex flex-col items-center justify-center py-24 text-tinta-400 gap-4">
             <span className="text-5xl">🔍</span>
-            <p className="font-medium text-gray-500">No hay productos con esos filtros.</p>
+            <p className="font-medium text-tinta-500">No hay productos con esos filtros.</p>
             <button
               onClick={() =>
                 setFilters({ categoria: '', genero: '', parteCuerpo: '', tag: '' })

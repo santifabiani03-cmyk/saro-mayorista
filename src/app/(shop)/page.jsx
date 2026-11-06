@@ -29,6 +29,15 @@ export default async function HomePage() {
     ropaMinorista: noPaleta.filter(p => Number(p.precioMinorista) > 0).length,
   }
 
+  // Paleta real para el mensaje de ejemplo de "Cómo comprar" (MensajePedido.jsx)
+  const paleta = visible.find(p => p.categoria === 'paleta' && Number(p.precioMinorista) > 0)
+  const muestra = paleta && {
+    nombre: paleta.nombre.trim(),
+    precio: Number(paleta.precioMinorista),
+    color: paleta.colores?.[0] ?? 'Único',
+    talle: paleta.talles?.[0] ?? 'Única',
+  }
+
   const minPurchase = config.suggestedMinPurchase ?? config.minPurchase
 
   return (
@@ -39,6 +48,7 @@ export default async function HomePage() {
       <link rel="preload" href="/models/paleta-opt.glb" as="fetch" crossOrigin="anonymous" fetchPriority="low" />
       <Landing
         stats={stats}
+        muestra={muestra || null}
         whatsappNumber={config.whatsappNumber}
         minPurchase={minPurchase}
         mostrarCompraMinima={config.mostrarCompraMinima === true}

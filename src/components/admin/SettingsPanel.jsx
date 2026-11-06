@@ -71,7 +71,7 @@ export default function SettingsPanel({ onToast }) {
 
   if (loading) {
     return (
-      <div className="flex items-center justify-center py-20 text-gray-400 text-sm">
+      <div className="flex items-center justify-center py-20 text-tinta-400 text-sm">
         Cargando configuración…
       </div>
     )
@@ -79,19 +79,19 @@ export default function SettingsPanel({ onToast }) {
 
   return (
     <div className="max-w-lg mx-auto">
-      <div className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
-        <div className="px-6 py-5 border-b border-gray-100">
-          <h2 className="font-extrabold text-lg text-gray-900">Ajustes de la tienda</h2>
-          <p className="text-sm text-gray-400 mt-0.5">Los cambios se ven en la web en menos de un minuto</p>
+      <div className="bg-white rounded-2xl shadow-sm border border-tinta-100 overflow-hidden">
+        <div className="px-6 py-5 border-b border-tinta-100">
+          <h2 className="font-extrabold text-lg text-tinta-900">Ajustes de la tienda</h2>
+          <p className="text-sm text-tinta-400 mt-0.5">Los cambios se ven en la web en menos de un minuto</p>
         </div>
 
         <div className="px-6 py-5 space-y-6">
 
           {/* Toggle: mostrar compra mínima (modo mayorista) */}
-          <div className="flex items-center justify-between gap-4 bg-gray-50 rounded-xl p-4 border border-gray-100">
+          <div className="flex items-center justify-between gap-4 bg-tinta-50 rounded-xl p-4 border border-tinta-100">
             <div>
-              <label className="block text-sm font-semibold text-gray-700">Mostrar compra mínima</label>
-              <p className="text-xs text-gray-400 mt-0.5">
+              <label className="block text-sm font-semibold text-tinta-700">Mostrar compra mínima</label>
+              <p className="text-xs text-tinta-400 mt-0.5">
                 Actívalo solo si vendés por mayor. Apagado = tienda minorista (se oculta en toda la página).
               </p>
             </div>
@@ -100,7 +100,7 @@ export default function SettingsPanel({ onToast }) {
               role="switch"
               aria-checked={mostrarCompraMinima}
               onClick={() => setMostrarCompraMinima(v => !v)}
-              className={`relative w-12 h-7 rounded-full transition-colors flex-shrink-0 ${mostrarCompraMinima ? 'bg-saro-blue' : 'bg-gray-300'}`}
+              className={`relative w-12 h-7 rounded-full transition-colors flex-shrink-0 ${mostrarCompraMinima ? 'bg-saro-blue' : 'bg-tinta-300'}`}
             >
               <span className={`absolute top-1 left-1 w-5 h-5 rounded-full bg-white shadow transition-transform duration-200 ${mostrarCompraMinima ? 'translate-x-5' : ''}`} />
             </button>
@@ -109,33 +109,33 @@ export default function SettingsPanel({ onToast }) {
           {/* Compras mínimas del catálogo mayorista */}
           <div className={`grid grid-cols-2 gap-3 ${mostrarCompraMinima ? '' : 'opacity-50 pointer-events-none'}`}>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mínimo · primera compra</label>
-              <p className="text-xs text-gray-400 mb-2">Cliente mayorista nuevo</p>
+              <label className="block text-sm font-semibold text-tinta-700 mb-1.5">Mínimo · primera compra</label>
+              <p className="text-xs text-tinta-400 mb-2">Cliente mayorista nuevo</p>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-tinta-400 font-medium">$</span>
                 <input
                   type="number" min="0" step="1000"
                   aria-label="Compra mínima para cliente mayorista nuevo"
                   value={minNuevo}
                   onChange={e => setMinNuevo(e.target.value)}
                   disabled={!mostrarCompraMinima}
-                  className="w-full border-2 border-gray-200 rounded-xl pl-8 pr-3 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
+                  className="w-full border-2 border-tinta-200 rounded-xl pl-8 pr-3 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
                   placeholder="180000"
                 />
               </div>
             </div>
             <div>
-              <label className="block text-sm font-semibold text-gray-700 mb-1.5">Mínimo · ya es cliente</label>
-              <p className="text-xs text-gray-400 mb-2">Mayorista que ya compró</p>
+              <label className="block text-sm font-semibold text-tinta-700 mb-1.5">Mínimo · ya es cliente</label>
+              <p className="text-xs text-tinta-400 mb-2">Mayorista que ya compró</p>
               <div className="relative">
-                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">$</span>
+                <span className="absolute left-3 top-1/2 -translate-y-1/2 text-tinta-400 font-medium">$</span>
                 <input
                   type="number" min="0" step="1000"
                   aria-label="Compra mínima para mayorista que ya compró"
                   value={minCliente}
                   onChange={e => setMinCliente(e.target.value)}
                   disabled={!mostrarCompraMinima}
-                  className="w-full border-2 border-gray-200 rounded-xl pl-8 pr-3 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
+                  className="w-full border-2 border-tinta-200 rounded-xl pl-8 pr-3 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
                   placeholder="100000"
                 />
               </div>
@@ -144,14 +144,14 @@ export default function SettingsPanel({ onToast }) {
 
           {/* Compra mínima */}
           <div className={mostrarCompraMinima ? '' : 'opacity-50 pointer-events-none'}>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label className="block text-sm font-semibold text-tinta-700 mb-1.5">
               Compra mínima
             </label>
-            <p className="text-xs text-gray-400 mb-2">
+            <p className="text-xs text-tinta-400 mb-2">
               Monto mínimo requerido para enviar un pedido
             </p>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-tinta-400 font-medium">$</span>
               <input
                 type="number"
                 min="0"
@@ -160,7 +160,7 @@ export default function SettingsPanel({ onToast }) {
                 value={minPurchase}
                 onChange={e => setMinPurchase(e.target.value)}
                 disabled={!mostrarCompraMinima}
-                className="w-full border-2 border-gray-200 rounded-xl pl-8 pr-4 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
+                className="w-full border-2 border-tinta-200 rounded-xl pl-8 pr-4 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
                 placeholder="150000"
               />
             </div>
@@ -168,14 +168,14 @@ export default function SettingsPanel({ onToast }) {
 
           {/* Compra mínima sugerida */}
           <div className={mostrarCompraMinima ? '' : 'opacity-50 pointer-events-none'}>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label className="block text-sm font-semibold text-tinta-700 mb-1.5">
               Compra mínima sugerida
             </label>
-            <p className="text-xs text-gray-400 mb-2">
+            <p className="text-xs text-tinta-400 mb-2">
               Se muestra como referencia en el header de la tienda
             </p>
             <div className="relative">
-              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-gray-400 font-medium">$</span>
+              <span className="absolute left-3 top-1/2 -translate-y-1/2 text-tinta-400 font-medium">$</span>
               <input
                 type="number"
                 min="0"
@@ -184,7 +184,7 @@ export default function SettingsPanel({ onToast }) {
                 value={suggestedMinPurchase}
                 onChange={e => setSuggestedMinPurchase(e.target.value)}
                 disabled={!mostrarCompraMinima}
-                className="w-full border-2 border-gray-200 rounded-xl pl-8 pr-4 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
+                className="w-full border-2 border-tinta-200 rounded-xl pl-8 pr-4 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
                 placeholder="150000"
               />
             </div>
@@ -192,27 +192,27 @@ export default function SettingsPanel({ onToast }) {
 
           {/* Teléfono WhatsApp */}
           <div>
-            <label className="block text-sm font-semibold text-gray-700 mb-1.5">
+            <label className="block text-sm font-semibold text-tinta-700 mb-1.5">
               Teléfono WhatsApp
             </label>
-            <p className="text-xs text-gray-400 mb-2">
+            <p className="text-xs text-tinta-400 mb-2">
               Número al que llegan los pedidos por WhatsApp
             </p>
             <div className="flex items-stretch">
-              <span className="flex items-center px-3 bg-gray-100 border-2 border-r-0 border-gray-200 rounded-l-xl text-sm font-bold text-gray-500 select-none">
+              <span className="flex items-center px-3 bg-tinta-100 border-2 border-r-0 border-tinta-200 rounded-l-xl text-sm font-bold text-tinta-500 select-none">
                 +54
               </span>
               <input
                 type="tel"
                 value={phoneNumber}
                 onChange={e => setPhoneNumber(e.target.value.replace(/[^\d]/g, ''))}
-                className="flex-1 border-2 border-gray-200 rounded-r-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
+                className="flex-1 border-2 border-tinta-200 rounded-r-xl px-4 py-2.5 text-sm font-medium focus:outline-none focus:border-saro-blue transition-colors"
                 aria-label="Teléfono de WhatsApp"
                 placeholder="9 11 2320 8058"
                 maxLength={13}
               />
             </div>
-            <p className="text-xs text-gray-300 mt-1.5">
+            <p className="text-xs text-tinta-300 mt-1.5">
               Número completo: +54{phoneNumber || '…'}
             </p>
           </div>
@@ -220,8 +220,8 @@ export default function SettingsPanel({ onToast }) {
         </div>
 
         {/* Footer */}
-        <div className="px-6 py-4 bg-gray-50 border-t border-gray-100 flex items-center justify-between">
-          <p className="text-xs text-gray-400">
+        <div className="px-6 py-4 bg-tinta-50 border-t border-tinta-100 flex items-center justify-between">
+          <p className="text-xs text-tinta-400">
             {config?.whatsappNumber && (
               <>Actual: +{config.whatsappNumber}</>
             )}

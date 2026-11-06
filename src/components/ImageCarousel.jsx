@@ -156,7 +156,7 @@ export default function ImageCarousel({
           <span className="text-6xl select-none">{emoji}</span>
         </div>
       ) : (
-        <div className="aspect-square rounded-2xl bg-gray-50 flex items-center justify-center">
+        <div className="aspect-square rounded-2xl bg-tinta-50 flex items-center justify-center">
           <span className="text-9xl select-none">{emoji}</span>
         </div>
       )
@@ -208,7 +208,7 @@ export default function ImageCarousel({
           <button
             onClick={e => go(-1, e)}
             className={`absolute left-2 top-1/2 -translate-y-1/2 bg-white/85 hover:bg-white
-              rounded-full shadow flex items-center justify-center text-gray-800 font-semibold
+              rounded-full shadow flex items-center justify-center text-tinta-800 font-semibold
               transition select-none
               ${compact
                 ? 'w-7 h-7 text-base opacity-0 group-hover/car:opacity-100'
@@ -217,7 +217,7 @@ export default function ImageCarousel({
           <button
             onClick={e => go(1, e)}
             className={`absolute right-2 top-1/2 -translate-y-1/2 bg-white/85 hover:bg-white
-              rounded-full shadow flex items-center justify-center text-gray-800 font-semibold
+              rounded-full shadow flex items-center justify-center text-tinta-800 font-semibold
               transition select-none
               ${compact
                 ? 'w-7 h-7 text-base opacity-0 group-hover/car:opacity-100'
@@ -257,7 +257,7 @@ export default function ImageCarousel({
               className={`w-14 h-14 rounded-xl overflow-hidden border-2 flex-shrink-0 transition
                 ${i === idx
                   ? 'border-saro-blue scale-105'
-                  : 'border-gray-100 opacity-60 hover:opacity-100 hover:border-gray-300'}`}
+                  : 'border-tinta-100 opacity-60 hover:opacity-100 hover:border-tinta-300'}`}
             >
               <Foto src={src} sizes="56px" alt="" className="w-full h-full object-cover" loading="lazy" decoding="async" />
             </button>

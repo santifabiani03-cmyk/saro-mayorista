@@ -112,7 +112,7 @@ export default function ChatWidget({ whatsappNumber }) {
 
       {/* Panel */}
       <div
-        className={`fixed bottom-24 right-5 z-40 w-[min(92vw,380px)] bg-white rounded-2xl shadow-float border border-gray-100/80 flex flex-col overflow-hidden transition duration-300 origin-bottom-right ${
+        className={`fixed bottom-24 right-5 z-40 w-[min(92vw,380px)] bg-white rounded-2xl shadow-float border border-tinta-100/80 flex flex-col overflow-hidden transition duration-300 origin-bottom-right ${
           open ? 'opacity-100 scale-100 pointer-events-auto' : 'opacity-0 scale-95 pointer-events-none'
         }`}
         style={{ height: 'min(70vh, 520px)' }}
@@ -125,8 +125,8 @@ export default function ChatWidget({ whatsappNumber }) {
           </span>
           <div className="min-w-0">
             <p className="text-white font-bold text-sm leading-tight">Asistente SARO</p>
-            <p className="text-[11px] text-slate-300 flex items-center gap-1.5">
-              <span className="w-1.5 h-1.5 rounded-full bg-emerald-400" /> Respuestas al instante
+            <p className="text-[11px] text-tinta-300 flex items-center gap-1.5">
+              <span className="w-1.5 h-1.5 rounded-full bg-wa-400" /> Respuestas al instante
             </p>
           </div>
         </div>
@@ -139,7 +139,7 @@ export default function ChatWidget({ whatsappNumber }) {
                 className={`max-w-[85%] px-3.5 py-2.5 rounded-2xl text-sm leading-relaxed whitespace-pre-wrap ${
                   m.role === 'user'
                     ? 'bg-saro-blue text-white rounded-br-sm'
-                    : 'bg-white text-gray-700 border border-gray-100 rounded-bl-sm'
+                    : 'bg-white text-tinta-700 border border-tinta-100 rounded-bl-sm'
                 }`}
               >
                 {m.text}
@@ -149,11 +149,11 @@ export default function ChatWidget({ whatsappNumber }) {
 
           {loading && (
             <div className="flex justify-start">
-              <div className="bg-white border border-gray-100 rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1.5">
+              <div className="bg-white border border-tinta-100 rounded-2xl rounded-bl-sm px-4 py-3 flex gap-1.5">
                 {[0, 150, 300].map(d => (
                   <span
                     key={d}
-                    className="w-1.5 h-1.5 rounded-full bg-gray-300 animate-bounce"
+                    className="w-1.5 h-1.5 rounded-full bg-tinta-300 animate-bounce"
                     style={{ animationDelay: `${d}ms` }}
                   />
                 ))}
@@ -168,7 +168,7 @@ export default function ChatWidget({ whatsappNumber }) {
                 <button
                   key={s}
                   onClick={() => enviar(s)}
-                  className="text-xs bg-white border border-gray-200 text-gray-600 px-3 py-1.5 rounded-full hover:border-saro-blue hover:text-saro-blue transition-colors"
+                  className="text-xs bg-white border border-tinta-200 text-tinta-600 px-3 py-1.5 rounded-full hover:border-saro-blue hover:text-saro-blue transition-colors"
                 >
                   {s}
                 </button>
@@ -183,7 +183,7 @@ export default function ChatWidget({ whatsappNumber }) {
               onClick={() => { track('chat_deriva_whatsapp'); trackContacto('chat') }}
               target="_blank"
               rel="noopener noreferrer"
-              className="flex items-center justify-center gap-2 bg-emerald-500 hover:bg-emerald-600 text-white text-sm font-bold py-2.5 rounded-xl transition-colors btn-press"
+              className="flex items-center justify-center gap-2 bg-wa-500 hover:bg-wa-600 text-white text-sm font-bold py-2.5 rounded-xl transition-colors btn-press"
             >
               <WaIcon className="w-4 h-4" />
               Seguir por WhatsApp
@@ -192,7 +192,7 @@ export default function ChatWidget({ whatsappNumber }) {
         </div>
 
         {/* Input */}
-        <div className="border-t border-gray-100 p-3 flex-shrink-0 bg-white">
+        <div className="border-t border-tinta-100 p-3 flex-shrink-0 bg-white">
           <div className="flex items-end gap-2">
             <textarea
               ref={inputRef}
@@ -204,7 +204,7 @@ export default function ChatWidget({ whatsappNumber }) {
               }}
               rows={1}
               placeholder="Escribí tu consulta…"
-              className="flex-1 resize-none border border-gray-200 rounded-xl px-3.5 py-2.5 text-sm max-h-24 focus:outline-none focus:border-saro-blue"
+              className="flex-1 resize-none border border-tinta-200 rounded-xl px-3.5 py-2.5 text-sm max-h-24 focus:outline-none focus:border-saro-blue"
             />
             <button
               onClick={() => enviar()}
@@ -217,7 +217,7 @@ export default function ChatWidget({ whatsappNumber }) {
               </svg>
             </button>
           </div>
-          <p className="text-[10px] text-gray-300 text-center mt-2">
+          <p className="text-[10px] text-tinta-300 text-center mt-2">
             Asistente automático · el pedido se cierra por WhatsApp
           </p>
         </div>

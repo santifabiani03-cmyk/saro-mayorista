@@ -7,24 +7,24 @@ function Bar({ label, value, max, color = 'bg-saro-blue' }) {
   const pct = max > 0 ? (value / max) * 100 : 0
   return (
     <div className="flex items-center gap-3">
-      <span className="text-xs text-gray-600 w-32 truncate text-right">{label}</span>
-      <div className="flex-1 bg-gray-100 rounded-full h-5 overflow-hidden">
+      <span className="text-xs text-tinta-600 w-32 truncate text-right">{label}</span>
+      <div className="flex-1 bg-tinta-100 rounded-full h-5 overflow-hidden">
         <div
           className={`h-full rounded-full ${color} transition duration-500`}
           style={{ width: `${pct}%` }}
         />
       </div>
-      <span className="text-xs font-bold text-gray-700 w-10 text-right">{value}</span>
+      <span className="text-xs font-bold text-tinta-700 w-10 text-right">{value}</span>
     </div>
   )
 }
 
 function StatCard({ icon, label, value }) {
   return (
-    <div className="bg-white rounded-2xl border border-gray-100 p-4 text-center shadow-sm">
+    <div className="bg-white rounded-2xl border border-tinta-100 p-4 text-center shadow-sm">
       <span className="text-2xl">{icon}</span>
       <p className="text-2xl font-extrabold text-saro-blue mt-1">{value}</p>
-      <p className="text-xs text-gray-400 mt-0.5">{label}</p>
+      <p className="text-xs text-tinta-400 mt-0.5">{label}</p>
     </div>
   )
 }
@@ -44,7 +44,7 @@ export default function DemandDashboard() {
 
   if (loading) {
     return (
-      <div className="text-center py-20 text-gray-400">
+      <div className="text-center py-20 text-tinta-400">
         <span className="text-4xl animate-pulse">📊</span>
         <p className="mt-2">Cargando datos…</p>
       </div>
@@ -120,7 +120,7 @@ export default function DemandDashboard() {
 
   if (totalPedidos === 0) {
     return (
-      <div className="text-center py-20 text-gray-400">
+      <div className="text-center py-20 text-tinta-400">
         <span className="text-5xl">📭</span>
         <p className="mt-3 font-medium">Aún no hay pedidos registrados</p>
         <p className="text-sm mt-1">Los pedidos se registran automáticamente cuando un cliente envía por WhatsApp</p>
@@ -132,7 +132,7 @@ export default function DemandDashboard() {
     <div className="space-y-6">
       {/* Filtro de período */}
       <div className="flex items-center justify-between flex-wrap gap-3">
-        <h2 className="text-lg font-bold text-gray-900">📊 Análisis de demanda</h2>
+        <h2 className="text-lg font-bold text-tinta-900">📊 Análisis de demanda</h2>
         <div className="flex gap-2">
           {[
             { val: '7',   label: '7 días' },
@@ -145,7 +145,7 @@ export default function DemandDashboard() {
               className={`px-3 py-1.5 rounded-xl text-xs font-medium border transition ${
                 period === p.val
                   ? 'bg-saro-blue border-saro-blue text-white'
-                  : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue'
+                  : 'bg-white border-tinta-200 text-tinta-600 hover:border-saro-blue'
               }`}
             >
               {p.label}
@@ -165,19 +165,19 @@ export default function DemandDashboard() {
 
       {/* Pedidos por día */}
       {dailySorted.length > 0 && (
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-          <h3 className="font-semibold text-gray-800 text-sm mb-4">Pedidos por día (últimos 30 días)</h3>
+        <div className="bg-white rounded-2xl border border-tinta-100 p-5 shadow-sm">
+          <h3 className="font-semibold text-tinta-800 text-sm mb-4">Pedidos por día (últimos 30 días)</h3>
           <div className="flex items-end gap-1.5 h-28">
             {dailySorted.map(([day, count]) => (
               <div key={day} className="flex-1 flex flex-col items-center gap-1">
                 <span className="text-[10px] font-bold text-saro-blue">{count}</span>
-                <div className="w-full bg-gray-100 rounded-t-md overflow-hidden" style={{ height: '80px' }}>
+                <div className="w-full bg-tinta-100 rounded-t-md overflow-hidden" style={{ height: '80px' }}>
                   <div
                     className="w-full bg-saro-blue rounded-t-md transition duration-500"
                     style={{ height: `${(count / maxDaily) * 100}%`, marginTop: 'auto', position: 'relative', top: `${100 - (count / maxDaily) * 100}%` }}
                   />
                 </div>
-                <span className="text-[9px] text-gray-400 -rotate-45 origin-center whitespace-nowrap">{day}</span>
+                <span className="text-[9px] text-tinta-400 -rotate-45 origin-center whitespace-nowrap">{day}</span>
               </div>
             ))}
           </div>
@@ -186,8 +186,8 @@ export default function DemandDashboard() {
 
       <div className="grid grid-cols-1 lg:grid-cols-3 gap-5">
         {/* Top productos */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-          <h3 className="font-semibold text-gray-800 text-sm mb-4">🏆 Top productos</h3>
+        <div className="bg-white rounded-2xl border border-tinta-100 p-5 shadow-sm">
+          <h3 className="font-semibold text-tinta-800 text-sm mb-4">🏆 Top productos</h3>
           <div className="space-y-2.5">
             {sortedProducts.map(([name, count]) => (
               <Bar key={name} label={name} value={count} max={maxProd} color="bg-saro-blue" />
@@ -196,18 +196,18 @@ export default function DemandDashboard() {
         </div>
 
         {/* Top colores */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-          <h3 className="font-semibold text-gray-800 text-sm mb-4">🎨 Top colores</h3>
+        <div className="bg-white rounded-2xl border border-tinta-100 p-5 shadow-sm">
+          <h3 className="font-semibold text-tinta-800 text-sm mb-4">🎨 Top colores</h3>
           <div className="space-y-2.5">
             {sortedColors.map(([name, count]) => (
-              <Bar key={name} label={name} value={count} max={maxColor} color="bg-emerald-500" />
+              <Bar key={name} label={name} value={count} max={maxColor} color="bg-wa-500" />
             ))}
           </div>
         </div>
 
         {/* Top talles */}
-        <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-          <h3 className="font-semibold text-gray-800 text-sm mb-4">📏 Top talles</h3>
+        <div className="bg-white rounded-2xl border border-tinta-100 p-5 shadow-sm">
+          <h3 className="font-semibold text-tinta-800 text-sm mb-4">📏 Top talles</h3>
           <div className="space-y-2.5">
             {sortedTalles.map(([name, count]) => (
               <Bar key={name} label={name} value={count} max={maxTalle} color="bg-amber-500" />
@@ -220,8 +220,8 @@ export default function DemandDashboard() {
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-5">
         {/* Top combinaciones color + talle */}
         {sortedCombos.length > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-            <h3 className="font-semibold text-gray-800 text-sm mb-4">🔗 Top combinaciones (color + talle)</h3>
+          <div className="bg-white rounded-2xl border border-tinta-100 p-5 shadow-sm">
+            <h3 className="font-semibold text-tinta-800 text-sm mb-4">🔗 Top combinaciones (color + talle)</h3>
             <div className="space-y-2.5">
               {sortedCombos.map(([name, count]) => (
                 <Bar key={name} label={name} value={count} max={maxCombo} color="bg-violet-500" />
@@ -232,8 +232,8 @@ export default function DemandDashboard() {
 
         {/* Pedidos por día de la semana */}
         {totalPedidos > 0 && (
-          <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-            <h3 className="font-semibold text-gray-800 text-sm mb-4">📅 Pedidos por día de la semana</h3>
+          <div className="bg-white rounded-2xl border border-tinta-100 p-5 shadow-sm">
+            <h3 className="font-semibold text-tinta-800 text-sm mb-4">📅 Pedidos por día de la semana</h3>
             <div className="flex items-end gap-2 h-36">
               {DAY_NAMES.map((name, idx) => {
                 const count = dayOfWeekCount[idx]
@@ -241,16 +241,16 @@ export default function DemandDashboard() {
                 const isBest = idx === bestDayIdx && count > 0
                 return (
                   <div key={name} className="flex-1 flex flex-col items-center gap-1">
-                    <span className={`text-[10px] font-bold ${isBest ? 'text-saro-blue' : 'text-gray-400'}`}>
+                    <span className={`text-[10px] font-bold ${isBest ? 'text-saro-blue' : 'text-tinta-400'}`}>
                       {count || ''}
                     </span>
-                    <div className="w-full bg-gray-100 rounded-t-md overflow-hidden" style={{ height: '80px' }}>
+                    <div className="w-full bg-tinta-100 rounded-t-md overflow-hidden" style={{ height: '80px' }}>
                       <div
-                        className={`w-full rounded-t-md transition duration-500 ${isBest ? 'bg-saro-blue' : 'bg-gray-300'}`}
+                        className={`w-full rounded-t-md transition duration-500 ${isBest ? 'bg-saro-blue' : 'bg-tinta-300'}`}
                         style={{ height: `${pct}%`, position: 'relative', top: `${100 - pct}%` }}
                       />
                     </div>
-                    <span className={`text-[10px] ${isBest ? 'font-bold text-saro-blue' : 'text-gray-400'}`}>
+                    <span className={`text-[10px] ${isBest ? 'font-bold text-saro-blue' : 'text-tinta-400'}`}>
                       {name.slice(0, 3)}
                     </span>
                   </div>
@@ -258,7 +258,7 @@ export default function DemandDashboard() {
               })}
             </div>
             {maxDayCount > 0 && (
-              <p className="text-xs text-gray-400 mt-3 text-center">
+              <p className="text-xs text-tinta-400 mt-3 text-center">
                 Día más activo: <span className="font-semibold text-saro-blue">{DAY_NAMES[bestDayIdx]}</span>
               </p>
             )}
@@ -267,31 +267,31 @@ export default function DemandDashboard() {
       </div>
 
       {/* Lista de pedidos recientes */}
-      <div className="bg-white rounded-2xl border border-gray-100 p-5 shadow-sm">
-        <h3 className="font-semibold text-gray-800 text-sm mb-4">📋 Últimos pedidos</h3>
+      <div className="bg-white rounded-2xl border border-tinta-100 p-5 shadow-sm">
+        <h3 className="font-semibold text-tinta-800 text-sm mb-4">📋 Últimos pedidos</h3>
         <div className="overflow-x-auto">
           <table className="w-full text-sm">
-            <thead className="bg-gray-50 border-b border-gray-100">
+            <thead className="bg-tinta-50 border-b border-tinta-100">
               <tr>
-                <th className="text-left px-3 py-2 text-xs font-semibold text-gray-500 uppercase">Fecha</th>
-                <th className="text-left px-3 py-2 text-xs font-semibold text-gray-500 uppercase">Productos</th>
-                <th className="text-right px-3 py-2 text-xs font-semibold text-gray-500 uppercase">Unidades</th>
-                <th className="text-right px-3 py-2 text-xs font-semibold text-gray-500 uppercase">Total</th>
+                <th className="text-left px-3 py-2 text-xs font-semibold text-tinta-500 uppercase">Fecha</th>
+                <th className="text-left px-3 py-2 text-xs font-semibold text-tinta-500 uppercase">Productos</th>
+                <th className="text-right px-3 py-2 text-xs font-semibold text-tinta-500 uppercase">Unidades</th>
+                <th className="text-right px-3 py-2 text-xs font-semibold text-tinta-500 uppercase">Total</th>
               </tr>
             </thead>
-            <tbody className="divide-y divide-gray-50">
+            <tbody className="divide-y divide-tinta-50">
               {filtered.slice(-20).reverse().map(o => (
-                <tr key={o.id} className="hover:bg-gray-50/60">
-                  <td className="px-3 py-2 text-gray-600 whitespace-nowrap">
+                <tr key={o.id} className="hover:bg-tinta-50/60">
+                  <td className="px-3 py-2 text-tinta-600 whitespace-nowrap">
                     {new Date(o.fecha).toLocaleDateString('es-AR', { day: '2-digit', month: '2-digit', year: '2-digit' })}
-                    <span className="text-gray-400 ml-1 text-xs">
+                    <span className="text-tinta-400 ml-1 text-xs">
                       {new Date(o.fecha).toLocaleTimeString('es-AR', { hour: '2-digit', minute: '2-digit' })}
                     </span>
                   </td>
                   <td className="px-3 py-2">
                     <div className="flex flex-col gap-0.5">
                       {o.items?.map((i, idx) => (
-                        <span key={idx} className="text-xs text-gray-600">
+                        <span key={idx} className="text-xs text-tinta-600">
                           {i.nombre} · {i.color}/{i.talle} ×{i.cantidad}
                         </span>
                       ))}

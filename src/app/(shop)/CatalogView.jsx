@@ -106,7 +106,7 @@ export default function CatalogView({ products, kind, modo = 'mayorista' }) {
           <h1 className="text-2xl sm:text-3xl font-extrabold text-saro-dark tracking-tight">
             {meta.heading}
           </h1>
-          <p className="text-sm text-gray-500 mt-4 leading-relaxed">
+          <p className="text-sm text-tinta-500 mt-4 leading-relaxed">
             Estamos terminando de cargar los precios por unidad de esta sección.
             Mientras tanto podés ver el catálogo por mayor o escribirnos y te pasamos
             el precio del producto que te interese.
@@ -120,7 +120,7 @@ export default function CatalogView({ products, kind, modo = 'mayorista' }) {
             </Link>
             <Link
               href="/paletas"
-              className="inline-flex items-center justify-center gap-2 bg-white border border-gray-200 hover:border-saro-blue text-saro-dark hover:text-saro-blue font-bold text-sm px-6 py-3 rounded-xl transition-colors btn-press"
+              className="inline-flex items-center justify-center gap-2 bg-white border border-tinta-200 hover:border-saro-blue text-saro-dark hover:text-saro-blue font-bold text-sm px-6 py-3 rounded-xl transition-colors btn-press"
             >
               Ver paletas
             </Link>
@@ -140,16 +140,16 @@ export default function CatalogView({ products, kind, modo = 'mayorista' }) {
 
       {/* Sección SEO server-rendered */}
       <section className="max-w-7xl mx-auto px-4 sm:px-6 pb-8">
-        <div className="bg-white rounded-2xl border border-gray-100/80 shadow-card p-6 space-y-4">
-          <h2 className="text-base font-bold text-gray-900 tracking-tight">{meta.seoTitle}</h2>
+        <div className="bg-white rounded-2xl border border-tinta-100/80 shadow-card p-6 space-y-4">
+          <h2 className="text-base font-bold text-tinta-900 tracking-tight">{meta.seoTitle}</h2>
           <div
-            className={`grid gap-4 text-sm text-gray-500 leading-relaxed ${
+            className={`grid gap-4 text-sm text-tinta-500 leading-relaxed ${
               meta.blocks.length > 1 ? 'sm:grid-cols-2' : ''
             }`}
           >
             {meta.blocks.map((b, i) => (
               <div key={i}>
-                <h3 className="font-semibold text-gray-700 mb-1">{b.h}</h3>
+                <h3 className="font-semibold text-tinta-700 mb-1">{b.h}</h3>
                 <p>{b.p}</p>
               </div>
             ))}

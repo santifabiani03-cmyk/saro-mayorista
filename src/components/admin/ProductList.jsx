@@ -15,11 +15,11 @@ function Precios({ p }) {
   return (
     <div className="text-right text-sm leading-tight whitespace-nowrap space-y-0.5">
       <p>
-        <span className="text-[10px] font-semibold text-gray-400 uppercase mr-1">May.</span>
+        <span className="text-[10px] font-semibold text-tinta-400 uppercase mr-1">May.</span>
         <span className="font-bold text-saro-blue">{pesos(p.precio)}</span>
       </p>
       <p>
-        <span className="text-[10px] font-semibold text-gray-400 uppercase mr-1">Min.</span>
+        <span className="text-[10px] font-semibold text-tinta-400 uppercase mr-1">Min.</span>
         {minorista
           ? <span className="font-bold text-saro-dark">{pesos(p.precioMinorista)}</span>
           : <span className="text-xs font-semibold text-amber-600" title={aviso}>sin cargar</span>}
@@ -48,7 +48,7 @@ function EyeOffIcon() {
 
 function SortChevron({ active, dir }) {
   return (
-    <span className={`inline-flex flex-col ml-1 leading-none ${active ? 'text-saro-blue' : 'text-gray-300'}`}>
+    <span className={`inline-flex flex-col ml-1 leading-none ${active ? 'text-saro-blue' : 'text-tinta-300'}`}>
       <svg viewBox="0 0 10 5" className={`w-2.5 h-1.5 ${active && dir === 'asc' ? 'text-saro-blue' : ''}`} fill="currentColor">
         <path d="M5 0l5 5H0z"/>
       </svg>
@@ -67,10 +67,10 @@ function MobileProductCard({ p, onEdit, onDelete, onToggleVisible, onToggleSinSt
   const thumb    = p.imagenes?.[0] ?? p.imagen
 
   return (
-    <div className={`bg-white rounded-xl border border-gray-100 p-3 shadow-sm ${!visible ? 'opacity-50' : ''}`}>
+    <div className={`bg-white rounded-xl border border-tinta-100 p-3 shadow-sm ${!visible ? 'opacity-50' : ''}`}>
       <div className="flex gap-3">
         {/* Thumb */}
-        <div className="w-16 h-16 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 relative">
+        <div className="w-16 h-16 rounded-xl bg-tinta-100 flex items-center justify-center overflow-hidden flex-shrink-0 relative">
           {thumb ? (
             <img src={thumb} alt={p.nombre} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
           ) : (
@@ -86,7 +86,7 @@ function MobileProductCard({ p, onEdit, onDelete, onToggleVisible, onToggleSinSt
         {/* Info */}
         <div className="flex-1 min-w-0">
           <div className="flex items-start justify-between gap-2">
-            <p className="font-semibold text-gray-900 text-sm leading-tight truncate">{p.nombre}</p>
+            <p className="font-semibold text-tinta-900 text-sm leading-tight truncate">{p.nombre}</p>
             <Precios p={p} />
           </div>
 
@@ -98,12 +98,12 @@ function MobileProductCard({ p, onEdit, onDelete, onToggleVisible, onToggleSinSt
               </span>
             ))}
             {!visible && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">Oculto</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-tinta-100 text-tinta-500">Oculto</span>
             )}
             {sinStock && (
-              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-gray-500 text-white">Sin stock</span>
+              <span className="text-[10px] px-1.5 py-0.5 rounded-full font-medium bg-tinta-500 text-white">Sin stock</span>
             )}
-            <span className="text-[10px] text-gray-400 capitalize">{p.categoria} · {p.genero}</span>
+            <span className="text-[10px] text-tinta-400 capitalize">{p.categoria} · {p.genero}</span>
           </div>
 
           {/* Colores */}
@@ -112,14 +112,14 @@ function MobileProductCard({ p, onEdit, onDelete, onToggleVisible, onToggleSinSt
               {p.colores.slice(0, 6).map(c => (
                 <span key={c} title={c} className="w-3 h-3 rounded-full border border-white shadow-sm" style={getSwatchStyle(c)} />
               ))}
-              {p.colores.length > 6 && <span className="text-[10px] text-gray-400">+{p.colores.length - 6}</span>}
+              {p.colores.length > 6 && <span className="text-[10px] text-tinta-400">+{p.colores.length - 6}</span>}
             </div>
           )}
         </div>
       </div>
 
       {/* Fechas en mobile */}
-      <div className="flex items-center gap-3 mt-2 text-[10px] text-gray-400">
+      <div className="flex items-center gap-3 mt-2 text-[10px] text-tinta-400">
         {p.fechaPublicacion && (
           <span>📅 Pub: {new Date(p.fechaPublicacion).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'2-digit' })}</span>
         )}
@@ -129,7 +129,7 @@ function MobileProductCard({ p, onEdit, onDelete, onToggleVisible, onToggleSinSt
       </div>
 
       {/* Acciones — siempre visibles en mobile */}
-      <div className="flex items-center gap-2 mt-2 pt-2.5 border-t border-gray-50">
+      <div className="flex items-center gap-2 mt-2 pt-2.5 border-t border-tinta-50">
         <button
           onClick={() => onEdit(p)}
           disabled={saving}
@@ -142,7 +142,7 @@ function MobileProductCard({ p, onEdit, onDelete, onToggleVisible, onToggleSinSt
           disabled={saving}
           title={sinStock ? 'Marcar con stock' : 'Marcar sin stock'}
           className={`p-2 rounded-lg transition-colors text-xs font-bold ${
-            sinStock ? 'bg-gray-500 text-white' : 'text-gray-300 hover:text-gray-600 bg-gray-50'
+            sinStock ? 'bg-tinta-500 text-white' : 'text-tinta-300 hover:text-tinta-600 bg-tinta-50'
           }`}
         >
           S
@@ -152,7 +152,7 @@ function MobileProductCard({ p, onEdit, onDelete, onToggleVisible, onToggleSinSt
           disabled={saving}
           title={visible ? 'Ocultar' : 'Mostrar'}
           className={`p-2 rounded-lg transition-colors ${
-            visible ? 'text-gray-400 bg-gray-50 hover:text-saro-blue' : 'text-gray-400 bg-gray-50 hover:text-green-600'
+            visible ? 'text-tinta-400 bg-tinta-50 hover:text-saro-blue' : 'text-tinta-400 bg-tinta-50 hover:text-wa-600'
           }`}
         >
           {visible ? <EyeIcon /> : <EyeOffIcon />}
@@ -238,7 +238,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
     { key: 'stock',  label: 'Stock' },
   ]
 
-  const thClass = 'text-left px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide'
+  const thClass = 'text-left px-4 py-3 text-xs font-semibold text-tinta-500 uppercase tracking-wide'
   const thButton = 'inline-flex items-center cursor-pointer hover:text-saro-blue transition-colors select-none'
 
   return (
@@ -254,7 +254,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
               placeholder="Buscar producto…"
               value={search}
               onChange={e => setSearch(e.target.value)}
-              className="border border-gray-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-saro-blue w-full sm:w-52"
+              className="border border-tinta-200 rounded-xl px-3 py-2 text-sm focus:outline-none focus:border-saro-blue w-full sm:w-52"
             />
             <div className="flex gap-1.5">
               {[
@@ -269,7 +269,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                   className={`flex items-center gap-1 px-3 py-1.5 sm:py-2 rounded-xl text-xs sm:text-sm font-medium border transition ${
                     filterCat === cat.val
                       ? 'bg-saro-blue border-saro-blue text-white'
-                      : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue'
+                      : 'bg-white border-tinta-200 text-tinta-600 hover:border-saro-blue'
                   }`}
                 >
                   {cat.icon}
@@ -278,16 +278,16 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
               ))}
             </div>
           </div>
-          <p className="text-xs sm:text-sm text-gray-400 flex-shrink-0">
+          <p className="text-xs sm:text-sm text-tinta-400 flex-shrink-0">
             {filtered.length} producto{filtered.length !== 1 ? 's' : ''}
             {' · '}
-            <span className="text-green-500 font-medium">{filtered.filter(p => p.visible !== false).length} visibles</span>
+            <span className="text-wa-500 font-medium">{filtered.filter(p => p.visible !== false).length} visibles</span>
           </p>
         </div>
 
         {/* Barra de ordenamiento */}
         <div className="flex items-center gap-1.5 overflow-x-auto scrollbar-hide">
-          <span className="text-[10px] sm:text-xs text-gray-400 flex-shrink-0 mr-0.5">Ordenar:</span>
+          <span className="text-[10px] sm:text-xs text-tinta-400 flex-shrink-0 mr-0.5">Ordenar:</span>
           {SORT_OPTIONS.map(opt => {
             const active = sortKey === opt.key
             return (
@@ -297,14 +297,14 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                 className={`flex items-center gap-1 px-2.5 py-1 rounded-lg text-[11px] sm:text-xs font-medium border transition flex-shrink-0 ${
                   active
                     ? 'border-saro-blue text-saro-blue bg-saro-light'
-                    : 'border-gray-200 text-gray-500 bg-white hover:border-gray-300'
+                    : 'border-tinta-200 text-tinta-500 bg-white hover:border-tinta-300'
                 }`}
               >
                 {opt.label}
                 {active && (
                   <svg viewBox="0 0 10 14" className="w-2.5 h-3" fill="currentColor">
-                    <path d="M5 0l4 5H1z" className={sortDir === 'asc' ? 'text-saro-blue' : 'text-gray-300'} />
-                    <path d="M5 14l-4-5h8z" className={sortDir === 'desc' ? 'text-saro-blue' : 'text-gray-300'} />
+                    <path d="M5 0l4 5H1z" className={sortDir === 'asc' ? 'text-saro-blue' : 'text-tinta-300'} />
+                    <path d="M5 14l-4-5h8z" className={sortDir === 'desc' ? 'text-saro-blue' : 'text-tinta-300'} />
                   </svg>
                 )}
               </button>
@@ -315,7 +315,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
 
       {/* Lista */}
       {filtered.length === 0 ? (
-        <div className="text-center py-20 text-gray-400">
+        <div className="text-center py-20 text-tinta-400">
           <p className="text-4xl mb-2">📭</p>
           <p>No hay productos que coincidan.</p>
         </div>
@@ -337,9 +337,9 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
           </div>
 
           {/* ── Desktop: Table ── */}
-          <div className="hidden sm:block bg-white rounded-2xl border border-gray-100 overflow-hidden shadow-sm">
+          <div className="hidden sm:block bg-white rounded-2xl border border-tinta-100 overflow-hidden shadow-sm">
             <table className="w-full text-sm">
-              <thead className="bg-gray-50 border-b border-gray-100">
+              <thead className="bg-tinta-50 border-b border-tinta-100">
                 <tr>
                   <th className={thClass}>
                     <button type="button" onClick={() => handleSort('nombre')} className={thButton}>
@@ -349,7 +349,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                   </th>
                   <th className={thClass}>Filtros</th>
                   <th className={`${thClass} hidden md:table-cell`}>Variantes</th>
-                  <th className="text-right px-4 py-3 text-xs font-semibold text-gray-500 uppercase tracking-wide">
+                  <th className="text-right px-4 py-3 text-xs font-semibold text-tinta-500 uppercase tracking-wide">
                     <button type="button" onClick={() => handleSort('precio')} className={`${thButton} justify-end`}>
                       Precios
                       <SortChevron active={sortKey === 'precio'} dir={sortDir} />
@@ -369,13 +369,13 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                   </th>
                 </tr>
               </thead>
-              <tbody className="divide-y divide-gray-50">
+              <tbody className="divide-y divide-tinta-50">
                 {sorted.map(p => {
                   const ptags    = getProductTags(p).map(k => TAG_CONFIG[k]).filter(Boolean)
                   const visible  = p.visible !== false
                   const sinStock = p.sinStock === true
                   return (
-                    <tr key={p.id} className={`hover:bg-gray-50/60 transition-colors group ${!visible ? 'opacity-40' : ''}`}>
+                    <tr key={p.id} className={`hover:bg-tinta-50/60 transition-colors group ${!visible ? 'opacity-40' : ''}`}>
 
                       {/* Producto */}
                       <td className="px-4 py-3">
@@ -383,7 +383,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                           {(() => {
                             const thumb = p.imagenes?.[0] ?? p.imagen
                             return (
-                              <div className="w-12 h-12 rounded-xl bg-gray-100 flex items-center justify-center overflow-hidden flex-shrink-0 relative">
+                              <div className="w-12 h-12 rounded-xl bg-tinta-100 flex items-center justify-center overflow-hidden flex-shrink-0 relative">
                                 {thumb ? (
                                   <img src={thumb} alt={p.nombre} className="w-full h-full object-cover" onError={e => { e.target.style.display = 'none' }} />
                                 ) : (
@@ -398,7 +398,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                             )
                           })()}
                           <div>
-                            <p className="font-semibold text-gray-900 leading-tight">{p.nombre}</p>
+                            <p className="font-semibold text-tinta-900 leading-tight">{p.nombre}</p>
                             <div className="flex items-center gap-1.5 flex-wrap mt-0.5">
                               {ptags.map((tag, i) => (
                                 <span key={i} className={`text-xs px-1.5 py-0.5 rounded-full font-medium ${tag.cls}`}>
@@ -406,13 +406,13 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                                 </span>
                               ))}
                               {!visible && (
-                                <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-gray-100 text-gray-500">Oculto</span>
+                                <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-tinta-100 text-tinta-500">Oculto</span>
                               )}
                               {sinStock && (
-                                <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-gray-500 text-white">Sin stock</span>
+                                <span className="text-xs px-1.5 py-0.5 rounded-full font-medium bg-tinta-500 text-white">Sin stock</span>
                               )}
                             </div>
-                            <p className="text-xs text-gray-400 mt-0.5 line-clamp-1">{p.descripcion}</p>
+                            <p className="text-xs text-tinta-400 mt-0.5 line-clamp-1">{p.descripcion}</p>
                           </div>
                         </div>
                       </td>
@@ -420,9 +420,9 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                       {/* Filtros */}
                       <td className="px-4 py-3">
                         <div className="space-y-0.5">
-                          <p className="text-xs text-gray-500 capitalize">{p.categoria}</p>
-                          <p className="text-xs text-gray-500 capitalize">{p.genero}</p>
-                          <p className="text-xs text-gray-500 capitalize">{p.parteCuerpo}</p>
+                          <p className="text-xs text-tinta-500 capitalize">{p.categoria}</p>
+                          <p className="text-xs text-tinta-500 capitalize">{p.genero}</p>
+                          <p className="text-xs text-tinta-500 capitalize">{p.parteCuerpo}</p>
                         </div>
                       </td>
 
@@ -433,9 +433,9 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                             {p.colores.slice(0, 8).map(c => (
                               <span key={c} title={c} className="w-3.5 h-3.5 rounded-full border border-white shadow-sm" style={getSwatchStyle(c)} />
                             ))}
-                            {p.colores.length > 8 && <span className="text-xs text-gray-400">+{p.colores.length - 8}</span>}
+                            {p.colores.length > 8 && <span className="text-xs text-tinta-400">+{p.colores.length - 8}</span>}
                           </div>
-                          <p className="text-xs text-gray-400">{p.talles.join(' · ')}</p>
+                          <p className="text-xs text-tinta-400">{p.talles.join(' · ')}</p>
                           {p.noStock?.length > 0 && (
                             <p className="text-xs text-red-400">{p.noStock.length} combo{p.noStock.length !== 1 ? 's' : ''} sin stock</p>
                           )}
@@ -452,18 +452,18 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                         <div className="space-y-1">
                           {p.fechaPublicacion ? (
                             <div>
-                              <p className="text-xs text-gray-400">Publicado</p>
-                              <p className="text-xs font-medium text-gray-600">
+                              <p className="text-xs text-tinta-400">Publicado</p>
+                              <p className="text-xs font-medium text-tinta-600">
                                 {new Date(p.fechaPublicacion).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' })}
                               </p>
                             </div>
                           ) : (
-                            <p className="text-xs text-gray-300 italic">Sin fecha</p>
+                            <p className="text-xs text-tinta-300 italic">Sin fecha</p>
                           )}
                           {p.fechaActualizacion && (
                             <div>
-                              <p className="text-xs text-gray-400">Editado</p>
-                              <p className="text-xs font-medium text-gray-500">
+                              <p className="text-xs text-tinta-400">Editado</p>
+                              <p className="text-xs font-medium text-tinta-500">
                                 {new Date(p.fechaActualizacion).toLocaleDateString('es-AR', { day:'2-digit', month:'2-digit', year:'numeric' })}
                               </p>
                             </div>
@@ -479,7 +479,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                             disabled={saving}
                             title={sinStock ? 'Marcar con stock' : 'Marcar sin stock'}
                             className={`p-1.5 rounded-lg transition-colors text-xs font-bold ${
-                              sinStock ? 'bg-gray-500 text-white hover:bg-gray-400' : 'text-gray-300 hover:text-gray-600 hover:bg-gray-100'
+                              sinStock ? 'bg-tinta-500 text-white hover:bg-tinta-400' : 'text-tinta-300 hover:text-tinta-600 hover:bg-tinta-100'
                             }`}
                           >
                             S
@@ -489,7 +489,7 @@ export default function ProductList({ products, onEdit, onDelete, onToggleVisibl
                             disabled={saving}
                             title={visible ? 'Ocultar en tienda' : 'Mostrar en tienda'}
                             className={`p-1.5 rounded-lg transition-colors ${
-                              visible ? 'text-gray-400 hover:text-saro-blue hover:bg-saro-light' : 'text-gray-400 hover:text-green-600 hover:bg-green-50'
+                              visible ? 'text-tinta-400 hover:text-saro-blue hover:bg-saro-light' : 'text-tinta-400 hover:text-wa-600 hover:bg-wa-50'
                             }`}
                           >
                             {visible ? <EyeIcon /> : <EyeOffIcon />}

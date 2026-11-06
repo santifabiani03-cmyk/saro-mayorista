@@ -112,7 +112,7 @@ export default function ProductClient({ product }) {
       <div className="max-w-5xl mx-auto px-4 sm:px-6 py-4">
         <Link
           href={backHref}
-          className="inline-flex items-center gap-1.5 text-sm text-gray-500 hover:text-saro-blue transition-colors font-medium"
+          className="inline-flex items-center gap-1.5 text-sm text-tinta-500 hover:text-saro-blue transition-colors font-medium"
         >
           <svg
             className="w-4 h-4"
@@ -133,7 +133,7 @@ export default function ProductClient({ product }) {
 
       {/* Contenido del producto */}
       <article className="max-w-5xl mx-auto px-4 sm:px-6 pb-12">
-        <div className="bg-white rounded-2xl shadow-card border border-gray-100/80 overflow-hidden">
+        <div className="bg-white rounded-2xl shadow-card border border-tinta-100/80 overflow-hidden">
           <div className="grid grid-cols-1 md:grid-cols-2 gap-0">
             {/* Galeria */}
             <div className="p-5 sm:p-6">
@@ -147,10 +147,10 @@ export default function ProductClient({ product }) {
             </div>
 
             {/* Info */}
-            <div className="p-5 sm:p-6 space-y-4 border-t md:border-t-0 md:border-l border-gray-100/80">
+            <div className="p-5 sm:p-6 space-y-4 border-t md:border-t-0 md:border-l border-tinta-100/80">
               <div>
                 <div className="flex items-center gap-2 flex-wrap">
-                  <h1 className="text-xl sm:text-2xl font-bold text-gray-900 tracking-tight">
+                  <h1 className="text-xl sm:text-2xl font-bold text-tinta-900 tracking-tight">
                     {product.nombre}
                   </h1>
                   {tags.map((tag, i) => (
@@ -164,39 +164,39 @@ export default function ProductClient({ product }) {
                 </div>
                 <p className="text-2xl font-extrabold text-saro-blue mt-1 tracking-tight">
                   ${product.precio.toLocaleString('es-AR')}
-                  <span className="text-sm font-normal text-gray-400 ml-1">
+                  <span className="text-sm font-normal text-tinta-400 ml-1">
                     c/u
                   </span>
                 </p>
               </div>
 
               {product.descripcion && (
-                <p className="text-sm text-gray-600 leading-relaxed">
+                <p className="text-sm text-tinta-600 leading-relaxed">
                   {product.descripcion}
                 </p>
               )}
 
-              <p className="text-[11px] text-gray-400 capitalize font-medium">
+              <p className="text-[11px] text-tinta-400 capitalize font-medium">
                 {product.categoria} · {product.genero}
                 {product.parteCuerpo && ` · ${product.parteCuerpo}`}
               </p>
 
               {/* Matriz color x talle */}
               <div className="space-y-3">
-                <h2 className="font-semibold text-gray-800 text-sm">
+                <h2 className="font-semibold text-tinta-800 text-sm">
                   Selecciona cantidades
                 </h2>
-                <div className="overflow-x-auto rounded-xl border border-gray-100/80">
+                <div className="overflow-x-auto rounded-xl border border-tinta-100/80">
                   <table className="w-full text-sm min-w-max">
-                    <thead className="bg-gray-50/80">
+                    <thead className="bg-tinta-50/80">
                       <tr>
-                        <th className="text-left py-2.5 px-3 text-gray-500 font-medium text-xs">
+                        <th className="text-left py-2.5 px-3 text-tinta-500 font-medium text-xs">
                           Color
                         </th>
                         {sortedTalles.map(t => (
                           <th
                             key={t}
-                            className="py-2.5 px-2 text-center text-gray-500 font-medium text-xs min-w-[68px]"
+                            className="py-2.5 px-2 text-center text-tinta-500 font-medium text-xs min-w-[68px]"
                           >
                             {t}
                           </th>
@@ -208,16 +208,16 @@ export default function ProductClient({ product }) {
                         <tr
                           key={color}
                           className={
-                            ci % 2 === 0 ? 'bg-white' : 'bg-gray-50/40'
+                            ci % 2 === 0 ? 'bg-white' : 'bg-tinta-50/40'
                           }
                         >
                           <td className="py-2 px-3">
                             <div className="flex items-center gap-1.5">
                               <span
-                                className="w-3 h-3 rounded-full border border-gray-200 flex-shrink-0"
+                                className="w-3 h-3 rounded-full border border-tinta-200 flex-shrink-0"
                                 style={getSwatchStyle(color, product.colorDefs)}
                               />
-                              <span className="text-xs text-gray-700 whitespace-nowrap">
+                              <span className="text-xs text-tinta-700 whitespace-nowrap">
                                 {color}
                               </span>
                             </div>
@@ -231,7 +231,7 @@ export default function ProductClient({ product }) {
                                 className="py-1.5 px-1 text-center"
                               >
                                 {noStock ? (
-                                  <span className="text-gray-300 text-base">
+                                  <span className="text-tinta-300 text-base">
                                     ✕
                                   </span>
                                 ) : (
@@ -240,7 +240,7 @@ export default function ProductClient({ product }) {
                                       onClick={() =>
                                         updateQty(color, talle, -1)
                                       }
-                                      className="w-6 h-6 rounded-lg bg-gray-100 hover:bg-red-50 hover:text-red-600 text-gray-600 text-xs font-bold transition-colors flex items-center justify-center"
+                                      className="w-6 h-6 rounded-lg bg-tinta-100 hover:bg-red-50 hover:text-red-600 text-tinta-600 text-xs font-bold transition-colors flex items-center justify-center"
                                     >
                                       −
                                     </button>
@@ -248,7 +248,7 @@ export default function ProductClient({ product }) {
                                       className={`w-6 text-center text-xs font-bold tabular-nums ${
                                         qty > 0
                                           ? 'text-saro-blue'
-                                          : 'text-gray-300'
+                                          : 'text-tinta-300'
                                       }`}
                                     >
                                       {qty}
@@ -257,7 +257,7 @@ export default function ProductClient({ product }) {
                                       onClick={() =>
                                         updateQty(color, talle, 1)
                                       }
-                                      className="w-6 h-6 rounded-lg bg-gray-100 hover:bg-green-50 hover:text-green-700 text-gray-600 text-xs font-bold transition-colors flex items-center justify-center"
+                                      className="w-6 h-6 rounded-lg bg-tinta-100 hover:bg-wa-50 hover:text-wa-700 text-tinta-600 text-xs font-bold transition-colors flex items-center justify-center"
                                     >
                                       +
                                     </button>
@@ -292,7 +292,7 @@ export default function ProductClient({ product }) {
               {/* Promos por cantidad */}
               {product.promos?.length > 0 && (
                 <div className="space-y-1.5">
-                  <p className="text-xs font-semibold text-gray-500">
+                  <p className="text-xs font-semibold text-tinta-500">
                     🔥 Promos por cantidad:
                   </p>
                   <div className="flex flex-wrap gap-1.5">
@@ -303,8 +303,8 @@ export default function ProductClient({ product }) {
                           key={i}
                           className={`text-xs px-2.5 py-1 rounded-lg border font-medium transition duration-200 ${
                             active
-                              ? 'bg-emerald-50 border-emerald-300 text-emerald-700'
-                              : 'bg-gray-50 border-gray-200 text-gray-500'
+                              ? 'bg-wa-50 border-wa-300 text-wa-700'
+                              : 'bg-tinta-50 border-tinta-200 text-tinta-500'
                           }`}
                         >
                           {p.cantidad}u → ${p.precioTotal.toLocaleString('es-AR')}
@@ -317,7 +317,7 @@ export default function ProductClient({ product }) {
 
               {totalUnidades > 0 && (
                 <div className="space-y-1.5">
-                  <div className="flex items-center justify-between bg-saro-light rounded-xl px-4 py-3 border border-blue-100/40">
+                  <div className="flex items-center justify-between bg-saro-light rounded-xl px-4 py-3 border border-saro-line/40">
                     <span className="text-sm font-medium text-saro-dark">
                       {totalUnidades} unidad
                       {totalUnidades !== 1 ? 'es' : ''} seleccionada
@@ -325,7 +325,7 @@ export default function ProductClient({ product }) {
                     </span>
                     <div className="text-right">
                       {ahorro > 0 && (
-                        <span className="text-xs text-gray-400 line-through mr-2">
+                        <span className="text-xs text-tinta-400 line-through mr-2">
                           ${totalSinPromo.toLocaleString('es-AR')}
                         </span>
                       )}
@@ -335,8 +335,8 @@ export default function ProductClient({ product }) {
                     </div>
                   </div>
                   {ahorro > 0 && (
-                    <div className="bg-emerald-50 border border-emerald-200/80 rounded-xl px-4 py-2">
-                      <span className="text-xs text-emerald-700 font-medium">
+                    <div className="bg-wa-50 border border-wa-200/80 rounded-xl px-4 py-2">
+                      <span className="text-xs text-wa-700 font-medium">
                         💰 Ahorras ${ahorro.toLocaleString('es-AR')} con la
                         promo de {applicable.cantidad}u
                       </span>
@@ -349,7 +349,7 @@ export default function ProductClient({ product }) {
               <div className="flex gap-3 pt-2">
                 <Link
                   href={backHref}
-                  className="flex-1 py-2.5 rounded-xl border border-gray-200 text-gray-600 hover:bg-gray-50 font-medium text-sm transition-colors text-center active:scale-[.98]"
+                  className="flex-1 py-2.5 rounded-xl border border-tinta-200 text-tinta-600 hover:bg-tinta-50 font-medium text-sm transition-colors text-center active:scale-[.98]"
                 >
                   ← Catalogo
                 </Link>
@@ -359,7 +359,7 @@ export default function ProductClient({ product }) {
                   className={`flex-1 py-2.5 rounded-xl font-bold text-sm transition duration-200 active:scale-[.98] ${
                     totalUnidades > 0
                       ? 'bg-saro-blue hover:bg-saro-mid text-white shadow-md shadow-saro-blue/20'
-                      : 'bg-gray-100 text-gray-400 cursor-not-allowed'
+                      : 'bg-tinta-100 text-tinta-400 cursor-not-allowed'
                   }`}
                 >
                   {totalUnidades > 0

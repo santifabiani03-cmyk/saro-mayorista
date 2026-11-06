@@ -52,7 +52,7 @@ function Chip({ active, onClick, children }) {
       className={`inline-flex items-center px-3 py-1.5 rounded-lg text-sm font-medium border transition duration-200 whitespace-nowrap btn-press ${
         active
           ? 'bg-saro-blue border-saro-blue text-white shadow-sm shadow-saro-blue/20'
-          : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue/40 hover:text-saro-blue hover:shadow-sm'
+          : 'bg-white border-tinta-200 text-tinta-600 hover:border-saro-blue/40 hover:text-saro-blue hover:shadow-sm'
       }`}
     >
       {children}
@@ -81,7 +81,7 @@ export default function Filters({ products, filters, setFilters }) {
     if (values.length < 2) return null
     return (
       <div className="flex flex-col gap-2">
-        <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">{label}</span>
+        <span className="text-[11px] font-semibold text-tinta-400 uppercase tracking-wider">{label}</span>
         <div className="flex flex-wrap gap-1.5">
           {values.map(v => (
             <Chip key={v} active={filters[filterKey] === v} onClick={() => toggle(filterKey, v)}>
@@ -95,18 +95,18 @@ export default function Filters({ products, filters, setFilters }) {
   }
 
   return (
-    <div className="bg-white rounded-2xl shadow-card border border-gray-100/80 p-4 sm:p-5">
+    <div className="bg-white rounded-2xl shadow-card border border-tinta-100/80 p-4 sm:p-5">
       <div className="flex items-center justify-between">
         <button
           onClick={() => setOpen(o => !o)}
-          className="flex items-center gap-2 font-semibold text-gray-800 text-sm"
+          className="flex items-center gap-2 font-semibold text-tinta-800 text-sm"
         >
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" className="w-4 h-4 text-saro-blue">
             <path strokeLinecap="round" strokeLinejoin="round" d="M10.5 6h9.75M10.5 6a1.5 1.5 0 11-3 0m3 0a1.5 1.5 0 10-3 0M3.75 6H7.5m3 12h9.75m-9.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-3.75 0H7.5m9-6h3.75m-3.75 0a1.5 1.5 0 01-3 0m3 0a1.5 1.5 0 00-3 0m-9.75 0h9.75" />
           </svg>
           Filtros
           <svg
-            className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
+            className={`w-4 h-4 text-tinta-400 transition-transform duration-200 ${open ? 'rotate-180' : ''}`}
             viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
             strokeLinecap="round" strokeLinejoin="round"
           >
@@ -132,12 +132,12 @@ export default function Filters({ products, filters, setFilters }) {
           </div>
 
           {activeTags.length > 0 && (
-            <div className="pt-3 border-t border-gray-100/80">
+            <div className="pt-3 border-t border-tinta-100/80">
               <button
                 onClick={() => setTagsOpen(o => !o)}
                 className="flex items-center justify-between w-full"
               >
-                <span className="text-[11px] font-semibold text-gray-400 uppercase tracking-wider">
+                <span className="text-[11px] font-semibold text-tinta-400 uppercase tracking-wider">
                   Etiquetas
                   {filters.tag && (
                     <span className="ml-2 px-1.5 py-0.5 rounded-md bg-saro-blue text-white text-[10px] normal-case font-bold">
@@ -146,7 +146,7 @@ export default function Filters({ products, filters, setFilters }) {
                   )}
                 </span>
                 <svg
-                  className={`w-4 h-4 text-gray-400 transition-transform duration-200 ${tagsOpen ? 'rotate-180' : ''}`}
+                  className={`w-4 h-4 text-tinta-400 transition-transform duration-200 ${tagsOpen ? 'rotate-180' : ''}`}
                   viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2"
                   strokeLinecap="round" strokeLinejoin="round"
                 >
@@ -165,7 +165,7 @@ export default function Filters({ products, filters, setFilters }) {
                         className={`px-3 py-1.5 rounded-lg text-sm font-medium border transition duration-200 whitespace-nowrap btn-press ${
                           filters.tag === k
                             ? 'bg-saro-blue border-saro-blue text-white shadow-sm shadow-saro-blue/20'
-                            : 'bg-white border-gray-200 text-gray-600 hover:border-saro-blue/40 hover:text-saro-blue'
+                            : 'bg-white border-tinta-200 text-tinta-600 hover:border-saro-blue/40 hover:text-saro-blue'
                         }`}
                       >
                         {tag.label}
