@@ -427,9 +427,7 @@
     "nombre": "Saro Nexus woman ",
     "precio": 140000,
     "descripcion": "Modelo pensado y diseñado para aquellos que buscan control de pelota sin perder pegada. Núcleo de Foam importado.",
-    "tags": [
-      "nuevo"
-    ],
+    "tags": [],
     "categoria": "paleta",
     "genero": "",
     "parteCuerpo": "",
@@ -444,10 +442,10 @@
     "promos": [],
     "id": "p1779990539906",
     "fechaPublicacion": "2026-05-28T17:48:59.906Z",
+    "fechaActualizacion": "2026-11-06T17:06:07.041Z",
     "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/saro-nexus-woman-1779992751622-encuadre.webp"
-    ],
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/saro-nexus-woman-1793984746112.webp"
+    ]
   },
   {
     "nombre": "Saro Radian Pro Carbono",
