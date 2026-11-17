@@ -5,7 +5,7 @@
 > chats viejos ni preguntar nada. Prioriza ser exhaustivo. Si algo cambia, actualizá este
 > archivo y `docs/ESTETICA.md`.
 
-Última actualización: 2026-11-06.
+Última actualización: 2026-11-17.
 
 > ⚠️ **Cambio importante (agosto 2026): el sitio pasó de MAYORISTA a MINORISTA.**
 > La tienda principal es minorista (`/paletas` y `/ropa-y-accesorios`, precio `precioMinorista`).
@@ -182,7 +182,8 @@ Pagina saro/
 │   ├── config.json           ← copia CONGELADA (30/09/2026). Lo vivo está en la rama `datos`
 │   ├── manifest.json         ← metadatos PWA (íconos, nombre)
 │   ├── favicon.png           ← "chip" navy con el logo blanco (ícono de pestaña)
-│   ├── models/paleta-opt.glb ← modelo 3D de la paleta (hero) — la lista está en Paleta3D.jsx
+│   ├── models/paletas/      ← paletas 3D a medida real (<slug>.glb + mini/<slug>.webp); lista en src/data/paletas3d.js
+│   ├── models/paleta-opt.glb ← modelo viejo (Meshy). Ya no lo usa el hero; sí la plantilla de videos (src/videos/Paleta3D.jsx)
 │   ├── videos/               ← música, efectos, fuente Inter y capturas de los videos (§8)
 │   └── assets/               ← logos + fondo-cancha.webp + saro-wordmark.png + fotos de producto
 ├── src/
@@ -434,7 +435,11 @@ archivos con sufijo `-sr` o prefijo `c-sr` en `public/assets/` (ej. `c-sr-...web
    salía con "basura" del escaneo (capturaba la mano) y la malla era ruidosa.
 3. **Meshy (IA image-to-3D)** ✅ **El que quedó.** Da el modelo más limpio y realista.
 
-**Estado final del modelo:**
+**Desde el 17/11/2026 el hero usa los modelos nuevos** (ver "Modelos 3D de las paletas" abajo): en
+cada carga elige uno al azar de `src/data/paletas3d.js` y baja sólo ese (~500 KB). Lo de abajo es
+el modelo anterior, que quedó sólo para los videos.
+
+**Modelo anterior (Meshy):**
 - Archivo: `public/models/paleta-opt.glb` (~**1.5 MB**, comprimido con meshopt + texturas WebP
   desde ~33 MB originales). El loader usa `MeshoptDecoder`.
 - Es la paleta **MASTER Carbono 12K** (dorada con carbono gris). ⚠️ **No regenerar a la ligera:**
@@ -496,10 +501,44 @@ archivos con sufijo `-sr` o prefijo `c-sr` en `public/assets/` (ej. `c-sr-...web
   y al final tiene la **guía de compra** (`GuiaPaletas.jsx`).
 - **Historia/Política y "Trabajá con nosotros"** son **dos pestañas** al final de la landing: al
   abrir una, el panel ocupa **todo el ancho** debajo.
-- **Modelos 3D aleatorios:** la lista está en `MODELOS` (arriba de `Paleta3D.jsx`) y en cada
-  carga elige uno al azar. Hoy hay **uno solo**; para sumar, dejar el `.glb` en `public/models/`
-  y agregarlo a la lista. ⚠️ Ojo: `page.jsx` precarga `paleta-opt.glb` fijo — al sumar modelos
-  hay que revisar ese `<link rel="preload">`.
+- **Modelos 3D aleatorios:** el hero elige uno al azar de `PALETAS_3D` (`src/data/paletas3d.js`)
+  en cada carga y baja sólo ese. Ya no hay `<link rel="preload">` fijo en `page.jsx`.
+
+### 4.4 Modelos 3D de las paletas (17/11/2026)
+
+- **Qué son:** 18 paletas armadas desde las fotos reales a **medida real**: 45,5 cm de largo, cabeza de
+  26 cm, perfil de 38 mm, grip de 116–137 mm (34 × 27 mm) con cinta en espiral, culata y correa.
+  Los arma el generador `archivo/paletas-v3/` (fuera de git; `scripts/lote.py` hace todas, ~10 min,
+  y deja `out/<slug>/<slug>-web.glb`, que se copia a `public/models/paletas/<slug>.glb`). Las caras
+  de carbono llevan relieve sacado de la propia foto, **sólo en la zona de trama** (sobre lo impreso
+  se veía todo abollado).
+- **Cuáles están publicadas (17/11/2026):** sólo las que tienen fotos de canto completas: Nexus
+  Carbono 12K y Radian Pro Carbono roja (`COMPLETAS` en `src/data/paletas3d.js`). Las otras 16 están
+  armadas en `archivo/paletas-v3/` pero no en git: al llegar sus cantos se regeneran, se copia el `.glb`
+  y la mini a `public/models/paletas/` y se suma el slug a `COMPLETAS`.
+- **Dónde se ven:** el hero de la portada (uno al azar, sin la correa) y el **visor de `/paletas`**
+  (`VisorPaletas.jsx`): se elige la paleta, se gira y tiene vistas Frente/Canto/Grip con las medidas
+  dibujadas. El visor pide three.js recién cuando está por entrar en pantalla y cada modelo cuando se
+  lo elige (más el siguiente del riel). Nombre, precio y link salen del producto (`productoId`); si el
+  producto no está publicado, su modelo no aparece.
+- **Color:** `NeutralToneMapping` con exposición **0,7** en hero y visor. Medido contra las fotos: el
+  tono se corre ≤ 6° y el brillo queda ~2 puntos más claro. Con ACES (lo de antes) el tono se corría
+  hasta 21° (Gold PRO, Flash Fibra). **No volver a ACES.**
+- **Golpe del hero:** la pelota persigue la cara real del modelo (la caja de los materiales
+  `-cara`/`-dorso`) y llega cuando el swing está en `IMPACTO` (0,6); antes tenía su propio reloj y
+  llegaba al 0,47–0,5, cuando la paleta todavía no estaba ahí. Si en el seguimiento la cara alcanza a
+  la pelota, la empuja (`empujar`). El revés pega con el dorso (medio giro al impacto). Probado con
+  Chrome sin ventana: 51 impactos y 7 remates en 3 modelos, 0 cuadros con la pelota dentro.
+- **Fotos de canto que faltan:** la mayoría de las paletas no tiene foto del canto (se usa el color
+  del marco) o tiene un solo costado (se repite en los dos). Lista en `archivo/paletas-v3/`.
+
+### 4.5 Otros (17/11/2026)
+
+- **Etiqueta de material:** las paletas de carbono muestran "Carbono 12K" / "Carbono 3K" / "Carbono"
+  en la tarjeta y en el visor (`src/utils/materialPaleta.js`, sale del nombre y la descripción; tests
+  en `materialPaleta.test.mjs`, se corren con `node --test`). Fibra de vidrio no lleva etiqueta.
+- **Barra superior compacta:** fuera de la portada, al bajar más de 80 px se achica (logo y alto) y
+  vuelve al subir a menos de 24 px; el aviso de compra mínima del celular se pliega.
 
 ---
 

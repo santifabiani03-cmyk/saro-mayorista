@@ -7,8 +7,9 @@ import ProductCard from '../../components/ProductCard'
 import ProductModal from '../../components/ProductModal'
 import Link from 'next/link'
 import { toSlug } from '../../utils/slug'
+import VisorPaletas from '../../components/VisorPaletas'
 
-export default function CatalogClient({ products, heading, showFilters = true, modo = null }) {
+export default function CatalogClient({ products, heading, showFilters = true, modo = null, modelos3d = [] }) {
   const router = useRouter()
   const [filters, setFilters] = useState({
     categoria: '',
@@ -75,6 +76,7 @@ export default function CatalogClient({ products, heading, showFilters = true, m
             Catalogo de paletas de padel, accesorios de padel y ropa deportiva en Argentina
           </h1>
         )}
+        {modelos3d.length > 0 && <VisorPaletas items={modelos3d} />}
         {showFilters && (
           <Filters products={visibleProducts} filters={filters} setFilters={setFilters} />
         )}

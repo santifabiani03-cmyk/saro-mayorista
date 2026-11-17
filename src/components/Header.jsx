@@ -1,6 +1,6 @@
 'use client'
 
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import LogoTrazo from './LogoTrazo'
 import { usePathname } from 'next/navigation'
 import { useCart } from '../context/CartContext'
@@ -11,6 +11,15 @@ export default function Header({ config }) {
   const { totalItems, isOpen, setIsOpen, fichaModo } = useCart()
   const [showHowTo, setShowHowTo] = useState(false)
   const pathname = usePathname()
+  // Al bajar, la barra fija se achica para dejarle más pantalla al catálogo.
+  // Dos umbrales (se achica a los 80 px, vuelve a los 24) para que no titile.
+  const [compacto, setCompacto] = useState(false)
+  useEffect(() => {
+    const alScroll = () => setCompacto(c => (c ? window.scrollY > 24 : window.scrollY > 80))
+    alScroll()
+    window.addEventListener('scroll', alScroll, { passive: true })
+    return () => window.removeEventListener('scroll', alScroll)
+  }, [])
   // En la landing el header flota transparente sobre el hero (sin barra de
   // compra mínima ni carrito). En el resto de las páginas es la barra sólida.
   // Cuando Vercel regenera la portada en segundo plano (ISR), del lado del
@@ -26,6 +35,8 @@ export default function Header({ config }) {
   const verCompraMinima = config.mostrarCompraMinima && !esMinorista
     && (!esFicha || fichaModo === 'mayorista')
 
+  const plegado = compacto && !isLanding
+
   return (
     <>
       <header
@@ -35,12 +46,12 @@ export default function Header({ config }) {
             : 'bg-white/80 backdrop-blur-xl border-b border-tinta-100/60 sticky top-0 z-30 shadow-sm'
         }
       >
-        <div className="max-w-7xl mx-auto px-4 sm:px-6 py-3.5 flex items-center justify-between gap-4">
+        <div className={`max-w-7xl mx-auto px-4 sm:px-6 flex items-center justify-between gap-4 transition-[padding] duration-300 ${plegado ? 'py-1.5' : 'py-3.5'}`}>
 
           {/* Logo */}
           <a href="/" className="group flex-shrink-0" aria-label="SARO - Paletas de pádel, accesorios y ropa deportiva (inicio)">
-            <LogoTrazo variante="icono" grosor={5.7} className="block sm:hidden h-11 w-auto" />
-            <LogoTrazo variante="horizontal" grosor={6.4} className="hidden sm:block h-14 w-auto" />
+            <LogoTrazo variante="icono" grosor={5.7} className={`block sm:hidden w-auto transition-[height] duration-300 ${plegado ? 'h-8' : 'h-11'}`} />
+            <LogoTrazo variante="horizontal" grosor={6.4} className={`hidden sm:block w-auto transition-[height] duration-300 ${plegado ? 'h-9' : 'h-14'}`} />
           </a>
 
           <div className="flex items-center gap-2.5 sm:gap-3">
@@ -101,7 +112,7 @@ export default function Header({ config }) {
 
         {/* Badge móvil mínimo (no en la landing, y solo si está activado) */}
         {!isLanding && verCompraMinima && (
-          <div className="sm:hidden bg-gradient-to-r from-saro-light to-saro-light px-4 py-2 text-center text-xs text-saro-dark font-medium border-t border-saro-line/40">
+          <div className={`sm:hidden bg-gradient-to-r from-saro-light to-saro-light px-4 text-center overflow-hidden transition-all duration-300 ${plegado ? 'max-h-0 py-0 border-t-0' : 'max-h-10 py-2 border-t'} text-xs text-saro-dark font-medium border-saro-line/40`}>
             Compra mín. sugerida: <strong className="text-saro-blue">${(config.suggestedMinPurchase ?? config.minPurchase).toLocaleString('es-AR')}</strong>
           </div>
         )}

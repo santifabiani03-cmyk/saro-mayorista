@@ -3,6 +3,7 @@
 import { COLOR_MAP, TAG_CONFIG, getProductTags, getSwatchStyle } from '../utils/colors'
 import ImageCarousel from './ImageCarousel'
 import Foto from './Foto'
+import { materialPaleta } from '../utils/materialPaleta'
 
 // Ancho de la tarjeta en la grilla (2 / 3 / 4 columnas, CatalogClient.jsx)
 const SIZES_TARJETA = '(min-width: 1024px) 300px, (min-width: 640px) 33vw, 50vw'
@@ -191,6 +192,8 @@ export default function ProductCard({ product, onClick, onNavigate }) {
   const tags = getProductTags(product)
     .map(k => TAG_CONFIG[k]).filter(Boolean)
     .sort((a, b) => b.label.length - a.label.length)
+  const material = product.categoria === 'paleta' ? materialPaleta(product) : null
+  if (material) tags.push({ label: material, cls: 'bg-saro-dark text-white' })
   const imgs = getImages(product)
 
   const totalCombos = product.colores.length * product.talles.length

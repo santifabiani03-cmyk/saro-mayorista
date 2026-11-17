@@ -1,13 +1,14 @@
 'use client'
 
 import { useEffect, useRef } from 'react'
+import { PALETAS_3D } from '../data/paletas3d'
 
 /**
- * Paleta3D — carga el modelo 3D escaneado real (fotogrametría) de la paleta
- * SARO MASTER Carbono 12K (public/models/paleta.glb) y lo hace girar según el
- * progreso de scroll (progressRef) + spin idle suave.
+ * Paleta3D — carga un modelo 3D de paleta (uno al azar de PALETAS_3D en cada
+ * carga de la página) y lo anima según el progreso de scroll (progressRef), el
+ * mouse y los clicks.
  *
- * El .glb trae malla + texturas PBR (color, normal, AO, metal/rough) del escaneo.
+ * Los modelos salen de las fotos reales, a medida real (src/data/paletas3d.js).
  * Acá se recentra, se escala y se orienta para el hero.
  */
 
@@ -17,17 +18,13 @@ const ROT_X = 0             // corrección de inclinación inicial
 const ROT_Y = 0             // corrección de giro inicial
 const ROT_Z = 0
 const MODEL_DROP = 0.7      // baja la paleta un poco para que no tape el título
-const HIT_Y = 0.6          // altura de impacto de la pelota: centro de la cara (bajó al bajar el modelo)
+const IMPACTO = 0.6         // en qué parte del golpe (0..1) la cara llega a la pelota: el pico de setSwing
+const R_PELOTA = 0.42
 
-/**
- * Modelos disponibles del hero. Al abrir/recargar la página se elige uno al azar.
- * Para sumar modelos: dejar el .glb en public/models/ y agregarlo a esta lista.
- * (El encuadre se autoajusta: la escena escala el modelo a TARGET_HEIGHT.)
- */
-const MODELOS = [
-  '/models/paleta-opt.glb',
-]
-const MODELO_ELEGIDO = MODELOS[Math.floor(Math.random() * MODELOS.length)]
+// Al abrir o recargar la página se elige una paleta al azar y sólo se baja esa
+// (~500 KB). El resto de los modelos los carga el visor de /paletas a pedido.
+// El encuadre se autoajusta: la escena escala el modelo a TARGET_HEIGHT.
+const MODELO_ELEGIDO = `/models/paletas/${PALETAS_3D[Math.floor(Math.random() * PALETAS_3D.length)].slug}.glb`
 
 export default function Paleta3D({ progressRef, onReady }) {
   const mountRef = useRef(null)
@@ -57,8 +54,10 @@ export default function Paleta3D({ progressRef, onReady }) {
       renderer.setSize(W(), H())
       renderer.shadowMap.enabled = true
       renderer.shadowMap.type = THREE.PCFSoftShadowMap
-      renderer.toneMapping = THREE.ACESFilmicToneMapping
-      renderer.toneMappingExposure = 1.0
+      // Neutral (Khronos PBR Neutral) respeta el color de la foto; ACES corría los rojos a
+      // naranja y lavaba los claros.
+      renderer.toneMapping = THREE.NeutralToneMapping
+      renderer.toneMappingExposure = 0.7   // medido: con 0,7 el brillo queda como en la foto
       mount.appendChild(renderer.domElement)
 
       const scene = new THREE.Scene()
@@ -97,7 +96,7 @@ export default function Paleta3D({ progressRef, onReady }) {
       scene.add(shadowPlane)
 
       // Pelota de padel/tenis (para el remate al final del scroll)
-      const ballGeo = new THREE.SphereGeometry(0.42, 28, 28)
+      const ballGeo = new THREE.SphereGeometry(R_PELOTA, 28, 28)
       const ballMat = new THREE.MeshStandardMaterial({ color: 0xc7f23a, roughness: 0.85, metalness: 0.0 })
       const ball = new THREE.Mesh(ballGeo, ballMat)
       ball.castShadow = true
@@ -116,6 +115,7 @@ export default function Paleta3D({ progressRef, onReady }) {
 
       let model = null
       let swing = null   // grupo que pivotea (swing del golpe)
+      let cara = null    // dónde está la cara de golpe del modelo (en el espacio de `holder`)
       const HALF = TARGET_HEIGHT / 2
       const ELBOW = 1.4  // el pivote baja por debajo del mango (como el codo)
       const loader = new GLTFLoader()
@@ -123,6 +123,10 @@ export default function Paleta3D({ progressRef, onReady }) {
       loader.load(MODELO_ELEGIDO, (gltf) => {
         if (disposed) return
         model = gltf.scene
+        // La correa cuelga quieta: en los golpes y giros del hero se vería rígida.
+        const correas = []
+        model.traverse(o => { if (o.isMesh && o.material?.name?.endsWith('-correa')) correas.push(o) })
+        correas.forEach(o => { o.removeFromParent(); o.geometry.dispose(); o.material.dispose() })
         model.traverse(o => {
           if (o.isMesh) {
             o.castShadow = true
@@ -136,6 +140,19 @@ export default function Paleta3D({ progressRef, onReady }) {
         const center = new THREE.Vector3(); box.getCenter(center)
         const scale = TARGET_HEIGHT / size.y
         model.position.sub(center)              // centra en origen
+        // La cara de golpe: la caja de las caras (materiales "-cara"/"-dorso"), medida en el
+        // espacio del modelo ya centrado. Cada modelo tiene la suya (la Kids es más chica).
+        model.updateMatrixWorld(true)
+        const caja = new THREE.Box3()
+        model.traverse(o => { if (o.isMesh && /-(cara|dorso)$/.test(o.material?.name || '')) caja.expandByObject(o) })
+        if (caja.isEmpty()) caja.copy(new THREE.Box3().setFromObject(model))
+        const alto = caja.max.y - caja.min.y
+        cara = {
+          x: (caja.min.x + caja.max.x) / 2, ancho: (caja.max.x - caja.min.x) / 2,
+          y: caja.max.y - 0.33 * alto, altoZona: 0.1 * alto,   // centro de la cabeza, no del cuello
+          yMin: caja.max.y - 0.62 * alto, yMax: caja.max.y,     // la cabeza (donde puede tocar la pelota)
+          zF: caja.max.z, zD: caja.min.z,
+        }
         const holder = new THREE.Group()
         holder.add(model)
         holder.scale.setScalar(scale)
@@ -146,6 +163,7 @@ export default function Paleta3D({ progressRef, onReady }) {
         swing.position.y = -(HALF + ELBOW)      // recoloca el conjunto centrado
         swing.add(holder)
         paleta.add(swing)
+        cara.holder = holder
         if (!disposed && onReady) onReady()   // avisa al hero que ya se puede sacar el placeholder
       }, undefined, (err) => console.error('Error cargando glb:', err))
 
@@ -178,6 +196,7 @@ export default function Paleta3D({ progressRef, onReady }) {
       let last = t0
 
       // Interactivo: click en la escena 1 lanza una pelota y la paleta la devuelve.
+      const remate = { u: 0, v: 0.3, lado: 1, fase: 'in', mesh: ball }
       let clickT = 0, clickActive = false, clickDur = 0.7, clickDir = 1, clickShot
       let lastLaunch = -999
       let hitsSinceFlip = 0, nextFlip = 4 + Math.floor(Math.random() * 3)  // cada 4–6 golpes, uno al revés
@@ -204,13 +223,50 @@ export default function Paleta3D({ progressRef, onReady }) {
         // Profundidad: carga hacia atrás en el windup y empuja hacia adelante en el impacto
         swing.position.z = (shot.thrust || 0) * (-0.4 * w * (1 - s) + hitEnv)
         // Golpe al revés: giro de 360° (se ve la otra cara y vuelve al frente)
-        if (shot.flip) swing.rotation.y += Math.PI * 2 * e * smoothstep(0.1, 0.9, prog)
+        // al impacto lleva medio giro (pega con el dorso, nunca de canto) y completa la vuelta después
+        if (shot.flip) swing.rotation.y += Math.PI * e * (smoothstep(0.1, IMPACTO, prog) + smoothstep(IMPACTO, 0.95, prog))
+      }
+      // Punto de contacto en el mundo, en este cuadro: el punto (u, v) de la cara, del lado que
+      // mira a la pelota, separado un radio de pelota. Se recalcula cada cuadro porque la paleta
+      // se mueve: así la pelota llega justo a la cara y nunca la atraviesa.
+      const vNormal = new THREE.Vector3(), vCentro = new THREE.Vector3(), vPunto = new THREE.Vector3()
+      const vDesde = new THREE.Vector3(), qCara = new THREE.Quaternion()
+      const contacto = (b, desde) => {
+        cara.holder.getWorldQuaternion(qCara)
+        vNormal.set(0, 0, 1).applyQuaternion(qCara)
+        vCentro.set(cara.x, cara.y, 0); cara.holder.localToWorld(vCentro)
+        const lado = b.lado ?? (vNormal.dot(vPunto.copy(desde).sub(vCentro)) >= 0 ? 1 : -1)
+        vPunto.set(cara.x + b.u * cara.ancho, cara.y + b.v * cara.altoZona, lado > 0 ? cara.zF : cara.zD)
+        cara.holder.localToWorld(vPunto)
+        vNormal.multiplyScalar(lado)
+        return vPunto.addScaledVector(vNormal, R_PELOTA)
+      }
+      // Si la cara alcanza a la pelota (en el seguimiento del golpe la paleta sigue avanzando),
+      // la empuja hasta apoyarla en la superficie: nunca la atraviesa.
+      const vLocal = new THREE.Vector3(), vEscala = new THREE.Vector3()
+      const empujar = (pos, lado) => {
+        vLocal.copy(pos); cara.holder.worldToLocal(vLocal)
+        if (Math.abs(vLocal.x - cara.x) > cara.ancho || vLocal.y < cara.yMin || vLocal.y > cara.yMax) return false
+        const r = R_PELOTA / cara.holder.getWorldScale(vEscala).x
+        const medio = (cara.zF + cara.zD) / 2, grosor = (cara.zF - cara.zD) / 2
+        if (Math.abs(vLocal.z - medio) >= grosor + r) return false
+        vLocal.z = medio + lado * (grosor + r)
+        pos.copy(cara.holder.localToWorld(vLocal))
+        return true
+      }
+      // Salida: en la dirección pedida pero siempre alejándose de la cara que pegó (vNormal)
+      const salir = (b, dx, dy, spd) => {
+        const v = new THREE.Vector3(dx, dy, 0).normalize().multiplyScalar(0.8).addScaledVector(vNormal, 0.6).normalize()
+        b.vx = v.x * spd; b.vy = v.y * spd; b.vz = v.z * spd
+        b.px = b.mesh.position.x; b.py = b.mesh.position.y; b.pz = b.mesh.position.z
+        b.phase = 'out'; b.outT = 0
       }
       const MIN_GAP = 0.45  // tiempo mínimo entre pelota y pelota (seg)
       const launch = () => {
         if (!swing || reduce) return
         const nowS = performance.now() / 1000
         if (nowS - lastLaunch < MIN_GAP) return        // throttle: no se acumulan
+        if (clickActive && clickT < IMPACTO) return    // la pelota anterior todavía no llegó a la cara
         const b = pool.find(x => !x.active)
         if (!b) return
         const interval = Math.min(2.5, nowS - lastLaunch)
@@ -224,21 +280,16 @@ export default function Paleta3D({ progressRef, onReady }) {
         let ox = mouse.x * halfW * 1.15
         if (Math.abs(ox) < 2.5) ox = (mouse.x < 0 ? -1 : 1) * 2.5  // asegurar que venga de un costado
         b.e = ox <= 0 ? 1 : -1
-        b.sx = ox; b.sy = mouse.y * halfH * 1.05; b.sz = 1.0
+        b.sx = ox; b.sy = mouse.y * halfH * 1.05; b.sz = 2.2   // siempre delante de la paleta
         // Destino aleatorio en cualquier dirección (arriba, abajo, diagonales), fuera de cuadro
         const ang = Math.random() * Math.PI * 2
         // Velocidad de salida constante: rebota hacia adelante (no atraviesa la paleta) y vuela
         // en línea recta hasta salir de la pantalla. Algo más rápida si el golpe fue rápido.
-        const dz = 0.35, dlen = Math.sqrt(1 + dz * dz)
-        const spd = 6 + (1 - speedK) * 4
-        b.vx = (Math.cos(ang) / dlen) * spd
-        b.vy = (Math.sin(ang) / dlen) * spd
-        b.vz = (dz / dlen) * spd
+        b.dx = Math.cos(ang); b.dy = Math.sin(ang); b.spd = 6 + (1 - speedK) * 4
         b.halfW = halfW; b.halfH = halfH
-        // Punto de impacto: aleatorio dentro de la zona central de la cara de la paleta
-        b.cx = (Math.random() - 0.5) * 1.4
-        b.cy = HIT_Y + (Math.random() - 0.5) * 1.1
-        b.cz = 0.8
+        // Punto de impacto: al azar en la zona central de la cara (en fracciones de la cara)
+        b.u = (Math.random() - 0.5) * 0.6
+        b.v = (Math.random() - 0.5) * 2
         // Cada 4–6 golpes, uno es "al revés" (giro). Si no, según hacia dónde sale la pelota
         // (sube→globo, baja→remate, clicks rápidos→volea) con algo de azar.
         hitsSinceFlip++
@@ -254,8 +305,9 @@ export default function Paleta3D({ progressRef, onReady }) {
             : (speedK < 0.3 ? 'volea' : ['drive', 'volea', 'globo'][Math.floor(Math.random() * 3)])
         }
         b.shot = SHOTS[shotName]
+        b.lado = shotName === 'reves' ? -1 : 1   // el revés pega con el dorso (llega con medio giro)
         clickShot = b.shot
-        b.phase = 'in'; b.tin = 0; b.tinDur = Math.max(0.16, dur * 0.5); b.outT = 0
+        b.phase = 'in'; b.outT = 0
         b.active = true
         clickActive = true; clickT = 0; clickDur = dur; clickDir = b.e
       }
@@ -324,22 +376,29 @@ export default function Paleta3D({ progressRef, onReady }) {
         // su recorte contra el borde del piso.
         shadowPlane.material.opacity = 0.16 * (1 - Math.min(1, camPull) * 0.6)
 
-        // Pelota del remate por scroll: entra desde izq-arriba → contacto → sale a la derecha
-        if (hitT > 0.001 && hitT < 0.999) {
+        paleta.updateMatrixWorld(true)
+
+        // Pelota del remate por scroll: entra desde arriba a la izquierda (delante de la paleta),
+        // llega a la cara justo en el impacto y sale a la derecha
+        if (cara && hitT > 0.001 && hitT < 0.999) {
           ball.visible = true
-          const cT = 0.47
-          if (hitT < cT) {
-            const k = hitT / cT
-            ball.position.set(-9 * sc * (1 - k), 4.2 - (4.2 - HIT_Y) * k, -2.5 + 3.3 * k)  // → (0, HIT_Y, 0.8)
+          if (hitT < IMPACTO) {
+            remate.fase = 'in'
+            vDesde.set(-9 * sc, 4.2, 2.5)
+            ball.position.copy(vDesde).lerp(contacto(remate, vDesde), hitT / IMPACTO)
+            empujar(ball.position, remate.lado)
           } else {
-            const k = (hitT - cT) / (1 - cT)
-            ball.position.set(10.5 * sc * k, HIT_Y + 1.4 * k, 0.8 - 3.3 * k)        // sale a la derecha
+            if (remate.fase === 'in') { contacto(remate, ball.position); salir(remate, 1, 0.25, 9) }
+            remate.fase = 'out'
+            remate.px += remate.vx * dt; remate.py += remate.vy * dt; remate.pz += remate.vz * dt
+            ball.position.set(remate.px, remate.py, remate.pz)
+            if (empujar(ball.position, remate.lado)) { remate.px = ball.position.x; remate.py = ball.position.y; remate.pz = ball.position.z }
           }
-          const pop = 1 + 0.4 * smoothstep(cT - 0.05, cT, hitT) * (1 - smoothstep(cT, cT + 0.06, hitT))
+          const pop = 1 + 0.4 * smoothstep(IMPACTO - 0.05, IMPACTO, hitT) * (1 - smoothstep(IMPACTO, IMPACTO + 0.06, hitT))
           ball.scale.set(pop, 2 - pop, pop)
           ball.rotation.x += 0.4; ball.rotation.y += 0.25
         } else {
-          ball.visible = false
+          ball.visible = false; remate.fase = 'in'
         }
 
         // Pelotas interactivas (click): salen desde el mouse → contacto → la paleta las manda a otro lado
@@ -347,21 +406,25 @@ export default function Paleta3D({ progressRef, onReady }) {
           if (!b.active) continue
           b.mesh.visible = true
           if (b.phase === 'in') {
-            // Llegada: del punto donde clickeaste/tocaste al centro de la cara
-            b.tin += dt / b.tinDur
-            const k = Math.min(1, b.tin)
-            b.mesh.position.set(b.sx + (b.cx - b.sx) * k, b.sy + (b.cy - b.sy) * k, b.sz + (b.cz - b.sz) * k)
-            const pop = 1 + 0.4 * smoothstep(0.82, 1, b.tin)   // squash al impactar
+            // Llegada: del punto donde clickeaste/tocaste a la cara, atada al golpe: llega cuando
+            // el swing está en IMPACTO (antes tenía su propio reloj y se desfasaba)
+            if (!cara) { b.active = false; b.mesh.visible = false; continue }
+            vDesde.set(b.sx, b.sy, b.sz)
+            const k = Math.min(1, clickActive ? clickT / IMPACTO : 1)
+            b.mesh.position.copy(vDesde).lerp(contacto(b, vDesde), k)
+            empujar(b.mesh.position, b.lado)
+            const pop = 1 + 0.4 * smoothstep(0.82, 1, k)   // squash al impactar
             b.mesh.scale.set(pop, 2 - pop, pop)
-            if (b.tin >= 1) { b.phase = 'out'; b.px = b.cx; b.py = b.cy; b.pz = b.cz }
+            if (k >= 1) salir(b, b.dx, b.dy, b.spd)
           } else {
             // Salida: velocidad constante en línea recta hasta salir de la pantalla
             b.outT += dt
             b.px += b.vx * dt; b.py += b.vy * dt; b.pz += b.vz * dt
             b.mesh.position.set(b.px, b.py, b.pz)
+            if (empujar(b.mesh.position, b.lado)) { b.px = b.mesh.position.x; b.py = b.mesh.position.y; b.pz = b.mesh.position.z }
             const pop = 1 + 0.3 * Math.max(0, 1 - b.outT / 0.09)  // pop breve al salir
             b.mesh.scale.set(pop, 2 - pop, pop)
-            if (Math.abs(b.px) > b.halfW * 1.3 || Math.abs(b.py) > b.halfH * 1.3 || b.outT > 3) {
+            if (Math.abs(b.px) > b.halfW * 1.3 || Math.abs(b.py) > b.halfH * 1.3 || b.pz > camera.position.z - 2 || b.outT > 3) {
               b.active = false; b.mesh.visible = false
             }
           }

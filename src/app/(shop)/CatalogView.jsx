@@ -1,6 +1,9 @@
 import Link from 'next/link'
 import CatalogClient from './CatalogClient'
 import GuiaPaletas from '../../components/GuiaPaletas'
+import { PALETAS_3D } from '../../data/paletas3d'
+import { materialPaleta } from '../../utils/materialPaleta'
+import { toSlug } from '../../utils/slug'
 
 const getImages = p => (p.imagenes?.length ? p.imagenes : p.imagen ? [p.imagen] : [])
 
@@ -62,6 +65,13 @@ export default function CatalogView({ products, kind, modo = 'mayorista' }) {
     .map(p => modo === 'minorista'
       ? { ...p, precio: Number(p.precioMinorista), promos: [], modo }
       : { ...p, modo })
+
+  // Visor 3D de /paletas: cada modelo toma nombre, precio y link de su producto.
+  // Los modelos de un producto que no está publicado no se muestran.
+  const modelos3d = kind !== 'paletas' ? [] : PALETAS_3D.flatMap(m => {
+    const p = visible.find(x => x.id === m.productoId)
+    return p ? [{ ...m, nombre: p.nombre.trim(), precio: p.precio, material: materialPaleta(p), href: `/producto/${toSlug(p.nombre, p.id)}` }] : []
+  })
 
   const itemListJsonLd = {
     '@context': 'https://schema.org',
@@ -132,6 +142,7 @@ export default function CatalogView({ products, kind, modo = 'mayorista' }) {
           heading={meta.heading}
           modo={kind === 'paletas' ? null : modo}
           showFilters={kind !== 'paletas'}
+          modelos3d={modelos3d}
         />
       )}
 
