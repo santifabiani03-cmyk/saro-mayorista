@@ -24,7 +24,13 @@ const R_PELOTA = 0.42
 // Al abrir o recargar la página se elige una paleta al azar y sólo se baja esa
 // (~500 KB). El resto de los modelos los carga el visor de /paletas a pedido.
 // El encuadre se autoajusta: la escena escala el modelo a TARGET_HEIGHT.
-const MODELO_ELEGIDO = `/models/paletas/${PALETAS_3D[Math.floor(Math.random() * PALETAS_3D.length)].slug}.glb`
+// La MASTER Carbono 12K (Meshy) es la paleta que tuvo siempre el hero: su textura se ajustó
+// mirándola con ACES, así que conserva ese tono. Las nuevas salen de fotos y van con Neutral.
+const MODELOS_HERO = [
+  ...PALETAS_3D.map(p => ({ url: `/models/paletas/${p.slug}.glb`, aces: false })),
+  { url: '/models/paleta-opt.glb', aces: true },
+]
+const MODELO_ELEGIDO = MODELOS_HERO[Math.floor(Math.random() * MODELOS_HERO.length)]
 
 export default function Paleta3D({ progressRef, onReady }) {
   const mountRef = useRef(null)
@@ -56,8 +62,8 @@ export default function Paleta3D({ progressRef, onReady }) {
       renderer.shadowMap.type = THREE.PCFSoftShadowMap
       // Neutral (Khronos PBR Neutral) respeta el color de la foto; ACES corría los rojos a
       // naranja y lavaba los claros.
-      renderer.toneMapping = THREE.NeutralToneMapping
-      renderer.toneMappingExposure = 0.7   // medido: con 0,7 el brillo queda como en la foto
+      renderer.toneMapping = MODELO_ELEGIDO.aces ? THREE.ACESFilmicToneMapping : THREE.NeutralToneMapping
+      renderer.toneMappingExposure = MODELO_ELEGIDO.aces ? 1.0 : 0.7   // medido: con 0,7 el brillo queda como en la foto
       mount.appendChild(renderer.domElement)
 
       const scene = new THREE.Scene()
@@ -120,7 +126,7 @@ export default function Paleta3D({ progressRef, onReady }) {
       const ELBOW = 1.4  // el pivote baja por debajo del mango (como el codo)
       const loader = new GLTFLoader()
       loader.setMeshoptDecoder(MeshoptDecoder)
-      loader.load(MODELO_ELEGIDO, (gltf) => {
+      loader.load(MODELO_ELEGIDO.url, (gltf) => {
         if (disposed) return
         model = gltf.scene
         // La correa cuelga quieta: en los golpes y giros del hero se vería rígida.

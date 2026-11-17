@@ -183,7 +183,7 @@ Pagina saro/
 │   ├── manifest.json         ← metadatos PWA (íconos, nombre)
 │   ├── favicon.png           ← "chip" navy con el logo blanco (ícono de pestaña)
 │   ├── models/paletas/      ← paletas 3D a medida real (<slug>.glb + mini/<slug>.webp); lista en src/data/paletas3d.js
-│   ├── models/paleta-opt.glb ← modelo viejo (Meshy). Ya no lo usa el hero; sí la plantilla de videos (src/videos/Paleta3D.jsx)
+│   ├── models/paleta-opt.glb ← MASTER Carbono 12K (Meshy). Entra al sorteo del hero (con ACES) y la usa la plantilla de videos
 │   ├── videos/               ← música, efectos, fuente Inter y capturas de los videos (§8)
 │   └── assets/               ← logos + fondo-cancha.webp + saro-wordmark.png + fotos de producto
 ├── src/
@@ -436,8 +436,9 @@ archivos con sufijo `-sr` o prefijo `c-sr` en `public/assets/` (ej. `c-sr-...web
 3. **Meshy (IA image-to-3D)** ✅ **El que quedó.** Da el modelo más limpio y realista.
 
 **Desde el 17/11/2026 el hero usa los modelos nuevos** (ver "Modelos 3D de las paletas" abajo): en
-cada carga elige uno al azar de `src/data/paletas3d.js` y baja sólo ese (~500 KB). Lo de abajo es
-el modelo anterior, que quedó sólo para los videos.
+cada carga elige uno al azar entre los de `src/data/paletas3d.js` y el anterior (abajo), y baja sólo
+ese. El anterior sigue en el sorteo a pedido de smfab (17/11/2026), con su tono de siempre (ACES 1,0;
+los nuevos van con Neutral 0,7). Probado: 92 golpes sin que la pelota quede dentro.
 
 **Modelo anterior (Meshy):**
 - Archivo: `public/models/paleta-opt.glb` (~**1.5 MB**, comprimido con meshopt + texturas WebP
@@ -501,8 +502,8 @@ el modelo anterior, que quedó sólo para los videos.
   y al final tiene la **guía de compra** (`GuiaPaletas.jsx`).
 - **Historia/Política y "Trabajá con nosotros"** son **dos pestañas** al final de la landing: al
   abrir una, el panel ocupa **todo el ancho** debajo.
-- **Modelos 3D aleatorios:** el hero elige uno al azar de `PALETAS_3D` (`src/data/paletas3d.js`)
-  en cada carga y baja sólo ese. Ya no hay `<link rel="preload">` fijo en `page.jsx`.
+- **Modelos 3D aleatorios:** el hero elige uno al azar de `MODELOS_HERO` (`Paleta3D.jsx`: las de
+  `PALETAS_3D` más `paleta-opt.glb`) en cada carga y baja sólo ese. Ya no hay `<link rel="preload">` fijo en `page.jsx`.
 
 ### 4.4 Modelos 3D de las paletas (17/11/2026)
 
