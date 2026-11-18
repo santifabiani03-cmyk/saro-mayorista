@@ -8,6 +8,9 @@ import SettingsPanel from '../components/admin/SettingsPanel'
 import PublicidadPanel from '../components/admin/PublicidadPanel'
 import VideosPanel from '../components/admin/VideosPanel'
 import { exportCatalogPdf, uploadCatalogPdf } from '../utils/exportCatalogPdf'
+import {
+  leerListaPendiente, guardarListaPendiente, borrarListaPendiente, contarCambios, fechaCorta,
+} from '../utils/borradorAdmin'
 
 
 const SESSION_KEY     = 'saro_admin_auth'
@@ -120,6 +123,7 @@ export default function AdminPage() {
   const [exportProgress, setExportProgress] = useState('')
   const [showQr, setShowQr]             = useState(false)
   const [showShare, setShowShare]       = useState(false)
+  const [recuperado, setRecuperado]     = useState(null) // fecha de los cambios sin publicar recuperados
   // isDev = true solo cuando corre en localhost (desarrollo local)
   const [isDev, setIsDev] = useState(false)
 
@@ -144,16 +148,45 @@ export default function AdminPage() {
   const isSynced = publishedSnap !== null &&
     JSON.stringify(products) === JSON.stringify(publishedSnap)
 
+  const pendientes = publishedSnap === null ? 0 : contarCambios(products, publishedSnap)
+
   useEffect(() => {
     fetch('/api/catalog')
       .then(r => r.json())
       .then(data => {
-        setProducts(data)
         setPublishedSnap(data) // guardamos snapshot de lo publicado
-        setBaseProducts(JSON.parse(JSON.stringify(data))) // deep copy para merge
+        // Cambios que quedaron sin publicar la última vez (recarga, pestaña cerrada)
+        const pendiente = leerListaPendiente()
+        const lista = Array.isArray(pendiente?.products) ? JSON.stringify(pendiente.products) : null
+        if (lista && lista !== JSON.stringify(pendiente.base) && lista !== JSON.stringify(data)) {
+          setProducts(pendiente.products)
+          // La base de entonces: el merge de /api/publish respeta lo que otro haya publicado después
+          setBaseProducts(Array.isArray(pendiente.base) ? pendiente.base : JSON.parse(JSON.stringify(data)))
+          setRecuperado(pendiente.fecha ?? '')
+        } else {
+          borrarListaPendiente()
+          setProducts(data)
+          setBaseProducts(JSON.parse(JSON.stringify(data))) // deep copy para merge
+        }
       })
       .catch(() => showToast('No se pudo cargar el catálogo.', 'error'))
   }, [])
+
+  useEffect(() => {
+    if (publishedSnap === null || isSynced) return
+    guardarListaPendiente(products, baseProducts)
+    const avisar = e => { e.preventDefault(); e.returnValue = '' }
+    window.addEventListener('beforeunload', avisar)
+    return () => window.removeEventListener('beforeunload', avisar)
+  }, [products, baseProducts, publishedSnap, isSynced])
+
+  const descartarPendientes = () => {
+    if (!confirm(`¿Descartar ${pendientes === 1 ? 'el cambio' : `los ${pendientes} cambios`} sin publicar? Se vuelve a lo que está en la web.`)) return
+    borrarListaPendiente()
+    setProducts(publishedSnap)
+    setBaseProducts(JSON.parse(JSON.stringify(publishedSnap)))
+    setRecuperado(null)
+  }
 
 
   const persistProducts = async (newList) => {
@@ -180,6 +213,7 @@ export default function AdminPage() {
     const withDate = { ...product, fechaPublicacion: new Date().toISOString() }
     await persistProducts([...products, withDate])
     changeTab('editar')
+    showToast('✅ Guardado. Falta tocar «Publicar en sitio» para que se vea en la web.', 'ok', 6000)
   }
 
   const handleUpdate = async (updated) => {
@@ -187,6 +221,7 @@ export default function AdminPage() {
     await persistProducts(products.map(p => p.id === updated.id ? withDate : p))
     setEditing(null)
     changeTab('editar')
+    showToast('✅ Cambios guardados. Falta tocar «Publicar en sitio» para que se vean en la web.', 'ok', 6000)
   }
 
   const handleDelete = async (id) => {
@@ -261,6 +296,11 @@ export default function AdminPage() {
   }
 
   const handleDeploy = async () => {
+    // Sin el catálogo cargado no hay base para el merge: publicar pisaría todo
+    if (publishedSnap === null) {
+      showToast('El catálogo no terminó de cargar. Recargá la página antes de publicar.', 'error', 6000)
+      return
+    }
     setDeploying(true)
     try {
       // /api/publish guarda el catálogo en la rama "datos" de GitHub: no hay
@@ -283,6 +323,8 @@ export default function AdminPage() {
       if (JSON.stringify(publicados) !== JSON.stringify(products)) setProducts(publicados)
       setPublishedSnap(publicados)
       setBaseProducts(JSON.parse(JSON.stringify(publicados)))
+      borrarListaPendiente()
+      setRecuperado(null)
 
       // Notificar merge si hubo cambios de otra persona
       const m = json.merge
@@ -351,7 +393,9 @@ export default function AdminPage() {
                   {publishedSnap !== null && (
                     <span className={`flex items-center gap-1 text-[10px] sm:text-xs font-semibold ${isSynced ? 'text-wa-400' : 'text-yellow-400'}`}>
                       <span className={`w-1.5 sm:w-2 h-1.5 sm:h-2 rounded-full flex-shrink-0 ${isSynced ? 'bg-wa-400' : 'bg-yellow-400 animate-pulse'}`} />
-                      <span className="hidden sm:inline">{isSynced ? 'En vivo' : 'Sin publicar'}</span>
+                      <span className="hidden sm:inline">
+                        {isSynced ? 'En vivo' : `${pendientes} ${pendientes === 1 ? 'cambio' : 'cambios'} sin publicar`}
+                      </span>
                     </span>
                   )}
                 </div>
@@ -377,6 +421,9 @@ export default function AdminPage() {
                 <span className="text-xs sm:text-base">{deploying ? '⏳' : '🚀'}</span>
                 <span className="hidden sm:inline">{deploying ? 'Publicando…' : 'Publicar en sitio'}</span>
                 <span className="sm:hidden">{deploying ? '…' : 'Publicar'}</span>
+                {!deploying && pendientes > 0 && (
+                  <span className="min-w-[1.25rem] rounded-full bg-white px-1 text-[10px] sm:text-xs font-extrabold text-wa-600">{pendientes}</span>
+                )}
               </button>
 
               {/* Compartir (dropdown) */}
@@ -435,6 +482,19 @@ export default function AdminPage() {
         </div>
       </header>
 
+      {recuperado !== null && pendientes > 0 && (
+        <div className="bg-saro-accent/15 border-b border-saro-accent/40">
+          <div className="max-w-6xl mx-auto px-3 sm:px-5 py-2.5 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-tinta-800">
+            <span>
+              📝 Recuperamos {pendientes === 1 ? '1 cambio que no se había publicado' : `${pendientes} cambios que no se habían publicado`}
+              {recuperado ? ` (${fechaCorta(recuperado)})` : ''}. Revisalos y tocá «Publicar en sitio».
+            </span>
+            <button onClick={descartarPendientes} className="font-semibold text-saro-blue hover:text-saro-dark">
+              Descartarlos
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Tabs */}
       <div className="bg-white border-b border-tinta-200 sticky top-0 z-20 shadow-sm">
@@ -474,7 +534,11 @@ export default function AdminPage() {
 
       {/* Contenido */}
       <div className="max-w-6xl mx-auto px-3 sm:px-5 py-4 sm:py-8">
-        {tab === 'nuevo' ? (
+        {tab === 'nuevo' && publishedSnap === null ? (
+          <p className="py-16 text-center text-sm text-tinta-500">
+            Cargando el catálogo… Si no aparece en unos segundos, recargá la página.
+          </p>
+        ) : tab === 'nuevo' ? (
           <ProductForm
             key={editingProduct?.id ?? '__new__'}
             initial={editingProduct}

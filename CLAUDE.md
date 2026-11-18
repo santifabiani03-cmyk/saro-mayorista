@@ -5,7 +5,7 @@
 > chats viejos ni preguntar nada. Prioriza ser exhaustivo. Si algo cambia, actualizá este
 > archivo y `docs/ESTETICA.md`.
 
-Última actualización: 2026-11-17.
+Última actualización: 2026-11-18.
 
 > ⚠️ **Cambio importante (agosto 2026): el sitio pasó de MAYORISTA a MINORISTA.**
 > La tienda principal es minorista (`/paletas` y `/ropa-y-accesorios`, precio `precioMinorista`).
@@ -158,7 +158,17 @@ sin que smfab los confirme. El pie de página tiene links reales a las 4 seccion
   guardados usan el `sha` de GitHub: si otro guardado se metió en el medio (dos pedidos
   simultáneos), GitHub lo rechaza y `actualizarArchivo` vuelve a leer y reintenta.
 - **Publicar una lista vacía se rechaza** si hay productos publicados (un admin que no llegó a
-  cargar el catálogo borraría todo).
+  cargar el catálogo borraría todo). Desde el 18/11/2026 también se rechaza publicar **sin base**
+  si ya hay productos, y el admin no deja cargar ni publicar hasta que el catálogo terminó de cargar.
+- **Borradores del admin (18/11/2026, `src/utils/borradorAdmin.js`):** lo cargado vive en la
+  memoria de la página hasta "Publicar en sitio". Ahora se guarda en el navegador (`localStorage`):
+  el formulario a medio llenar (`saro_borrador_nuevo` / `saro_borrador_<id>`) y la lista con
+  cambios sin publicar más su base (`saro_admin_pendiente`). Si la página se recarga, se cierra o
+  se cambia de pestaña, al volver aparece "Recuperamos…" con opción de descartar. Hay aviso antes
+  de cerrar con cambios sin publicar, y si falta un dato obligatorio el formulario lleva hasta ese
+  campo. Es por equipo/navegador: lo cargado en el celular no aparece en la PC hasta publicarlo.
+  Motivo: el 18/11/2026 se perdieron 38 fotos (subidas desde otro equipo, el formulario nunca se
+  guardó); se recuperaron 12 productos ocultos y sin precio con un parche en `datos` (commit `ea99f6d`).
 
 ### 2.4 Autenticación del admin
 

@@ -5,6 +5,9 @@ import {
   getAutoEmoji, TAG_CONFIG, getProductTags, getSwatchStyle,
 } from '../../utils/colors'
 import { ENCUADRE, medirPaleta, planEncuadre, recortarConMascara } from '../../utils/encuadrePaleta'
+import {
+  leerBorradorFormulario, guardarBorradorFormulario, borrarBorradorFormulario, fechaCorta,
+} from '../../utils/borradorAdmin'
 
 // ── Background removal & logo watermark ──────────────────────────────────────
 const LOGO_URL = '/assets/logo-icon.png'
@@ -613,7 +616,7 @@ function RadioGroup({ options, value, onChange }) {
 
 // ── Multi-image uploader ──────────────────────────────────────────────────────
 
-function MultiImageUploader({ images, onChange, productName, applyLogo, encuadrar }) {
+function MultiImageUploader({ images, onChange, onAdd, productName, applyLogo, encuadrar }) {
   const inputRef    = useRef()
   const [pending, setPending] = useState(0)
   const [dragging, setDragging] = useState(false)
@@ -650,12 +653,15 @@ function MultiImageUploader({ images, onChange, productName, applyLogo, encuadra
           console.error('Error aplicando logo al subir:', e)
         }
       }
-      if (url) urls.push(url)
+      // Cada foto entra apenas se sube (no al final de la tanda): si se cambia de
+      // pestaña en el medio, las que ya subieron quedan en el borrador.
+      if (url) { urls.push(url); onAdd(url) }
     }
 
-    onChange([...images, ...urls])
     setPending(p => p - list.length)
-    inputRef.current.value = ''
+    if (inputRef.current) inputRef.current.value = ''
+    const fallidas = list.length - urls.length
+    if (fallidas > 0) alert(`No se pudo subir ${fallidas === 1 ? '1 foto' : `${fallidas} fotos`}. Probá de nuevo.`)
   }
 
   const remove = (i) => onChange(images.filter((_, j) => j !== i))
@@ -888,7 +894,7 @@ function AiSceneSection({ images, onChange, productName }) {
       const file = base64ToFile(results[idx].b64, results[idx].mime)
       const url = await uploadFile(file, productName)
       if (!url) throw new Error('No se pudo subir')
-      onChange([...images, url])
+      onChange(prev => [...prev, url])
       setResults(prev => prev.map((r, i) => i === idx ? { ...r, adding: false, added: true } : r))
     } catch {
       setResults(prev => prev.map((r, i) => i === idx ? { ...r, adding: false } : r))
@@ -1588,31 +1594,93 @@ function PromoEditor({ promos, onChange, precioBase }) {
 
 // ── Formulario principal ──────────────────────────────────────────────────────
 
-export default function ProductForm({ initial, onSave, onCancel, saving }) {
+function formDesde(initial) {
   // Excluir campos de imagen del form; se manejan en estado separado
-  const [form, setForm] = useState(() => {
-    if (!initial) return { ...BLANK }
-    const { imagen: _img, imagenes: _imgs, ...rest } = initial
-    // Migrar campo legacy `tag` → `tags` array
-    const tags = getProductTags(initial)
-    return {
-      ...BLANK, ...rest, tags,
-      precio: String(initial.precio),
-      precioMinorista: initial.precioMinorista != null ? String(initial.precioMinorista) : '',
-      peso: initial.peso != null ? String(initial.peso) : '',
-    }
-  })
+  if (!initial) return { ...BLANK }
+  const { imagen: _img, imagenes: _imgs, ...rest } = initial
+  // Migrar campo legacy `tag` → `tags` array
+  const tags = getProductTags(initial)
+  return {
+    ...BLANK, ...rest, tags,
+    precio: initial.precio ? String(initial.precio) : '',
+    precioMinorista: initial.precioMinorista != null ? String(initial.precioMinorista) : '',
+    peso: initial.peso != null ? String(initial.peso) : '',
+  }
+}
+
+const imagenesDesde = initial =>
+  initial?.imagenes?.length ? initial.imagenes : initial?.imagen ? [initial.imagen] : []
+
+// El emoji se recalcula solo al abrir el formulario: no cuenta como cambio.
+const huella = (form, imagenes) => {
+  const { emoji: _emoji, ...resto } = form
+  return JSON.stringify({ form: resto, imagenes })
+}
+
+const NOMBRE_CAMPO = { nombre: 'nombre', precio: 'precio mayorista', colores: 'colores', talles: 'talles' }
+
+export default function ProductForm({ initial, onSave, onCancel, saving }) {
+  const idBorrador = initial?.id
+  // Lo que había quedado a medio cargar (recarga, cambio de pestaña, celular)
+  const [restaurado, setRestaurado] = useState(() => leerBorradorFormulario(idBorrador))
+  const [form, setForm] = useState(() => restaurado?.form ? { ...BLANK, ...restaurado.form } : formDesde(initial))
   // imagenes: array de URLs ya subidas
-  const [imagenes, setImagenes] = useState(
-    () => initial?.imagenes?.length ? initial.imagenes : initial?.imagen ? [initial.imagen] : []
-  )
+  const [imagenes, setImagenes] = useState(() => restaurado?.imagenes ?? imagenesDesde(initial))
   const [applyLogo, setApplyLogo] = useState(false) // Logo SR en imagen (desactivado: se muestra en la card)
   const [errors, setErrors] = useState({})
+  const huellaInicial = useRef(huella(formDesde(initial), imagenesDesde(initial)))
 
   // Auto emoji cuando cambia categoría o parteCuerpo
   useEffect(() => {
     setForm(f => ({ ...f, emoji: getAutoEmoji(f.categoria, f.parteCuerpo) }))
   }, [form.categoria, form.parteCuerpo])
+
+  // Cada cambio queda guardado en el navegador hasta que se guarda o se descarta
+  const huellaActual = huella(form, imagenes)
+  const cambiado = huellaActual !== huellaInicial.current
+  useEffect(() => {
+    if (cambiado) guardarBorradorFormulario(idBorrador, { form, imagenes })
+    else borrarBorradorFormulario(idBorrador)
+  }, [huellaActual])
+
+  useEffect(() => {
+    if (!cambiado) return
+    const avisar = e => { e.preventDefault(); e.returnValue = '' }
+    window.addEventListener('beforeunload', avisar)
+    return () => window.removeEventListener('beforeunload', avisar)
+  }, [cambiado])
+
+  const descartarBorrador = () => {
+    if (!confirm('¿Descartar lo que habías cargado y empezar de cero?')) return
+    borrarBorradorFormulario(idBorrador)
+    setForm(formDesde(initial))
+    setImagenes(imagenesDesde(initial))
+    setErrors({})
+    setRestaurado(null)
+  }
+
+  const cancelar = () => {
+    cerrado.current = true
+    borrarBorradorFormulario(idBorrador)
+    onCancel()
+  }
+
+  // Una foto que termina de subir después de salir de la pestaña va directo al
+  // borrador. Si el producto ya se guardó o se canceló, no se crea un borrador.
+  const montado = useRef(true)
+  const cerrado = useRef(false)
+  const ultimo = useRef({ form, imagenes })
+  ultimo.current = { form, imagenes }
+  useEffect(() => {
+    montado.current = true
+    return () => { montado.current = false }
+  }, [])
+  const agregarFoto = url => {
+    if (montado.current) { setImagenes(prev => [...prev, url]); return }
+    if (cerrado.current) return
+    const previo = leerBorradorFormulario(idBorrador) ?? ultimo.current
+    guardarBorradorFormulario(idBorrador, { form: previo.form, imagenes: [...(previo.imagenes ?? []), url] })
+  }
 
   const set = (key, val) => setForm(f => ({ ...f, [key]: val }))
 
@@ -1624,21 +1692,28 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     if (form.colores.length === 0)   e.colores  = 'Elegí al menos un color'
     if (form.talles.length === 0)    e.talles   = 'Elegí al menos un talle'
     setErrors(e)
-    return Object.keys(e).length === 0
+    return Object.keys(e)
   }
 
   const handleSubmit = (e) => {
     e.preventDefault()
-    if (!validate()) return
+    const faltan = validate()
+    if (faltan.length) {
+      // El aviso de cada campo es chico y suele quedar fuera de la pantalla
+      document.getElementById(`campo-${faltan[0]}`)?.scrollIntoView({ behavior: 'smooth', block: 'center' })
+      return
+    }
 
     // Incluir definiciones de colores custom para que se vean en la web pública
     const allCustomDefs = loadCustomDefs()
     const predefinedSet = new Set(PREDEFINED_COLORS)
     const colorDefs = {}
     form.colores.forEach(c => {
-      if (!predefinedSet.has(c) && allCustomDefs[c]) {
-        colorDefs[c] = allCustomDefs[c]
-      }
+      if (predefinedSet.has(c)) return
+      // Las definiciones viven en el navegador de quien creó el color: si el
+      // producto ya traía la suya (cargada en otro equipo), se conserva.
+      const def = allCustomDefs[c] ?? form.colorDefs?.[c]
+      if (def) colorDefs[c] = def
     })
 
     // Limpiar promos: convertir a números y filtrar vacías
@@ -1655,8 +1730,9 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
       peso:     Number(form.peso) || 0,
       imagenes,
       promos:   cleanPromos,
-      ...(Object.keys(colorDefs).length > 0 && { colorDefs }),
+      colorDefs,
     }
+    if (!Object.keys(colorDefs).length) delete product.colorDefs
     // Eliminar campos legacy
     delete product.imagen
     delete product.tag
@@ -1667,8 +1743,12 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
     // Publicitar viene prendido por defecto: sólo se guarda cuando se apaga
     if (product.publicitar !== false) delete product.publicitar
 
+    cerrado.current = true
+    borrarBorradorFormulario(idBorrador)
     onSave(product)
   }
+
+  const faltantes = Object.keys(errors).map(k => NOMBRE_CAMPO[k] ?? k)
 
   const busy = saving
 
@@ -1682,6 +1762,14 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
         <p className="text-sm text-tinta-500 mt-0.5">
           Completá el formulario y guardá. Usá "Publicar en sitio" para que los cambios sean visibles.
         </p>
+        {restaurado && (
+          <div className="mt-3 flex flex-wrap items-center gap-x-3 gap-y-1 rounded-xl border border-saro-accent/40 bg-saro-accent/10 px-4 py-2.5 text-sm text-tinta-800">
+            <span>📝 Recuperamos lo que estabas cargando{restaurado.fecha ? ` (${fechaCorta(restaurado.fecha)})` : ''}.</span>
+            <button type="button" onClick={descartarBorrador} className="font-semibold text-saro-blue hover:text-saro-dark">
+              Descartar y empezar de cero
+            </button>
+          </div>
+        )}
       </div>
 
       {/* Grid principal */}
@@ -1717,6 +1805,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
             <MultiImageUploader
               images={imagenes}
               onChange={setImagenes}
+              onAdd={agregarFoto}
               productName={form.nombre}
               applyLogo={applyLogo}
               encuadrar={form.categoria === 'paleta'}
@@ -1757,6 +1846,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
           <Field>
             <Label required>Nombre</Label>
             <input
+              id="campo-nombre"
               type="text"
               value={form.nombre}
               onChange={e => set('nombre', e.target.value)}
@@ -1770,6 +1860,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
           <Field>
             <Label required>Precio mayorista (ARS)</Label>
             <input
+              id="campo-precio"
               type="number"
               min="0"
               value={form.precio}
@@ -2020,7 +2111,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
           </div>
 
           {/* Colores */}
-          <div className="bg-white rounded-2xl border border-tinta-100 p-5 space-y-3">
+          <div id="campo-colores" className={`bg-white rounded-2xl border p-5 space-y-3 ${errors.colores ? 'border-red-400' : 'border-tinta-100'}`}>
             <h3 className="font-semibold text-tinta-800 text-sm">
               Colores disponibles
               {errors.colores && <span className="ml-2 text-red-500 font-normal text-xs">{errors.colores}</span>}
@@ -2032,7 +2123,7 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
           </div>
 
           {/* Talles */}
-          <div className="bg-white rounded-2xl border border-tinta-100 p-5 space-y-3">
+          <div id="campo-talles" className={`bg-white rounded-2xl border p-5 space-y-3 ${errors.talles ? 'border-red-400' : 'border-tinta-100'}`}>
             <h3 className="font-semibold text-tinta-800 text-sm">
               Talles disponibles
               {errors.talles && <span className="ml-2 text-red-500 font-normal text-xs">{errors.talles}</span>}
@@ -2099,11 +2190,16 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
           </div>
 
           {/* Botones */}
+          {faltantes.length > 0 && (
+            <p className="rounded-xl bg-red-50 border border-red-200 px-4 py-2.5 text-sm font-semibold text-red-600">
+              No se guardó: falta completar {faltantes.join(', ')}.
+            </p>
+          )}
           <div className="flex gap-3 pt-2">
             {onCancel && (
               <button
                 type="button"
-                onClick={onCancel}
+                onClick={cancelar}
                 className="px-6 py-2.5 rounded-xl border border-tinta-200 text-tinta-600 hover:bg-tinta-50 font-medium text-sm"
               >
                 Cancelar
@@ -2118,9 +2214,12 @@ export default function ProductForm({ initial, onSave, onCancel, saving }) {
                   : 'bg-saro-blue hover:bg-saro-dark text-white shadow-sm'
               }`}
             >
-              {saving ? '💾 Guardando…' : initial ? '💾 Guardar cambios' : '✅ Publicar producto'}
+              {saving ? '💾 Guardando…' : initial ? '💾 Guardar cambios' : '✅ Guardar producto'}
             </button>
           </div>
+          <p className="text-xs text-tinta-500">
+            Queda en la lista del admin. Para que se vea en la web, después tocá «Publicar en sitio» arriba.
+          </p>
         </div>
       </div>
     </form>

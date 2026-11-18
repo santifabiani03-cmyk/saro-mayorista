@@ -120,7 +120,11 @@ export async function POST(request) {
         mergeInfo = result.mergeInfo
         return result.merged
       }
-      // Sin base (fallback legacy) → reemplazo directo como antes
+      // Sin base sólo se acepta si no hay nada publicado: si no, un admin que no
+      // llegó a cargar el catálogo lo reemplazaría entero por su lista.
+      if (currentProducts.length > 0) {
+        throw new Error('El admin no tiene el catálogo cargado. Recargá la página antes de publicar.')
+      }
       mergeInfo = null
       return products
     }, 'actualizar catalogo')
