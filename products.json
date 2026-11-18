@@ -1899,5 +1899,33 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792759312222.webp"
     ],
     "fechaActualizacion": "2026-11-18T19:02:39.465Z"
+  },
+  {
+    "nombre": "BOLSO MEDIANO LONA ",
+    "precio": 32000,
+    "precioMinorista": 42000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Violeta",
+      "Azul",
+      "Gris"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1795028659432",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028627751.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028632961.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028635223.webp"
+    ],
+    "fechaPublicacion": "2026-11-18T19:04:19.433Z"
   }
 ]
