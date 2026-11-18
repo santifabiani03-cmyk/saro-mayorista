@@ -1936,7 +1936,8 @@
   },
   {
     "nombre": "MUSCULOSA DRY ELAST. CLÁSICA ENTALLADA DAMA",
-    "precio": 0,
+    "precio": 11000,
+    "precioMinorista": 16000,
     "descripcion": "Musculosa dry elastizada clásica entallada para dama, en negro y gris. Tiene espalda deportiva tipo nadadora y logo SR en el pecho; talles S a XXL.",
     "tags": [],
     "categoria": "ropa",
@@ -1957,12 +1958,13 @@
     "emoji": "👕",
     "promos": [],
     "id": "p1795029331551",
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": true,
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024852994.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024856470.webp"
     ],
-    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
-    "visible": false
+    "fechaActualizacion": "2026-11-18T19:20:54.168Z"
   },
   {
     "nombre": "MUSCULOSA DRY ELAST. ESPALDA CRUZADA DAMA",
