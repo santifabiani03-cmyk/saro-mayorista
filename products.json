@@ -414,7 +414,8 @@
     "fechaActualizacion": "2026-11-06T17:06:07.041Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/saro-nexus-woman-1793984746112.webp"
-    ]
+    ],
+    "visible": false
   },
   {
     "nombre": "Saro Radian Pro Carbono",
