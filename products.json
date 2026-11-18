@@ -1068,7 +1068,8 @@
     "parteCuerpo": "torso",
     "colores": [
       "Negro",
-      "Naranja"
+      "Naranja",
+      "Turquesa"
     ],
     "talles": [
       "S",
@@ -1087,9 +1088,16 @@
     "id": "p1786715378297",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715338319.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715340495.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715340495.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/buzo-entrenamiento-liviano-dama-1795025988405.webp"
     ],
-    "fechaPublicacion": "2026-08-14T13:49:38.297Z"
+    "fechaPublicacion": "2026-08-14T13:49:38.297Z",
+    "colorDefs": {
+      "Turquesa": [
+        "Celeste"
+      ]
+    },
+    "fechaActualizacion": "2026-11-18T19:15:31.551Z"
   },
   {
     "nombre": "CAMPERA ROMPEVIENTOS BASICA ESTAMPADA DAMA ",
@@ -1905,5 +1913,397 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028635223.webp"
     ],
     "fechaPublicacion": "2026-11-18T19:04:19.433Z"
+  },
+  {
+    "nombre": "MUSCULOSA DRY ELAST. CLÁSICA ENTALLADA DAMA",
+    "precio": 0,
+    "descripcion": "Musculosa dry elastizada clásica entallada para dama, en negro y gris. Tiene espalda deportiva tipo nadadora y logo SR en el pecho; talles S a XXL.",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro",
+      "Gris"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1795029331551",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024852994.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024856470.webp"
+    ],
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": false
+  },
+  {
+    "nombre": "MUSCULOSA DRY ELAST. ESPALDA CRUZADA DAMA",
+    "precio": 0,
+    "descripcion": "Musculosa dry elastizada para dama en negro, violeta y azul marino. Espalda con tiras cruzadas y abertura, logo SR en el pecho; talles S/M y L/XL.",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro",
+      "Violeta",
+      "Marino"
+    ],
+    "talles": [
+      "S/M",
+      "L/XL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1795029331552",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024953796.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024956187.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024959509.webp"
+    ],
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": false
+  },
+  {
+    "nombre": "REMERA DRY FIT LIVIANO ENTALLADA DAMA",
+    "precio": 0,
+    "descripcion": "Remera dry fit liviana entallada para dama en fucsia, violeta y coral. Manga corta, cuello redondo y tela con textura; talles S a XL.",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Fucsia",
+      "Violeta",
+      "Coral"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1795029331553",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025155417.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025157880.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025160370.webp"
+    ],
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": false,
+    "colorDefs": {
+      "Coral": [
+        "Rosa"
+      ]
+    }
+  },
+  {
+    "nombre": "BUZO LYCRA ESTAMPADO LIVIANO DAMA",
+    "precio": 0,
+    "descripcion": "Buzo de lycra liviana estampada para dama en azul, violeta y fucsia. Capucha con cordón y bolsillo canguro; talles S/M y L/XL.",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Azul",
+      "Violeta",
+      "Fucsia"
+    ],
+    "talles": [
+      "S/M",
+      "L/XL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1795029331554",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025263764.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025267135.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025269729.webp"
+    ],
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": false
+  },
+  {
+    "nombre": "SHORT DRY ELAST. CAB.",
+    "precio": 0,
+    "descripcion": "Short dry elastizado con cintura elástica y vivo de color en el costado, en negro con vivo celeste o negro con vivo rojo; talles S a XXL.",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro/Celeste",
+      "Negro/Rojo"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1795029331555",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025354159.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025357681.webp"
+    ],
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": false,
+    "colorDefs": {
+      "Negro/Celeste": [
+        "Negro",
+        "Celeste"
+      ]
+    }
+  },
+  {
+    "nombre": "REMERA DRY ELAST. MULTIPUNTO CAB. FRANJA",
+    "precio": 0,
+    "descripcion": "Remera dry elastizada multipunto con franja horizontal en el pecho y manga corta. En rojo con franja negra o azul marino con franja celeste; talles S a XXL.",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Rojo/Negro",
+      "Marino/Celeste"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1795029331556",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025492024.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025494420.webp"
+    ],
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": false,
+    "colorDefs": {
+      "Rojo/Negro": [
+        "Rojo",
+        "Negro"
+      ],
+      "Marino/Celeste": [
+        "Marino",
+        "Celeste"
+      ]
+    }
+  },
+  {
+    "nombre": "CROP TOP C/CIERRE LYCRA DAMA",
+    "precio": 0,
+    "descripcion": "Crop top de lycra para dama en bordó, marrón, verde y negro. Cuello alto con medio cierre, sin mangas y calado en la espalda; talles M a XXL.",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Bordó",
+      "Marrón",
+      "Verde",
+      "Negro"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1795029331557",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025717513.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025719567.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025721652.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025723962.webp"
+    ],
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": false,
+    "colorDefs": {
+      "Marrón": [
+        "Bordó"
+      ]
+    }
+  },
+  {
+    "nombre": "SHORT CALZA VAPLEX C/BOLSILLO",
+    "precio": 0,
+    "descripcion": "Short calza corta de lycra Vaplex en negro, con bolsillos laterales; talles S a XXL.",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1795029331558",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026281317.webp"
+    ],
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": false
+  },
+  {
+    "nombre": "MUSCULOSA DRY ELAST. SLIMFIT CAB.",
+    "precio": 0,
+    "descripcion": "Musculosa dry elastizada con textura y calce slim fit, en gris, negro y celeste. Logo SR en el pecho; talles S a XXL.",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Gris",
+      "Negro",
+      "Celeste"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1795029331559",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026466543.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026469109.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026471090.webp"
+    ],
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": false
+  },
+  {
+    "nombre": "BUZO ENTRENAMIENTO ELAST. LIVIANO CAB.",
+    "precio": 0,
+    "descripcion": "Buzo de entrenamiento elastizado liviano con capucha con cordón y bolsillo canguro, en azul. Talles M a XL.",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Azul"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1795029331560",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026788017.webp"
+    ],
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": false
+  },
+  {
+    "nombre": "CAMPERA LYCRA LIVIANA CAB.",
+    "precio": 0,
+    "descripcion": "Campera liviana de lycra con capucha, cierre completo y bolsillos con cierre, en negro y azul marino. Talles M a XXL.",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro",
+      "Marino"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1795029331561",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026977164.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026979533.webp"
+    ],
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": false
+  },
+  {
+    "nombre": "CAMPERA ROMPEVIENTOS DEGRADÉ DAMA",
+    "precio": 0,
+    "descripcion": "Campera rompevientos liviana con capucha, cierre completo, bolsillos con cierre y costuras con vivos blancos. En verde agua, lila, coral y celeste con degradé desde blanco.",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Verde agua",
+      "Lila",
+      "Coral",
+      "Celeste"
+    ],
+    "talles": [],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1795029331562",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028131579.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028135283.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028137837.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028140163.webp"
+    ],
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": false,
+    "colorDefs": {
+      "Verde agua": [
+        "Verde"
+      ],
+      "Lila": [
+        "Violeta"
+      ],
+      "Coral": [
+        "Rosa"
+      ]
+    }
   }
 ]
