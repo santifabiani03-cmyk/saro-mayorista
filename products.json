@@ -1878,20 +1878,26 @@
       "XL",
       "XXL"
     ],
-    "noStock": [],
+    "noStock": [
+      {
+        "color": "Celeste",
+        "talle": "XXL"
+      }
+    ],
     "emoji": "👕",
     "promos": [],
     "id": "p1792759384677",
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792759307212.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792759310081.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792759312222.webp"
-    ],
     "colorDefs": {
       "LAVANDA": [
         "Fucsia"
       ]
     },
-    "fechaPublicacion": "2026-10-23T12:43:04.677Z"
+    "fechaPublicacion": "2026-10-23T12:43:04.677Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792759307212.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792759310081.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792759312222.webp"
+    ],
+    "fechaActualizacion": "2026-11-18T19:02:39.465Z"
   }
 ]
