@@ -1995,7 +1995,8 @@
   },
   {
     "nombre": "REMERA DRY FIT LIVIANO ENTALLADA DAMA",
-    "precio": 0,
+    "precio": 11500,
+    "precioMinorista": 17000,
     "descripcion": "Remera dry fit liviana entallada para dama en fucsia, violeta y coral. Manga corta, cuello redondo y tela con textura; talles S a XL.",
     "tags": [],
     "categoria": "ropa",
@@ -2012,22 +2013,32 @@
       "L",
       "XL"
     ],
-    "noStock": [],
+    "noStock": [
+      {
+        "color": "Fucsia",
+        "talle": "XL"
+      },
+      {
+        "color": "Violeta",
+        "talle": "XL"
+      }
+    ],
     "emoji": "👕",
     "promos": [],
     "id": "p1795029331553",
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": true,
+    "colorDefs": {
+      "Coral": [
+        "Rosa"
+      ]
+    },
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025155417.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025157880.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025160370.webp"
     ],
-    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
-    "visible": false,
-    "colorDefs": {
-      "Coral": [
-        "Rosa"
-      ]
-    }
+    "fechaActualizacion": "2026-11-18T19:19:57.274Z"
   },
   {
     "nombre": "BUZO LYCRA ESTAMPADO LIVIANO DAMA",
