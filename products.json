@@ -734,7 +734,16 @@
     "talles": [
       "Única"
     ],
-    "noStock": [],
+    "noStock": [
+      {
+        "color": "Negro",
+        "talle": "Única"
+      },
+      {
+        "color": "Gris",
+        "talle": "Única"
+      }
+    ],
     "emoji": "📦",
     "promos": [
       {
@@ -746,7 +755,7 @@
     "_aiCount": 3,
     "id": "p1786626830320",
     "fechaPublicacion": "2026-08-13T13:13:50.320Z",
-    "fechaActualizacion": "2026-11-18T18:51:52.180Z",
+    "fechaActualizacion": "2026-11-18T19:01:01.784Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626667811.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626643468.webp"
