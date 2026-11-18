@@ -767,7 +767,7 @@
     "precioMinorista": 14000,
     "descripcion": "Top de lycra con espalda cruzada para mujer, en negro y blanco, para entrenar o jugar.",
     "tags": [
-      "stock_limitado"
+      "destacado"
     ],
     "categoria": "ropa",
     "genero": "femenino",
@@ -788,11 +788,11 @@
     "promos": [],
     "id": "p1786640460659",
     "fechaPublicacion": "2026-08-13T17:01:00.659Z",
+    "fechaActualizacion": "2026-11-18T19:01:52.456Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640424052.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640426768.webp"
-    ],
-    "fechaActualizacion": "2026-11-18T18:49:50.933Z"
+    ]
   },
   {
     "nombre": "CAMPERA ALGODÓN DOBLE NEO (SCUBA)",
