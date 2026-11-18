@@ -795,35 +795,6 @@
     ]
   },
   {
-    "nombre": "CAMPERA ALGODÓN DOBLE NEO (SCUBA)",
-    "precio": 21000,
-    "descripcion": "Campera de algodón doble neo (scuba) para hombre, en negro. Queda como capa de abrigo sobre el equipo.",
-    "tags": [
-      "nuevo"
-    ],
-    "categoria": "ropa",
-    "genero": "masculino",
-    "parteCuerpo": "",
-    "colores": [
-      "Negro"
-    ],
-    "talles": [
-      "M",
-      "L",
-      "XL",
-      "XXL"
-    ],
-    "noStock": [],
-    "emoji": "📦",
-    "promos": [],
-    "id": "p1786640518778",
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640476927.webp"
-    ],
-    "fechaPublicacion": "2026-08-13T17:01:58.778Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
-  },
-  {
     "nombre": "POLLERA LYCRA C/SHORT y BOLSILLO ABERTURA PIERNA ",
     "precio": 13500,
     "descripcion": "Pollera de lycra con short y bolsillo, con abertura en la pierna, para mujer. En negro, lila, azul y short azul aero.",
@@ -902,7 +873,7 @@
       ]
     },
     "fechaPublicacion": "2026-08-13T17:04:35.695Z",
-    "fechaActualizacion": "2026-10-23T12:26:52.251Z",
+    "fechaActualizacion": "2026-11-18T19:09:17.660Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640596225.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640619728.webp"
@@ -1604,7 +1575,7 @@
     "parteCuerpo": "torso",
     "colores": [
       "Negro",
-      "Azul"
+      "Fucsia"
     ],
     "talles": [
       "S/M",
@@ -1614,12 +1585,12 @@
     "emoji": "👕",
     "promos": [],
     "id": "p1787835496022",
+    "fechaPublicacion": "2026-08-27T12:58:16.022Z",
+    "fechaActualizacion": "2026-11-18T19:10:11.819Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835427436.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835429219.webp"
-    ],
-    "fechaPublicacion": "2026-08-27T12:58:16.022Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/remer-n-dry-elast-dama-1795028995797.webp"
+    ]
   },
   {
     "nombre": "JOGGER SEMIRRECTO C/ELÁSTICO REGULABLE y REFLEX CAB.",
