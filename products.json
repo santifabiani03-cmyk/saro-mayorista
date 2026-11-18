@@ -942,6 +942,7 @@
   {
     "nombre": "SHORT CALZA LYCRA LISO DAMA ",
     "precio": 7000,
+    "precioMinorista": 11000,
     "descripcion": "Short calza de lycra lisa para mujer, en negro, elastizado y de calce ajustado.",
     "tags": [],
     "categoria": "ropa",
@@ -957,14 +958,20 @@
       "XL",
       "XXL"
     ],
-    "noStock": [],
+    "noStock": [
+      {
+        "color": "Negro",
+        "talle": "M"
+      }
+    ],
     "emoji": "🩳",
     "promos": [],
     "id": "p1786712445285",
+    "fechaPublicacion": "2026-08-14T13:00:45.285Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712313630.webp"
     ],
-    "fechaPublicacion": "2026-08-14T13:00:45.285Z"
+    "fechaActualizacion": "2026-11-18T19:05:00.952Z"
   },
   {
     "nombre": "CALZA TÉRMICA RECTA DAMA",
