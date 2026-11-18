@@ -130,10 +130,10 @@
     "id": "p1779452295652",
     "fechaPublicacion": "2026-05-22T12:18:15.652Z",
     "visible": true,
+    "fechaActualizacion": "2026-11-18T18:49:02.093Z",
     "imagenes": [
       "/assets/imagen-1779452173589.webp"
-    ],
-    "fechaActualizacion": "2026-06-25T12:01:06.350Z"
+    ]
   },
   {
     "nombre": "CARAMELERA NOAC PERFORADOS X60u. ",
@@ -161,51 +161,21 @@
     "id": "p1779452463276",
     "fechaPublicacion": "2026-05-22T12:21:03.276Z",
     "visible": true,
+    "fechaActualizacion": "2026-11-18T18:47:32.138Z",
     "imagenes": [
       "/assets/imagen-1779452345276.webp"
     ],
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
-  },
-  {
-    "nombre": "TOALLA DE MANO MICROFIBRA ",
-    "precio": 4200,
-    "descripcion": "Toalla de mano de microfibra de secado rápido, incluye estuche. En gris, rosa, verde, marino, gris oscuro, violeta, naranja, surtido y azul.",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "unisex",
-    "parteCuerpo": "accesorio",
-    "colores": [
-      "Gris",
-      "Rosa",
-      "Verde",
-      "Marino",
-      "Gris osc.",
-      "Violeta",
-      "Naranja",
-      "Surtido",
-      "Azul"
-    ],
-    "talles": [
-      "Única"
-    ],
-    "noStock": [],
-    "emoji": "🎾",
-    "promos": [
-      {
-        "cantidad": 10,
-        "precioTotal": 38000
-      }
-    ],
-    "id": "p1779452642845",
-    "fechaPublicacion": "2026-05-22T12:24:02.845Z",
-    "imagenes": [
-      "/assets/imagen-1779452499007.webp"
-    ],
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+    "colorDefs": {
+      "Multicolor": [
+        "Azul",
+        "Violeta"
+      ]
+    }
   },
   {
     "nombre": "Mochila Paletera",
-    "precio": 27000,
+    "precio": 28000,
+    "precioMinorista": 35000,
     "descripcion": "Práctica, cómoda y funcional, la mochila paletera fue diseñada para acompañarte en cada entrenamiento o partido, ofreciendo el espacio justo con una estructura compacta pero amplia al mismo tiempo. \n\nCuenta con un compartimento delantero especial para transportar tu paleta de forma segura y accesible. Su interior amplio permite llevar indumentaria, accesorios y objetos personales sin perder comodidad al trasladarla.",
     "tags": [],
     "categoria": "padel",
@@ -225,7 +195,7 @@
     "visible": true,
     "sinStock": false,
     "fechaPublicacion": "2026-05-22T21:19:26.000Z",
-    "fechaActualizacion": "2026-08-13T12:59:03.265Z",
+    "fechaActualizacion": "2026-11-18T18:49:26.352Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-paletera-1786625926376.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-paletera-1786625929921.webp"
@@ -297,11 +267,10 @@
   },
   {
     "nombre": "Pelotas Nova Padel Pro",
-    "precio": 5800,
+    "precio": 6500,
+    "precioMinorista": 8500,
     "descripcion": "Pelotas Nova Padel Pro en tubo por 2 unidades, importadas, con buen paño, compresión y durabilidad. También en caja por 24 unidades.",
-    "tags": [
-      "nuevo"
-    ],
+    "tags": [],
     "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "accesorio",
@@ -318,10 +287,10 @@
     "visible": true,
     "sinStock": false,
     "fechaPublicacion": "2026-05-22T21:21:10.000Z",
+    "fechaActualizacion": "2026-11-18T18:48:22.818Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/pelotas-nova-padel-pro-1779969106167.webp"
-    ],
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+    ]
   },
   {
     "nombre": "Saro MAX Carbono 12k",
@@ -576,9 +545,9 @@
   {
     "nombre": "Bolso mochila PREMIUM ",
     "precio": 56000,
+    "precioMinorista": 70000,
     "descripcion": "Este bolso mochila PREMIUM combina ecocuero y lona reforzada para máxima durabilidad. Presenta doble asa de agarre acolchonada, un bolsillo lateral para objetos personales y compartimentos independientes para ropa y zapatillas. Incluye dos compartimentos laterales acolchados y reforzados, diseñados para transportar paletas de forma segura.",
     "tags": [
-      "nuevo",
       "destacado"
     ],
     "categoria": "padel",
@@ -608,12 +577,12 @@
     "_aiCount": 2,
     "id": "p1782391159367",
     "fechaPublicacion": "2026-06-25T12:39:19.367Z",
+    "fechaActualizacion": "2026-11-18T18:47:17.131Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782390069890.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782390066839.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782390096005.webp"
-    ],
-    "fechaActualizacion": "2026-06-25T12:40:22.616Z"
+    ]
   },
   {
     "nombre": "COMBO TORNEO BOLSO GRANDE ",
@@ -750,7 +719,8 @@
   },
   {
     "nombre": "BOLSO MOCHILA GRANDE LONA ",
-    "precio": 40000,
+    "precio": 44000,
+    "precioMinorista": 52000,
     "descripcion": "Bolso paletero grande de lona, diseñado para transportar equipamiento deportivo completo. Incorpora tres compartimentos principales: dos para paletas y uno espacioso para objetos personales. Cuenta con un compartimento independiente e impermeable ideal para zapatillas o ropa húmeda. Incluye una correa regulable y reforzada para mayor comodidad, junto con una manija frontal para un transporte rápido y sencillo.",
     "tags": [],
     "categoria": "padel",
@@ -774,16 +744,17 @@
     "_aiLoading": false,
     "_aiCount": 3,
     "id": "p1786626830320",
+    "fechaPublicacion": "2026-08-13T13:13:50.320Z",
+    "fechaActualizacion": "2026-11-18T18:51:52.180Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626667811.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626643468.webp"
-    ],
-    "fechaPublicacion": "2026-08-13T13:13:50.320Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+    ]
   },
   {
     "nombre": "TOP LYCRA ESPALDA CRUZADA ",
     "precio": 8000,
+    "precioMinorista": 14000,
     "descripcion": "Top de lycra con espalda cruzada para mujer, en negro y blanco, para entrenar o jugar.",
     "tags": [
       "stock_limitado"
@@ -806,11 +777,12 @@
     "emoji": "📦",
     "promos": [],
     "id": "p1786640460659",
+    "fechaPublicacion": "2026-08-13T17:01:00.659Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640424052.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640426768.webp"
     ],
-    "fechaPublicacion": "2026-08-13T17:01:00.659Z"
+    "fechaActualizacion": "2026-11-18T18:49:50.933Z"
   },
   {
     "nombre": "CAMPERA ALGODÓN DOBLE NEO (SCUBA)",
@@ -929,6 +901,7 @@
   {
     "nombre": "SHORT C/CALZA DRY ELASTIZADO DAMA",
     "precio": 13500,
+    "precioMinorista": 18500,
     "descripcion": "Short con calza dry elastizado para mujer, en negro y gris. La tela dry seca rápido y la calza estira con el movimiento.",
     "tags": [],
     "categoria": "ropa",
@@ -949,11 +922,12 @@
     "emoji": "🩳",
     "promos": [],
     "id": "p1786712282456",
+    "fechaPublicacion": "2026-08-14T12:58:02.456Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712225912.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786712237649.webp"
     ],
-    "fechaPublicacion": "2026-08-14T12:58:02.456Z"
+    "fechaActualizacion": "2026-11-18T18:50:27.545Z"
   },
   {
     "nombre": "SHORT CALZA LYCRA LISO DAMA ",
