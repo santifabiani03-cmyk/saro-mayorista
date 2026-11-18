@@ -138,6 +138,7 @@
   {
     "nombre": "CARAMELERA NOAC PERFORADOS X60u. ",
     "precio": 60000,
+    "precioMinorista": 65000,
     "descripcion": "Caramelera Noac de cubre grips perforados importados, con 60 unidades surtidas o todas blancas. Deja los cubre grips a mano.",
     "tags": [],
     "categoria": "padel",
@@ -161,16 +162,16 @@
     "id": "p1779452463276",
     "fechaPublicacion": "2026-05-22T12:21:03.276Z",
     "visible": true,
-    "fechaActualizacion": "2026-11-18T18:47:32.138Z",
-    "imagenes": [
-      "/assets/imagen-1779452345276.webp"
-    ],
+    "fechaActualizacion": "2026-11-18T19:15:47.851Z",
     "colorDefs": {
       "Multicolor": [
         "Azul",
         "Violeta"
       ]
-    }
+    },
+    "imagenes": [
+      "/assets/imagen-1779452345276.webp"
+    ]
   },
   {
     "nombre": "Mochila Paletera",
@@ -481,7 +482,8 @@
   },
   {
     "nombre": "Bolso mochila ELITE ",
-    "precio": 52000,
+    "precio": 53000,
+    "precioMinorista": 67000,
     "descripcion": "El bolso mochila paletero ELITE es un accesorio versátil para el equipamiento deportivo. Cuenta con dos compartimentos laterales diseñados para paletas, junto con depósitos independientes para zapatillas y ropa. Incorpora tiradores de mochila regulables, una manija superior y un bolsillo específico para objetos personales pequeños.\nCompuesto por ecocuero resistente y fácil de limpiar, lona reforzada e interior forrado. ",
     "tags": [],
     "categoria": "padel",
@@ -489,7 +491,9 @@
     "parteCuerpo": "",
     "colores": [
       "Rosa",
-      "Negro"
+      "Negro",
+      "Gris",
+      "turquesa"
     ],
     "talles": [
       "Única"
@@ -506,12 +510,18 @@
     "_aiCount": 1,
     "id": "p1782388768791",
     "fechaPublicacion": "2026-06-25T11:59:28.791Z",
-    "fechaActualizacion": "2026-10-23T12:34:05.269Z",
+    "fechaActualizacion": "2026-11-18T19:17:55.254Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388111268.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388169727.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388114714.webp"
-    ]
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388114714.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/bolso-mochila-elite-1795029424430.webp"
+    ],
+    "colorDefs": {
+      "turquesa": [
+        "Celeste"
+      ]
+    }
   },
   {
     "nombre": "TUBO PELOTAS x2 NOVA ",
@@ -989,6 +999,7 @@
   {
     "nombre": "CAMISETA TÉRMICA DAMA",
     "precio": 10000,
+    "precioMinorista": 15000,
     "descripcion": "Camiseta térmica para mujer, en negro, blanco y gris. Primera capa de abrigo para días fríos.",
     "tags": [
       "sale"
@@ -1021,13 +1032,13 @@
     "emoji": "👕",
     "promos": [],
     "id": "p1786715256504",
+    "fechaPublicacion": "2026-08-14T13:47:36.504Z",
+    "fechaActualizacion": "2026-11-18T19:16:32.094Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715207372.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715204272.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715209179.webp"
-    ],
-    "fechaPublicacion": "2026-08-14T13:47:36.504Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z"
+    ]
   },
   {
     "nombre": "SHORT CON CALZA CABALLERO ",
@@ -1573,17 +1584,19 @@
     }
   },
   {
-    "nombre": "REMERÓN DRY ELAST. DAMA",
+    "nombre": "REMERÓN DRYFIT ELASTIZADO DAMA",
     "precio": 12000,
-    "precioMinorista": 21000,
-    "descripcion": "Remerón dry elastizado para mujer, en negro y azul. El calce largo cubre más y la tela dry seca rápido.",
-    "tags": [],
+    "precioMinorista": 19000,
+    "descripcion": "Remerón deportivo de dama confeccionado en tejido dryfit elastizado. Esta prenda brinda una excelente transpirabilidad y libertad de movimiento. Es ideal para la práctica de pádel y otras actividades físicas. Su diseño y composición aseguran confort durante el entrenamiento.",
+    "tags": [
+      "destacado"
+    ],
     "categoria": "ropa",
     "genero": "femenino",
     "parteCuerpo": "torso",
     "colores": [
       "Negro",
-      "Fucsia"
+      "Magenta"
     ],
     "talles": [
       "S/M",
@@ -1594,11 +1607,18 @@
     "promos": [],
     "id": "p1787835496022",
     "fechaPublicacion": "2026-08-27T12:58:16.022Z",
-    "fechaActualizacion": "2026-11-18T19:10:11.819Z",
+    "fechaActualizacion": "2026-11-18T19:11:50.330Z",
+    "_aiLoading": false,
+    "_aiCount": 4,
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835427436.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/remer-n-dry-elast-dama-1795028995797.webp"
-    ]
+    ],
+    "colorDefs": {
+      "Magenta": [
+        "Fucsia"
+      ]
+    }
   },
   {
     "nombre": "JOGGER SEMIRRECTO C/ELÁSTICO REGULABLE y REFLEX CAB.",
