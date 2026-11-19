@@ -1968,7 +1968,8 @@
   },
   {
     "nombre": "MUSCULOSA DRY ELAST. ESPALDA CRUZADA DAMA",
-    "precio": 0,
+    "precio": 12000,
+    "precioMinorista": 19000,
     "descripcion": "Musculosa dry elastizada para dama en negro, violeta y azul marino. Espalda con tiras cruzadas y abertura, logo SR en el pecho; talles S/M y L/XL.",
     "tags": [],
     "categoria": "ropa",
@@ -1987,13 +1988,14 @@
     "emoji": "👕",
     "promos": [],
     "id": "p1795029331552",
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": true,
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024953796.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024956187.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024959509.webp"
     ],
-    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
-    "visible": false
+    "fechaActualizacion": "2026-11-19T17:41:01.174Z"
   },
   {
     "nombre": "REMERA DRY FIT LIVIANO ENTALLADA DAMA",
@@ -2044,7 +2046,8 @@
   },
   {
     "nombre": "BUZO LYCRA ESTAMPADO LIVIANO DAMA",
-    "precio": 0,
+    "precio": 20000,
+    "precioMinorista": 30000,
     "descripcion": "Buzo de lycra liviana estampada para dama en azul, violeta y fucsia. Capucha con cordón y bolsillo canguro; talles S/M y L/XL.",
     "tags": [],
     "categoria": "ropa",
@@ -2063,17 +2066,19 @@
     "emoji": "👕",
     "promos": [],
     "id": "p1795029331554",
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": true,
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025263764.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025267135.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025269729.webp"
     ],
-    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
-    "visible": false
+    "fechaActualizacion": "2026-11-19T17:41:48.718Z"
   },
   {
     "nombre": "SHORT DRY ELAST. CAB.",
-    "precio": 0,
+    "precio": 10000,
+    "precioMinorista": 17000,
     "descripcion": "Short dry elastizado con cintura elástica y vivo de color en el costado, en negro con vivo celeste o negro con vivo rojo; talles S a XXL.",
     "tags": [],
     "categoria": "ropa",
@@ -2094,18 +2099,19 @@
     "emoji": "🩳",
     "promos": [],
     "id": "p1795029331555",
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025354159.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025357681.webp"
-    ],
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
-    "visible": false,
+    "visible": true,
     "colorDefs": {
       "Negro/Celeste": [
         "Negro",
         "Celeste"
       ]
-    }
+    },
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025354159.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025357681.webp"
+    ],
+    "fechaActualizacion": "2026-11-19T17:42:23.961Z"
   },
   {
     "nombre": "REMERA DRY ELAST. MULTIPUNTO CAB. FRANJA",
