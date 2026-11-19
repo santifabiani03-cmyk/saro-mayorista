@@ -2779,5 +2779,37 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114813470.webp"
     ],
     "fechaActualizacion": "2026-11-19T19:01:49.481Z"
+  },
+  {
+    "nombre": "MEDIAS TENIS UNISEX",
+    "precio": 3700,
+    "precioMinorista": 4500,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "unisex",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro",
+      "Blanco",
+      "Gris"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [
+      {
+        "cantidad": 12,
+        "precioTotal": 35000
+      }
+    ],
+    "id": "p1795115112928",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114990268.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795115046297.webp"
+    ],
+    "fechaPublicacion": "2026-11-19T19:05:12.929Z"
   }
 ]
