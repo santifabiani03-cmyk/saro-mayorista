@@ -2445,5 +2445,35 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795111078119.webp"
     ],
     "fechaPublicacion": "2026-11-19T17:58:38.851Z"
+  },
+  {
+    "nombre": "JOGGER MICROFIBRA ELAST SEMIRECTO C/REGULABLE",
+    "precio": 17500,
+    "precioMinorista": 25500,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1795111468892",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/jogger-microfibra-elast-semirecto-c-regulable-1795111421643.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/jogger-microfibra-elast-semirecto-c-regulable-1795111434258.webp"
+    ],
+    "fechaPublicacion": "2026-11-19T18:04:28.892Z"
   }
 ]
