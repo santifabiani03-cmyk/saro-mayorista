@@ -512,25 +512,25 @@
     "promos": [
       {
         "cantidad": 4,
-        "precioTotal": 200000
+        "precioTotal": 208000
       }
     ],
     "_aiLoading": false,
     "_aiCount": 1,
     "id": "p1782388768791",
     "fechaPublicacion": "2026-06-25T11:59:28.791Z",
-    "fechaActualizacion": "2026-11-18T19:17:55.254Z",
+    "fechaActualizacion": "2026-11-19T19:09:16.477Z",
+    "colorDefs": {
+      "turquesa": [
+        "Celeste"
+      ]
+    },
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388111268.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388169727.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782388114714.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/bolso-mochila-elite-1795029424430.webp"
-    ],
-    "colorDefs": {
-      "turquesa": [
-        "Celeste"
-      ]
-    }
+    ]
   },
   {
     "nombre": "TUBO PELOTAS x2 NOVA ",
@@ -696,47 +696,6 @@
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626041062.webp"
     ]
-  },
-  {
-    "nombre": "BOLSO MEDIANO LONA ",
-    "precio": 31000,
-    "descripcion": "Este bolso mochila paletero mediano ofrece una opción básica y económica para deportistas. Cuenta con dos compartimentos principales, ideales para llevar paletas, indumentaria y objetos personales. Además, incluye un bolsillo delantero con cierre, perfecto para guardar artículos pequeños esenciales. Es el compañero ideal para quienes priorizan llevar lo justo y necesario al deporte.",
-    "tags": [],
-    "categoria": "padel",
-    "genero": "",
-    "parteCuerpo": "",
-    "colores": [
-      "Negro",
-      "Gris",
-      "Rosa",
-      "Azul",
-      "Celeste",
-      "Verde"
-    ],
-    "talles": [
-      "Única"
-    ],
-    "noStock": [],
-    "emoji": "📦",
-    "promos": [
-      {
-        "cantidad": 4,
-        "precioTotal": 120000
-      }
-    ],
-    "_aiLoading": false,
-    "_aiCount": 2,
-    "id": "p1786626453330",
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626251431.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626198103.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626211318.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626256299.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626260414.webp"
-    ],
-    "fechaPublicacion": "2026-08-13T13:07:33.330Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
-    "visible": false
   },
   {
     "nombre": "BOLSO MOCHILA GRANDE LONA ",
