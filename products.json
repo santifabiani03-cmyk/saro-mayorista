@@ -2674,5 +2674,81 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795113916359.webp"
     ],
     "fechaActualizacion": "2026-11-19T18:46:19.037Z"
+  },
+  {
+    "nombre": "BIKER LYCRA CALADO LASER C/BOLSILLO LUMBAR",
+    "precio": 11000,
+    "precioMinorista": 16000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro",
+      "Azul",
+      "Rosa viejo",
+      "chocolate"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [
+      {
+        "color": "Negro",
+        "talle": "XXL"
+      }
+    ],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1795114265980",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114098327.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114102046.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114104205.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114106593.webp"
+    ],
+    "colorDefs": {
+      "Rosa viejo": [
+        "Fucsia"
+      ]
+    },
+    "fechaPublicacion": "2026-11-19T18:51:05.980Z"
+  },
+  {
+    "nombre": "SHORT MICROFIBRA ELASTIZADO IMPORTADO",
+    "precio": 14000,
+    "precioMinorista": 20000,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Gris",
+      "Verde"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL",
+      "XXXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1795114612517",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114547113.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114550600.webp"
+    ],
+    "fechaPublicacion": "2026-11-19T18:56:52.517Z"
   }
 ]
