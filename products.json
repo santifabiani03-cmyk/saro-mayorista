@@ -196,7 +196,7 @@
     "visible": true,
     "sinStock": false,
     "fechaPublicacion": "2026-05-22T21:19:26.000Z",
-    "fechaActualizacion": "2026-11-18T19:03:11.127Z",
+    "fechaActualizacion": "2026-11-19T17:59:28.584Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mochila-paletera-1786625929921.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/mochila-paletera-1795028585564.webp"
@@ -1920,7 +1920,9 @@
     "colores": [
       "Violeta",
       "Azul",
-      "Gris"
+      "Gris",
+      "Celeste",
+      "Negro"
     ],
     "talles": [
       "Única"
@@ -1929,12 +1931,15 @@
     "emoji": "📦",
     "promos": [],
     "id": "p1795028659432",
+    "fechaPublicacion": "2026-11-18T19:04:19.433Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028627751.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028632961.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028635223.webp"
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028635223.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/bolso-mediano-lona-1795111231524.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/bolso-mediano-lona-1795111351552.webp"
     ],
-    "fechaPublicacion": "2026-11-18T19:04:19.433Z"
+    "fechaActualizacion": "2026-11-19T18:02:40.205Z"
   },
   {
     "nombre": "MUSCULOSA DRY ELAST. CLÁSICA ENTALLADA DAMA",
