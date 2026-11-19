@@ -2281,7 +2281,7 @@
     "nombre": "MUSCULOSA DRY ELAST. SLIMFIT CAB.",
     "precio": 12000,
     "precioMinorista": 18500,
-    "descripcion": "Musculosa dry elastizada con textura y calce slim fit, en gris, negro y celeste. Logo SR en el pecho; talles S a XXL.",
+    "descripcion": "Musculosa dry elastizada con textura y calce slim fit, en gris, negro y celeste. Logo SR en el pecho; talles S a XXL.\n\nMedidas Musculosa dry elast. SLIMFIT \n\nTalle S: ancho 47cm // largo 69cm \nTalle M: ancho 49cm // largo 72cm \nTalle L: ancho 51cm // largo 74cm \nTalle XL: ancho 52cm // largo 76cm \nTalle XXL: ancho 54cm // largo 78cm",
     "tags": [
       "nuevo",
       "destacado"
@@ -2307,12 +2307,12 @@
     "id": "p1795029331559",
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
     "visible": true,
+    "fechaActualizacion": "2026-11-19T18:06:51.203Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026466543.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026469109.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026471090.webp"
-    ],
-    "fechaActualizacion": "2026-11-19T17:53:45.960Z"
+    ]
   },
   {
     "nombre": "BUZO ENTRENAMIENTO ELAST. LIVIANO CAB.",
@@ -2454,9 +2454,9 @@
     "tags": [
       "nuevo"
     ],
-    "categoria": "",
-    "genero": "",
-    "parteCuerpo": "",
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "piernas",
     "colores": [
       "Negro"
     ],
@@ -2467,13 +2467,45 @@
       "XXL"
     ],
     "noStock": [],
-    "emoji": "📦",
+    "emoji": "🩳",
     "promos": [],
     "id": "p1795111468892",
+    "fechaPublicacion": "2026-11-19T18:04:28.892Z",
+    "fechaActualizacion": "2026-11-19T18:06:12.649Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/jogger-microfibra-elast-semirecto-c-regulable-1795111421643.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/jogger-microfibra-elast-semirecto-c-regulable-1795111434258.webp"
+    ]
+  },
+  {
+    "nombre": "CALZA CAPRI LYCRA LISA",
+    "precio": 9500,
+    "precioMinorista": 13500,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
     ],
-    "fechaPublicacion": "2026-11-19T18:04:28.892Z"
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1795112411750",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/capri-liso-1795112195127.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/calza-capri-lycra-lisa-1795112401059.webp"
+    ],
+    "fechaPublicacion": "2026-11-19T18:20:11.750Z"
   }
 ]
