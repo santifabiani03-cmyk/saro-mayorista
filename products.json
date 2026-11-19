@@ -59,7 +59,8 @@
       "/assets/imagen-1779451998087.webp"
     ],
     "imagenVideo": "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/video-medias-algod-n-3-4-1791095565774.webp",
-    "imagenVideoOrigen": "/assets/imagen-1779451998087.webp"
+    "imagenVideoOrigen": "/assets/imagen-1779451998087.webp",
+    "sinStock": true
   },
   {
     "nombre": "CUBRE GRIP PERFORADO C/RELIEVE ",
@@ -376,7 +377,6 @@
     "parteCuerpo": "accesorio",
     "colores": [
       "Rosa",
-      "Blanco",
       "Negro",
       "Azul",
       "Gris"
@@ -385,11 +385,11 @@
       "Única"
     ],
     "noStock": [],
-    "emoji": "📦",
+    "emoji": "🎾",
     "promos": [],
     "id": "p1779968140080",
     "fechaPublicacion": "2026-05-28T11:35:40.080Z",
-    "fechaActualizacion": "2026-09-28T22:28:08.155Z",
+    "fechaActualizacion": "2026-11-19T18:28:43.014Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/mu-equera-x-par-1787836390834.webp"
     ]
@@ -624,10 +624,11 @@
     ],
     "id": "p1782405898282",
     "fechaPublicacion": "2026-06-25T16:44:58.283Z",
-    "fechaActualizacion": "2026-10-23T12:29:06.407Z",
+    "fechaActualizacion": "2026-11-19T18:28:58.603Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1782405816945.webp"
-    ]
+    ],
+    "sinStock": true
   },
   {
     "nombre": "CARAMELERA NOAC LISA",
@@ -2545,5 +2546,37 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/botella-1795112765259.webp"
     ],
     "fechaPublicacion": "2026-11-19T18:28:07.174Z"
+  },
+  {
+    "nombre": "COMBO MOCHILA - ACCESORIOS",
+    "precio": 110000,
+    "descripcion": "Incluye: 2u. MOCHILAS PALETERAS // 2u. MUÑEQUERAS // 4u. MEDIAS ALGODON 3/4 // 4u. CUBRE GRIP RELIEVE // 4u. BOTELLAS 🏆",
+    "tags": [
+      "nuevo",
+      "destacado"
+    ],
+    "categoria": "padel",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro",
+      "Gris"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [
+      {
+        "cantidad": 2,
+        "precioTotal": 200000
+      }
+    ],
+    "id": "p1795113116389",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795113002323.webp"
+    ],
+    "fechaPublicacion": "2026-11-19T18:31:56.389Z"
   }
 ]
