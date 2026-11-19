@@ -2644,5 +2644,35 @@
       ]
     },
     "fechaPublicacion": "2026-11-19T18:43:44.105Z"
+  },
+  {
+    "nombre": "CALZA LYCRA MORLEY COSTURAS ",
+    "precio": 12000,
+    "precioMinorista": 18000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Fucsia",
+      "Azul"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1795113964892",
+    "fechaPublicacion": "2026-11-19T18:46:04.892Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795113913956.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795113916359.webp"
+    ],
+    "fechaActualizacion": "2026-11-19T18:46:19.037Z"
   }
 ]
