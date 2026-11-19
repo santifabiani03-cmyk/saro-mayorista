@@ -222,7 +222,8 @@
     "colores": [
       "Rosa",
       "Negro",
-      "Azul"
+      "Azul",
+      "Gris"
     ],
     "talles": [
       "Única"
@@ -236,7 +237,7 @@
     "fechaPublicacion": "2026-05-22T21:20:20.000Z",
     "_aiLoading": false,
     "_aiCount": 1,
-    "fechaActualizacion": "2026-10-23T12:29:31.441Z",
+    "fechaActualizacion": "2026-11-19T19:10:02.570Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968378771.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/bolso-mochila-ecocuero-1779968383284.webp",
@@ -738,7 +739,8 @@
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626667811.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786626643468.webp"
-    ]
+    ],
+    "visible": false
   },
   {
     "nombre": "TOP LYCRA ESPALDA CRUZADA ",
