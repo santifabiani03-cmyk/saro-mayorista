@@ -777,8 +777,8 @@
   },
   {
     "nombre": "TOP LYCRA ESPALDA CRUZADA ",
-    "precio": 8000,
-    "precioMinorista": 14000,
+    "precio": 8500,
+    "precioMinorista": 14500,
     "descripcion": "Top de lycra con espalda cruzada para mujer, en negro y blanco, para entrenar o jugar.",
     "tags": [
       "destacado"
@@ -802,7 +802,7 @@
     "promos": [],
     "id": "p1786640460659",
     "fechaPublicacion": "2026-08-13T17:01:00.659Z",
-    "fechaActualizacion": "2026-11-18T19:01:52.456Z",
+    "fechaActualizacion": "2026-11-19T19:01:35.084Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640424052.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786640426768.webp"
@@ -2750,5 +2750,34 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114550600.webp"
     ],
     "fechaPublicacion": "2026-11-19T18:56:52.517Z"
+  },
+  {
+    "nombre": "TOP LYCRA CLASICO ",
+    "precio": 7500,
+    "precioMinorista": 13500,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "torso",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "👕",
+    "promos": [],
+    "id": "p1795114865464",
+    "fechaPublicacion": "2026-11-19T19:01:05.464Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114813470.webp"
+    ],
+    "fechaActualizacion": "2026-11-19T19:01:49.481Z"
   }
 ]
