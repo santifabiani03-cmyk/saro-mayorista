@@ -2508,5 +2508,42 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/calza-capri-lycra-lisa-1795112401059.webp"
     ],
     "fechaPublicacion": "2026-11-19T18:20:11.750Z"
+  },
+  {
+    "nombre": "BOTELLA CON TAPA 350ml",
+    "precio": 4500,
+    "precioMinorista": 5500,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Azul",
+      "Rojo",
+      "Celeste",
+      "Negro",
+      "Verde"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [
+      {
+        "cantidad": 10,
+        "precioTotal": 43000
+      },
+      {
+        "cantidad": 20,
+        "precioTotal": 82000
+      }
+    ],
+    "id": "p1795112887174",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/botella-1795112765259.webp"
+    ],
+    "fechaPublicacion": "2026-11-19T18:28:07.174Z"
   }
 ]
