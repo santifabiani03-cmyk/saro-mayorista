@@ -2578,5 +2578,34 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795113002323.webp"
     ],
     "fechaPublicacion": "2026-11-19T18:31:56.389Z"
+  },
+  {
+    "nombre": "TUBO SIUX x2u.",
+    "precio": 5500,
+    "precioMinorista": 7500,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Amarillo Fluo"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [
+      {
+        "cantidad": 24,
+        "precioTotal": 125000
+      }
+    ],
+    "id": "p1795113210603",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795113127014.webp"
+    ],
+    "fechaPublicacion": "2026-11-19T18:33:30.603Z"
   }
 ]
