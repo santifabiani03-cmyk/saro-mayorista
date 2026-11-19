@@ -396,6 +396,7 @@
   {
     "nombre": "Saro Nexus woman ",
     "precio": 140000,
+    "precioMinorista": 165000,
     "descripcion": "Modelo pensado y diseñado para aquellos que buscan control de pelota sin perder pegada. Núcleo de Foam importado.",
     "tags": [],
     "categoria": "paleta",
@@ -412,11 +413,11 @@
     "promos": [],
     "id": "p1779990539906",
     "fechaPublicacion": "2026-05-28T17:48:59.906Z",
-    "fechaActualizacion": "2026-11-06T17:06:07.041Z",
+    "fechaActualizacion": "2026-11-19T17:57:13.373Z",
+    "visible": true,
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/saro-nexus-woman-1793984746112.webp"
-    ],
-    "visible": true
+    ]
   },
   {
     "nombre": "Saro Radian Pro Carbono",
@@ -2332,11 +2333,12 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026788017.webp"
     ],
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
-    "visible": true
+    "visible": false
   },
   {
     "nombre": "CAMPERA LYCRA LIVIANA CAB.",
-    "precio": 0,
+    "precio": 20000,
+    "precioMinorista": 30000,
     "descripcion": "Campera liviana de lycra con capucha, cierre completo y bolsillos con cierre, en negro y azul marino. Talles M a XXL.",
     "tags": [],
     "categoria": "ropa",
@@ -2344,7 +2346,7 @@
     "parteCuerpo": "torso",
     "colores": [
       "Negro",
-      "Marino"
+      "Azul"
     ],
     "talles": [
       "M",
@@ -2356,18 +2358,22 @@
     "emoji": "👕",
     "promos": [],
     "id": "p1795029331561",
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": true,
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026977164.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026979533.webp"
     ],
-    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
-    "visible": true
+    "fechaActualizacion": "2026-11-19T17:55:00.141Z"
   },
   {
-    "nombre": "CAMPERA ROMPEVIENTOS DEGRADÉ DAMA",
-    "precio": 0,
+    "nombre": "CAMPERA MICROFIBRA ELAST. IMPORTADA DAMA",
+    "precio": 19000,
+    "precioMinorista": 32000,
     "descripcion": "Campera rompevientos liviana con capucha, cierre completo, bolsillos con cierre y costuras con vivos blancos. En verde agua, lila, coral y celeste con degradé desde blanco.",
-    "tags": [],
+    "tags": [
+      "nuevo"
+    ],
     "categoria": "ropa",
     "genero": "femenino",
     "parteCuerpo": "torso",
@@ -2377,17 +2383,17 @@
       "Coral",
       "Celeste"
     ],
-    "talles": [],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
     "noStock": [],
     "emoji": "👕",
     "promos": [],
     "id": "p1795029331562",
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028131579.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028135283.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028137837.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028140163.webp"
-    ],
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
     "visible": true,
     "colorDefs": {
@@ -2400,6 +2406,13 @@
       "Coral": [
         "Rosa"
       ]
-    }
+    },
+    "fechaActualizacion": "2026-11-19T17:56:46.741Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028131579.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028135283.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028137837.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028140163.webp"
+    ]
   }
 ]
