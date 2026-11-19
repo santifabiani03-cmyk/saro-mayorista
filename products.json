@@ -2778,5 +2778,31 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795115046297.webp"
     ],
     "fechaPublicacion": "2026-11-19T19:05:12.929Z"
+  },
+  {
+    "nombre": "MOCHILA RAQUETERA ",
+    "precio": 40000,
+    "precioMinorista": 55000,
+    "descripcion": "",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "promos": [],
+    "id": "p1795115720045",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/mochila-raquetera-1795115670197.webp"
+    ],
+    "fechaPublicacion": "2026-11-19T19:15:20.045Z"
   }
 ]
