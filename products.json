@@ -1072,6 +1072,7 @@
   {
     "nombre": "BUZO ENTRENAMIENTO LIVIANO DAMA ",
     "precio": 16000,
+    "precioMinorista": 23000,
     "descripcion": "Buzo de entrenamiento liviano para mujer, en negro y naranja. Para antes o después de la actividad.",
     "tags": [],
     "categoria": "ropa",
@@ -1097,18 +1098,18 @@
     "emoji": "👕",
     "promos": [],
     "id": "p1786715378297",
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715338319.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715340495.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/buzo-entrenamiento-liviano-dama-1795025988405.webp"
-    ],
     "fechaPublicacion": "2026-08-14T13:49:38.297Z",
     "colorDefs": {
       "Turquesa": [
         "Celeste"
       ]
     },
-    "fechaActualizacion": "2026-11-18T19:15:31.551Z"
+    "fechaActualizacion": "2026-11-19T17:43:03.706Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715338319.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1786715340495.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/buzo-entrenamiento-liviano-dama-1795025988405.webp"
+    ]
   },
   {
     "nombre": "CAMPERA ROMPEVIENTOS BASICA ESTAMPADA DAMA ",
@@ -1971,7 +1972,9 @@
     "precio": 12000,
     "precioMinorista": 19000,
     "descripcion": "Musculosa dry elastizada para dama en negro, violeta y azul marino. Espalda con tiras cruzadas y abertura, logo SR en el pecho; talles S/M y L/XL.",
-    "tags": [],
+    "tags": [
+      "destacado"
+    ],
     "categoria": "ropa",
     "genero": "femenino",
     "parteCuerpo": "torso",
@@ -1990,12 +1993,12 @@
     "id": "p1795029331552",
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
     "visible": true,
+    "fechaActualizacion": "2026-11-19T17:46:53.478Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024953796.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024956187.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024959509.webp"
-    ],
-    "fechaActualizacion": "2026-11-19T17:41:01.174Z"
+    ]
   },
   {
     "nombre": "REMERA DRY FIT LIVIANO ENTALLADA DAMA",
@@ -2115,9 +2118,12 @@
   },
   {
     "nombre": "REMERA DRY ELAST. MULTIPUNTO CAB. FRANJA",
-    "precio": 0,
+    "precio": 13500,
+    "precioMinorista": 21500,
     "descripcion": "Remera dry elastizada multipunto con franja horizontal en el pecho y manga corta. En rojo con franja negra o azul marino con franja celeste; talles S a XXL.",
-    "tags": [],
+    "tags": [
+      "stock_limitado"
+    ],
     "categoria": "ropa",
     "genero": "masculino",
     "parteCuerpo": "torso",
@@ -2132,16 +2138,45 @@
       "XL",
       "XXL"
     ],
-    "noStock": [],
+    "noStock": [
+      {
+        "color": "Marino/Celeste",
+        "talle": "XL"
+      },
+      {
+        "color": "Marino/Celeste",
+        "talle": "XXL"
+      },
+      {
+        "color": "Rojo/Negro",
+        "talle": "XXL"
+      },
+      {
+        "color": "Marino/Celeste",
+        "talle": "M"
+      },
+      {
+        "color": "Rojo/Negro",
+        "talle": "M"
+      },
+      {
+        "color": "Rojo/Negro",
+        "talle": "XL"
+      },
+      {
+        "color": "Rojo/Negro",
+        "talle": "S"
+      },
+      {
+        "color": "Marino/Celeste",
+        "talle": "S"
+      }
+    ],
     "emoji": "👕",
     "promos": [],
     "id": "p1795029331556",
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025492024.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025494420.webp"
-    ],
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
-    "visible": false,
+    "visible": true,
     "colorDefs": {
       "Rojo/Negro": [
         "Rojo",
@@ -2151,20 +2186,24 @@
         "Marino",
         "Celeste"
       ]
-    }
+    },
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025492024.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025494420.webp"
+    ],
+    "fechaActualizacion": "2026-11-19T17:46:36.399Z"
   },
   {
     "nombre": "CROP TOP C/CIERRE LYCRA DAMA",
-    "precio": 0,
+    "precio": 11500,
+    "precioMinorista": 18500,
     "descripcion": "Crop top de lycra para dama en bordó, marrón, verde y negro. Cuello alto con medio cierre, sin mangas y calado en la espalda; talles M a XXL.",
     "tags": [],
     "categoria": "ropa",
     "genero": "femenino",
     "parteCuerpo": "torso",
     "colores": [
-      "Bordó",
       "Marrón",
-      "Verde",
       "Negro"
     ],
     "talles": [
@@ -2173,29 +2212,41 @@
       "XL",
       "XXL"
     ],
-    "noStock": [],
+    "noStock": [
+      {
+        "color": "Marrón",
+        "talle": "M"
+      },
+      {
+        "color": "Marrón",
+        "talle": "L"
+      }
+    ],
     "emoji": "👕",
     "promos": [],
     "id": "p1795029331557",
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025717513.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025719567.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025721652.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025723962.webp"
-    ],
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
-    "visible": false,
+    "visible": true,
     "colorDefs": {
       "Marrón": [
         "Bordó"
       ]
-    }
+    },
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025719567.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025723962.webp"
+    ],
+    "fechaActualizacion": "2026-11-19T17:52:07.105Z"
   },
   {
     "nombre": "SHORT CALZA VAPLEX C/BOLSILLO",
-    "precio": 0,
+    "precio": 9000,
+    "precioMinorista": 16000,
     "descripcion": "Short calza corta de lycra Vaplex en negro, con bolsillos laterales; talles S a XXL.",
-    "tags": [],
+    "tags": [
+      "nuevo",
+      "destacado"
+    ],
     "categoria": "ropa",
     "genero": "femenino",
     "parteCuerpo": "piernas",
@@ -2213,17 +2264,22 @@
     "emoji": "🩳",
     "promos": [],
     "id": "p1795029331558",
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": true,
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026281317.webp"
     ],
-    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
-    "visible": false
+    "fechaActualizacion": "2026-11-19T17:52:50.189Z"
   },
   {
     "nombre": "MUSCULOSA DRY ELAST. SLIMFIT CAB.",
-    "precio": 0,
+    "precio": 12000,
+    "precioMinorista": 18500,
     "descripcion": "Musculosa dry elastizada con textura y calce slim fit, en gris, negro y celeste. Logo SR en el pecho; talles S a XXL.",
-    "tags": [],
+    "tags": [
+      "nuevo",
+      "destacado"
+    ],
     "categoria": "ropa",
     "genero": "masculino",
     "parteCuerpo": "torso",
@@ -2243,13 +2299,14 @@
     "emoji": "👕",
     "promos": [],
     "id": "p1795029331559",
+    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
+    "visible": true,
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026466543.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026469109.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026471090.webp"
     ],
-    "fechaPublicacion": "2026-11-18T19:15:31.551Z",
-    "visible": false
+    "fechaActualizacion": "2026-11-19T17:53:45.960Z"
   },
   {
     "nombre": "BUZO ENTRENAMIENTO ELAST. LIVIANO CAB.",
@@ -2275,7 +2332,7 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026788017.webp"
     ],
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
-    "visible": false
+    "visible": true
   },
   {
     "nombre": "CAMPERA LYCRA LIVIANA CAB.",
@@ -2304,7 +2361,7 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026979533.webp"
     ],
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
-    "visible": false
+    "visible": true
   },
   {
     "nombre": "CAMPERA ROMPEVIENTOS DEGRADÉ DAMA",
@@ -2332,7 +2389,7 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028140163.webp"
     ],
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
-    "visible": false,
+    "visible": true,
     "colorDefs": {
       "Verde agua": [
         "Verde"
