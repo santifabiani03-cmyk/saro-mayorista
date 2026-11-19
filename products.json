@@ -2,6 +2,7 @@
   {
     "nombre": "Tubo pelotas NOAC x2u. ",
     "precio": 6500,
+    "precioMinorista": 7800,
     "descripcion": "Tubo de pelotas NOAC x2 unidades, importadas. Este producto destaca por su excelente paño y presurización, garantizando un rendimiento óptimo en cada golpe. Ideal para entrenamientos y partidos de pádel.",
     "tags": [],
     "categoria": "padel",
@@ -15,11 +16,16 @@
     ],
     "noStock": [],
     "emoji": "🎾",
-    "promos": [],
+    "promos": [
+      {
+        "cantidad": 24,
+        "precioTotal": 145000
+      }
+    ],
     "id": "p10",
-    "visible": false,
+    "visible": true,
     "sinStock": false,
-    "fechaActualizacion": "2026-05-27T03:40:17.218Z",
+    "fechaActualizacion": "2026-11-19T19:06:30.363Z",
     "_aiLoading": false,
     "_aiCount": 1,
     "imagenes": [
