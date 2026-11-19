@@ -2414,5 +2414,31 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028137837.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795028140163.webp"
     ]
+  },
+  {
+    "nombre": "MANGA COMPRESION DIADORA",
+    "precio": 12500,
+    "precioMinorista": 18500,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "",
+    "parteCuerpo": "",
+    "colores": [
+      "Negro",
+      "Azul",
+      "Blanco"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "📦",
+    "promos": [],
+    "id": "p1795111118851",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795111078119.webp"
+    ],
+    "fechaPublicacion": "2026-11-19T17:58:38.851Z"
   }
 ]
