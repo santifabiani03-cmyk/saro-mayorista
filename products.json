@@ -1555,7 +1555,7 @@
     }
   },
   {
-    "nombre": "REMERÓN DRYFIT ELASTIZADO DAMA",
+    "nombre": "REMERON DRYFIT ELASTIZADO DAMA",
     "precio": 12000,
     "precioMinorista": 19000,
     "descripcion": "Remerón deportivo de dama confeccionado en tejido dryfit elastizado. Esta prenda brinda una excelente transpirabilidad y libertad de movimiento. Es ideal para la práctica de pádel y otras actividades físicas. Su diseño y composición aseguran confort durante el entrenamiento.",
@@ -1578,18 +1578,18 @@
     "promos": [],
     "id": "p1787835496022",
     "fechaPublicacion": "2026-08-27T12:58:16.022Z",
-    "fechaActualizacion": "2026-11-18T19:11:50.330Z",
+    "fechaActualizacion": "2026-11-19T18:57:39.639Z",
     "_aiLoading": false,
     "_aiCount": 4,
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835427436.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/remer-n-dry-elast-dama-1795028995797.webp"
-    ],
     "colorDefs": {
       "Magenta": [
         "Fucsia"
       ]
-    }
+    },
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/master/public/assets/imagen-1787835427436.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/remer-n-dry-elast-dama-1795028995797.webp"
+    ]
   },
   {
     "nombre": "JOGGER SEMIRRECTO C/ELÁSTICO REGULABLE y REFLEX CAB.",
