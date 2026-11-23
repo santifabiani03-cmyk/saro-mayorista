@@ -1430,5 +1430,45 @@
     ],
     "total": 170000,
     "totalItems": 1
+  },
+  {
+    "id": "o1795398091780",
+    "fecha": "2026-11-23T01:41:31.780Z",
+    "items": [
+      {
+        "productId": "p1792758730422",
+        "nombre": "BIKER LYCRA VAPLEX C/BOLSILLO - CALADO LASER ",
+        "precio": 20000,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1795113824105",
+        "nombre": "CALZA LYCRA ESTAMPADA CHUPIN ",
+        "precio": 18000,
+        "color": "Gris",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1795114265980",
+        "nombre": "BIKER LYCRA CALADO LASER C/BOLSILLO LUMBAR",
+        "precio": 16000,
+        "color": "chocolate",
+        "talle": "L",
+        "cantidad": 1
+      },
+      {
+        "productId": "p1795112411750",
+        "nombre": "CALZA CAPRI LYCRA LISA",
+        "precio": 13500,
+        "color": "Negro",
+        "talle": "L",
+        "cantidad": 1
+      }
+    ],
+    "total": 67500,
+    "totalItems": 4
   }
 ]
