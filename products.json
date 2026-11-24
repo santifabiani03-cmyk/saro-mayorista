@@ -2167,7 +2167,7 @@
     "id": "p1795029331558",
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
     "visible": true,
-    "fechaActualizacion": "2026-11-24T17:52:46.866Z",
+    "fechaActualizacion": "2026-11-24T19:21:04.608Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026281317.webp"
     ]
@@ -2777,5 +2777,34 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795544654982.webp"
     ],
     "fechaPublicacion": "2026-11-24T18:28:30.073Z"
+  },
+  {
+    "nombre": "SHORT DRY ELAST. C/ BOLSILLO ARG",
+    "precio": 11000,
+    "precioMinorista": 18000,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "ropa",
+    "genero": "masculino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Blanco"
+    ],
+    "talles": [
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1795548157318",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/short-dry-1795548075962.webp"
+    ],
+    "fechaPublicacion": "2026-11-24T19:22:37.319Z"
   }
 ]
