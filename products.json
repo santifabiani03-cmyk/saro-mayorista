@@ -2644,7 +2644,7 @@
   {
     "nombre": "BIKER LYCRA CALADO LASER C/BOLSILLO LUMBAR",
     "precio": 11000,
-    "precioMinorista": 16000,
+    "precioMinorista": 18000,
     "descripcion": "",
     "tags": [],
     "categoria": "ropa",
@@ -2672,18 +2672,19 @@
     "emoji": "🩳",
     "promos": [],
     "id": "p1795114265980",
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114098327.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114102046.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114104205.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114106593.webp"
-    ],
     "colorDefs": {
       "Rosa viejo": [
         "Fucsia"
       ]
     },
-    "fechaPublicacion": "2026-11-19T18:51:05.980Z"
+    "fechaPublicacion": "2026-11-19T18:51:05.980Z",
+    "fechaActualizacion": "2026-11-24T17:50:54.745Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114104205.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114102046.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114106593.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795114098327.webp"
+    ]
   },
   {
     "nombre": "SHORT MICROFIBRA ELASTIZADO IMPORTADO",
