@@ -2738,5 +2738,44 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795115046297.webp"
     ],
     "fechaPublicacion": "2026-11-19T19:05:12.929Z"
+  },
+  {
+    "nombre": "CALZA LYCRA LISA AL TOBILLO",
+    "precio": 10500,
+    "precioMinorista": 14500,
+    "descripcion": "",
+    "tags": [
+      "nuevo"
+    ],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [
+      {
+        "color": "Negro",
+        "talle": "L"
+      },
+      {
+        "color": "Negro",
+        "talle": "M"
+      }
+    ],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1795544910073",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795544654982.webp"
+    ],
+    "fechaPublicacion": "2026-11-24T18:28:30.073Z"
   }
 ]
