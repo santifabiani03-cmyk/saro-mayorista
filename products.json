@@ -1856,17 +1856,22 @@
       "XL",
       "XXL"
     ],
-    "noStock": [],
+    "noStock": [
+      {
+        "color": "Gris",
+        "talle": "M"
+      }
+    ],
     "emoji": "👕",
     "promos": [],
     "id": "p1795029331551",
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
     "visible": true,
+    "fechaActualizacion": "2026-11-25T20:05:49.462Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024852994.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024856470.webp"
-    ],
-    "fechaActualizacion": "2026-11-18T19:20:54.168Z"
+    ]
   },
   {
     "nombre": "MUSCULOSA DRY ELAST. ESPALDA CRUZADA DAMA",
@@ -2051,26 +2056,6 @@
       {
         "color": "Rojo/Negro",
         "talle": "XXL"
-      },
-      {
-        "color": "Marino/Celeste",
-        "talle": "M"
-      },
-      {
-        "color": "Rojo/Negro",
-        "talle": "M"
-      },
-      {
-        "color": "Rojo/Negro",
-        "talle": "XL"
-      },
-      {
-        "color": "Rojo/Negro",
-        "talle": "S"
-      },
-      {
-        "color": "Marino/Celeste",
-        "talle": "S"
       }
     ],
     "emoji": "👕",
@@ -2088,11 +2073,11 @@
         "Celeste"
       ]
     },
+    "fechaActualizacion": "2026-11-25T20:06:55.242Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025492024.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795025494420.webp"
-    ],
-    "fechaActualizacion": "2026-11-19T17:46:36.399Z"
+    ]
   },
   {
     "nombre": "CROP TOP C/CIERRE LYCRA DAMA",
