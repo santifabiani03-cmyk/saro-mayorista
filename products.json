@@ -1733,9 +1733,7 @@
     "precio": 11000,
     "precioMinorista": 18000,
     "descripcion": "Short de microfibra con cierre para mujer, en negro. La microfibra seca rápido.",
-    "tags": [
-      "nuevo"
-    ],
+    "tags": [],
     "categoria": "ropa",
     "genero": "femenino",
     "parteCuerpo": "piernas",
@@ -1749,14 +1747,20 @@
       "XL",
       "XXL"
     ],
-    "noStock": [],
+    "noStock": [
+      {
+        "color": "Negro",
+        "talle": "XXL"
+      }
+    ],
     "emoji": "🩳",
     "promos": [],
     "id": "p1792758909719",
+    "fechaPublicacion": "2026-10-23T12:35:09.719Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1792758868161.webp"
     ],
-    "fechaPublicacion": "2026-10-23T12:35:09.719Z"
+    "fechaActualizacion": "2026-11-27T18:13:05.930Z"
   },
   {
     "nombre": "REMERA DRY ELAST MULTIPUNTO C/TRANSPARENCIA DAMA ",
@@ -1860,6 +1864,10 @@
       {
         "color": "Gris",
         "talle": "M"
+      },
+      {
+        "color": "Gris",
+        "talle": "L"
       }
     ],
     "emoji": "👕",
@@ -1867,7 +1875,7 @@
     "id": "p1795029331551",
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
     "visible": true,
-    "fechaActualizacion": "2026-11-25T20:05:49.462Z",
+    "fechaActualizacion": "2026-11-27T18:12:07.033Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024852994.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024856470.webp"
@@ -1893,13 +1901,22 @@
       "S/M",
       "L/XL"
     ],
-    "noStock": [],
+    "noStock": [
+      {
+        "color": "Marino",
+        "talle": "S/M"
+      },
+      {
+        "color": "Marino",
+        "talle": "L/XL"
+      }
+    ],
     "emoji": "👕",
     "promos": [],
     "id": "p1795029331552",
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
     "visible": true,
-    "fechaActualizacion": "2026-11-19T17:46:53.478Z",
+    "fechaActualizacion": "2026-11-27T18:12:39.570Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024953796.webp",
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795024956187.webp",
@@ -2146,13 +2163,18 @@
       "XL",
       "XXL"
     ],
-    "noStock": [],
+    "noStock": [
+      {
+        "color": "Negro",
+        "talle": "XXL"
+      }
+    ],
     "emoji": "🩳",
     "promos": [],
     "id": "p1795029331558",
     "fechaPublicacion": "2026-11-18T19:15:31.551Z",
     "visible": true,
-    "fechaActualizacion": "2026-11-24T19:21:04.608Z",
+    "fechaActualizacion": "2026-11-27T18:14:01.757Z",
     "imagenes": [
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795026281317.webp"
     ]
@@ -2801,5 +2823,40 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/short-dry-1795548075962.webp"
     ],
     "fechaActualizacion": "2026-11-25T20:05:14.137Z"
+  },
+  {
+    "nombre": "BIKER LYCRA LISA ",
+    "precio": 8500,
+    "precioMinorista": 12500,
+    "descripcion": "",
+    "tags": [
+      "destacado"
+    ],
+    "categoria": "ropa",
+    "genero": "femenino",
+    "parteCuerpo": "piernas",
+    "colores": [
+      "Negro"
+    ],
+    "talles": [
+      "S",
+      "M",
+      "L",
+      "XL",
+      "XXL"
+    ],
+    "noStock": [
+      {
+        "color": "Negro",
+        "talle": "L"
+      }
+    ],
+    "emoji": "🩳",
+    "promos": [],
+    "id": "p1795804998058",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795804889628.webp"
+    ],
+    "fechaPublicacion": "2026-11-27T18:43:18.063Z"
   }
 ]
