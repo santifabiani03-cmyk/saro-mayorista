@@ -2858,5 +2858,68 @@
       "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795804889628.webp"
     ],
     "fechaPublicacion": "2026-11-27T18:43:18.063Z"
+  },
+  {
+    "nombre": "TOALLA DE MANO MICROFIBRA SECADO RAPIDO",
+    "precio": 4400,
+    "precioMinorista": 5000,
+    "descripcion": "",
+    "tags": [],
+    "categoria": "padel",
+    "genero": "unisex",
+    "parteCuerpo": "accesorio",
+    "colores": [
+      "Celeste",
+      "Gris",
+      "Violeta",
+      "Rosa pastel",
+      "Rosa chicle",
+      "Magenta",
+      "Marino",
+      "Coral",
+      "Verde agua",
+      "Verde",
+      "Gris claro",
+      "Naranja"
+    ],
+    "talles": [
+      "Única"
+    ],
+    "noStock": [],
+    "emoji": "🎾",
+    "promos": [
+      {
+        "cantidad": 10,
+        "precioTotal": 40000
+      },
+      {
+        "cantidad": 20,
+        "precioTotal": 76000
+      },
+      {
+        "cantidad": 30,
+        "precioTotal": 110000
+      }
+    ],
+    "id": "p1795806391053",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795805878954.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/toalla-de-mano-microfibra-secado-rapido-1795806153904.webp"
+    ],
+    "colorDefs": {
+      "Rosa pastel": [
+        "Rosa"
+      ],
+      "Rosa chicle": [
+        "Fucsia"
+      ],
+      "Magenta": [
+        "Rosa"
+      ],
+      "Gris claro": [
+        "Blanco"
+      ]
+    },
+    "fechaPublicacion": "2026-11-27T19:06:31.053Z"
   }
 ]
