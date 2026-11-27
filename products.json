@@ -2864,7 +2864,9 @@
     "precio": 4400,
     "precioMinorista": 5000,
     "descripcion": "",
-    "tags": [],
+    "tags": [
+      "destacado"
+    ],
     "categoria": "padel",
     "genero": "unisex",
     "parteCuerpo": "accesorio",
@@ -2902,10 +2904,6 @@
       }
     ],
     "id": "p1795806391053",
-    "imagenes": [
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795805878954.webp",
-      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/toalla-de-mano-microfibra-secado-rapido-1795806153904.webp"
-    ],
     "colorDefs": {
       "Rosa pastel": [
         "Rosa"
@@ -2920,6 +2918,11 @@
         "Blanco"
       ]
     },
-    "fechaPublicacion": "2026-11-27T19:06:31.053Z"
+    "fechaPublicacion": "2026-11-27T19:06:31.053Z",
+    "imagenes": [
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/imagen-1795805878954.webp",
+      "https://raw.githubusercontent.com/santifabiani03-cmyk/saro-mayorista/datos/fotos/toalla-de-mano-microfibra-secado-rapido-1795806153904.webp"
+    ],
+    "fechaActualizacion": "2026-11-27T19:06:48.044Z"
   }
 ]
